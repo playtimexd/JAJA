@@ -154,7 +154,7 @@ const WP = {
 export const units = [
   {
     id: 'm1', icon: '🔢',
-    title: T('Les nombres jusqu’à 1000', 'Numbers to 1000'),
+    title: T('Les nombres jusqu’à 10 000', 'Numbers to 10,000'),
     pfeq: 'Arithmétique — lire, écrire, représenter les nombres naturels < 1000',
     generate(level, R) {
       if (level === 1) {
