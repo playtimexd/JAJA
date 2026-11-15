@@ -3,6 +3,7 @@
 <div id="o"></div>
 <script type="module">
 const q = new URLSearchParams(location.search), id = q.get('id'), from = +(q.get('from') || 0), n = +(q.get('n') || 99);
+const img = (v) => { if (!/xmlns=/.test(v)) v = v.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"'); return `<img style="width:288px;display:block" src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(v)}">`; };
 const { book: b } = await import(`../js/content/livres/${id}.js?${Date.now()}`);
-document.getElementById('o').innerHTML = `<h2>${b.emoji} ${b.title} (niv ${b.level})</h2><div class="row">` + (from === 0 ? `<div class="st">${b.cover}<b>Couverture</b></div>` : '') + b.pages.slice(from, from + n).map((p, i) => `<div class="st">${p.svg}<div><b>${from + i + 1}.</b> ${p.text}</div></div>`).join('') + '</div>';
+document.getElementById('o').innerHTML = `<h2>${b.emoji} ${b.title} (niv ${b.level})</h2><div class="row">` + (from === 0 ? `<div class="st">${img(b.cover)}<b>Couverture</b></div>` : '') + b.pages.slice(from, from + n).map((p, i) => `<div class="st">${img(p.svg)}<div><b>${from + i + 1}.</b> ${p.text}</div></div>`).join('') + '</div>';
 </script>
