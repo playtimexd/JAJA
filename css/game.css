@@ -440,3 +440,11 @@
 .resume { display: flex; align-items: center; gap: 14px; background: var(--card); border: 3px solid var(--green); border-radius: 22px; padding: 10px 18px; box-shadow: 0 5px 0 #1f8a5240; text-align: left; }
 .resume:active { transform: translateY(3px); }
 .resume-i { font-size: 36px; } .resume-t { display: flex; flex-direction: column; } .resume-t b { font-size: 20px; color: #1f8a52; } .resume-t small { color: var(--ink2); font-weight: 700; font-size: 15px; }
+.review-card { display: flex; align-items: center; gap: 14px; background: var(--card); border: 3px solid #f0a020; border-radius: 22px; padding: 10px 18px; box-shadow: 0 5px 0 #f0a02040; text-align: left; }
+.review-card.calm { border-color: var(--line); box-shadow: var(--shadow); opacity: .85; }
+.review-card .resume-t b { color: #b56d00; }
+.home .resume + .review-card, .home .review-card { margin-top: -4px; }
+.diff-seg button { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.diff-seg .sugg { font-size: 13px; font-weight: 800; opacity: .9; }
+.res-tip { background: #fff3c4; border-radius: 16px; padding: 10px 18px; font-weight: 800; font-size: 19px; }
+.btn.pulse { animation: pulse 1s ease infinite; }

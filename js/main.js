@@ -104,6 +104,8 @@ function home() {
       el('div', { class: 'hud' }, wallet(), streakPill()),
     ),
     resumeCard(),
+    (() => { const n = dueMistakes().length, all = mistakes().length; return all ? el('button', { class: `review-card ${n ? '' : 'calm'}`, onclick: () => { sfx('tap'); n ? play({ mode: 'review' }) : sheet(el('p', { class: 'hub-intro' }, t('reviewNone'))); } },
+      el('span', { class: 'resume-i' }, '📕'), el('span', { class: 'resume-t' }, el('b', {}, t('review'), n ? ` · ${n}` : ''), el('small', {}, n ? t('reviewSub') : `${all} ${t('reviewLater')}`))) : null; })(),
     el('div', { class: 'subjects five' }, cards),
     el('div', { class: 'home-row' },
       el('div', { class: 'missions mcard-box' },
@@ -217,13 +219,42 @@ function section(s, secId) {
   });
 }
 
+// ---------------- Mes erreurs: wrong answers come back after 1, 3, 7, 14 days ----------------
+const GAPS = [1, 3, 7, 14];
+const dayPlus = (n) => { const d = new Date(Date.now() + n * 864e5); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const mistakes = () => (store.mistakes ??= []);
+const dueMistakes = () => mistakes().filter((m) => m.due <= today() && unitById(m.unit));
+function noteMistake(q, u, level) {
+  if (!u || !q?.key || !units[u.subject.id]?.includes(u)) return;
+  const list = mistakes();
+  const old = list.find((m) => m.unit === u.id && m.q.key === q.key);
+  if (old) { old.box = 0; old.due = dayPlus(1); old.q = q; return; }
+  list.push({ unit: u.id, level, q, box: 0, due: dayPlus(1), added: today() });
+  if (list.length > 250) list.splice(0, list.length - 250);
+}
+function reviewDone(m, s) {
+  const list = mistakes();
+  if (s >= 1) {
+    m.box++;
+    if (m.box >= GAPS.length) { list.splice(list.indexOf(m), 1); bump('mastered'); return 'learned'; }
+    m.due = dayPlus(GAPS[m.box]);
+  } else { m.box = 0; m.due = dayPlus(1); }
+  return null;
+}
+// Suggested level for a unit: the next level once the current one has ≥ 2 stars.
+function suggestedLevel(u) {
+  let l = 1;
+  while (l < 3 && (levelStats(u.id, l)?.stars ?? 0) >= 2) l++;
+  return l;
+}
+
 // Difficulty picker used by sheets.
-function diffPicker(key, onChange) {
-  let cur = store.pick[key] || 1;
+function diffPicker(key, onChange, suggest = 0) {
+  let cur = store.pick[key] || suggest || 1;
   const seg = el('div', { class: 'diff-seg' });
   const draw = () => {
     seg.innerHTML = '';
-    for (const l of [1, 2, 3]) seg.append(el('button', { class: `${DIFF_COL[l]} ${cur === l ? 'on' : ''}`, onclick: () => { sfx('tap'); cur = l; store.pick[key] = l; save(); draw(); onChange?.(l); } }, t('diff' + l)));
+    for (const l of [1, 2, 3]) seg.append(el('button', { class: `${DIFF_COL[l]} ${cur === l ? 'on' : ''}`, onclick: () => { sfx('tap'); cur = l; store.pick[key] = l; save(); draw(); onChange?.(l); } }, t('diff' + l), suggest === l ? el('small', { class: 'sugg' }, `⭐ ${t('suggested')}`) : null));
   };
   draw();
   return { node: seg, get: () => cur };
@@ -247,7 +278,7 @@ function openUnit(u, sec) {
       modeCard('🎈', t('ballons'), `❤️❤️❤️ · ${t('record')} ${record(`${u.id}|${l}|ballons`)}`, 'ballons', () => { sh.close(); play({ mode: 'ballons', unit: u, level: l, back }); }),
     );
   };
-  const dp = diffPicker(u.id, fill);
+  const dp = diffPicker(u.id, fill, suggestedLevel(u));
   sh = sheet(
     el('div', { class: 'sheet-head' }, el('span', { class: 'sheet-icon' }, u.icon), el('div', {}, el('h2', {}, tr(u.title)), el('small', {}, u.pfeq || ''))),
     dp.node, box);
@@ -323,6 +354,12 @@ async function play(opts) {
   // question supply
   let fixed = null;
   if (mode === 'practice') fixed = buildFixed([{ unit: opts.unit, level, n: perSession() }], R);
+  let reviewItems = null;
+  if (mode === 'review') {
+    reviewItems = R.shuffle(dueMistakes()).slice(0, Math.max(perSession(), 8));
+    fixed = reviewItems.map((m) => ({ q: m.q, unit: unitById(m.unit), m }));
+    if (!fixed.length) return home();
+  }
   if (mode === 'daily') {
     const plan = SUBJECTS.flatMap((s) => R.sample(units[s.id], Math.min(3, units[s.id].length)).map((u) => ({ unit: u, level: Math.max(1, ...[1, 2, 3].filter((l) => (levelStats(u.id, l - 1)?.stars ?? (l === 1 ? 3 : 0)) >= 2)), n: 1 })));
     fixed = buildFixed(R.shuffle(plan), R);
@@ -339,14 +376,14 @@ async function play(opts) {
     return { q, unit: u };
   };
 
-  const accent = mode === 'daily' ? 'orange' : (opts.unit || pool[0])?.subject.color || 'blue';
+  const accent = mode === 'daily' || mode === 'review' ? 'orange' : (opts.unit || pool[0])?.subject.color || 'blue';
   const qRoot = el('div', { class: 'q' });
   const bubble = el('div', { class: 'owl-bubble' });
   const nextBtn = el('button', { class: 'btn next hidden' }, t('next'), ' ➜');
   const owlNode = owl('mini');
   const hud = el('div', { class: 'game-hud' });
   let quit = false;
-  const title = mode === 'daily' ? `🌞 ${t('daily')}` : mode === 'boss' ? `${opts.sec.boss} ${t('guardian')}` : `${opts.unit ? opts.unit.icon : { eclair: '⚡', ballons: '🎈', marathon: '⏱️' }[mode]} ${t('diff' + level)}`;
+  const title = mode === 'review' ? `📕 ${t('review')}` : mode === 'daily' ? `🌞 ${t('daily')}` : mode === 'boss' ? `${opts.sec.boss} ${t('guardian')}` : `${opts.unit ? opts.unit.icon : { eclair: '⚡', ballons: '🎈', marathon: '⏱️' }[mode]} ${t('diff' + level)}`;
   screen(`session ${accent} mode-${mode}`,
     el('header', { class: 'bar' },
       el('button', { class: 'round back', onclick: () => { quit = true; clearInterval(timer); stopSpeech(); back(); } }, '✕'),
@@ -437,6 +474,9 @@ async function play(opts) {
     api = null;
     if (quit) return;
     answered++;
+    // --- mistakes notebook ---
+    if (mode === 'review') { if (reviewDone(fixed[i].m, s) === 'learned') toast('📗', t('learnedIt')); }
+    else if (s < 1) noteMistake(q, u, level);
     // --- scoring ---
     const where = qRoot.querySelector('.q-prompt')?.getBoundingClientRect() || { left: innerWidth / 2, top: 120, width: 0 };
     const fx = where.left + where.width / 2, fy = where.top + 30;
@@ -504,7 +544,11 @@ function finishGame(g) {
   progress('combo', bestCombo, { set: true });
   const subj = (g.unit || g.pool?.[0])?.subject;
   if (subj) progress(subj.id);
-  if (mode === 'practice' || mode === 'daily') {
+  if (mode === 'review') {
+    store.log.push({ d: today(), unit: 'review', level: 0, mode, score, total, ms });
+    coins = Math.floor(correct) * 2;
+    progress('stars', 0);
+  } else if (mode === 'practice' || mode === 'daily') {
     stars = recordSession(mode === 'daily' ? null : g.unit.id, mode === 'daily' ? 0 : level, score, total, ms);
     coins = Math.floor(correct) + stars * 2;
     progress('stars', stars);
@@ -551,9 +595,13 @@ async function results(g) {
   if (mode === 'eclair') { head = newRecord ? t('newRecord') : tr(STRINGS.endMsg[score >= 100 ? 3 : score >= 50 ? 2 : 1]); big = el('div', { class: 'res-score' }, `⚡ ${score}`); }
   else if (mode === 'ballons') { head = newRecord ? t('newRecord') : tr(STRINGS.endMsg[score >= 10 ? 3 : score >= 5 ? 2 : 1]); big = el('div', { class: 'res-score' }, `🎈 ${score}`); }
   else if (mode === 'boss') { head = won ? t('bossWon') : t('bossLost'); big = el('div', { class: `res-boss ${won ? 'won' : ''}` }, g.sec.boss, won ? ' 🏆' : ''); }
+  else if (mode === 'review') { const r = total ? correct / total : 0; head = tr(STRINGS.endMsg[r >= 0.9 ? 3 : r >= 0.6 ? 2 : 1]); big = el('div', { class: 'res-score' }, `📕 ${Math.floor(correct)} / ${total}`); }
   else { head = tr(STRINGS.endMsg[mode === 'daily' ? 3 : stars]); big = mode === 'daily' ? el('div', { class: 'res-score' }, `${Math.round(score * 10) / 10} / ${total}`) : starRow; }
   const coinEl = el('div', { class: 'res-coins' }, `+0 ${COIN}`);
   const canHarder = mode === 'practice' && level < 3;
+  const tip = mode === 'practice' && stars === 3 && level < 3 ? t('tipUp') : mode === 'practice' && stars === 0 && level > 1 ? t('tipDown') : null;
+  const canEasier = mode === 'practice' && stars === 0 && level > 1;
+  const dueN = dueMistakes().length;
   screen(`results ${accent}`,
     owl('big hop-loop'),
     el('h1', {}, head),
@@ -561,10 +609,13 @@ async function results(g) {
     newRecord ? el('div', { class: 'res-record' }, `🏆 ${t('record')} : ${recScore}`) : null,
     el('div', { class: 'res-row' }, coinEl, bestCombo >= 3 ? el('div', { class: 'res-combo' }, `🔥 ×${bestCombo}`) : null),
     sticker ? el('div', { class: 'sticker-reveal' }, el('div', { class: 'sticker-big' }, sticker), el('div', {}, t('newSticker'))) : null,
+    tip ? el('div', { class: 'res-tip' }, tip) : null,
     el('div', { class: 'res-btns' },
       el('button', { class: 'btn ghost', onclick: () => (g.back || home)() }, '‹ ', t('back')),
       mode !== 'daily' ? el('button', { class: 'btn', onclick: () => play(g) }, '↻ ', t('replay')) : null,
-      canHarder ? el('button', { class: 'btn primary', onclick: () => play({ ...g, level: level + 1 }) }, t('nextLevel'), ' ➜') : null,
+      canEasier ? el('button', { class: 'btn primary', onclick: () => play({ ...g, level: level - 1 }) }, '⬇ ', t('easier')) : null,
+      canHarder && !canEasier ? el('button', { class: `btn primary ${stars === 3 ? 'pulse' : ''}`, onclick: () => play({ ...g, level: level + 1 }) }, t('nextLevel'), ' ➜') : null,
+      mode === 'review' && dueN ? el('button', { class: 'btn primary', onclick: () => play({ mode: 'review' }) }, `📕 ${dueN}`, ' ➜') : null,
     ),
   );
   speak({ text: { fr: head, en: head } });
