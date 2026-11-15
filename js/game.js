@@ -41,6 +41,8 @@ const MISSIONS = [
   { id: 'francais', goal: 1, reward: 10, icon: '📖', t: { fr: 'Joue une partie de français', en: 'Play a French game' } },
   { id: 'math', goal: 1, reward: 10, icon: '🧮', t: { fr: 'Joue une partie de maths', en: 'Play a math game' } },
   { id: 'anglais', goal: 1, reward: 10, icon: '🍁', t: { fr: 'Joue une partie d’anglais', en: 'Play an English game' } },
+  { id: 'why', goal: 1, reward: 15, icon: '🔭', t: { fr: 'Découvre un « Pourquoi? »', en: 'Discover a “Why?”' } },
+  { id: 'chinois', goal: 1, reward: 10, icon: '🐼', t: { fr: 'Joue une partie de chinois', en: 'Play a Chinese game' } },
   { id: 'arts', goal: 1, reward: 20, icon: '🎨', t: { fr: 'Termine un bricolage ou un dessin', en: 'Finish a craft or a drawing' } },
   { id: 'record', goal: 1, reward: 20, icon: '🏆', t: { fr: 'Bats un de tes records', en: 'Beat one of your records' } },
 ];
@@ -98,6 +100,9 @@ export const BADGES = [
   { id: 'trilingue', icon: '🌍', t: { fr: 'Touche-à-tout', en: 'All-rounder' }, d: { fr: 'Joue aux 3 matières le même jour', en: 'Play all 3 subjects in one day' }, ok: () => S('allSubjectsDay') >= 1 },
   { id: 'artiste', icon: '🎨', t: { fr: 'Artiste', en: 'Artist' }, d: { fr: 'Termine 3 projets d’arts', en: 'Finish 3 art projects' }, ok: () => Object.keys(store.arts.done).length >= 3 },
   { id: 'artiste20', icon: '🖼️', t: { fr: 'Grand artiste', en: 'Great artist' }, d: { fr: 'Termine 20 projets d’arts', en: 'Finish 20 art projects' }, ok: () => Object.keys(store.arts.done).length >= 20 },
+  { id: 'curieux', icon: '🔭', t: { fr: 'Curieux', en: 'Curious' }, d: { fr: 'Découvre 10 « Pourquoi? »', en: 'Discover 10 “Why?”' }, ok: () => Object.keys(store.why || {}).length >= 10 },
+  { id: 'savant', icon: '🧪', t: { fr: 'Petit savant', en: 'Little scientist' }, d: { fr: 'Découvre 50 « Pourquoi? »', en: 'Discover 50 “Why?”' }, ok: () => Object.keys(store.why || {}).length >= 50 },
+  { id: 'panda', icon: '🐼', t: { fr: 'Petit panda', en: 'Little panda' }, d: { fr: 'Gagne 20 étoiles en chinois', en: 'Earn 20 stars in Chinese' }, ok: () => Object.entries(store.progress).filter(([k]) => /^c\d+$/.test(k)).reduce((a, [, v]) => a + Object.values(v).reduce((b, x) => b + (x.stars || 0), 0), 0) >= 20 },
   { id: 'shop', icon: '🛍️', t: { fr: 'Coquet', en: 'Stylish' }, d: { fr: 'Achète un accessoire', en: 'Buy an accessory' }, ok: () => store.owned.length >= 1 },
   { id: 'missions', icon: '🎯', t: { fr: 'Mission accomplie', en: 'Mission done' }, d: { fr: 'Réussis 10 missions', en: 'Complete 10 missions' }, ok: () => S('missions') >= 10 },
 ];

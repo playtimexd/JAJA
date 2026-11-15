@@ -24,7 +24,7 @@ const STR = {
   newSticker: { fr: 'Nouvel autocollant!', en: 'New sticker!' },
   stickers: { fr: 'autocollants', en: 'stickers' },
   locked: { fr: 'Gagne une étoile au niveau plus facile', en: 'Earn a star on the easier level' },
-  great: { fr: ['Bravo!', 'Super!', 'Excellent!', 'Wow!', 'Génial!', 'Bien joué!'], en: ['Great!', 'Super!', 'Excellent!', 'Wow!', 'Awesome!', 'Well done!'] },
+  great: { zh: ['真棒!', '太好了!', '对啦!', '厉害!', '好样的!'], fr: ['Bravo!', 'Super!', 'Excellent!', 'Wow!', 'Génial!', 'Bien joué!'], en: ['Great!', 'Super!', 'Excellent!', 'Wow!', 'Awesome!', 'Well done!'] },
   endMsg: [
     { fr: 'On continue de pratiquer!', en: 'Let’s keep practising!' },
     { fr: 'Bon travail!', en: 'Good work!' },
@@ -90,6 +90,9 @@ const STR = {
   familyCode: { fr: 'Code familial', en: 'Family code' },
   talkLimit: { fr: 'Conversation max / jour', en: 'Talk time max / day' },
   readVoice: { fr: 'Voix naturelle pour la lecture', en: 'Natural voice for reading' },
+  chinois: { fr: 'Chinois', en: 'Chinese' },
+  pinyin: { fr: 'Pinyin au-dessus des caractères', en: 'Pinyin above characters' },
+  why: { fr: 'Pourquoi? 为什么', en: 'Why? 为什么' },
   talkShort: { fr: 'Parler', en: 'Talk' },
   grade: { fr: '2e année · Programme du Québec', en: 'Grade 2 · Québec program' },
 };

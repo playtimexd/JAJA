@@ -14,6 +14,7 @@ const SUBJECTS = [
   { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js'], speech: 'fr-CA', praise: 'fr' },
   { id: 'math', icon: '🧮', color: 'blue', mods: ['./content/math.js'], speech: null, praise: null },
   { id: 'anglais', icon: '🍁', color: 'green', mods: ['./content/anglais.js', './content/anglais2.js'], speech: 'en-CA', praise: 'en' },
+  { id: 'chinois', icon: '🐼', color: 'red', mods: ['./content/chinois.js', './content/chinois2.js'], speech: 'zh-CN', praise: 'zh' },
 ];
 const perSession = () => store.settings.perSession || 8;
 const STICKERS = '🦊🐻🐼🐨🐯🦁🐸🐵🐧🐦🦉🦄🐝🦋🐢🐙🦀🐬🐳🦭🦫🦌🐿️🦔🐞🍁🌻🌈⭐🌙☀️❄️⛄🍓🍉🍩🧁🍭🎈🎨🚀🚲🛷🏒🎸🎁🏆👑💎🦕🦖🐲'.match(/\p{Extended_Pictographic}(️)?/gu);
@@ -52,6 +53,12 @@ const SECTIONS = {
     { id: 'gram', icon: '✍️', t: { fr: 'Phrases et grammaire', en: 'Sentences & grammar' }, ids: [...range('e', 21, 33)], boss: '🐙' },
     { id: 'talk', icon: '💬', t: { fr: 'Parler', en: 'Speaking' }, ids: ['e1', 'e12'], boss: '🦈', talk: true },
   ],
+  chinois: [
+    { id: 'py', icon: '🔤', t: { fr: 'Pinyin et tons · 拼音', en: 'Pinyin & tones · 拼音' }, ids: range('c', 1, 5), boss: '🐉' },
+    { id: 'sz', icon: '🀄', t: { fr: 'Caractères · 识字', en: 'Characters · 识字' }, ids: range('c', 6, 14), boss: '🦁' },
+    { id: 'xz', icon: '🖌️', t: { fr: 'Écrire · 写字', en: 'Writing · 写字' }, ids: range('c', 15, 18), boss: '🐯' },
+    { id: 'yd', icon: '📜', t: { fr: 'Lire · 儿歌和古诗', en: 'Reading · 儿歌和古诗' }, ids: range('c', 19, 21), boss: '🐲' },
+  ],
 };
 function sectionsOf(s) {
   const list = units[s.id];
@@ -80,6 +87,10 @@ function home() {
         el('span', { class: 'sub-bar' }, el('span', { style: { width: `${max ? (got / max) * 100 : 0}%` } })),
         el('span', { class: 'sub-stars' }, `★ ${got}`));
     }),
+    el('button', { class: 'subject teal', onclick: async () => { sfx('tap'); (await import('./why.js')).whyHome(home, play); } },
+      el('span', { class: 'sub-icon' }, '🔭'),
+      el('span', { class: 'sub-name' }, t('why')),
+      el('span', { class: 'sub-stars' }, `✔ ${Object.keys(store.why || {}).length}`)),
     el('button', { class: 'subject purple', onclick: async () => { sfx('tap'); (await import('./arts.js')).artsHome(home); } },
       el('span', { class: 'sub-icon' }, '🎨'),
       el('span', { class: 'sub-name' }, t('arts')),
@@ -91,7 +102,7 @@ function home() {
       el('div', { class: 'bubble' }, el('div', { class: 'greet' }, greet), el('div', {}, t('pickSubject'))),
       el('div', { class: 'hud' }, wallet(), streakPill()),
     ),
-    el('div', { class: 'subjects four' }, cards),
+    el('div', { class: 'subjects five' }, cards),
     el('div', { class: 'home-row' },
       el('div', { class: 'missions mcard-box' },
         el('h3', {}, '🎯 ', t('missions')),
@@ -394,7 +405,7 @@ async function play(opts) {
       fast: quick,
       style: mode === 'ballons' ? 'balloons' : undefined,
       bind: (a) => { api = a; },
-      praise: () => { const p = STRINGS.great[praiseLang]; const w = p[R.int(0, p.length - 1)]; say(w, 'good'); if (!quick) speak({ text: w, lang: praiseLang === 'fr' ? 'fr-CA' : 'en-CA' }); },
+      praise: () => { const p = STRINGS.great[praiseLang]; const w = p[R.int(0, p.length - 1)]; say(w, 'good'); if (!quick) speak({ text: w, lang: { fr: 'fr-CA', en: 'en-CA', zh: 'zh-CN' }[praiseLang] || 'en-CA' }); },
       retry: () => say(t('tryAgain'), 'bad'),
       reveal: () => say(t('answerWas'), 'bad'),
       waitNext: (cb) => {
@@ -553,7 +564,7 @@ function memory(s, level, back) {
   unlockAudio();
   const R = makeRng();
   const n = [0, 6, 8, 10][level];
-  const pairs = s.id === 'math' ? mathPairs(level, n, R) : wordPairs(s.id === 'anglais' ? 'en' : 'fr', n, R);
+  const pairs = s.id === 'math' ? mathPairs(level, n, R) : wordPairs({ anglais: 'en', chinois: 'zh' }[s.id] || 'fr', n, R);
   const cards = R.shuffle(pairs.flatMap((p, i) => [{ i, f: p.a, say: p.say }, { i, f: p.b, say: p.say }]));
   let open = [], found = 0, flips = 0, lock = false;
   const t0 = Date.now();
@@ -566,7 +577,7 @@ function memory(s, level, back) {
       if (lock || b.classList.contains('up')) return;
       sfx('tap');
       b.classList.add('up');
-      if (c.say && c.f.text) speak(c.say);
+      if (c.say && (c.f.text || c.f.hz)) speak(c.say);
       open.push({ b, c });
       if (open.length < 2) return;
       flips++;
@@ -684,6 +695,7 @@ function parents() {
       el('div', { class: 'row' }, el('span', {}, t('perSession')),
         el('div', { class: 'seg' }, [8, 12, 16].map((n) => el('button', { class: perSession() === n ? 'on' : '', onclick: () => { store.settings.perSession = n; save(); parents(); } }, String(n))))),
       el('div', { class: 'row' }, el('span', {}, t('sound')), toggle('sound')),
+      el('div', { class: 'row' }, el('span', {}, '🐼 ', t('pinyin')), (() => { if (store.settings.pinyin === undefined) store.settings.pinyin = true; return toggle('pinyin'); })()),
       el('div', { class: 'row' }, el('span', {}, `${COIN} ${t('coinsP')}`), el('b', {}, String(store.coins))),
     ),
     el('section', { class: 'card-p' },

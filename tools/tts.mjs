@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export const VOICES = { 'fr-CA': 'fr-CA-SylvieNeural', 'en-CA': 'en-CA-ClaraNeural' };
+export const VOICES = { 'fr-CA': 'fr-CA-SylvieNeural', 'en-CA': 'en-CA-ClaraNeural', 'zh-CN': 'zh-CN-XiaoxiaoNeural' };
 const KEY_FILE = path.join(root, '.secrets', 'azure-speech.json');
 
 export function ttsConfig() {

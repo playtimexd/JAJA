@@ -28,7 +28,7 @@ const server = http.createServer((req, res) => {
   }
   if (u.pathname === '/tts') {
     const text = (u.searchParams.get('text') || '').slice(0, 1500);
-    const lang = u.searchParams.get('lang') === 'en-CA' ? 'en-CA' : 'fr-CA';
+    const lang = ['en-CA', 'zh-CN'].includes(u.searchParams.get('lang')) ? u.searchParams.get('lang') : 'fr-CA';
     const rate = Math.max(-50, Math.min(50, Number(u.searchParams.get('rate')) || 0));
     if (!text || !ttsConfig()) { res.writeHead(404).end(); return; }
     ttsCached(cacheDir, text, lang, rate)

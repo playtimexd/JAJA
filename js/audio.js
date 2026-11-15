@@ -13,13 +13,13 @@ if ('speechSynthesis' in window) {
 function voiceFor(l) {
   if (!voices.length) loadVoices();
   const base = l.slice(0, 2);
-  const prefs = l === 'fr-CA'
-    ? ['fr-CA', 'fr-FR', 'fr']
-    : ['en-CA', 'en-US', 'en-GB', 'en'];
+  const prefs = l === 'fr-CA' ? ['fr-CA', 'fr-FR', 'fr']
+    : l === 'zh-CN' ? ['zh-CN', 'zh-Hans', 'cmn', 'zh']
+      : ['en-CA', 'en-US', 'en-GB', 'en'];
   for (const p of prefs) {
     const list = voices.filter((v) => v.lang.replace('_', '-').startsWith(p));
     // prefer enhanced / premium voices when the iPad has them
-    const good = list.find((v) => /premium|enhanced|amélie|amelie|samantha/i.test(v.name));
+    const good = list.find((v) => /premium|enhanced|amélie|amelie|samantha|tingting|yu-shu|lilian/i.test(v.name));
     if (good || list[0]) return good || list[0];
   }
   return voices.find((v) => v.lang.startsWith(base)) || null;
@@ -70,13 +70,26 @@ function speakNeural(text, l) {
 // Same idea through the parents' voice server (worker/index.js → OpenAI TTS) when the app is hosted online.
 const cloudCache = new Map();   // text|lang|rate -> object URL (kept for the session)
 const voiceUrl = () => (store.settings.voiceUrl || VOICE_URL).replace(/\/$/, '');
+// Reading voice from the family PC (localvoice/ Kokoro, free), found through the worker; otherwise the iPad voice.
+let pcBase = null, pcChecked = 0;
+async function pcVoice() {
+  if (Date.now() - pcChecked < 120000) return pcBase;
+  pcChecked = Date.now();
+  try {
+    const info = await (await fetch(`${voiceUrl()}/local`, { headers: store.settings.voiceCode ? { 'x-family-code': store.settings.voiceCode } : {}, signal: AbortSignal.timeout(2500) })).json();
+    pcBase = info.url && (await fetch(`${info.url}/health`, { signal: AbortSignal.timeout(2500) })).ok ? info.url : null;
+  } catch { pcBase = null; }
+  return pcBase;
+}
 const cloudOn = () => store.settings.cloudVoice !== false && !!voiceUrl() && location.protocol === 'https:';
 async function speakCloud(text, l, my) {
   const rate = store.settings.rate;
   const k = `${l}|${rate}|${text}`;
   let src = cloudCache.get(k);
   if (!src) {
-    const r = await fetch(`${voiceUrl()}/tts`, {
+    const base = await pcVoice();
+    if (!base) throw new Error('no pc voice');
+    const r = await fetch(`${base}/tts`, {
       method: 'POST', headers: { 'content-type': 'application/json', ...(store.settings.voiceCode ? { 'x-family-code': store.settings.voiceCode } : {}) },
       body: JSON.stringify({ text, lang: l, rate }), signal: AbortSignal.timeout(8000),
     });
@@ -88,7 +101,7 @@ async function speakCloud(text, l, my) {
   if (my !== token) return;
   return playSrc(src);
 }
-function playSrc(src) {
+export function playSrc(src) {
   return new Promise((resolve, reject) => {
     player ??= new Audio();
     player.src = src;

@@ -18,7 +18,11 @@ const W = [
   ['🚪', 'porte', 'door'], ['🔑', 'clé', 'key'], ['⏰', 'réveil', 'clock'], ['🎁', 'cadeau', 'gift'], ['🎈', 'ballon', 'balloon'],
 ];
 // Duplicate words inside one language (ballon) are fine: one game never uses both.
+const ZH = {"🐱": ["猫", "māo"], "🐶": ["狗", "gǒu"], "🐰": ["兔子", "tù zi"], "🐟": ["鱼", "yú"], "🐦": ["鸟", "niǎo"], "🐻": ["熊", "xióng"], "🦊": ["狐狸", "hú li"], "🐸": ["青蛙", "qīng wā"], "🐴": ["马", "mǎ"], "🐮": ["牛", "niú"], "🐷": ["猪", "zhū"], "🐔": ["鸡", "jī"], "🦆": ["鸭子", "yā zi"], "🐭": ["老鼠", "lǎo shǔ"], "🐢": ["乌龟", "wū guī"], "🦋": ["蝴蝶", "hú dié"], "🐝": ["蜜蜂", "mì fēng"], "🐘": ["大象", "dà xiàng"], "🦁": ["狮子", "shī zi"], "🐵": ["猴子", "hóu zi"], "🍎": ["苹果", "píng guǒ"], "🍌": ["香蕉", "xiāng jiāo"], "🍓": ["草莓", "cǎo méi"], "🍇": ["葡萄", "pú tao"], "🥕": ["胡萝卜", "hú luó bo"], "🍞": ["面包", "miàn bāo"], "🥚": ["鸡蛋", "jī dàn"], "🥛": ["牛奶", "niú nǎi"], "🍰": ["蛋糕", "dàn gāo"], "🍦": ["冰淇淋", "bīng qí lín"], "🍉": ["西瓜", "xī guā"], "🚗": ["汽车", "qì chē"], "🚌": ["公共汽车", "gōng gòng qì chē"], "✈️": ["飞机", "fēi jī"], "🚂": ["火车", "huǒ chē"], "⛵": ["船", "chuán"], "🚀": ["火箭", "huǒ jiàn"], "🏠": ["房子", "fáng zi"], "🌳": ["树", "shù"], "🌸": ["花", "huā"], "☀️": ["太阳", "tài yáng"], "🌙": ["月亮", "yuè liang"], "⭐": ["星星", "xīng xing"], "☁️": ["云", "yún"], "❄️": ["雪花", "xuě huā"], "🌈": ["彩虹", "cǎi hóng"], "📚": ["书", "shū"], "✏️": ["铅笔", "qiān bǐ"], "🎒": ["书包", "shū bāo"], "⚽": ["足球", "zú qiú"], "👕": ["衣服", "yī fu"], "🧦": ["袜子", "wà zi"], "👟": ["鞋", "xié"], "👁️": ["眼睛", "yǎn jing"], "👂": ["耳朵", "ěr duo"], "👃": ["鼻子", "bí zi"], "✋": ["手", "shǒu"], "🛏️": ["床", "chuáng"], "🪑": ["椅子", "yǐ zi"], "🚪": ["门", "mén"], "🎁": ["礼物", "lǐ wù"], "🎈": ["气球", "qì qiú"]};
 export function wordPairs(lang, n, R) {
+  if (lang === 'zh') {
+    return R.shuffle(Object.entries(ZH)).slice(0, n).map(([e, [hz, py]]) => ({ a: { emoji: e }, b: { hz, py }, say: { text: hz, lang: 'zh-CN' } }));
+  }
   const col = lang === 'en' ? 2 : 1;
   const seen = new Set();
   const out = [];

@@ -20,6 +20,7 @@ const defaults = () => ({
   badges: [],               // badge ids earned (shown once)
   pick: {},                 // unit id -> last chosen difficulty
   arts: { done: {}, fav: {} },
+  why: {},                  // topic id -> date learned
 });
 
 function load() {

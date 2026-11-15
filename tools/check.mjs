@@ -29,9 +29,11 @@ for (const s of subjects) {
           case 'choice': {
             if (!Array.isArray(q.options) || q.options.length < 2) { fail(where, 'options', q); break; }
             if (!(q.answer >= 0 && q.answer < q.options.length)) fail(where, 'answer index', q);
-            const labels = q.options.map((o) => txt(o.text) + (o.emoji || '') + (o.svg || ''));
+            const labels = q.options.map((o) => txt(o.text) + (o.emoji || '') + (o.svg || '') + (o.hz || '') + (o.hz ? '' : o.py || ''));
             if (new Set(labels).size !== labels.length) fail(where, 'duplicate options', q);
-            if (q.options.some((o) => !o.text && !o.emoji && !o.svg && o.text !== 0)) fail(where, 'empty option', q);
+            if (q.options.some((o) => !o.text && !o.emoji && !o.svg && !o.hz && !o.py && o.text !== 0)) fail(where, 'empty option', q);
+            for (const o of q.options) if (o.hz && o.py && !pyOk(o.hz, o.py)) fail(where, 'pinyin syllables ≠ characters', o);
+            if (q.stimulus?.hz && q.stimulus.py && !pyOk(q.stimulus.hz, q.stimulus.py)) fail(where, 'stimulus pinyin ≠ characters', q.stimulus);
             break;
           }
           case 'sort':
@@ -40,7 +42,8 @@ for (const s of subjects) {
             if (q.items?.some((it) => !(it.bin >= 0 && it.bin < q.bins.length))) fail(where, 'item bin', q);
             break;
           case 'order':
-            if (!(q.tiles?.length >= 2) || q.tiles.some((x) => !txt(x))) fail(where, 'tiles', q);
+            if (!(q.tiles?.length >= 2) || q.tiles.some((x) => !(x?.hz || txt(x)))) fail(where, 'tiles', q);
+            if (q.tiles?.some((x) => x?.hz && x.py && !pyOk(x.hz, x.py))) fail(where, 'tile pinyin ≠ characters', q);
             break;
           case 'keypad':
             if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer > 9999) fail(where, 'keypad answer', q);
@@ -51,6 +54,9 @@ for (const s of subjects) {
           case 'numberline':
             if ((q.answer - q.min) % q.step || q.answer < q.min || q.answer > q.max) fail(where, 'numberline answer', q);
             break;
+          case 'write':
+            if (typeof q.char !== 'string' || [...q.char].length !== 1 || !/\p{Script=Han}/u.test(q.char) || !q.py) fail(where, 'write needs one Han char + py', q);
+            break;
           default: fail(where, 'unknown type ' + q.type, q);
         }
       }
@@ -60,5 +66,6 @@ for (const s of subjects) {
     console.log(`  ${s.padEnd(9)} ${u.id.padEnd(4)} ${u.icon} distinct L1/L2/L3 = ${counts.join(' / ')}`);
   }
 }
+function pyOk(hz, py) { return [...hz].filter((c) => /\p{Script=Han}/u.test(c)).length === py.trim().split(/\s+/).length; }
 console.log(errors ? `FAIL: ${errors} problem(s) in ${total} questions` : `PASS: ${total} questions OK`);
 process.exit(errors ? 1 : 0);

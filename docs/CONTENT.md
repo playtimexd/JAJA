@@ -84,3 +84,13 @@ Use for: syllables → word (`joiner: ''`), letters → word, words → sentence
 - Prefer emoji for pictures (they look great on iPad). Each emoji must be unambiguous for a 7-year-old.
 - French content uses Québec spelling/vocabulary where it differs (ex. « déjeuner » = breakfast, « dîner » = lunch).
 - No question may have two correct options. No duplicate option labels.
+
+## Chinese (中文) — `js/content/chinois.js`, `js/content/chinois2.js`
+Simplified characters + Hanyu Pinyin with tone marks. The child speaks some Mandarin at home but reads almost nothing: start at 人教版一年级 level.
+- Character text: `{ hz: '大山', py: 'dà shān' }` — one pinyin syllable per Han character (punctuation has none). The validator checks the counts.
+  Allowed on: options (`{ hz, py, emoji?, say? }`), `stimulus: { hz, py }`, order `tiles: [{ hz, py }]`, sort `bins: [{ hz, py }]`, sort items (`{ hz, py, emoji? }`).
+  Pinyin-only option (pinyin exercises): `{ py: 'mā' }`. The pinyin shown above characters can be switched off by parents.
+- Prompts/instructions: `{ fr, en }` (the child does not read Chinese instructions yet). Put Chinese audio in `say: { text: '山', lang: 'zh-CN' }`.
+- Praise is spoken in Chinese automatically.
+- New type **write** (stroke order, Hanzi Writer, needs Internet):
+  `{ type: 'write', key, prompt, say?, char: '人', py: 'rén' }` — shows the stroke animation, then the child traces each stroke.

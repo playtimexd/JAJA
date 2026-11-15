@@ -4,7 +4,7 @@ import { el } from './util.js';
 import { VOICE_URL } from './config.js';
 import { store, save, today } from './store.js';
 import { tr, lang } from './i18n.js';
-import { sfx, stopSpeech } from './audio.js';
+import { sfx, stopSpeech, playSrc } from './audio.js';
 import { screen, backBtn, wallet, sheet } from './ui.js';
 import { COIN, addCoins, bump, progress, checkBadges, showBadges, confetti, touchStreak, dressedOwl } from './game.js';
 
@@ -46,6 +46,10 @@ const L = {
   left: { fr: 'min restantes aujourd’hui', en: 'min left today' },
   bravo: { fr: 'Super conversation!', en: 'Great conversation!' },
   you: { fr: 'Toi', en: 'You' },
+  tapTalk: { fr: 'Touche et parle', en: 'Tap and talk' },
+  tapSend: { fr: 'Touche quand tu as fini', en: 'Tap when you are done' },
+  thinking: { fr: 'Hibou réfléchit…', en: 'Owl is thinking…' },
+  yourTurn: { fr: 'À toi! Touche le micro.', en: 'Your turn! Tap the mic.' },
 };
 
 const BASE = (level, T) => `You are "Hoo" (in Chinese: 小猫头鹰 Hoo, in French: Hibou), a warm, playful owl who helps a 7-year-old child ${T.who}
@@ -127,9 +131,14 @@ async function start(s, level, back, tl = 'en') {
   try {
     const mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
     live.mic = mic;
+    const local = await findLocal();
+    const instr = `${BASE(level, T)}\n\nActivity: ${s.task}`;
+    if (local && await localSession(local, instr, T.code, 'pc')) return;
+    if (live && await localSession(`${voiceUrl()}/ai`, instr, T.code, 'cloud')) return;
+    if (!live) return;
     const r = await fetch(`${voiceUrl()}/realtime`, {
       method: 'POST', headers: { 'content-type': 'application/json', ...(store.settings.voiceCode ? { 'x-family-code': store.settings.voiceCode } : {}) },
-      body: JSON.stringify({ scenario: s.id, lang: lang(), instructions: `${BASE(level)}\n\nActivity: ${s.task}` }),
+      body: JSON.stringify({ scenario: s.id, lang: T.code, instructions: `${BASE(level, T)}\n\nActivity: ${s.task}` }),
     });
     if (r.status === 401) { ui.status.textContent = tr(L.badCode); cleanup(); return; }
     if (!r.ok) throw new Error(`server ${r.status}`);
@@ -161,9 +170,87 @@ async function start(s, level, back, tl = 'en') {
   }
 }
 
+// ---------- Local mode: the family PC (localvoice/) does Whisper + qwen3 + Kokoro, free ----------
+const codeHdr = () => (store.settings.voiceCode ? { 'x-family-code': store.settings.voiceCode } : {});
+async function findLocal() {
+  try {
+    const info = await (await fetch(`${voiceUrl()}/local`, { headers: codeHdr(), signal: AbortSignal.timeout(3000) })).json();
+    if (!info.url || Date.now() - info.at > 3 * 864e5) return null;
+    const h = await fetch(`${info.url}/health`, { signal: AbortSignal.timeout(3000) });
+    return h.ok ? info.url : null;
+  } catch { return null; }
+}
+const audioUrl = (b64, mime = 'audio/wav') => URL.createObjectURL(new Blob([Uint8Array.from(atob(b64), (c) => c.charCodeAt(0))], { type: mime }));
+// Returns true when the conversation ran (or failed for a reason that a fallback cannot fix), false to try the next voice.
+async function localSession(base, instructions, code, kind) {
+  const ui = live.ui;
+  live.local = true;
+  const history = [];
+  const mic = live.mic;
+  const type = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find((t) => window.MediaRecorder?.isTypeSupported?.(t)) || '';
+  const btn = el('button', { class: 'btn talk-mic', disabled: true }, '🎤 ', tr(L.tapTalk));
+  const say = async (b64, mime) => { setState('speaking'); try { if (b64) await playSrc(audioUrl(b64, mime)); } catch {} if (live) setState('ready'); };
+  const call = async (path, opts) => {
+    const r = await fetch(`${base}${path}`, { ...opts, headers: { ...(opts.headers || {}), ...codeHdr() } });
+    if (r.status === 401) throw Object.assign(new Error('code'), { code: 401 });
+    if (!r.ok) throw new Error(path + ' ' + r.status);
+    return r.json();
+  };
+  try {
+    ui.status.textContent = tr(L.connecting);
+    const first = await call('/start', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lang: code, instructions }) });
+    if (!live) return;
+    live.t0 = Date.now(); live.tick = setInterval(tick, 500);
+    ui.log.after(btn);
+    ui.log.before(el('div', { class: 'talk-via' }, kind === 'pc' ? '🖥️ PC' : '☁️ Cloudflare'));
+    addLine('owl', first.reply); history.push({ role: 'assistant', content: first.reply });
+    await say(first.audio, first.mime);
+  } catch (e) {
+    if (!live) return true;
+    if (e.code === 401) { ui.status.textContent = tr(L.badCode); return true; }
+    console.warn('voice', kind, e);
+    clearInterval(live.tick); live.t0 = 0;
+    return false;
+  }
+  if (!live) return true;
+  btn.disabled = false;
+  let rec = null, chunks = [];
+  btn.onclick = async () => {
+    if (!live) return;
+    if (!rec) {                                   // start recording
+      stopSpeech();
+      chunks = [];
+      rec = new MediaRecorder(mic, type ? { mimeType: type } : undefined);
+      rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+      rec.start();
+      btn.textContent = `⏹ ${tr(L.tapSend)}`; btn.classList.add('rec'); setState('listening');
+      live.recTimer = setTimeout(() => rec && btn.onclick(), 20000);
+      return;
+    }
+    clearTimeout(live.recTimer);                  // stop + send
+    const r = rec; rec = null;
+    await new Promise((res) => { r.onstop = res; r.stop(); });
+    btn.disabled = true; btn.classList.remove('rec'); btn.textContent = '⏳ …';
+    ui.status.textContent = tr(L.thinking); ui.owlBox.className = 'talk-owl thinking';
+    try {
+      const blob = new Blob(chunks, { type: r.mimeType || 'audio/webm' });
+      const fd = new FormData();
+      fd.append('audio', blob, (r.mimeType || '').includes('mp4') ? 'talk.mp4' : 'talk.webm');
+      fd.append('meta', JSON.stringify({ lang: code, instructions, history }));
+      const res = await call('/talk', { method: 'POST', body: fd });
+      if (!live) return;
+      if (res.heard) { addLine('me', res.heard); history.push({ role: 'user', content: res.heard }); live.turns++; sfx('tap'); }
+      addLine('owl', res.reply); history.push({ role: 'assistant', content: res.reply });
+      await say(res.audio, res.mime);
+    } catch (e) { if (live) ui.status.textContent = tr(e.code === 401 ? L.badCode : L.error); }
+    if (live) { btn.disabled = false; btn.textContent = `🎤 ${tr(L.tapTalk)}`; }
+  };
+  return true;
+}
+
 function setState(st) {
   if (!live) return;
-  live.ui.status.textContent = tr(st === 'listening' ? L.listening : L.speaking);
+  live.ui.status.textContent = tr(st === 'listening' ? L.listening : st === 'ready' ? L.yourTurn : L.speaking);
   live.ui.owlBox.className = `talk-owl ${st}`;
 }
 function addLine(who, text) {
@@ -190,7 +277,7 @@ function tick() {
 }
 function cleanup() {
   if (!live) return;
-  clearInterval(live.tick);
+  clearInterval(live.tick); clearTimeout(live.recTimer);
   try { live.pc?.close(); } catch {}
   live.mic?.getTracks().forEach((t) => t.stop());
   if (live.out) live.out.srcObject = null;

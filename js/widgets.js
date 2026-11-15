@@ -6,11 +6,36 @@
 import { el, wait } from './util.js';
 import { tr, t } from './i18n.js';
 import { speak, sfx } from './audio.js';
+import { store } from './store.js';
+
+// Chinese: characters with pinyin on top. hz = '大山', py = 'dà shān' (one syllable per character; punctuation has none).
+const isHan = (c) => /\p{Script=Han}/u.test(c);
+export function hanzi(hz, py, cls = '') {
+  const n = el('span', { class: `hz ${cls}` });
+  const syl = String(py || '').trim().split(/\s+/).filter(Boolean);
+  const chars = [...String(hz)];
+  const hanCount = chars.filter(isHan).length;
+  if (!py || store.settings.pinyin === false || syl.length !== hanCount) {
+    n.append(String(hz));
+    if (py && store.settings.pinyin !== false && syl.length !== hanCount) n.prepend(el('span', { class: 'py-line' }, py));
+    return n;
+  }
+  let k = 0, last = null;
+  for (const c of chars) {
+    if (isHan(c)) { last = el('ruby', {}, c, el('rt', {}, syl[k++].replace(/[，。、？！,.!?;:；：]+$/u, ''))); n.append(last); }
+    else if (last && /[，。、？！,.!?;:；：」』）)…]/u.test(c)) {   // keep punctuation glued to the previous character
+      const g = el('span', { class: 'hz-g' }); last.replaceWith(g); g.append(last, el('span', { class: 'hz-p' }, c)); last = g;
+    } else { n.append(c); last = null; }
+  }
+  return n;
+}
 
 export function face(o, cls = '') {
   const f = el('span', { class: `face ${cls}` });
   if (o.svg) f.append(el('span', { class: 'f-svg', html: o.svg }));
   if (o.emoji) f.append(el('span', { class: 'f-emoji' }, o.emoji));
+  if (o.hz) f.append(el('span', { class: 'f-text f-hz' }, hanzi(o.hz, o.py)));
+  else if (o.py && !o.hz) f.append(el('span', { class: 'f-text f-py' }, o.py));
   if (o.text != null && o.text !== '') f.append(el('span', { class: 'f-text' }, tr(o.text)));
   return f;
 }
@@ -21,7 +46,10 @@ const speakerBtn = (say) =>
 export function stimulus(s) {
   if (!s) return null;
   const box = el('div', { class: 'stim' });
-  if (s.svg) box.append(el('div', { class: 'stim-svg', html: s.svg }));
+  if (s.hz) {
+    const long = [...s.hz].length > 14;
+    box.append(el('div', { class: `stim-text stim-hz ${long ? 'long' : [...s.hz].length > 4 ? 'mid' : ''}` }, hanzi(s.hz, s.py)));
+  } else if (s.svg) box.append(el('div', { class: 'stim-svg', html: s.svg }));
   else if (s.emojis) {
     const g = el('div', { class: 'stim-count' });
     for (let i = 0; i < s.count; i += 5) {
@@ -78,7 +106,7 @@ function sort(q, area, ctx) {
   let selected = null, left = items.length;
   const binEls = q.bins.map((b, bi) => {
     const drop = el('div', { class: 'bin-drop' });
-    const node = el('button', { class: 'bin' }, el('div', { class: 'bin-head' }, b.emoji ? el('span', { class: 'bin-emoji' }, b.emoji) : null, el('span', {}, tr(b.text))), drop);
+    const node = el('button', { class: 'bin' }, el('div', { class: 'bin-head' }, b.emoji ? el('span', { class: 'bin-emoji' }, b.emoji) : null, el('span', {}, b.hz ? hanzi(b.hz, b.py) : tr(b.text))), drop);
     node.addEventListener('click', () => selected && place(selected, bi));
     node.drop = drop;
     return node;
@@ -150,6 +178,8 @@ function sort(q, area, ctx) {
 }
 
 // ---------------- order ----------------
+const tileKey = (x) => (x && x.hz ? x.hz : tr(x));
+const tileLabel = (x) => (x && x.hz ? hanzi(x.hz, x.py) : tr(x));
 function order(q, area, ctx) {
   const all = [...q.tiles.map((x, i) => ({ x, i })), ...(q.extra || []).map((x) => ({ x, i: -1 }))];
   let pool = ctx.R.shuffle(all);
@@ -164,7 +194,7 @@ function order(q, area, ctx) {
   const refresh = () => { checkBtn.disabled = !filled(); };
 
   for (const p of pool) {
-    const tile = el('button', { class: 'tile' }, tr(p.x));
+    const tile = el('button', { class: 'tile' }, tileLabel(p.x));
     tile.p = p;
     tile.addEventListener('click', () => {
       if (area.classList.contains('locked')) return;
@@ -177,8 +207,8 @@ function order(q, area, ctx) {
     poolRow.append(tile);
   }
   checkBtn.addEventListener('click', () => {
-    const got = slots.map((s) => tr(s.firstChild.p.x));
-    const want = q.tiles.map((x) => tr(x));
+    const got = slots.map((s) => tileKey(s.firstChild.p.x));
+    const want = q.tiles.map((x) => tileKey(x));
     const ok = got.every((g, k) => g === want[k]);
     const r = ctx.check(ok);
     if (r === 'ok') { slots.forEach((s) => s.firstChild.classList.add('right')); area.classList.add('locked'); checkBtn.remove(); }
@@ -192,7 +222,7 @@ function order(q, area, ctx) {
       }, 900);
     } else {
       area.classList.add('locked'); checkBtn.remove();
-      slots.forEach((s, k) => { s.innerHTML = ''; s.append(el('span', { class: 'tile right' }, want[k])); });
+      slots.forEach((s, k) => { s.innerHTML = ''; s.append(el('span', { class: 'tile right' }, tileLabel(q.tiles[k]))); });
       poolRow.innerHTML = '';
       ctx.revealed();
     }
@@ -315,7 +345,39 @@ function numberline(q, area, ctx) {
   area.append(svgNode, el('div', { class: 'actions' }, checkBtn));
 }
 
-export const WIDGETS = { choice, sort, order, keypad, base10, numberline };
+// ---------------- write (Chinese stroke order, Hanzi Writer) ----------------
+// q: { type:'write', key, prompt, say?, char:'人', py:'rén' } — watch the strokes, then trace them.
+let hwLoad = null;
+const loadHW = () => hwLoad ??= new Promise((res, rej) => {
+  if (window.HanziWriter) return res(window.HanziWriter);
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.2/dist/hanzi-writer.min.js';
+  s.onload = () => res(window.HanziWriter); s.onerror = () => { hwLoad = null; rej(new Error('hanzi-writer')); };
+  document.head.append(s);
+});
+function write(q, area, ctx) {
+  const size = Math.min(340, Math.round(window.innerHeight * 0.42));
+  const box = el('div', { class: 'hw-box', style: { width: `${size}px`, height: `${size}px` } });
+  const grid = `<svg class="hw-grid" viewBox="0 0 100 100"><rect x="1" y="1" width="98" height="98" fill="none" stroke="#e5534b" stroke-width="1.5"/><path d="M0 0L100 100M100 0L0 100M50 0V100M0 50H100" stroke="#e5534b" stroke-width=".6" stroke-dasharray="3 3"/></svg>`;
+  box.innerHTML = grid;
+  const pin = el('div', { class: 'hw-py' }, hanzi(q.char, q.py, 'big'));
+  const watchBtn = el('button', { class: 'btn' }, '▶ ', tr({ fr: 'Regarder', en: 'Watch' }));
+  const msg = el('div', { class: 'hw-msg' });
+  area.append(el('div', { class: 'hw-wrap' }, el('div', { class: 'hw-side' }, pin, watchBtn, msg), box));
+  loadHW().then((HW) => {
+    const w = HW.create(box, q.char, { width: size, height: size, padding: 10, showOutline: true, strokeColor: '#2b2d42', outlineColor: '#ddd', drawingColor: '#ff5d8f', highlightColor: '#4f8ef7', drawingWidth: 26, strokeAnimationSpeed: 1, delayBetweenStrokes: 250, showHintAfterMisses: 2, highlightOnComplete: true });
+    const quiz = () => w.quiz({
+      onComplete: (d) => { const ok = d.totalMistakes <= Math.max(2, w._character?.strokes?.length ?? 4); ctx.check(true); if (!ok) msg.textContent = '👍'; },
+    });
+    watchBtn.onclick = () => { sfx('tap'); w.cancelQuiz?.(); w.animateCharacter({ onComplete: quiz }); };
+    w.animateCharacter({ onComplete: quiz });
+  }).catch(() => {
+    msg.textContent = tr({ fr: 'Il faut Internet pour cet exercice.', en: 'This exercise needs the Internet.' });
+    ctx.finish();
+  });
+}
+
+export const WIDGETS = { choice, sort, order, keypad, base10, numberline, write };
 
 // Render a question; resolves with a score in [0, 1].
 export function runQuestion(q, root, R, hooks) {
