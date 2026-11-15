@@ -1,15 +1,15 @@
-// « Plan du jour »: one language per day (français → English → 中文), about 30 minutes, 4 short blocks.
-// Starts 2026-11-16. Each block points to an existing activity; it is ticked when that activity is finished today.
+// « Plan du jour »: one subject per day (français → English → mathématique), about 30 minutes, 4 short blocks.
+// Starts 2026-11-16 (Chinese is not part of the plan — parent's choice). Each block points to an existing activity; it is ticked when that activity is finished today.
 import { el } from './util.js';
 import { store, save, today, levelStats } from './store.js';
 import { tr } from './i18n.js';
 
 export const PLAN_START = '2026-11-16';
-const ORDER = ['francais', 'anglais', 'chinois'];
+const ORDER = ['francais', 'anglais', 'math'];
 const SUBJ = {
   francais: { icon: '📖', t: { fr: 'Français', en: 'French' } },
   anglais: { icon: '🍁', t: { fr: 'Anglais', en: 'English' } },
-  chinois: { icon: '🐼', t: { fr: 'Chinois', en: 'Chinese' } },
+  math: { icon: '🧮', t: { fr: 'Mathématique', en: 'Math' } },
 };
 // Unit sequences each block walks through (one step every time that language comes back, i.e. every 3 days).
 const SEQ = {
@@ -25,17 +25,17 @@ const SEQ = {
     ecoute: ['e19', 'e20', 'e35'],
     parler: ['TALK', 'e37', 'e36', 'e38'],
   },
-  chinois: {
-    pinyin: ['c1', 'c2', 'c3', 'c4', 'c5'],
-    zi: ['c6', 'c7', 'c8', 'c9', 'c10', 'c11', 'c12', 'c13', 'c14'],
-    xie: ['c16', 'c22', 'c17', 'c23', 'c18', 'c24', 'c15'],
-    du: ['c19', 'c20', 'c21', 'WHY'],
+  math: {
+    nombres: ['m1', 'm2', 'm3', 'm4', 'm8'],
+    calcul: ['m5', 'm6', 'm14', 'm13'],
+    espace: ['m9', 'm10', 'm11', 'm15', 'm16', 'm12'],
+    probl: ['m7', 'm17', 'm18', 'm19'],
   },
 };
 const BLOCKS = {
   francais: [['lire', '📗', { fr: 'Lecture', en: 'Reading' }, 9], ['langue', '✏️', { fr: 'Orthographe et grammaire', en: 'Spelling & grammar' }, 7], ['dictee', '🎧', { fr: 'Dictée', en: 'Dictation' }, 6], ['ecrire', '✍️', { fr: 'J’écris / un livre', en: 'Writing / a book' }, 8]],
   anglais: [['catch', '📗', { fr: 'Catch : vocabulaire de l’unité', en: 'Catch: unit vocabulary' }, 9], ['langue', '🔤', { fr: 'Sons, phrases et grammaire', en: 'Sounds, sentences, grammar' }, 7], ['ecoute', '👂', { fr: 'Écouter, lire, épeler', en: 'Listen, read, spell' }, 6], ['parler', '💬', { fr: 'Parler ou écrire', en: 'Speak or write' }, 8]],
-  chinois: [['pinyin', '🔤', { fr: 'Pinyin et tons', en: 'Pinyin & tones' }, 7], ['zi', '🀄', { fr: 'Caractères', en: 'Characters' }, 8], ['xie', '🖌️', { fr: 'Écrire', en: 'Writing' }, 8], ['du', '📜', { fr: 'Comptines, poèmes, pourquoi?', en: 'Rhymes, poems, why?' }, 7]],
+  math: [['nombres', '🔢', { fr: 'Les nombres', en: 'Numbers' }, 6], ['calcul', '➕', { fr: 'Calcul', en: 'Calculation' }, 8], ['espace', '📐', { fr: 'Fractions, géométrie, mesure', en: 'Fractions, geometry, measuring' }, 8], ['probl', '🕵️', { fr: 'Je résous un problème', en: 'Problem solving' }, 8]],
 };
 
 const dayIndex = (d = today()) => Math.round((new Date(`${d}T12:00`) - new Date(`${PLAN_START}T12:00`)) / 864e5);
