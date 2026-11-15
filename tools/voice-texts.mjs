@@ -46,7 +46,9 @@ export async function collect({ sets = ['books', 'why', 'prompts', 'arts'] } = {
     const LANGS = { fr: 'fr-CA', en: 'en-CA' };
     const NEED = { fr: 'Ce qu’il te faut', en: 'What you need' };
     const both = (o) => { if (o && typeof o === 'object') for (const [ui, l] of Object.entries(LANGS)) if (typeof o[ui] === 'string') add(l, o[ui], 'arts'); };
-    for (const f of ART_FILES) {
+    // lessons and artists first (most voiced reading), then the new techniques
+    const PRIO = ['cours', 'artistes', 'peinture', 'collage', 'impression', 'modelage', 'fils'];
+    for (const f of [...PRIO, ...ART_FILES.filter((x) => !PRIO.includes(x))]) {
       if (!fs.existsSync(new URL(`js/content/arts/${f}.js`, root))) continue;
       const mod = await import(new URL(`js/content/arts/${f}.js`, root).href);
       for (const p of mod.projects || []) {
