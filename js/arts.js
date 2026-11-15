@@ -10,6 +10,7 @@ import { COIN, addCoins, progress, bump, checkBadges, showBadges, confetti, touc
 const CATS = [
   { id: 'saison', icon: '🗓️', t: { fr: 'En ce moment', en: 'Right now' } },
   { id: 'dessin', icon: '✏️', t: { fr: 'Dessin', en: 'Drawing' } },
+  { id: 'scene', icon: '🏞️', t: { fr: 'Grandes scènes', en: 'Big scenes' } },
   { id: 'pliage', icon: '📄', t: { fr: 'Pliage et découpage', en: 'Folding & cutting' } },
   { id: 'recup', icon: '♻️', t: { fr: 'Bricolage récup', en: 'Recycled crafts' } },
   { id: 'fetes', icon: '🎃', t: { fr: 'Fêtes et saisons', en: 'Holidays & seasons' } },
@@ -32,7 +33,7 @@ let all = null;
 async function load() {
   if (all) return all;
   all = [];
-  for (const c of ['dessin', 'pliage', 'recup', 'fetes']) {
+  for (const c of ['dessin', 'dessin2', 'dessin3', 'pliage', 'recup', 'fetes']) {
     try { all.push(...(await import(`./content/arts/${c}.js`)).projects); } catch (e) { console.warn('arts missing', c, e.message); }
   }
   return all;
@@ -44,7 +45,9 @@ export async function artsHome(home) {
   const month = new Date().getMonth() + 1;
   const now = SEASONS_BY_MONTH[month];
   const pick = (cat) => cat === 'saison' ? list.filter((p) => p.season && now.includes(p.season))
-    : cat === 'fav' ? list.filter((p) => store.arts.fav[p.id]) : list.filter((p) => p.cat === cat);
+    : cat === 'fav' ? list.filter((p) => store.arts.fav[p.id])
+      : cat === 'scene' ? list.filter((p) => p.theme === 'scene')
+        : list.filter((p) => p.cat === cat && p.theme !== 'scene');
   const grid = el('div', { class: 'art-grid' });
   const tabs = el('div', { class: 'art-tabs' });
   const lv = el('div', { class: 'art-lvls' });
