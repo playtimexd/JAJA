@@ -9,18 +9,32 @@ import { speak, sfx, setContentLang, unlockAudio } from './audio.js';
 import { screen, backBtn, wallet, sheet } from './ui.js';
 import { ensureSteps, thumbSvg, CREDIT } from './arts-gen.js';
 import { ART_FILES, BIG_FILES } from './content/arts/index.js';
+import { openAtelier, coloringFromProject } from './atelier.js';
+import { openMusee, addArtwork } from './musee.js';
 import { COIN, addCoins, progress, bump, checkBadges, showBadges, confetti, touchStreak, dressedOwl } from './game.js';
 
 const CATS = [
   { id: 'saison', icon: '🗓️', t: { fr: 'En ce moment', en: 'Right now' } },
   { id: 'dessin', icon: '✏️', t: { fr: 'Dessin', en: 'Drawing' } },
-  { id: 'anib', lib: true, icon: '🐾', t: { fr: 'Animaux (bibliothèque)', en: 'Animals (library)' } },
-  { id: 'biblio', lib: true, icon: '📚', t: { fr: 'Bibliothèque', en: 'Library' } },
   { id: 'scene', icon: '🏞️', t: { fr: 'Grandes scènes', en: 'Big scenes' } },
+  { id: 'peinture', icon: '🖌️', t: { fr: 'Peinture', en: 'Painting' } },
+  { id: 'collage', icon: '✂️', t: { fr: 'Collage', en: 'Collage' } },
+  { id: 'impression', icon: '🥔', t: { fr: 'Impression', en: 'Printing' } },
+  { id: 'modelage', icon: '🏺', t: { fr: 'Modelage', en: 'Modelling' } },
+  { id: 'fils', icon: '🧶', t: { fr: 'Fils et tissage', en: 'Threads & weaving' } },
   { id: 'pliage', icon: '📄', t: { fr: 'Pliage et découpage', en: 'Folding & cutting' } },
   { id: 'recup', icon: '♻️', t: { fr: 'Bricolage récup', en: 'Recycled crafts' } },
   { id: 'fetes', icon: '🎃', t: { fr: 'Fêtes et saisons', en: 'Holidays & seasons' } },
+  { id: 'anib', lib: true, icon: '🐾', t: { fr: 'Animaux (bibliothèque)', en: 'Animals (library)' } },
+  { id: 'biblio', lib: true, icon: '📚', t: { fr: 'Bibliothèque', en: 'Library' } },
   { id: 'fav', icon: '❤️', t: { fr: 'Mes favoris', en: 'My favourites' } },
+];
+// Big doors at the top of the Arts screen: learn (lessons, artists) and make/keep (Atelier, museum).
+const HUB = [
+  { id: 'cours', icon: '🧑‍🏫', t: { fr: 'Mes cours d’art', en: 'Art lessons' }, s: { fr: 'Lignes, couleurs, formes…', en: 'Lines, colours, shapes…' } },
+  { id: 'artistes', icon: '🖼️', t: { fr: 'Les artistes', en: 'Artists' }, s: { fr: 'À la manière de…', en: 'In the style of…' } },
+  { id: 'atelier', icon: '🎨', t: { fr: 'Atelier', en: 'Studio' }, s: { fr: 'Peindre et colorier', en: 'Paint and colour' } },
+  { id: 'musee', icon: '🏛️', t: { fr: 'Mon musée', en: 'My museum' }, s: { fr: 'Mes œuvres', en: 'My artworks' } },
 ];
 const L = {
   all: { fr: 'Tous', en: 'All' }, d1: { fr: 'Facile', en: 'Easy' }, d2: { fr: 'Moyen', en: 'Medium' }, d3: { fr: 'Difficile', en: 'Hard' },
@@ -28,7 +42,7 @@ const L = {
   done: { fr: 'J’ai fini! 🎉', en: 'I’m done! 🎉' }, bravo: { fr: 'Bravo, artiste!', en: 'Well done, artist!' }, adult: { fr: 'Avec un adulte', en: 'With a grown-up' },
   min: { fr: 'min', en: 'min' }, none: { fr: 'Rien ici pour l’instant.', en: 'Nothing here yet.' }, again: { fr: 'Refaire', en: 'Do it again' },
   search: { fr: 'Chercher un dessin…', en: 'Search for a drawing…' }, moreCards: { fr: 'Voir plus ▼', en: 'Show more ▼' }, loading: { fr: 'Chargement…', en: 'Loading…' },
-  more: { fr: 'Autres projets', en: 'More projects' }, made: { fr: 'déjà fait', en: 'done' }, tapCheck: { fr: 'Touche chaque objet quand tu l’as.', en: 'Tap each item when you have it.' },
+  more: { fr: 'Autres projets', en: 'More projects' }, photo: { fr: '📷 Prendre en photo', en: '📷 Take a photo' }, colorier: { fr: '🖍️ Colorier dans l’Atelier', en: '🖍️ Colour it in the Studio' }, made: { fr: 'déjà fait', en: 'done' }, tapCheck: { fr: 'Touche chaque objet quand tu l’as.', en: 'Tap each item when you have it.' },
 };
 const SEASONS_BY_MONTH = {
   1: ['hiver'], 2: ['hiver', 'saint-valentin'], 3: ['hiver', 'cabane-a-sucre', 'printemps', 'paques'], 4: ['printemps', 'paques', 'cabane-a-sucre', 'jour-de-la-terre'],
@@ -60,6 +74,19 @@ const view = { cat: 'saison', lvl: 0, q: '', page: 1 };
 const PAGE = 36;
 
 export async function openArt(id, home, i = 0) { const list = isBig(id) ? await loadBig() : await load(); const p = list.find((x) => x.id === id); if (p) steps(p, home, Math.min(i, ensureSteps(p).length - 1)); else artsHome(home); }
+
+// Lessons and artists live in their own modules; they open projects through this.
+const projectBack = new Map();   // project id -> where its back button goes (an artist, a lesson) instead of the Arts home
+async function openHub(id, home) {
+  const back = () => artsHome(home);
+  const opener = (pid, from) => { if (from) projectBack.set(pid, from); openArt(pid, home); };
+  if (id === 'atelier') return openAtelier({ back, onMusee: () => openMusee({ back, onAtelier: () => openAtelier({ back }) }) });
+  if (id === 'musee') return openMusee({ back, onAtelier: () => openAtelier({ back }) });
+  try {
+    if (id === 'cours') { const m = await import('./arts-cours.js'); m.setProjectOpener?.((pid) => opener(pid, () => m.openCourse(back))); return m.openCourse(back); }
+    if (id === 'artistes') { const m = await import('./arts-artistes.js'); m.setProjectOpener?.(opener); return m.openArtists(back); }
+  } catch (e) { console.warn('arts hub', id, e.message); }
+}
 
 export async function artsHome(home) {
   const list = await load();
@@ -124,6 +151,8 @@ export async function artsHome(home) {
   };
   screen('arts-screen purple',
     el('header', { class: 'bar' }, backBtn(home), el('h1', {}, '🎨 ', lang() === 'fr' ? 'Arts plastiques' : 'Arts & crafts'), wallet()),
+    el('div', { class: 'art-hub' }, HUB.map((h) => el('button', { class: `art-door d-${h.id}`, onclick: () => { sfx('tap'); openHub(h.id, home); } },
+      el('span', { class: 'ad-i' }, h.icon), el('b', {}, tr(h.t)), el('small', {}, tr(h.s))))),
     tabs, search, lv, grid, more);
   draw();
 }
@@ -136,7 +165,7 @@ function project(p, home) {
   const have = new Set();
   const favBtn = el('button', { class: `round fav ${store.arts.fav[p.id] ? 'on' : ''}`, onclick: () => { sfx('tap'); store.arts.fav[p.id] = !store.arts.fav[p.id]; if (!store.arts.fav[p.id]) delete store.arts.fav[p.id]; save(); favBtn.classList.toggle('on'); favBtn.textContent = store.arts.fav[p.id] ? '❤️' : '🤍'; } }, store.arts.fav[p.id] ? '❤️' : '🤍');
   screen('art-intro purple',
-    el('header', { class: 'bar' }, backBtn(() => artsHome(home)), el('h1', {}, p.emoji, ' ', tr(p.title)), favBtn),
+    el('header', { class: 'bar' }, backBtn(() => { const b = projectBack.get(p.id); projectBack.delete(p.id); b ? b() : artsHome(home); }), el('h1', {}, p.emoji, ' ', tr(p.title)), favBtn),
     el('div', { class: 'art-intro-body' },
       el('div', { class: 'art-final', html: thumbSvg(p) }),
       el('div', { class: 'art-need' },
@@ -148,9 +177,17 @@ function project(p, home) {
           return b;
         })),
         el('button', { class: 'btn primary big-go', onclick: () => { sfx('tap'); steps(p, home, 0); } }, tr(L.go), ' ➜'),
+        colorBtn(p, home),
         CREDIT[p.source] ? el('div', { class: 'art-credit' }, tr(CREDIT[p.source])) : null)),
   );
   speak({ text: `${tr(p.title)}. ${tr(L.need)} : ${p.materials.map(tr).join(', ')}.` });
+}
+
+function colorBtn(p, home) {
+  let svg = null;
+  try { svg = coloringFromProject(p); } catch { svg = null; }
+  if (!svg) return null;
+  return el('button', { class: 'btn ghost color-go', onclick: () => { sfx('tap'); openAtelier({ coloring: svg, title: p.title, projectId: p.id, back: () => project(p, home) }); } }, tr(L.colorier));
 }
 
 function steps(p, home, i) {
@@ -189,6 +226,7 @@ function finish(p, home) {
     el('div', { class: 'art-final small', html: thumbSvg(p) }),
     el('div', { class: 'res-coins' }, `+${coins} ${COIN}`),
     el('div', { class: 'res-btns' },
+      el('button', { class: 'btn', onclick: () => { addArtwork({ title: tr(p.title), projectId: p.id, source: 'photo', pick: 'camera' }); } }, tr(L.photo)),
       el('button', { class: 'btn ghost', onclick: () => { sh.close(); steps(p, home, 0); } }, '↻ ', tr(L.again)),
       el('button', { class: 'btn primary', onclick: () => { sh.close(); artsHome(home); } }, tr(L.more), ' ➜'))));
   speak({ text: tr(L.bravo) });

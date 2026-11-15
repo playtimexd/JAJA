@@ -45,3 +45,9 @@ Short sentences a 7–8-year-old understands when read aloud. French is Québec 
 - `strokes`: `"x,y x,y|x,y …"`, 4-14 strokes in a 256 box; 1-2 strokes per step, fitted into 400x300.
 - Generated step pictures may be up to 12 KB (limit in check-arts). Each such project shows a credit line (`CREDIT` in arts-gen.js; see docs/CREDITS.md).
 - Regenerating: these files were built by scripts outside the repo from the OpenMoji npm package (SVGs), hand-written French/English titles, and Quick, Draw! ndjson samples (first ~1.8 MB per category).
+
+## 2026-11 expansion (art-teacher mode)
+- File list lives in `js/content/arts/index.js` (`ART_FILES`, `BIG_FILES`); `js/arts.js` and `tools/check-arts.mjs` read it. New categories: `peinture`, `collage`, `impression`, `modelage`, `fils` (one tab each); more projects in `dessin4` (scenes), `pliage2`, `recup2`, `fetes2`.
+- Hub doors on the Arts screen: **Mes cours d'art** (`js/arts-cours.js` + `js/content/arts/cours.js`: 20 ordered lessons, goal → slides → vocabulary → mini-game (sort, mix, symmetry, pattern, spot, quiz) → reflection → project; check `node tools/check-cours.mjs`), **Les artistes** (`js/arts-artistes.js` + `js/content/arts/artistes.js`: 25 artists, Québec/Canada, Premières Nations/Métis/Inuit, world; original pictures "in the style", works only described; check `node tools/check-artistes.mjs`), **Atelier** (`js/atelier.js`: Pencil canvas, fill, mirror, colour mixer, colouring pages `coloriages.js` or any drawing project via « Colorier »), **Mon musée** (`js/musee.js`: photos of real artworks + Atelier saves in IndexedDB `hibou-musee`, only on the iPad).
+- Project back buttons can return to the lesson/artist that opened them (`projectBack` in arts.js).
+- Voice-over: `tools/voice-texts.mjs` set `arts` (project intro + steps, lessons, artists, generic library lines).

@@ -14,7 +14,7 @@ export function voiceKey(lang, text) {
 export const norm = (t) => String(t).replace(/☐/g, '').replace(/_{2,}/g, ' … ').trim();
 
 const root = new URL('../', import.meta.url);
-export async function collect({ sets = ['books', 'why', 'prompts'] } = {}) {
+export async function collect({ sets = ['books', 'why', 'prompts', 'arts'] } = {}) {
   const out = new Map();   // key -> { lang, text, set }
   const add = (lang, text, set) => { if (!text) return; const t = norm(text); if (!t) return; const k = voiceKey(lang, t); if (!out.has(k)) out.set(k, { lang, text: t, set }); };
 
@@ -39,6 +39,28 @@ export async function collect({ sets = ['books', 'why', 'prompts'] } = {}) {
         for (const q of t.quiz) { add('zh-CN', q.zh, 'why'); add('fr-CA', q.fr, 'why'); }
       }
     }
+  }
+  if (sets.includes('arts')) {
+    // hand-made Arts plastiques projects (what js/arts.js reads aloud), in both UI languages
+    const { ART_FILES } = await import(new URL('js/content/arts/index.js', root).href);
+    const LANGS = { fr: 'fr-CA', en: 'en-CA' };
+    const NEED = { fr: 'Ce qu’il te faut', en: 'What you need' };
+    const both = (o) => { if (o && typeof o === 'object') for (const [ui, l] of Object.entries(LANGS)) if (typeof o[ui] === 'string') add(l, o[ui], 'arts'); };
+    for (const f of ART_FILES) {
+      if (!fs.existsSync(new URL(`js/content/arts/${f}.js`, root))) continue;
+      const mod = await import(new URL(`js/content/arts/${f}.js`, root).href);
+      for (const p of mod.projects || []) {
+        for (const ui of ['fr', 'en']) add(LANGS[ui], `${p.title[ui]}. ${NEED[ui]} : ${p.materials.map((m) => m[ui]).join(', ')}.`, 'arts');
+        for (const s of p.steps || []) both(s.text);
+      }
+      for (const x of mod.lessons || []) { both(x.goal); for (const v of x.vocab || []) { both(v.word); both(v.def); } for (const s of x.teach || []) both(s.text); for (const q of x.retour || []) both(q); }
+      for (const a of mod.artists || []) { for (const s of a.bio || []) both(s); for (const q of a.look || []) both(q); for (const w of a.famous || []) both(w.desc); for (const q of a.quiz || []) both(q.q); }
+    }
+    // generic sentences of the generated libraries (recorded once)
+    for (const t of [{ fr: 'Ajoute le trait suivant.', en: 'Add the next line.' }, { fr: 'Continue avec la ligne rose.', en: 'Keep going with the pink line.' },
+      { fr: 'Dessine la partie en rose.', en: 'Draw the part in pink.' }, { fr: 'Ajoute un autre trait.', en: 'Add another line.' },
+      { fr: 'Ajoute le dernier trait.', en: 'Add the last line.' }, { fr: 'Colorie-le comme tu veux!', en: 'Color it any way you like!' },
+      { fr: 'Bravo, artiste!', en: 'Well done, artist!' }]) both(t);
   }
   if (sets.includes('prompts')) {
     // texts that come back again and again in the generated exercises (≥ 8 % of a unit's questions)

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Atelier / Musée test</title>
+  <link rel="stylesheet" href="../css/app.css">
+  <link rel="stylesheet" href="../css/game.css">
+  <link rel="stylesheet" href="../css/atelier.css">
+</head>
+<body>
+  <main id="app"></main>
+  <!-- Test harness for js/atelier.js + js/musee.js (silent: sounds off). Used by tools/shot.mjs:
+       window.T.atelier(opts) / window.T.musee() / window.T.stroke(...) -->
+  <script type="module">
+    import { store } from '../js/store.js';
+    store.settings.sound = false; store.settings.voice = false;
+    const A = await import('../js/atelier.js');
+    const M = await import('../js/musee.js');
+    const home = () => { document.getElementById('app').innerHTML = '<p>home</p>'; };
+    window.T = {
+      A, M,
+      atelier: (o = {}) => A.openAtelier({ back: home, onMusee: () => M.openMusee({ back: home }), ...o }),
+      musee: () => M.openMusee({ back: home, onAtelier: () => window.T.atelier() }),
+      // synthetic stroke on the board: points in 0..1 board coordinates
+      stroke(pts, type = 'pen') {
+        const b = document.querySelector('.at-board'), r = b.getBoundingClientRect();
+        const ev = (n, [x, y], p = 0.6) => b.dispatchEvent(new PointerEvent(n, { pointerId: 7, pointerType: type, pressure: p, clientX: r.left + x * r.width, clientY: r.top + y * r.height, bubbles: true, cancelable: true, button: 0, buttons: n === 'pointerup' ? 0 : 1 }));
+        ev('pointerdown', pts[0]);
+        pts.slice(1).forEach((q, i) => ev('pointermove', q, 0.3 + 0.6 * Math.abs(Math.sin(i / 4))));
+        ev('pointerup', pts[pts.length - 1]);
+      },
+      tap(x, y) { this.stroke([[x, y]]); },
+    };
+    window.ready = true;
+  </script>
+</body>
+</html>

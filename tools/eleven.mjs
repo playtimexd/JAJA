@@ -32,8 +32,8 @@ let left = Infinity;
 if (sub.detail) console.log('Balance not readable with this key (', sub.detail.status || sub.detail, ') — recording until ElevenLabs says the quota is used up.');
 else { left = sub.character_limit - sub.character_count; console.log(`ElevenLabs plan: ${sub.tier} · used ${sub.character_count} / ${sub.character_limit} characters · left ${left}`); }
 
-const sets = arg('sets', 'books,why,prompts').split(',');
-const order = { books: 0, why: 1, prompts: 2 };
+const sets = arg('sets', 'books,why,prompts,arts').split(',');
+const order = { books: 0, why: 1, prompts: 2, arts: 3 };
 const items = [...(await collect({ sets })).entries()].sort((a, b) => order[a[1].set] - order[b[1].set]).filter(([k]) => !fs.existsSync(path.join(out, `${k}.mp3`)));
 const chars = items.reduce((a, [, v]) => a + v.text.length, 0);
 console.log(`to record: ${items.length} clips, ${chars} characters (${sets.join(', ')})`);

@@ -491,3 +491,15 @@
 .pb-i { font-size: 28px; flex: none; } .pb-t { display: flex; flex-direction: column; min-width: 0; } .pb-t b { font-size: 16px; } .pb-t small { color: var(--ink2); font-weight: 700; font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
 .plan-table tr.today td { background: #eef6ff; } .plan-row { font-size: 14px; }
 @media (max-width: 900px) { .plan-blocks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* arts hub doors: lessons, artists, studio, museum */
+.art-hub { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 4px 0 14px; }
+.art-door { background: var(--card); border-radius: 22px; padding: 14px 12px; box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; border: 4px solid transparent; }
+.art-door .ad-i { font-size: 40px; line-height: 1.1; }
+.art-door b { font-size: 19px; }
+.art-door small { color: var(--ink2); font-size: 14px; }
+.art-door.d-cours { border-color: #ffd36e; } .art-door.d-artistes { border-color: #c9a2ff; }
+.art-door.d-atelier { border-color: #8fd6ff; } .art-door.d-musee { border-color: #ffa9c4; }
+.art-door:active { transform: scale(.97); }
+.color-go { margin-top: 8px; width: 100%; }
+@media (max-width: 600px) { .art-hub { grid-template-columns: repeat(2, 1fr); gap: 8px; } .art-door { padding: 10px 6px; } .art-door .ad-i { font-size: 32px; } .art-door b { font-size: 16px; } .art-door small { display: none; } }

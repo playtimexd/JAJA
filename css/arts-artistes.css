@@ -1,0 +1,76 @@
+/* Arts plastiques — galerie d'artistes (js/arts-artistes.js). Museum wall + gilded frames. */
+.aa-gallery, .aa-artist { background: repeating-linear-gradient(90deg, #f4ede0 0 46px, #efe6d6 46px 92px); }
+.aa-intro { margin: 0; font-size: 20px; font-weight: 700; color: var(--ink2); }
+.aa-wall { display: flex; flex-direction: column; gap: 12px; }
+.aa-wall-title { margin: 8px 0 0; font-size: 26px; padding-bottom: 6px; border-bottom: 4px solid #d8c8a8; }
+.aa-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 26px 20px; padding: 6px 0 14px; }
+
+/* gilded frame around a canvas */
+.aa-frame { position: relative; padding: 12px; background: linear-gradient(135deg, #f3d98b, #b07d2b 30%, #f1d27a 52%, #8a5a14 78%, #e6c26a);
+  border-radius: 6px; box-shadow: 0 10px 18px rgba(60, 40, 10, .28), inset 0 0 0 2px rgba(255, 255, 255, .45); }
+.aa-frame::before { content: ""; position: absolute; left: 50%; top: -18px; width: 2px; height: 18px; background: #8a7a5a; }
+.aa-canvas { background: #fff; padding: 6px; box-shadow: inset 0 0 0 3px #f7f1e3, inset 0 0 0 5px #c9b48a; }
+.aa-canvas svg { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; }
+.aa-frame.sm { padding: 9px; }
+.aa-frame.big { padding: 18px; }
+.aa-frame.big::before { display: none; }
+
+.aa-card { position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 18px 0 0; text-align: center; }
+.aa-card:active .aa-frame { transform: translateY(3px) scale(.99); }
+.aa-plaque { align-self: center; background: #fffdf7; border: 2px solid #d8c8a8; border-radius: 8px; padding: 6px 14px; box-shadow: 0 3px 0 rgba(43, 45, 66, .12);
+  display: flex; flex-direction: column; gap: 2px; line-height: 1.2; max-width: 100%; }
+.aa-plaque b { font-size: 18px; }
+.aa-plaque small { color: var(--ink2); font-weight: 700; font-size: 15px; }
+.aa-plaque.big b { font-size: 24px; }
+.aa-plaque.big small { font-size: 17px; }
+.aa-seen { position: absolute; right: 4px; top: 8px; background: var(--green); color: #fff; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; box-shadow: var(--shadow); }
+
+/* artist visit */
+.aa-body { flex: 1; display: grid; grid-template-columns: 1.05fr 1fr; gap: 26px; align-items: start; }
+.aa-left { display: flex; flex-direction: column; gap: 12px; align-items: stretch; position: sticky; top: 8px; }
+.aa-left .aa-plaque { align-self: center; text-align: center; }
+.aa-note { margin: 0; text-align: center; font-size: 14px; color: var(--ink2); font-weight: 600; }
+.aa-right { display: flex; flex-direction: column; gap: 12px; }
+.aa-dots { display: flex; gap: 7px; flex-wrap: wrap; }
+.aa-dot { width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 3px solid var(--line); }
+.aa-dot.look { border-radius: 5px; }
+.aa-dot.quiz { border-radius: 4px; transform: rotate(45deg) scale(.85); }
+.aa-dot.past { background: var(--purple); border-color: var(--purple); }
+.aa-dot.now { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-l); transform: scale(1.25); }
+.aa-dot.quiz.now { transform: rotate(45deg) scale(1.1); }
+.aa-panel { background: var(--card); border-radius: 28px; box-shadow: var(--shadow); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; border-top: 8px solid var(--purple); animation: up .25s ease; }
+.aa-panel.look { border-top-color: #f0a020; }
+.aa-panel.famous { border-top-color: #b07d2b; }
+.aa-panel.quiz { border-top-color: var(--blue); }
+.aa-panel.end { border-top-color: var(--green); }
+.aa-head { display: flex; align-items: center; gap: 12px; }
+.aa-head h3 { margin: 0; font-size: 26px; flex: 1; }
+.aa-icon { font-size: 34px; }
+.aa-big { margin: 0; font-size: clamp(22px, 2.6vw, 30px); font-weight: 800; line-height: 1.35; }
+.aa-q { color: #9a5b00; }
+.aa-work { display: flex; flex-direction: column; gap: 4px; background: #fbf6ea; border: 3px dashed #d8c8a8; border-radius: 18px; padding: 14px 16px; }
+.aa-work b { font-size: 24px; }
+.aa-work small { color: var(--ink2); font-weight: 800; font-size: 17px; }
+.aa-work p { margin: 6px 0 0; font-size: 21px; font-weight: 700; line-height: 1.4; }
+.aa-work em { color: var(--ink2); font-size: 15px; font-weight: 600; }
+.aa-nav { display: flex; gap: 12px; }
+.aa-nav .btn { flex: 1; font-size: 24px; }
+.aa-nav .btn.ghost { flex: .45; background: var(--card); box-shadow: var(--shadow); }
+.aa-thought { background: #f0a020 !important; box-shadow: 0 6px 0 #b9770a !important; }
+.aa-choices { display: flex; flex-direction: column; gap: 10px; }
+.aa-choice { background: var(--card); border: 4px solid var(--line); border-radius: 18px; padding: 14px 16px; font-size: 22px; font-weight: 800; text-align: left; box-shadow: 0 5px 0 var(--line); }
+.aa-choice.right { background: var(--green-l); border-color: var(--green); }
+.aa-choice.wrong { background: var(--red-l); border-color: var(--red); animation: aa-shake .35s; }
+.aa-choices.locked .aa-choice:not(.right):not(.wrong) { opacity: .5; }
+.aa-fb { min-height: 28px; font-size: 21px; font-weight: 900; }
+.aa-fb.ok { color: var(--green); }
+.aa-fb.no { color: var(--red); }
+.aa-projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+.aa-proj { position: relative; background: #fbf6ea; border-radius: 18px; box-shadow: var(--shadow); padding: 8px 8px 12px; display: flex; flex-direction: column; gap: 6px; text-align: left; font-size: 17px; line-height: 1.25; }
+.aa-proj-pic svg { display: block; width: 100%; height: auto; border-radius: 10px; background: #fff; }
+@keyframes aa-shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+@media (orientation: portrait), (max-width: 900px) {
+  .aa-body { grid-template-columns: 1fr; }
+  .aa-left { position: static; max-width: 560px; width: 100%; margin: 0 auto; }
+}
