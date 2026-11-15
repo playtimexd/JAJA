@@ -1,0 +1,15 @@
+name = "petithibou-voice"
+main = "index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://www.zhangandrew.com,https://zhangandrew.com,https://playtimexd.github.io"
+REALTIME_MODEL = "gpt-realtime-2.1-mini"
+REALTIME_VOICE = "marin"
+TTS_MODEL = "gpt-4o-mini-tts"
+TTS_VOICE_EN = "marin"
+TTS_VOICE_FR = "coral"
+
+# Secrets — never in this file:
+#   npx wrangler secret put OPENAI_API_KEY
+#   npx wrangler secret put FAMILY_CODE

@@ -1,0 +1,8 @@
+.secrets/
+.tts-cache/
+.tmp*/
+.claude/
+node_modules/
+worker/.wrangler/
+worker/node_modules/
+*.mp3

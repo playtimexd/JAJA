@@ -1,0 +1,19 @@
+// Petit Hibou mascot (inline SVG so it works offline and scales crisply).
+export const OWL = `<svg viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <ellipse cx="60" cy="124" rx="34" ry="5" fill="#00000018"/>
+  <path d="M22 40 L18 14 L42 30 Z" fill="#7a4f2e"/>
+  <path d="M98 40 L102 14 L78 30 Z" fill="#7a4f2e"/>
+  <ellipse cx="60" cy="72" rx="44" ry="50" fill="#9c6b43"/>
+  <ellipse cx="60" cy="86" rx="28" ry="32" fill="#f4dcb8"/>
+  <path d="M42 80 q6 5 12 0 M58 92 q6 5 12 0 M44 102 q6 5 12 0 M62 70 q6 5 12 0" stroke="#d9b98c" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M18 70 q-10 22 6 40 q8-16 4-38 z" fill="#7a4f2e"/>
+  <path d="M102 70 q10 22 -6 40 q-8-16 -4-38 z" fill="#7a4f2e"/>
+  <circle cx="41" cy="48" r="19" fill="#fff" stroke="#7a4f2e" stroke-width="4"/>
+  <circle cx="79" cy="48" r="19" fill="#fff" stroke="#7a4f2e" stroke-width="4"/>
+  <g class="eyes"><circle cx="43" cy="50" r="9" fill="#2b2d42"/><circle cx="81" cy="50" r="9" fill="#2b2d42"/>
+  <circle cx="46" cy="46" r="3.2" fill="#fff"/><circle cx="84" cy="46" r="3.2" fill="#fff"/></g>
+  <path d="M54 62 L66 62 L60 74 Z" fill="#ffb02e" stroke="#c97a00" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M40 120 l-4 6 M46 121 l0 6 M74 121 l0 6 M80 120 l4 6" stroke="#ffb02e" stroke-width="4" stroke-linecap="round"/>
+  <path d="M30 22 Q60 2 90 22 L84 30 Q60 18 36 30 Z" fill="#4f8ef7"/>
+  <circle cx="60" cy="8" r="6" fill="#ffd23f"/>
+</svg>`;
