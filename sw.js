@@ -1,5 +1,5 @@
 // Offline cache. Bump VERSION whenever files change.
-const VERSION = 'hibou-v11';
+const VERSION = 'hibou-v12';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/app.css', 'css/game.css',
   'js/main.js', 'js/util.js', 'js/i18n.js', 'js/store.js', 'js/audio.js', 'js/widgets.js', 'js/owl.js', 'js/ui.js', 'js/game.js', 'js/arts.js',
