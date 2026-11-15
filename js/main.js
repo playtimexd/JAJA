@@ -9,6 +9,7 @@ import {
   SHOP, SLOTS, buy, toggleWear, dressedOwl, confetti, floatText, toast,
 } from './game.js';
 import { wordPairs, mathPairs } from './content/pairs.js';
+import { planCard, markPlan, upcoming } from './plan.js';
 
 const SUBJECTS = [
   { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js', './content/francais2.js', './content/francais3.js'], speech: 'fr-CA', praise: 'fr' },
@@ -109,6 +110,7 @@ function home() {
       el('div', { class: 'bubble' }, el('div', { class: 'greet' }, greet), el('div', {}, t('pickSubject'))),
       el('div', { class: 'hud' }, wallet(), streakPill()),
     ),
+    planCard(openPlanBlock, planUnitTitle),
     resumeCard(),
     (() => { const n = dueMistakes().length, all = mistakes().length; return all ? el('button', { class: `review-card ${n ? '' : 'calm'}`, onclick: () => { sfx('tap'); n ? play({ mode: 'review' }) : sheet(el('p', { class: 'hub-intro' }, t('reviewNone'))); } },
       el('span', { class: 'resume-i' }, '📕'), el('span', { class: 'resume-t' }, el('b', {}, t('review'), n ? ` · ${n}` : ''), el('small', {}, n ? t('reviewSub') : `${all} ${t('reviewLater')}`))) : null; })(),
@@ -143,6 +145,29 @@ function home() {
   );
   speak({ text: { fr: greet, en: greet } });
 }
+
+// ---------------- Plan du jour ----------------
+function planUnitTitle(target, subj) {
+  if (target === 'BOOK') return tr({ fr: 'Un livre de « Mes livres »', en: 'A book from “My books”' });
+  if (target === 'TALK') return tr({ fr: 'Parle avec Hibou (anglais)', en: 'Talk with Owl (English)' });
+  if (target === 'WHY') return tr({ fr: 'Un « Pourquoi? » en chinois', en: 'A “Why?” in Chinese' });
+  const u = unitById(target);
+  return u ? tr(u.title) : target;
+}
+async function openPlanBlock(b) {
+  sfx('tap');
+  if (b.target === 'BOOK') return (await import('./livres.js')).libraryHome(home);
+  if (b.target === 'TALK') return (await import('./talk.js')).talkHome(home, 'en');
+  if (b.target === 'WHY') { store.settings.whyLang = 'zh'; save(); return (await import('./why.js')).whyHome(home, play); }
+  const u = unitById(b.target);
+  if (u) play({ mode: 'practice', unit: u, level: suggestedLevel(u), back: home });
+}
+export function planDone(target) {
+  const r = markPlan(target);
+  if (r?.all) { addCoins(20); save(); setTimeout(() => { toast('📅', t('planAll')); confetti(70); }, 900); }
+  else if (r) setTimeout(() => toast('✅', `${t('planBlock')} · ${tr(r.block.label)}`), 900);
+}
+window.__planDone = planDone;
 
 // ▶ Continuer: picks up the last book page, craft step, « Pourquoi? » topic or exercise.
 function resumeCard() {
@@ -550,6 +575,7 @@ function finishGame(g) {
   progress('combo', bestCombo, { set: true });
   const subj = (g.unit || g.pool?.[0])?.subject;
   if (subj) progress(subj.id);
+  if (mode === 'practice' && g.unit) planDone(g.unit.id);
   if (mode === 'review') {
     store.log.push({ d: today(), unit: 'review', level: 0, mode, score, total, ms });
     coins = Math.floor(correct) * 2;
@@ -786,6 +812,11 @@ function parents() {
       el('div', { class: 'row' }, el('span', {}, t('readVoice')), toggle('cloudVoice')),
       el('p', { class: 'hint' }, t('installHint')),
     ),
+    el('section', { class: 'card-p' },
+      el('h2', {}, '📅 ', t('planTitle')),
+      el('table', { class: 'prog plan-table' }, upcoming(14).map((p) => el('tr', { class: p.date === today() ? 'today' : '' },
+        el('td', { class: 'pu' }, el('div', {}, new Date(`${p.date}T12:00`).toLocaleDateString(lang() === 'fr' ? 'fr-CA' : 'en-CA', { weekday: 'short', day: 'numeric', month: 'short' })), el('small', {}, `${p.icon} ${tr(p.t)} · ${p.done}/${p.blocks.length}`)),
+        el('td', {}, p.blocks.map((b) => el('div', { class: 'plan-row' }, b.icon, ' ', planUnitTitle(b.target, p.subject), ` · ${b.min}′`))))))),
     el('section', { class: 'card-p' },
       el('h2', {}, t('progress'), ' · ', `${mins(today())} ${t('minutes')}`),
       el('div', { class: 'week' }, week.map((d) => { const m = mins(d); return el('div', { class: 'wk' }, el('div', { class: 'wk-bar', style: { height: `${Math.min(100, m * 3)}%` } }), el('span', {}, `${m}′`), el('small', {}, d.slice(8))); })),

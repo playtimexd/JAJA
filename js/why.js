@@ -141,6 +141,7 @@ async function quiz(t, home, playFn) {
   const first = !store.why?.[t.id];
   store.why = { ...(store.why || {}), [t.id]: today() };
   const coins = (first ? 8 + t.level * 2 : 2) + Math.round(score);
+  if (wl() === 'zh') window.__planDone?.('WHY');
   addCoins(coins); touchStreak(); bump('why'); bump('games'); progress('correct', Math.floor(score)); progress('why');
   const fresh = checkBadges(); save();
   confetti(50); sfx('win');

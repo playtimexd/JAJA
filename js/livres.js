@@ -154,6 +154,7 @@ async function quiz(b, back) {
   const prev = store.books?.[b.id];
   store.books = { ...(store.books || {}), [b.id]: { date: today(), stars: Math.max(stars, prev?.stars || 0) } };
   const coins = (prev ? 3 : 15 + b.level * 5) + stars * 2;
+  window.__planDone?.('BOOK');
   addCoins(coins); touchStreak(); bump('books'); bump('games'); progress('francais'); progress('stars', stars); progress('correct', Math.floor(score));
   const fresh = checkBadges(); save();
   confetti(60); sfx('win');

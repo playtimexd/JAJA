@@ -480,3 +480,14 @@
 .hand-model { background: #e8f7ee; border-radius: 14px; padding: 10px 14px; }
 .hand-wait { font-weight: 800; color: var(--ink2); }
 .q:has(.t-hand) .stim-text.long { max-height: 34vh; overflow-y: auto; }
+/* plan du jour */
+.plan-card { background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 14px 16px; border: 3px solid var(--blue); display: flex; flex-direction: column; gap: 10px; }
+.plan-card.all { border-color: var(--green); background: #f2fbf4; }
+.plan-head { display: flex; align-items: baseline; gap: 10px; } .plan-head b { font-size: 21px; flex: 1; } .plan-head small { font-weight: 800; color: var(--ink2); }
+.plan-blocks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.plan-block { background: var(--blue-l); border-radius: 16px; padding: 10px 12px; display: flex; gap: 10px; align-items: center; text-align: left; }
+.plan-block:disabled { opacity: .75; }
+.plan-block.done { background: var(--green-l); }
+.pb-i { font-size: 28px; flex: none; } .pb-t { display: flex; flex-direction: column; min-width: 0; } .pb-t b { font-size: 16px; } .pb-t small { color: var(--ink2); font-weight: 700; font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+.plan-table tr.today td { background: #eef6ff; } .plan-row { font-size: 14px; }
+@media (max-width: 900px) { .plan-blocks { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

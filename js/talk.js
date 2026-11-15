@@ -308,6 +308,7 @@ function end(quit) {
   live = null;
   if (turns >= 2) {
     const coins = Math.min(30, turns * 2);
+    if (tl === 'en') window.__planDone?.('TALK');
     addCoins(coins); touchStreak(); bump('talks'); bump('games'); progress(tl === 'fr' ? 'francais' : tl === 'en' ? 'anglais' : 'chinois'); progress('correct', turns);
     store.log.push({ d: today(), unit: 'talk', level: 0, mode: 'talk', score: turns, total: turns, ms: sec * 1000 });
     const fresh = checkBadges(); save();

@@ -103,6 +103,9 @@ const STR = {
   tipUp: { fr: 'Parfait! Tu es prêt pour le niveau suivant.', en: 'Perfect! You are ready for the next level.' },
   tipDown: { fr: 'C’était difficile. Essaie un niveau plus facile, puis reviens!', en: 'That was hard. Try an easier level, then come back!' },
   easier: { fr: 'Plus facile', en: 'Easier' },
+  planAll: { fr: 'Plan du jour terminé! +20 plumes', en: 'Today’s plan done! +20 feathers' },
+  planBlock: { fr: 'Étape du plan réussie', en: 'Plan step done' },
+  planTitle: { fr: 'Plan des deux prochaines semaines', en: 'Plan for the next two weeks' },
   talkShort: { fr: 'Parler', en: 'Talk' },
   grade: { fr: '2e année · Programme du Québec', en: 'Grade 2 · Québec program' },
 };
