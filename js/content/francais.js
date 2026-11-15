@@ -370,89 +370,6 @@ export const wordBank = RAW.trim()
   });
 const W = wordBank;
 
-/* ---------------- listes pour l'orthographe (f3) ---------------- */
-const extra = (arr, mapper) => arr.map((l) => mapper(l.split('|')));
-const F3_COLORS = extra(
-  [
-    'rouge|🔴|rouje,rougue',
-    'bleu|🔵|bleuh,blue',
-    'vert|🟢|verd,vèr',
-    'jaune|🟡|jône,jaunne',
-    'violet|🟣|viollet,violè',
-    'noir|⚫|noar,nouar',
-    'blanc|⚪|blan,blant',
-    'brun|🟤|brein,brunn',
-  ],
-  ([text, emoji, bad]) => ({ text, emoji, bad: bad.split(',') }),
-);
-const F3_NUMS = extra(
-  [
-    '1|un|ein,hun',
-    '2|deux|deu,deus',
-    '3|trois|troi,troa',
-    '4|quatre|catre,quatr',
-    '5|cinq|cinc,sinq',
-    '6|six|sis,sic',
-    '7|sept|sepp,cept',
-    '8|huit|uit,huite',
-    '9|neuf|neuff,neuph',
-    '10|dix|dics,dixx',
-    '11|onze|onse,honze',
-    '12|douze|douse,douz',
-    '13|treize|trèze,treise',
-    '14|quatorze|catorze,quatorse',
-    '15|quinze|quinse,kinze',
-    '16|seize|sèze,seise',
-    '17|dix-sept|dix-set,dix-cept',
-    '18|dix-huit|dix-uit,dis-huit',
-    '19|dix-neuf|dix-neuff,dis-neuf',
-    '20|vingt|vaint,vinq',
-  ],
-  ([digit, text, bad]) => ({ text, digit, bad: bad.split(',') }),
-);
-const F3_DAYS = extra(
-  [
-    'lundi|lundie,landi',
-    'mardi|mardy,mardie',
-    'mercredi|mercrédi,mercredie',
-    'jeudi|jeudie,jeudy',
-    'vendredi|vandredi,vendredie',
-    'samedi|samdi,samedie',
-    'dimanche|dimanch,dimenche',
-  ],
-  ([text, bad]) => ({ text, bad: bad.split(',') }),
-);
-const F3_TOOLS = extra(
-  [
-    'avec|avek,avecq',
-    'dans|dan,dens',
-    'pour|pur,pourr',
-    'sur|surr,syr',
-    'aussi|ausi,osi',
-    'beaucoup|beaucou,bocoup',
-    'toujours|toujour,toujous',
-    'maintenant|maintenan,mintenant',
-    'jamais|jamè,jammais',
-    'mais|mèe,maiss',
-    'très|trè,tres',
-    'quand|quan,cand',
-    'comme|com,comm',
-    'ici|issi,icit',
-    'chez|chè,chaiz',
-    'encore|encor,ancore',
-    'souvent|souvan,souvend',
-    'ensemble|ansemble,ensenble',
-  ],
-  ([text, bad]) => ({ text, bad: bad.split(',') }),
-);
-const F3_POOL = [
-  ...W.map((w) => ({ text: w.text, emoji: w.emoji, bad: w.bad })),
-  ...F3_COLORS,
-  ...F3_NUMS,
-  ...F3_DAYS,
-  ...F3_TOOLS,
-];
-
 /* ---------------- petits outils ---------------- */
 const byCat = (c) => W.filter((w) => w.cat === c);
 // Groupes de mots dont les images se ressemblent ou dont le sens se chevauche :
@@ -697,55 +614,15 @@ const f2 = {
 /* ================================================================== */
 /*  f3 — Mes mots (orthographe)                                        */
 /* ================================================================== */
-const lenOk = {
-  1: (t) => t.length <= 5,
-  2: (t) => t.length >= 5 && t.length <= 8,
-  3: (t) => t.length >= 6,
-};
 const LETTERS_ONLY = /^[a-zàâçéèêëîïôûùüœ]+$/;
 const ALPHA = 'abcdefghijlmnoprstuvxyz'.split('');
 
-function f3Spell(R, level) {
-  const w = R.pick(F3_POOL.filter((x) => lenOk[level](x.text)));
-  const q = mkChoice(
-    R,
-    `f3-s-${w.text}`,
-    'Écoute le mot. Touche la bonne façon de l’écrire.',
-    { text: w.text },
-    w.bad.slice(0, 2).map((t) => ({ text: t })),
-    { say: say(w.text) },
-  );
-  if (level === 1 && w.emoji) q.stimulus = { emoji: w.emoji };
-  if (level === 1 && w.digit) q.stimulus = { text: w.digit };
-  if (level === 2 && w.digit) q.stimulus = { text: w.digit };
-  return q;
-}
-function f3Letters(R, level) {
-  const range = level === 2 ? [4, 6] : [7, 10];
-  const w = R.pick(F3_POOL.filter((x) => LETTERS_ONLY.test(x.text) && x.text.length >= range[0] && x.text.length <= range[1]));
-  const q = {
-    type: 'order',
-    key: `f3-o-${w.text}`,
-    prompt: 'Écoute le mot. Remets les lettres dans l’ordre.',
-    say: say(w.text),
-    tiles: Array.from(w.text),
-    joiner: '',
-  };
-  if (level === 2 && w.emoji) q.stimulus = { emoji: w.emoji };
-  if (level === 2 && w.digit) q.stimulus = { text: w.digit };
-  if (level === 3) q.extra = R.sample(ALPHA.filter((c) => !w.text.includes(c)), 2);
-  return q;
-}
 const f3 = {
   id: 'f3',
   icon: '✏️',
   title: { fr: 'Mes mots', en: 'My words' },
-  pfeq: 'Écriture — orthographe lexicale, liste orthographique de 1re et 2e année (PFEQ 1er cycle)',
-  generate: run({
-    1: [(R) => f3Spell(R, 1)],
-    2: [(R) => f3Spell(R, 2), (R) => f3Letters(R, 2)],
-    3: [(R) => f3Spell(R, 3), (R) => f3Letters(R, 3)],
-  }),
+  pfeq: 'Écriture — orthographe d’usage : mots de la liste orthographique du MEQ (2e/3e année) (PFEQ 1er cycle)',
+  generate: () => { throw new Error('f3.generate est défini plus bas'); },
 };
 
 /* ================================================================== */
@@ -934,6 +811,14 @@ const SENT_V = [
   [1, 'Mia mange une pomme.', 'mange'],
   [1, 'Le chien aboie.', 'aboie'],
   [1, 'Maman lave l’auto.', 'lave'],
+  [1, 'Papa donne un bonbon.', 'donne'],
+  [1, 'Le garçon regarde la lune.', 'regarde'],
+  [1, 'Ma sœur parle à maman.', 'parle'],
+  [1, 'Léa ouvre la fenêtre.', 'ouvre'],
+  [1, 'Nous voyons un oiseau.', 'voyons'],
+  [1, 'Je veux du pain.', 'veux'],
+  [1, 'Le bébé dort dans son lit.', 'dort'],
+  [1, 'Tu cherches ton livre.', 'cherches'],
   [2, 'Le petit chien court dans le parc.', 'court'],
   [2, 'Ma cousine joue avec ses amis.', 'joue'],
   [2, 'Le gros ours dort dans sa grotte.', 'dort'],
@@ -946,6 +831,17 @@ const SENT_V = [
   [2, 'Elle ouvre la fenêtre doucement.', 'ouvre'],
   [2, 'La petite fille cueille des fleurs.', 'cueille'],
   [2, 'Mon frère range ses jouets.', 'range'],
+  [2, 'Le train arrive à midi.', 'arrive'],
+  [2, 'Mon oncle prend le café.', 'prend'],
+  [2, 'Nous trouvons une clé.', 'trouvons'],
+  [2, 'Les enfants tombent dans la neige.', 'tombent'],
+  [2, 'Maman dit bonjour à la voisine.', 'dit'],
+  [2, 'Papa fait du pain.', 'fait'],
+  [2, 'Léa répond à la question.', 'répond'],
+  [2, 'Il reste dans sa chambre.', 'reste'],
+  [2, 'Je sors de l’école à quatre heures.', 'sors'],
+  [2, 'Mon cousin vient chez nous.', 'vient'],
+  [2, 'Le chat monte dans l’arbre.', 'monte'],
   [3, 'Tous les matins, mon frère prend l’autobus.', 'prend'],
   [3, 'Le samedi, ma famille va au chalet.', 'va'],
   [3, 'Zoé range ses jouets dans la boîte bleue.', 'range'],
@@ -958,6 +854,18 @@ const SENT_V = [
   [3, 'Le petit garçon cherche son chat.', 'cherche'],
   [3, 'La neige tombe sur la montagne.', 'tombe'],
   [3, 'Les canetons suivent leur maman.', 'suivent'],
+  [3, 'Mon père apporte un cadeau.', 'apporte'],
+  [3, 'Le professeur aide les élèves.', 'aide'],
+  [3, 'Nous choisissons un livre.', 'choisissons'],
+  [3, 'Zoé commence sa lecture.', 'commence'],
+  [3, 'Les enfants descendent de l’autobus.', 'descendent'],
+  [3, 'Mon voisin garde les clés.', 'garde'],
+  [3, 'Je comprends la question.', 'comprends'],
+  [3, 'Elle porte une robe rouge.', 'porte'],
+  [3, 'Les élèves écrivent une lettre.', 'écrivent'],
+  [3, 'Mon chat attrape une souris.', 'attrape'],
+  [3, 'Le garçon pousse la chaise.', 'pousse'],
+  [3, 'Tu travailles très bien.', 'travailles'],
 ];
 function f6FindVerb(R, level) {
   const [, s, v] = R.pick(SENT_V.filter((x) => x[0] === level));
@@ -979,7 +887,8 @@ function f6FindVerb(R, level) {
     cols: 2,
   });
 }
-const VERBS_INF = ['courir', 'sauter', 'manger', 'dormir', 'chanter', 'jouer', 'rire', 'lire', 'danser', 'nager', 'dessiner', 'marcher', 'écrire', 'boire'];
+const VERBS_INF = ['courir', 'sauter', 'manger', 'dormir', 'chanter', 'jouer', 'rire', 'lire', 'danser', 'nager', 'dessiner', 'marcher', 'écrire', 'boire',
+  'aller', 'faire', 'dire', 'prendre', 'venir', 'finir', 'chercher', 'écouter', 'aider', 'ouvrir', 'tomber', 'arriver', 'trouver', 'rester'];
 const VERB_FORM_NOUNS = new Set(['livre', 'porte', 'pêche', 'tente', 'règle', 'cloche', 'lit', 'vague', 'luge', 'crêpe', 'robe', 'dé', 'jus', 'main', 'pied', 'dent', 'ski', 'patin', 'fleur', 'lune', 'bague', 'danse', 'boxe', 'pile', 'mouche', 'cible', 'goutte', 'herbe', 'ancre', 'terre', 'lanterne', 'montre', 'étiquette', 'enveloppe', 'pilote', 'balai', 'bol', 'quille', 'comète']);
 const SAFE_NOUNS = W.filter((w) => !VERB_FORM_NOUNS.has(w.text));
 function f6SortVerb(R, n) {
@@ -1015,7 +924,35 @@ const ER = [
   ['arriver', 'arriv', 'à l’école'],
   ['trouver', 'trouv', 'une clé'],
   ['cacher', 'cach', 'un trésor'],
+  ['chercher', 'cherch', 'ses clés'],
+  ['demander', 'demand', 'la permission'],
+  ['penser', 'pens', 'à ses amis'],
+  ['rester', 'rest', 'à la maison'],
+  ['tomber', 'tomb', 'dans la neige'],
+  ['passer', 'pass', 'devant l’école'],
+  ['tourner', 'tourn', 'à gauche'],
+  ['monter', 'mont', 'dans l’autobus'],
+  ['arrêter', 'arrêt', 'devant la porte'],
+  ['écouter', 'écout', 'la musique'],
+  ['aider', 'aid', 'sa maman'],
+  ['apporter', 'apport', 'un cadeau'],
 ];
+// Verbes irréguliers de la liste orthographique (formes du présent, je / tu / il / nous / vous / ils).
+const IRR = {
+  aller: { forms: ['vais', 'vas', 'va', 'allons', 'allez', 'vont'], comp: ['à l’école', 'au parc', 'chez grand-maman', 'à la maison', 'dehors'] },
+  faire: { forms: ['fais', 'fais', 'fait', 'faisons', 'faites', 'font'], comp: ['un gâteau', 'du pain', 'un dessin', 'du bruit', 'la lecture'] },
+  dire: { forms: ['dis', 'dis', 'dit', 'disons', 'dites', 'disent'], comp: ['bonjour', 'merci', 'oui', 'la vérité', 'un mot'] },
+  venir: { forms: ['viens', 'viens', 'vient', 'venons', 'venez', 'viennent'], comp: ['chez nous', 'à la maison', 'avec moi', 'à l’école', 'demain'] },
+  prendre: { forms: ['prends', 'prends', 'prend', 'prenons', 'prenez', 'prennent'], comp: ['l’autobus', 'un bain', 'le train', 'du pain', 'son sac'] },
+  pouvoir: { forms: ['peux', 'peux', 'peut', 'pouvons', 'pouvez', 'peuvent'], comp: ['jouer dehors', 'venir avec nous', 'sortir', 'lire', 'chanter'] },
+  vouloir: { forms: ['veux', 'veux', 'veut', 'voulons', 'voulez', 'veulent'], comp: ['du lait', 'un livre', 'jouer', 'du pain', 'dormir'] },
+  mettre: { forms: ['mets', 'mets', 'met', 'mettons', 'mettez', 'mettent'], comp: ['la table', 'un chapeau', 'ses bottes', 'sa robe', 'son manteau'] },
+  savoir: { forms: ['sais', 'sais', 'sait', 'savons', 'savez', 'savent'], comp: ['lire', 'nager', 'la réponse', 'chanter', 'compter'] },
+};
+function f6Irr(R, keys, subjects) {
+  const v = R.pick(keys);
+  return conjQuestion(R, v, IRR[v].forms, R.pick(IRR[v].comp), v, R.pick(subjects));
+}
 const COMP = {
   être: ['à la maison', 'dans le parc', 'à l’école', 'en classe', 'au parc', 'dehors'],
   avoir: ['un chat', 'faim', 'froid', 'un vélo', 'des amis', 'sept ans'],
@@ -1054,11 +991,14 @@ const f6 = {
   id: 'f6',
   icon: '🏃',
   title: { fr: 'Le verbe', en: 'The verb' },
-  pfeq: 'Grammaire — le verbe, présent de être, avoir et des verbes en -er (PFEQ 1er cycle, 2e année)',
+  pfeq: 'Grammaire — le verbe, présent de être, avoir, aller, faire, dire, venir, prendre… et des verbes en -er; mots de la liste orthographique du MEQ (2e/3e année) (PFEQ 1er cycle, 2e année)',
   generate: run({
     1: [(R) => f6FindVerb(R, 1), (R) => f6FindVerb(R, 1), (R) => f6SortVerb(R, 4)],
-    2: [(R) => f6FindVerb(R, 2), (R) => f6BeHave(R, SUBJ_PRON), (R) => f6SortVerb(R, 6)],
-    3: [(R) => f6FindVerb(R, 3), (R) => f6ConjEr(R), (R) => f6ConjEr(R), (R) => f6BeHave(R, SUBJ_ALL)],
+    2: [(R) => f6FindVerb(R, 2), (R) => f6BeHave(R, SUBJ_PRON), (R) => f6SortVerb(R, 6), (R) => f6Irr(R, ['aller', 'faire', 'dire'], SUBJ_PRON)],
+    3: [
+      (R) => f6FindVerb(R, 3), (R) => f6ConjEr(R), (R) => f6ConjEr(R), (R) => f6BeHave(R, SUBJ_ALL),
+      (R) => f6Irr(R, Object.keys(IRR), SUBJ_ALL), (R) => f6Irr(R, Object.keys(IRR), SUBJ_ALL),
+    ],
   }),
 };
 
@@ -1886,37 +1826,39 @@ const f8 = {
 /* ================================================================== */
 /*  f9 — Les mots                                                      */
 /* ================================================================== */
+// Contraires : uniquement des mots de la liste orthographique du MEQ. [mot, contraire, groupe, année du mot le plus difficile]
 const PAIRS = [
-  ['grand', 'petit', 'taille'], ['long', 'court', 'taille'], ['haut', 'bas', 'taille'], ['gros', 'mince', 'taille'],
-  ['chaud', 'froid', 'temp'],
-  ['jour', 'nuit', 'temps'], ['tôt', 'tard', 'temps'], ['début', 'fin', 'temps'],
-  ['content', 'triste', 'emotion'], ['rire', 'pleurer', 'emotion'], ['aimer', 'détester', 'emotion'],
-  ['ouvert', 'fermé', 'etat'], ['plein', 'vide', 'etat'], ['propre', 'sale', 'etat'], ['sec', 'mouillé', 'etat'],
-  ['dur', 'mou', 'etat'], ['lourd', 'léger', 'etat'],
-  ['monter', 'descendre', 'lieu'], ['entrer', 'sortir', 'lieu'], ['devant', 'derrière', 'lieu'],
-  ['dedans', 'dehors', 'lieu'], ['gauche', 'droite', 'lieu'],
-  ['beau', 'laid', 'aspect'], ['jeune', 'vieux', 'aspect'], ['noir', 'blanc', 'aspect'],
-  ['vite', 'lent', 'force'], ['fort', 'faible', 'force'],
+  ['grand', 'petit', 'taille', 1], ['jour', 'nuit', 'temps', 1], ['matin', 'soir', 'temps', 1], ['blanc', 'noir', 'couleur', 1],
+  ['haut', 'bas', 'lieu', 2], ['chaud', 'froid', 'qualite', 2], ['été', 'hiver', 'saison', 2], ['printemps', 'automne', 'saison', 2],
+  ['beau', 'laid', 'qualite', 2], ['oui', 'non', 'reponse', 2], ['devant', 'derrière', 'lieu', 2], ['avant', 'après', 'temps', 2],
+  ['loin', 'près', 'distance', 2], ['toujours', 'jamais', 'frequence', 2], ['sur', 'sous', 'lieu', 2], ['plus', 'moins', 'quantite', 2],
+  ['vrai', 'faux', 'verite', 2], ['premier', 'dernier', 'temps', 2], ['avec', 'sans', 'accompagne', 2], ['beaucoup', 'peu', 'quantite', 2],
+  ['aller', 'venir', 'mouvement', 2], ['donner', 'prendre', 'geste', 2],
+  ['long', 'court', 'taille', 3], ['vieux', 'jeune', 'age', 3], ['dedans', 'dehors', 'lieu', 3], ['entrer', 'sortir', 'mouvement', 3],
+  ['monter', 'descendre', 'mouvement', 3], ['ouvrir', 'fermer', 'geste', 3], ['bon', 'mauvais', 'qualite', 3], ['heureux', 'triste', 'qualite', 3],
+  ['riche', 'pauvre', 'qualite', 3], ['mal', 'bien', 'maniere', 3], ['gauche', 'droite', 'lieu', 3], ['vite', 'lentement', 'vitesse', 3],
+  ['gentil', 'méchant', 'qualite', 3], ['commencer', 'terminer', 'action', 3], ['seul', 'ensemble', 'groupe', 3], ['lever', 'coucher', 'geste', 3],
+  ['gagner', 'perdre', 'jeu', 3], ['doux', 'dur', 'toucher', 3],
 ];
-const ANT_ITEMS = PAIRS.flatMap(([a, b, g]) => [
-  { q: a, a: b, g },
-  { q: b, a: a, g },
-]);
-const ALL_ANT_WORDS = PAIRS.flatMap(([a, b, g]) => [
-  { t: a, g },
-  { t: b, g },
-]);
-function f9Antonym(R, n) {
-  const it = R.pick(ANT_ITEMS);
-  const wrong = R.sample(ALL_ANT_WORDS.filter((x) => x.g !== it.g), n - 1);
+// Facile = 1re + 2e année ; Moyen = 2e + 3e année ; Difficile = 3e année.
+const antPairs = (level) => PAIRS.filter((p) => (level === 1 ? p[3] <= 2 : level === 2 ? p[3] >= 2 : p[3] === 3));
+const antItems = (level) =>
+  antPairs(level).flatMap(([a, b, g]) => [
+    { q: a, a: b, g },
+    { q: b, a: a, g },
+  ]);
+const antWords = (level) => antPairs(level).flatMap(([a, b, g]) => [{ t: a, g }, { t: b, g }]);
+function f9Antonym(R, n, level) {
+  const it = R.pick(antItems(level));
+  const wrong = R.sample(antWords(level).filter((x) => x.g !== it.g), n - 1);
   const o = (t) => ({ text: t, say: say(t) });
   return mkChoice(R, `f9-a-${it.q}`, `Quel est le contraire de « ${it.q} »?`, o(it.a), wrong.map((x) => o(x.t)), {
     say: say(`Quel est le contraire de ${it.q}?`),
     cols: n === 3 ? 3 : 2,
   });
 }
-function f9AntonymLetters(R) {
-  const it = R.pick(ANT_ITEMS.filter((x) => Array.from(x.a).length <= 7));
+function f9AntonymLetters(R, level) {
+  const it = R.pick(antItems(level).filter((x) => Array.from(x.a).length <= 8));
   return {
     type: 'order',
     key: `f9-al-${it.q}`,
@@ -1927,8 +1869,14 @@ function f9AntonymLetters(R) {
     joiner: '',
   };
 }
-const AMBIG = new Set(['tomate', 'concombre', 'aubergine', 'poivron', 'champignon', 'maïs', 'piment', 'avocat', 'tente', 'château', 'luge', 'patin', 'ski', 'érable', 'dinosaure', 'tyrannosaure', 'cœur', 'bras', 'pirate', 'dragon', 'licorne']);
-const W9 = W.filter((w) => !AMBIG.has(w.text));
+// Mots illustrables de la liste orthographique du MEQ (année de la liste), pour « image et mot », catégories, intrus.
+const W9_GRADE = new Map(`chat:1 chien:1 lapin:1 cheval:1 mouton:1 canard:2 loup:1 ours:3 lion:3 souris:1 poisson:1 oiseau:1 coq:2 renard:3 pomme:1 banane:2 fraise:3 orange:2 carotte:2 patate:2 pain:1 bonbon:1 jus:3 bas:2 robe:1 pantalon:3 chapeau:1 auto:2 autobus:3 train:1 avion:3 bateau:3 vélo:1 camion:3 livre:1 école:1 ballon:3 cadeau:3 fantôme:2 fée:2 maison:1 porte:1 lit:1 chaise:3 clé:3 ampoule:3 télévision:3 téléphone:3 main:1 nez:1 bouche:1 oreille:1 dent:1 langue:3 pied:1 soleil:1 lune:1 étoile:3 nuage:3 arbre:1 fleur:1 pluie:1 montagne:1 feu:1 maman:1 papa:1 bébé:1 fille:1 garçon:1 princesse:2 poule:1 poussin:3 rat:3 œuf:1 viande:3 café:2 botte:3 sac:1 journal:3 papier:1 radio:3 danse:3 fenêtre:1 hôpital:3 église:3 usine:3 terre:1 feuille:1 herbe:3 goutte:3 jambe:3 doigt:3 monstre:2 enfant:1 sapin:3`.split(' ').map((x) => { const [t, g] = x.split(':'); return [t, Number(g)]; }));
+const W9ALL = W.filter((w) => W9_GRADE.has(w.text));
+const W9LV = {
+  1: W9ALL.filter((w) => W9_GRADE.get(w.text) <= 2),
+  2: W9ALL.filter((w) => W9_GRADE.get(w.text) >= 2),
+  3: W9ALL.filter((w) => W9_GRADE.get(w.text) === 3),
+};
 const CATS = [
   { id: 'animal', label: 'Les animaux', emoji: '🐾', phrase: 'un animal' },
   { id: 'fruit', label: 'Les fruits', emoji: '🍎', phrase: 'un fruit' },
@@ -1938,13 +1886,15 @@ const CATS = [
   { id: 'nature', label: 'La nature', emoji: '🌳', phrase: 'dans la nature', wrong: ['trans', 'vet', 'ecole', 'musique', 'objet', 'maison', 'food'] },
   { id: 'maison', label: 'La maison', emoji: '🏠', phrase: 'dans la maison', wrong: ['nature', 'trans'] },
   { id: 'corps', label: 'Le corps', emoji: '🧍', phrase: 'une partie du corps' },
-  { id: 'metier', label: 'Les métiers', emoji: '👷', phrase: 'un métier', wrong: ['animal', 'fruit', 'vet', 'trans', 'nature', 'objet', 'maison'] },
+  { id: 'famille', label: 'La famille', emoji: '👪', phrase: 'dans la famille', wrong: ['animal', 'fruit', 'legume', 'vet', 'trans', 'nature', 'maison', 'corps', 'food', 'ecole'] },
 ];
-const w9ByCat = (id) => W9.filter((w) => w.cat === id);
-function f9Sort(R, nb, counts, fixedIds) {
-  const cats = fixedIds ? fixedIds.map((id) => CATS.find((c) => c.id === id)) : R.sample(CATS, nb);
+const w9ByCat = (pool, id) => pool.filter((w) => w.cat === id);
+const catsWith = (pool, n) => CATS.filter((c) => w9ByCat(pool, c.id).length >= n);
+function f9Sort(R, level, nb, counts, fixedIds) {
+  const pool = W9LV[level];
+  const cats = fixedIds ? fixedIds.map((id) => CATS.find((c) => c.id === id)) : R.sample(catsWith(pool, Math.max(...counts)), nb);
   const groups = cats.map((c, i) =>
-    R.sample(w9ByCat(c.id), counts[i]).map((w) => ({ text: w.text, emoji: w.emoji, say: say(w.text) })),
+    R.sample(w9ByCat(pool, c.id), counts[i]).map((w) => ({ text: w.text, emoji: w.emoji, say: say(w.text) })),
   );
   return mkSort(
     R,
@@ -1956,16 +1906,17 @@ function f9Sort(R, nb, counts, fixedIds) {
   );
 }
 function f9Image(R, level) {
+  const pool = W9LV[level];
   let w;
   let wrong;
   if (level === 3) {
-    const cat = R.pick(CATS.filter((c) => w9ByCat(c.id).length >= 4));
-    const pool = w9ByCat(cat.id);
-    w = R.pick(pool);
-    wrong = R.sample(pool.filter((x) => x !== w && compat(w, x)), 3);
+    const cat = R.pick(catsWith(pool, 4));
+    const same = w9ByCat(pool, cat.id);
+    w = R.pick(same);
+    wrong = R.sample(same.filter((x) => x !== w && compat(w, x)), 3);
   } else {
-    w = R.pick(W9);
-    wrong = R.sample(W9.filter((x) => x.cat !== w.cat && compat(w, x)), level === 1 ? 2 : 3);
+    w = R.pick(pool);
+    wrong = R.sample(pool.filter((x) => x.cat !== w.cat && compat(w, x)), level === 1 ? 2 : 3);
   }
   const o = (x) => ({ text: x.text, say: say(x.text) });
   return mkChoice(R, `f9-i-${w.text}`, 'Quel mot va avec l’image?', o(w), wrong.map(o), {
@@ -1974,20 +1925,22 @@ function f9Image(R, level) {
     cols: level === 1 ? 3 : 2,
   });
 }
-function f9Which(R) {
-  const cat = R.pick(CATS);
-  const w = R.pick(w9ByCat(cat.id));
-  const wrong = R.sample(W9.filter((x) => x.cat !== cat.id && (!cat.wrong || cat.wrong.includes(x.cat)) && compat(w, x)), 3);
+function f9Which(R, level) {
+  const pool = W9LV[level];
+  const cat = R.pick(catsWith(pool, 1).filter((c) => pool.filter((x) => x.cat !== c.id && (!c.wrong || c.wrong.includes(x.cat))).length >= 3));
+  const w = R.pick(w9ByCat(pool, cat.id));
+  const wrong = R.sample(pool.filter((x) => x.cat !== cat.id && (!cat.wrong || cat.wrong.includes(x.cat)) && compat(w, x)), 3);
   const o = (x) => ({ text: x.text, emoji: x.emoji, say: say(x.text) });
   return mkChoice(R, `f9-q-${cat.id}-${w.text}`, `Lequel est ${cat.phrase}?`, o(w), wrong.map(o), {
     say: say(`Lequel est ${cat.phrase}?`),
     cols: 2,
   });
 }
-function f9Intruder(R) {
-  const cat = R.pick(CATS.filter((c) => w9ByCat(c.id).length >= 4));
-  const group = R.sample(w9ByCat(cat.id), 3);
-  const odd = R.pick(W9.filter((x) => x.cat !== cat.id));
+function f9Intruder(R, level) {
+  const pool = W9LV[level];
+  const cat = R.pick(catsWith(pool, 4));
+  const group = R.sample(w9ByCat(pool, cat.id), 3);
+  const odd = R.pick(pool.filter((x) => x.cat !== cat.id && group.every((g) => compat(g, x))));
   const o = (x) => ({ text: x.text, say: say(x.text) });
   return mkChoice(R, `f9-x-${sortedKey([...group, odd].map((x) => x.text))}`, 'Quel mot ne va pas avec les autres?', o(odd), group.map(o), {
     say: say('Quel mot ne va pas avec les autres?'),
@@ -1998,15 +1951,16 @@ const f9 = {
   id: 'f9',
   icon: '🧩',
   title: { fr: 'Les mots', en: 'Words' },
-  pfeq: 'Lecture / écriture — vocabulaire : contraires, catégories de mots, image et mot (PFEQ 1er cycle, 2e année)',
+  pfeq: 'Lecture / écriture — vocabulaire : contraires, catégories de mots, image et mot; mots de la liste orthographique du MEQ (2e/3e année) (PFEQ 1er cycle, 2e année)',
   generate: run({
-    1: [(R) => f9Antonym(R, 3), (R) => f9Sort(R, 2, [2, 2], ['animal', 'fruit']), (R) => f9Image(R, 1)],
-    2: [(R) => f9Antonym(R, 4), (R) => f9Sort(R, 2, [3, 3]), (R) => f9Image(R, 2), (R) => f9Which(R)],
+    1: [(R) => f9Antonym(R, 3, 1), (R) => f9Sort(R, 1, 2, [2, 2], ['animal', 'fruit']), (R) => f9Image(R, 1)],
+    2: [(R) => f9Antonym(R, 4, 2), (R) => f9Sort(R, 2, 2, [3, 3]), (R) => f9Image(R, 2), (R) => f9Which(R, 2)],
     3: [
-      (R) => f9AntonymLetters(R),
-      (R) => f9Sort(R, 3, R.shuffle([2, 3, 3])),
+      (R) => f9AntonymLetters(R, 3),
+      (R) => f9Sort(R, 3, 3, R.shuffle([2, 3, 3])),
       (R) => f9Image(R, 3),
-      (R) => f9Intruder(R),
+      (R) => f9Intruder(R, 3),
+      (R) => f9Antonym(R, 4, 3),
     ],
   }),
 };
@@ -2964,118 +2918,735 @@ f2.generate = run({
 f2.pfeq = 'Lecture / écriture — découpage en syllabes de mots longs (3 à 5 syllabes), assemblage et syllabe manquante (PFEQ 1er cycle, 2e–3e année)';
 
 /* ---------------- f3 : orthographe d’usage ---------------- */
+// Mots de la liste orthographique du MEQ (Liste orthographique – Document de référence, 1re à 3e année)
+// mot|année|fautes plausibles (lettre muette, double consonne, é/er, an/en, s/ss/c/ç, g/ge, eau/au/o…)
 const ORTHO_RAW = `
-appartement|apartement,appartemant
-attention|atention,attantion
-aujourd’hui|aujourdhui,aujourd’huit
-bibliothèque|bibliotèque,bibiothèque
-camarade|camerade,camarad
-chaussure|chossure,chausure
-exercice|exercise,éxercice
-gentil|gentill,jentil
-histoire|histoir,istoire
-hiver|hivaire,yver
-jardin|jardain,jardein
-lumière|lumiaire,lumièr
-mélange|mélenge,méllange
-musique|musik,musiqu
-nettoyer|netoyer,nettoier
-pharmacie|farmacie,pharmassie
-problème|problême,problaime
-question|quéstion,kestion
-quelquefois|quelquefoit,quelcquefois
-rapidement|rapidemant,rapidment
-réponse|réponce,répons
-semaine|semène,semaîne
-tableau|tablo,tabeau
-travail|travaille,travaïl
-vacances|vacanses,vaccances
-voyage|voiyage,voyaje
-voisin|voisain,voizin
-vêtement|vêtemant,vètement
-magasin|magazin,magasain
-mouchoir|mouchoire,mouchoar
-comprendre|comprandre,compendre
-anniversaire|aniversaire,anniverssaire
-bouteille|boutelle,bouteile
-chanson|chançon,chenson
-chercher|chercer,chèrcher
-classe|clase,classse
-devoir|devoire,dévoir
-difficile|dificile,difficille
-douleur|douleure,dolleur
-famille|famile,familie
-fatigué|fatigé,fattigué
-fleuve|fleuv,fleuvre
-garage|garaje,garrage
-général|jénéral,généralle
-habiter|abiter,habitter
-immeuble|imeuble,immeubble
-inviter|enviter,invitter
-janvier|janvié,jenvier
-lentement|lentemant,lentment
-neige|neije,nège
-propre|propr,prope
-raconter|racconter,raconnter
-regarder|reguarder,regardder
-saison|saizon,saisson
-trouver|trouvere,trouvair
-vraiment|vraimant,vrèment
-écouter|ecouter,écoutter
-électricité|électricitée,életricité
-courageux|courageu,couragieux
-dangereux|dangeureux,danjereux
-bonheur|bonheure,bonneur
-attendre|atandre,attendrre
-acheter|achetter,ashéter
-allumer|alumer,allummer
-apporter|aporter,apportter
-arrêter|arréter,arêter
-bruit|brui,bruitt
-chaque|chacque,chaqe
-début|débu,debut
-déjà|dèja,déja
-depuis|depui,depuit
-derrière|dérrière,deriere
-dessin|desin,dessain
-devant|devent,dévant
-espace|éspace,espase
-lettre|letre,lettr
-longtemps|longtemp,lontemps
-magnifique|magnifik,manifique
-pendant|pandant,pendent
-personne|persone,personnne
-plusieurs|plusieur,plusieures
-prendre|prandre,prendrre
-réussir|réusir,réussire
-sentir|santir,sentire
-tempête|tempète,tempette
-terminer|termminer,terminner
-tomber|tonber,tombber
-éléphant|élèphant,éléfant
-orchestre|orquestre,orchestr
-spectacle|spectacl,spéctacle
-quartier|cartier,quartié
+aile|1|èle,ayle
+aimer|1|aimmer,eimer
+animal|1|animmal,enimal
+arbre|1|arbe,arbr
+avoir|1|avoar,avoire
+beau|1|bau,bo
+beaucoup|1|beaucou,bocoup
+bébé|1|bébée,bebé
+blanc|1|blan,blant
+bleu|1|bleuh,blue
+bonbon|1|bonbont,bombon
+bouche|1|bouch,bousche
+bras|1|bra,brat
+brun|1|brein,brunn
+carte|1|cart,carthe
+chambre|1|chanbre,shambre
+chanter|1|shanter,chenter
+chapeau|1|chapo,chapau
+chat|1|cha,chatt
+chaud|1|shaud,cheaud,chau
+chemin|1|chemain,chemmin,shemin
+cher|1|sher,chèr
+chercher|1|chercer,chèrcher
+cheval|1|cheveal,chéval
+cheveu|1|cheveut,sheveu,chevœu
+chien|1|chiain,chein
+chose|1|choze,shose
+ciel|1|siel,ciele
+cinq|1|cinc,sinq
+classe|1|clase,classse
+cœur|1|keur,cœure
+coup|1|coupt,koup
+dame|1|damme,dane
+dans|1|dan,dens
+demander|1|demender,demmander
+dent|1|dan,dend
+deux|1|deu,deus
+devenir|1|devanir,devennir
+devoir|1|devoire,dévoir
+dimanche|1|dimanch,dimenche
+donner|1|doner,donnair
+dormir|1|dormire,dorrmir
+doux|1|doup,douxe
+école|1|écol,ékole
+enfant|1|enfan,anfant
+être|1|etre,aître
+famille|1|famile,familie
+fenêtre|1|fenètre,fenaitre
+fête|1|fêtte,fete
+feuille|1|feuile,feuye
+fille|1|filie,fiile
+finir|1|finnir,fainir
+fleur|1|fleure,fleurre
+fois|1|foit,foix
+forêt|1|foret,forrêt,forê
+frère|1|frèrre,frere
+garçon|1|garson,garçont
+grand|1|gran,grend
+gris|1|gri,grix
+gros|1|gro,groz
+heure|1|hœure,heurre
+heureux|1|heureu,hœureux,heurreux
+histoire|1|histoir,istoire
+huit|1|uit,huite
+jardin|1|jardain,jardein
+jaune|1|jône,jaunne
+jeudi|1|jeudie,jeudy
+joie|1|joi,joye
+joli|1|jolli,joly
+jouer|1|juer,jouair
+jour|1|jou,jourt
+journée|1|jurnée,journee
+lapin|1|lapain,lappin
+lettre|1|letre,lettr
+lever|1|levair,lèver
+lire|1|lirre,lirhe
+livre|1|livr,lyvre
+long|1|lon,lonc
+loup|1|lou,loux
+lundi|1|lundie,landi
+lune|1|lun,lunne
+main|1|min,mainn
+mais|1|mèe,maiss
+maison|1|maizon,maisson
+maman|1|mamant,mamman
+manger|1|menger,manjer
+marche|1|marshe,marsche
+mardi|1|mardy,mardie
+matin|1|matain,mattin
+merci|1|mercit,mersi
+mercredi|1|mercrédi,mercredie
+mère|1|mèrre,mére
+midi|1|middi,mydi
+monde|1|monnde,mondde
+montagne|1|montagn,montane
+mouton|1|mouthon,moutont
+musique|1|musik,musiqu
+neige|1|neije,nège
+neuf|1|neuff,neuph
+noir|1|noar,nouar
+nous|1|nou,noux
+nuit|1|nui,nuite
+oiseau|1|oizeau,oiso
+oreille|1|oreile,orèye
+ouvrir|1|ouvrire,ouvrirr
+page|1|paje,pagge
+pain|1|pein,painn
+papa|1|pappa,papat
+papier|1|papié,papiér
+parler|1|parlair,parlerr
+pauvre|1|peauvre,povre
+pays|1|pais,païs
+père|1|pèrre,pere
+personne|1|persone,personnne
+petit|1|peti,pettit
+phrase|1|phrasse,frase
+pied|1|pié,piet
+place|1|plasse,plase
+plaisir|1|plaizir,pleisir
+plein|1|plin,pleain
+pluie|1|plui,pluit
+plus|1|pluss,pluz
+poisson|1|poiçon,poisso
+pomme|1|pome,pomm
+porte|1|port,portte
+poule|1|poul,poulle
+poupée|1|poupee,pupée,pouppée
+pouvoir|1|pouvoar,puvoir,pouvoire
+premier|1|premié,premmier
+quand|1|quan,cand
+quatre|1|catre,quatr
+queue|1|quœue,keue
+regarder|1|reguarder,regardder
+robe|1|rob,robbe
+rose|1|roze,rôse
+rouge|1|rouje,rougue
+route|1|routte,rute
+samedi|1|samdi,samedie
+sept|1|sepp,cept
+sœur|1|seur,sœure
+soir|1|soar,soire
+soleil|1|soleille,solèy
+souris|1|sourri,souriss
+table|1|tabble,tabl
+terre|1|tère,terr
+tête|1|têtte,tete
+train|1|trin,trein
+trois|1|troi,troa
+vélo|1|vélau,véllo
+vendredi|1|vandredi,vendredie
+vent|1|vant,venth
+vert|1|verd,vèr
+ville|1|vill,vilee
+visage|1|vissage,visaje
+voir|1|voar,voire
+voler|1|voller,volair
+vouloir|1|vouloar,vuloir,vouloire
+vous|1|vou,voux
+aller|2|aler,allair
+alors|2|allors,alor
+amuser|2|anuser,ammuser,amusser
+appeler|2|apeler,appeller
+après|2|aprè,aprés
+arrêter|2|arréter,arêter
+arriver|2|ariver,arrivair
+attendre|2|atandre,attendrre
+aussi|2|ausi,osi
+auto|2|otto,autto
+automne|2|autonne,otomne
+autour|2|otour,autur
+autre|2|otre,autr
+avant|2|avan,avent
+avec|2|avek,avecq
+banane|2|banan,bananne
+bois|2|boi,boas
+bout|2|bou,boutt
+brebis|2|brebi,brebbis
+bruit|2|brui,bruitt
+café|2|caffé,cafè
+campagne|2|canpagne,campane
+canard|2|canar,kanard
+cane|2|cene,kane
+carotte|2|carote,carrotte
+celui|2|cellui,celuit,selui
+cent|2|cant,centt
+certains|2|sertains,certeins,certèns
+chanson|2|chançon,chenson
+chaque|2|chacque,chaqe
+chez|2|chè,chaiz
+cinquante|2|cincuante,cainquante,sinquante
+comme|2|com,comm
+comment|2|coment,commant,commen
+côté|2|coté,côtté
+cour|2|kour,courr
+cousin|2|cousain,cusin
+déjà|2|dèja,déja
+depuis|2|depui,depuit
+dernier|2|derniez,dernié
+derrière|2|dérrière,deriere
+deuxième|2|dœuxième,deuxièmme,deuxieme
+devant|2|devent,dévant
+dire|2|dirre,dirr
+donc|2|donk,donq
+douze|2|douse,douz
+élève|2|éllève,éléve
+encore|2|ancore,encorre
+enfin|2|enfain,enfine
+ensuite|2|ensuitte,ansuite
+entendre|2|entandre,antendre
+entre|2|entr,entrre
+face|2|fase,facce
+faire|2|fairre,feire
+fantôme|2|fantome,fantaume
+faux|2|fau,fauxe
+femme|2|famme,feme
+figure|2|figurre,figre
+fils|2|filz,fiss
+fort|2|forr,fortt
+froid|2|froad,froi
+fruit|2|frui,fruix
+grand-maman|2|grand-mamen,grand-mamman
+grand-mère|2|grend-mère,grand-mèrre,grand-mere
+grand-papa|2|grand-papat,grand-pappa,grend-papa
+grand-père|2|grand-pére,grend-père,grand-pèrre
+haut|2|hau,haud
+hiver|2|hivaire,yver
+homme|2|home,honme
+idée|2|iddée,idèe
+image|2|imaje,immage
+jamais|2|jamè,jammais
+joyeux|2|joyœux,joyeu
+jument|2|jumant,jumen,jumment
+laid|2|laïd,laidt
+large|2|larje,larg
+leçon|2|lesson,lecon
+lecture|2|lecturre,lectur
+légume|2|légumme,lègume,légme
+leur|2|leure,lleur
+loin|2|loain,loan
+lorsque|2|lorske,lorscue
+madame|2|madane,maddame
+maintenant|2|maintenan,mintenant
+malade|2|maladde,mallade
+marier|2|marrier,mariair
+même|2|meme,mêmme
+mettre|2|metre,mettr
+mieux|2|miœux,mieu
+moins|2|moains,moans,moin
+moment|2|momment,momen,monent
+monsieur|2|mosieur,monsieu
+monstre|2|monstr,monstrre
+monter|2|monnter,montair
+nature|2|natture,naturre
+notre|2|notr,notrre
+nouveau|2|nouveaut,nouvo,nuveau
+oncle|2|oncl,onkle
+onze|2|onse,honze
+orange|2|oranje,orrange
+paire|2|peire,pairre
+parent|2|paren,parant
+parfois|2|parfoas,parfoi
+partout|2|partut,partou
+passer|2|paser,paçer
+patate|2|patatte,patat
+patte|2|pate,patt
+peau|2|pau,peaut
+peine|2|peaine,peinne
+pendant|2|pandant,pendan
+penser|2|pensair,pencer
+peur|2|peure,peureu
+peut-être|2|pœut-être,peut-ètre
+porc|2|por,pork
+pour|2|pourr,pourt
+pourquoi|2|pourcuoi,purquoi,pourquoit
+prendre|2|prandre,prendrre
+près|2|pres,prés
+prière|2|prièrre,priaire,priére
+prince|2|praince,prinsse
+princesse|2|prinsesse,princese
+printemps|2|praintemps,printenps
+propre|2|propr,prope
+puis|2|pui,puie
+quarante|2|quarente,quarrante,karante
+quatorze|2|catorze,quatorse
+quelque|2|cuelque,kelque
+quinze|2|quinse,kinze
+reine|2|reaine,reinne
+répondre|2|réppondre,rèpondre
+rester|2|restair,resster
+sage|2|saje,sagge
+sans|2|san,sanz
+savoir|2|savoar,cavoir,savoire
+seize|2|sèze,seise
+semaine|2|semène,semaîne
+seul|2|seull,seulle
+soixante|2|soixente,soaxante
+sortir|2|sortire,sorttir
+sous|2|soux,souss
+souvent|2|souvan,souvend
+suivre|2|suivr,suivrre
+surtout|2|surtut,surtou
+tableau|2|tablo,tabeau
+tant|2|tent,tanth
+tante|2|tanthe,tantte
+tard|2|tar,tart
+tellement|2|tellemen,tellemant,tellemment
+temps|2|tenps,tamps
+tomber|2|tonber,tombber
+toujours|2|toujour,toujous
+tourner|2|turner,tournair
+tout|2|tou,toutt
+treize|2|trèze,treise
+trente|2|trante,trent
+très|2|trè,tres
+trop|2|tro,troph
+trouver|2|trouvere,trouvair
+truie|2|trui,truye
+venir|2|vennir,vanir
+vers|2|verd,verss
+vieux|2|viœux,vieu
+vingt|2|vaint,vinq
+vite|2|vitte,vyte
+voici|2|voisi,voaci,voicit
+voilà|2|voila,voalà,voillà
+voix|2|voi,voiz
+votre|2|votr,votrre
+vrai|2|vrei,vrè
+vraiment|2|vraimant,vrèment
+zéro|2|zérro,zero
+abri|3|abrie,abry
+acheter|3|achetter,ashéter
+adulte|3|addulte,adulde
+affaire|3|affeire,affairre
+agneau|3|agneaut,agno,aneau
+aider|3|aidder,èder
+allure|3|alure,allurre
+alphabet|3|alphabbet,alphabe,alfabet
+amour|3|amur,ammour,anour
+amoureux|3|anoureux,amourœux,amourreux
+ampoule|3|anpoule,ampoul
+année|3|annèe,ennée,anée
+appartement|3|apartement,appartemant
+apporter|3|aporter,apportter
+apprendre|3|apprandre,aprendre
+approcher|3|approsher,aprocher
+après-midi|3|après-midit,aprés-midi,après-middi
+argent|3|arjent,argant,argen
+assez|3|açez,asez,asse
+attention|3|atention,attantion
+attraper|3|atraper,attrapper
+aussitôt|3|aussitot,ausitôt,eaussitôt
+autobus|3|otobus,autobuss
+avaler|3|avaller,avalair
+avancer|3|avencer,avanser
+avant-midi|3|avent-midi,avant-middi,avant-midit
+avion|3|avionn,avian
+avril|3|avrile,avrill
+baigner|3|bainer,beigner
+bain|3|baain,bein
+balle|3|bale,bâlle
+ballon|3|balon,ballont
+bande|3|bende,bannde
+barbe|3|bare,barbbe
+bateau|3|bato,batau
+bâton|3|baton,bâtton
+battre|3|batre,battr
+bête|3|bete,bêtte
+bien|3|bian,bein
+bientôt|3|biantôt,bientô,bientot
+boire|3|boare,boirre
+bonheur|3|bonheure,bonneur
+bonhomme|3|bonhome,bonhonme
+bonjour|3|bonjur,bonjoure
+bonsoir|3|bonsoar,bonsoire
+bord|3|bor,bort
+botte|3|bote,bott
+bouchon|3|buchon,boushon
+bouteille|3|boutelle,bouteile
+branche|3|brenche,branshe
+brutal|3|bruttal,brutall
+bureau|3|burau,bureaut,burreau
+cacher|3|casher,cachair
+cadeau|3|cado,cadau
+camion|3|camionn,camyon
+cause|3|causse,ceause
+certain|3|sertain,certein,certaain
+chacun|3|chacein,shacun
+chagrin|3|shagrin,chagrain
+chaise|3|chèse,chaize
+champ|3|cham,chanp
+changer|3|chenger,chanjer
+chant|3|chan,chent,shant
+chasse|3|shasse,chase
+chasser|3|chaser,shasser
+chasseur|3|chaçeur,chassœur,shasseur
+château|3|châtau,chatô
+chiffre|3|chifre,shiffre
+choisir|3|choasir,shoisir,choissir
+choix|3|choi,choax,shoix
+cinéma|3|cainéma,sinéma,cinèma
+clair|3|clèr,cleir
+coin|3|coan,coain
+combien|3|conbien,combian
+commencer|3|commensser,comencer,commancer
+comprendre|3|comprandre,compendre
+compter|3|conpter,comter
+congé|3|conger,conjé,conge
+consoler|3|consoller,consolair
+conte|3|conthe,contte
+continuer|3|containuer,continnuer
+contre|3|contr,contrre
+corps|3|corp,corpt
+costume|3|costumme,costum
+coucher|3|cousher,cucher
+couleur|3|culeur,coulleur,coulœur
+courant|3|couran,courrant
+courir|3|courrir,curir
+cours|3|curs,courx
+course|3|curse,courss
+court|3|curt,courd
+crème|3|crèmme,creme
+crier|3|criair,crièr
+crise|3|crize,criz
+croire|3|croare,croirre
+cuisine|3|cuisaine,cuizine,cuisinne
+danger|3|dangez,danjer,denger
+danse|3|dence,danze
+danser|3|denser,dancer
+date|3|datte,dâte
+décembre|3|décenbre,déssembre,dècembre
+découvrir|3|décuvrir,dècouvrir
+dedans|3|deddans,dedan,dedens
+dehors|3|dehor,déhors
+demain|3|demein,demaine
+demande|3|demmande,demende
+demi|3|demmi,demy
+déposer|3|deposer,dépozer,dépposer
+descendre|3|descandre,dessendre
+diriger|3|dirijer,dirriger
+docteur|3|doctor,dokteur
+doigt|3|doig,doigth
+droit|3|droi,droat
+droite|3|droitte,droate
+écouter|3|ecouter,écoutter
+écrire|3|écrirre,ecrire
+église|3|eglise,églize
+embrasser|3|embraçer,enbrasser,embraser
+enquête|3|anquête,enquêtte,enquète
+ensemble|3|ansemble,ensenble
+entrer|3|antrer,entrair
+environ|3|anviron,envirron
+épais|3|épai,epais,épeis
+espérer|3|espérrer,esperer
+étoile|3|étoal,étoille
+exemple|3|exenple,exanple
+facile|3|facille,fasile
+faim|3|fain,faime
+faute|3|fautte,feaute
+ferme|3|fairme,ferm
+fermer|3|fermair,fairmer
+février|3|fèvrier,févriez,févrié
+fier|3|fiér,fiere
+film|3|fime,fylm
+fixe|3|fiks,fice
+fleuve|3|fleuv,fleuvre
+fond|3|fon,fonc
+frais|3|frès,fraix
+fraise|3|frèse,fraize
+frapper|3|fraper,frappair
+gagner|3|ganer,gagnair
+garder|3|gardair,gardère
+gauche|3|geauche,gaushe
+genou|3|genu,jenou,gennou
+genre|3|ganre,jenre
+gens|3|jens,gans
+gentil|3|gentill,jentil
+glace|3|glase,glasse
+glisser|3|gliser,glissair
+gorge|3|gorje,gorgue
+goutte|3|goute,gouthe
+groupe|3|grouppe,grupe
+guerre|3|guere,gerre
+habiter|3|abiter,habitter
+hauteur|3|hoteur,hautœur,hautteur
+herbe|3|erbe,herb
+hôpital|3|hopital,opital
+horrible|3|horible,orrible
+important|3|inportant,importan
+invitation|3|ainvitation,invitasion,invittation
+jambe|3|janbe,jamb
+janvier|3|janvié,jenvier
+jeter|3|geter,jetter
+jeune|3|jeeine,geune,jœune
+joue|3|jou,joux
+jouet|3|jouè,jouett
+journal|3|jurnal,journale
+juillet|3|juilet,juille
+juin|3|juain,juein
+juste|3|just,justte
+laisser|3|laiser,lèsser
+lancer|3|lencer,lansser
+langue|3|lanque,lengue
+lendemain|3|landemain,lendemèn,lendemmain
+lentement|3|lentemant,lentment
+lèvre|3|levre,lévre
+libre|3|libbre,libr
+lieu|3|liu,lyeu
+lièvre|3|liévre,lievre
+ligne|3|linne,lygne
+lion|3|liont,liom
+longtemps|3|longtemp,lontemps
+lumière|3|lumiaire,lumièr
+machine|3|machaine,machinne,mashine
+magasin|3|magazin,magasain
+maladie|3|malladie,maladdie
+malheur|3|malheure,maleur
+manquer|3|manker,menquer
+marché|3|marshé,marchè
+marcher|3|marsher,marchair
+mari|3|marri,mary
+mars|3|mar,marss
+mauvais|3|mauveis,mauvai,movais
+méchant|3|méchan,méshant
+meilleur|3|meileur,meillœur
+ménage|3|ménnage,ménaje
+mener|3|maner,menner
+métal|3|méttal,mètal
+métier|3|métié,méttier
+mètre|3|métre,metre
+milieu|3|miliœu,milieut,millieu
+mille|3|milhe,myle
+millier|3|millié,milier
+million|3|milion,millon
+mine|3|minne,myne
+minuit|3|minnuit,minui,mainuit
+minute|3|minutte,mainute
+mois|3|moie,moit
+moitié|3|moitier,moitiè,moittié
+montrer|3|montrair,montrère
+morceau|3|morcau,morceaut,morseau
+mort|3|mor,mortt
+mourir|3|mourrir,murir
+moyen|3|moyan,moien
+murmure|3|murmurre,murmur
+museau|3|muzeau,museaut,musau
+naissance|3|naisance,nèssance,naissence
+nombre|3|nonbre,nombr
+nourrir|3|nourir,nurrir
+nourriture|3|nourritture,nurriture
+novembre|3|novenbre,novembr
+nuage|3|nuaje,nuagge
+occuper|3|occupper,ocuper
+octobre|3|octobr,octoble
+offrir|3|ofrir,offrire
+ombre|3|onbre,ombr
+oublier|3|oubliair,oublir
+ours|3|oursse,ourss
+ouvert|3|ouver,uvert
+pâle|3|pâlle,pâl
+pantalon|3|pentalon,pantalont
+parc|3|park,parck
+part|3|pard,partt
+partie|3|party,partye
+passage|3|passaje,pasage
+patin|3|patain,pattin
+payer|3|paiyer,payerr
+pencher|3|pancher,pensher
+perdre|3|perdrre,perdr
+permettre|3|permetre,permettr
+photo|3|photot,photto,foto
+pièce|3|piece,pièsse
+pierre|3|piere,pierr
+pile|3|pil,pyle
+plan|3|plen,plam
+plastique|3|plasticue,plastike
+pleuvoir|3|pleuvoire,plœuvoir,pleuvoar
+plusieurs|3|plusieur,plusieures
+poche|3|poshe,poch
+poids|3|poads,poid
+poil|3|poal,poile
+point|3|poaint,poant,poin
+porter|3|portair,portère
+poser|3|posser,pozer
+posséder|3|possèder,poséder
+possible|3|posible,possibble
+poudre|3|pudre,poudr
+pousser|3|pouser,pusser
+poussin|3|poucin,poussain
+précipiter|3|prècipiter,préssipiter,précippiter
+préférer|3|prèférer,préfférer
+préparer|3|prèparer,prépparer
+présenter|3|prézenter,présanter,presenter
+presque|3|preske,prescue
+prix|3|pri,pryx
+prochain|3|prochein,proshain,prochaain
+professeur|3|professœur,proffesseur,profeçeur
+promener|3|promenner,pronener
+promettre|3|pronettre,prommettre
+protéger|3|proteger,prottéger,protéjer
+quel|3|kel,quell
+question|3|quéstion,kestion
+raconter|3|racconter,raconnter
+radio|3|radiau,radyo
+rappeler|3|rapeler,rappeller
+rayon|3|raion,rayan
+réaction|3|rèaction,réacsion
+recevoir|3|ressevoir,recevoar,recevoire
+recherche|3|resherche,recherch
+rejoindre|3|rejoaindre,rejoandre
+remarquer|3|remmarquer,remarcuer
+remettre|3|remmettre,remetre
+remonter|3|remmonter,remontair
+remplir|3|renplir,remplire
+renard|3|renar,renare
+rencontrer|3|rancontrer,rencontrair
+rendre|3|randre,rendr
+repas|3|repa,reppas
+reprendre|3|reprandre,reprendr
+restaurant|3|resteaurant,restauran,restaurent
+retard|3|rettard,retar
+retenir|3|rettenir,retanir
+retourner|3|returner,rettourner
+retrouver|3|retruver,retrouvair
+réussir|3|réusir,réussire
+réveiller|3|réveiler,reveiller
+revenir|3|revennir,revanir
+rêver|3|rever,rèver
+riche|3|rishe,rich
+rien|3|rian,riain
+rire|3|rirre,rirh
+rivière|3|rivièrre,riviaire,riviere
+rond|3|ron,ront
+rouler|3|ruler,rouller
+ruisseau|3|ruiseau,ruisso,ruisseaut
+sabot|3|sabbot,sabo
+saison|3|saizon,saisson
+salle|3|calle,sall
+salut|3|salu,sallut,calut
+santé|3|santè,canté,santer
+sapin|3|sapain,sappin
+sauver|3|cauver,sover
+secouer|3|cecouer,secuer
+sembler|3|cembler,senbler
+sentier|3|santier,sentié
+sentir|3|santir,sentire
+septembre|3|septenbre,ceptembre
+service|3|cervice,servise
+servir|3|cervir,servire
+soie|3|soye,soaie
+soigner|3|soiner,soagner
+soin|3|soain,soan
+soirée|3|soirrée,soarée,soirèe
+sorte|3|sorth,sortte
+souhaiter|3|suhaiter,souhaitter,souheiter
+soulier|3|soulié,sulier,souliez
+souper|3|soupper,soupère
+sourcil|3|surcil,sourssil
+souvenir|3|souvanir,suvenir,souvennir
+spectacle|3|spectacl,spéctacle
+sucre|3|sucr,suckre
+suite|3|suitte,suyte
+sujet|3|suje,suget
+surface|3|surfasse,surfase
+taille|3|taile,tèlle
+téléphone|3|téléfone,télephone
+télévision|3|télévizion,télévisson
+terminer|3|termminer,terminner
+terrain|3|terrèn,terraain,terain
+timide|3|timidde,timmide
+tirer|3|tirrer,tirair
+toucher|3|tucher,tousher
+tour|3|tou,tourt
+tranquille|3|tranquile,trenquille,trankille
+travailler|3|travailer,traveiller
+traverser|3|traversair,traversser
+trésor|3|tréssor,trèsor
+triste|3|trist,tristte
+troisième|3|troisiéme,troasième,troisièmme
+trottoir|3|trotoir,trottoar
+trou|3|trout,troux
+tuer|3|tuher,tuerr
+usine|3|usin,uzine
+vacances|3|vacanses,vaccances
+valoir|3|valoire,valloir,valoar
+ventre|3|vantre,ventr
+verre|3|vere,verr
+verser|3|versair,versser
+vêtement|3|vêtemant,vètement
+viande|3|viand,vyande
+village|3|villaje,vilage
+vinaigre|3|vainaigre,vinnaigre,vinègre
+visite|3|vizite,visitte
+vitesse|3|vitese,vittesse
+vivre|3|vivr,vivvre
+voisin|3|voisain,voizin
+voiture|3|voature,voiturre
+voyage|3|voiyage,voyaje
 `;
 const ORTHO = ORTHO_RAW.trim().split('\n').map((l) => {
-  const [text, b] = l.split('|');
-  return { text, bad: b.split(',') };
+  const [text, g, b] = l.split('|');
+  return { text, g: Number(g), bad: b.split(',') };
 });
-const ORTHO_LONG = ORTHO.filter((x) => x.text.length >= 8);
+const HARD_RX = /(ill|ph|gn|ç|ss|tt|nn|mm|ll|rr|pp|cc|ff|eau|œu|qu|th|ent$|ement|tion|[êîôâ]|x$|oi|ain|ein)/;
+const ORTHO1 = ORTHO.filter((x) => x.g <= 2 && x.text.length <= 9); // facile : 1re + 2e année
+const ORTHO2 = ORTHO.filter((x) => x.g >= 2); // moyen : 2e + 3e année
+const ORTHO3 = ORTHO.filter((x) => x.g === 3 && (x.text.length >= 7 || HARD_RX.test(x.text))); // difficile : 3e année (mots plus difficiles)
+const F3_EMOJI = new Map([...W.map((w) => [w.text, w.emoji]), ['rouge', '🔴'], ['bleu', '🔵'], ['vert', '🟢'], ['jaune', '🟡'], ['noir', '⚫'], ['blanc', '⚪'], ['brun', '🟤']]);
+const F3_DIGIT = new Map([["un","1"],["deux","2"],["trois","3"],["quatre","4"],["cinq","5"],["six","6"],["sept","7"],["huit","8"],["neuf","9"],["dix","10"],["onze","11"],["douze","12"],["treize","13"],["quatorze","14"],["quinze","15"],["seize","16"],["dix-sept","17"],["dix-huit","18"],["dix-neuf","19"],["vingt","20"],["trente","30"],["quarante","40"],["cinquante","50"],["soixante","60"],["cent","100"],["mille","1000"],["zéro","0"]]);
 const F3_DBL = [
-  ['allumer', 'a', 'umer', 'll', 'l'], ['attendre', 'a', 'endre', 'tt', 't'], ['apporter', 'a', 'orter', 'pp', 'p'],
-  ['attention', 'a', 'ention', 'tt', 't'], ['classe', 'cla', 'e', 'ss', 's'], ['dessin', 'de', 'in', 'ss', 's'],
-  ['lettre', 'le', 're', 'tt', 't'], ['personne', 'perso', 'e', 'nn', 'n'], ['nettoyer', 'ne', 'oyer', 'tt', 't'],
-  ['appartement', 'a', 'artement', 'pp', 'p'], ['anniversaire', 'a', 'iversaire', 'nn', 'n'], ['difficile', 'di', 'icile', 'ff', 'f'],
-  ['pomme', 'po', 'e', 'mm', 'm'], ['passer', 'pa', 'er', 'ss', 's'], ['grosse', 'gro', 'e', 'ss', 's'], ['assiette', 'a', 'iette', 'ss', 's'],
-  ['appétit', 'a', 'étit', 'pp', 'p'], ['accident', 'a', 'ident', 'cc', 'c'], ['occupé', 'o', 'upé', 'cc', 'c'], ['ballon', 'ba', 'on', 'll', 'l'],
-  ['immeuble', 'i', 'euble', 'mm', 'm'], ['commencer', 'co', 'encer', 'mm', 'm'], ['sonner', 'so', 'er', 'nn', 'n'], ['bonne', 'bo', 'e', 'nn', 'n'],
+  ['attendre', 'a', 'endre', 'tt', 't'], ['apporter', 'a', 'orter', 'pp', 'p'], ['attention', 'a', 'ention', 'tt', 't'], ['attraper', 'a', 'raper', 'tt', 't'],
+  ['classe', 'cla', 'e', 'ss', 's'], ['chasse', 'cha', 'e', 'ss', 's'], ['lettre', 'le', 're', 'tt', 't'], ['personne', 'perso', 'e', 'nn', 'n'],
+  ['appartement', 'a', 'artement', 'pp', 'p'], ['pomme', 'po', 'e', 'mm', 'm'], ['femme', 'fe', 'e', 'mm', 'm'], ['homme', 'ho', 'e', 'mm', 'm'],
+  ['passer', 'pa', 'er', 'ss', 's'], ['patte', 'pa', 'e', 'tt', 't'], ['carotte', 'caro', 'e', 'tt', 't'], ['botte', 'bo', 'e', 'tt', 't'],
+  ['balle', 'ba', 'e', 'll', 'l'], ['mille', 'mi', 'e', 'll', 'l'], ['ballon', 'ba', 'on', 'll', 'l'], ['commencer', 'co', 'encer', 'mm', 'm'],
+  ['bonne', 'bo', 'e', 'nn', 'n'], ['grosse', 'gro', 'e', 'ss', 's'], ['terre', 'te', 'e', 'rr', 'r'], ['année', 'a', 'ée', 'nn', 'n'],
+  ['occuper', 'o', 'uper', 'cc', 'c'], ['appeler', 'a', 'eler', 'pp', 'p'], ['aller', 'a', 'er', 'll', 'l'], ['mettre', 'me', 're', 'tt', 't'],
+  ['donner', 'do', 'er', 'nn', 'n'],
 ];
-function f3xSpell(R, pool) {
+function f3xSpell(R, pool, level) {
   const w = R.pick(pool);
-  return mkChoice(R, `f3x-s-${w.text}`, 'Écoute le mot. Touche la bonne façon de l’écrire.', { text: w.text }, R.sample(w.bad, 2).map((t) => ({ text: t })), {
+  const q = mkChoice(R, `f3x-s-${w.text}`, 'Écoute le mot. Touche la bonne façon de l’écrire.', { text: w.text }, R.sample(w.bad, 2).map((t) => ({ text: t })), {
     say: say(w.text),
   });
+  if (level === 1 && F3_EMOJI.has(w.text)) q.stimulus = { emoji: F3_EMOJI.get(w.text) };
+  else if (level <= 2 && F3_DIGIT.has(w.text)) q.stimulus = { text: F3_DIGIT.get(w.text) };
+  return q;
 }
 function f3xSpot(R, pool) {
   const w = R.pick(pool);
@@ -3094,42 +3665,46 @@ function f3xDouble(R, n) {
     cols: 2,
   });
 }
-function f3xLetters(R, lo, hi, nExtra) {
-  const w = R.pick(ORTHO.filter((x) => LETTERS_ONLY.test(x.text) && x.text.length >= lo && x.text.length <= hi));
-  return {
+function f3xLetters(R, lo, hi, nExtra, pool, level) {
+  const w = R.pick(pool.filter((x) => LETTERS_ONLY.test(x.text) && x.text.length >= lo && x.text.length <= hi));
+  const q = {
     type: 'order',
     key: `f3x-o-${w.text}`,
     prompt: 'Écoute le mot. Remets les lettres dans l’ordre.',
     say: say(w.text),
     tiles: Array.from(w.text),
-    extra: R.sample(ALPHA.filter((c) => !w.text.includes(c)), nExtra),
     joiner: '',
   };
+  if (nExtra) q.extra = R.sample(ALPHA.filter((c) => !w.text.includes(c)), nExtra);
+  if (level === 1 && F3_EMOJI.has(w.text)) q.stimulus = { emoji: F3_EMOJI.get(w.text) };
+  else if (level <= 2 && F3_DIGIT.has(w.text)) q.stimulus = { text: F3_DIGIT.get(w.text) };
+  return q;
 }
+// Facile = 1re + 2e année, Moyen = 2e + 3e année, Difficile = 3e année (mots plus difficiles) — liste orthographique du MEQ.
 f3.generate = run({
   1: [
-    (R) => f3Spell(R, 3),
-    (R) => f3Letters(R, 3),
-    (R) => f3xSpell(R, ORTHO.filter((x) => x.text.length <= 8)),
-    (R) => f3xSpot(R, ORTHO.filter((x) => x.text.length <= 8)),
+    (R) => f3xSpell(R, ORTHO1, 1),
+    (R) => f3xSpell(R, ORTHO1, 1),
+    (R) => f3xSpot(R, ORTHO1),
     (R) => f3xDouble(R, 3),
+    (R) => f3xLetters(R, 4, 6, 0, ORTHO1, 1),
   ],
   2: [
-    (R) => f3xSpell(R, ORTHO),
-    (R) => f3xSpell(R, ORTHO),
-    (R) => f3xSpot(R, ORTHO),
+    (R) => f3xSpell(R, ORTHO2, 2),
+    (R) => f3xSpell(R, ORTHO2, 2),
+    (R) => f3xSpot(R, ORTHO2),
     (R) => f3xDouble(R, 4),
-    (R) => f3xLetters(R, 7, 9, 2),
+    (R) => f3xLetters(R, 6, 9, 2, ORTHO2, 2),
   ],
   3: [
-    (R) => f3xSpell(R, ORTHO_LONG),
-    (R) => f3xSpot(R, ORTHO_LONG),
-    (R) => f3xSpot(R, ORTHO),
+    (R) => f3xSpell(R, ORTHO3, 3),
+    (R) => f3xSpot(R, ORTHO3),
+    (R) => f3xSpot(R, ORTHO3),
     (R) => f3xDouble(R, 4),
-    (R) => f3xLetters(R, 9, 13, 3),
+    (R) => f3xLetters(R, 8, 13, 3, ORTHO3, 3),
   ],
 });
-f3.pfeq = 'Écriture — orthographe d’usage : mots fréquents de 2e et 3e année, lettres doubles, accents (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+f3.pfeq = 'Écriture — orthographe d’usage : mots de la liste orthographique du MEQ (2e/3e année; 1re année au niveau facile), lettres doubles, accents (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
 
 /* ---------------- f4 : groupe du nom, déterminants ---------------- */
 const ADJ_PRE = [['petit', 'petite'], ['grand', 'grande'], ['gros', 'grosse'], ['joli', 'jolie'], ['bon', 'bonne']];
@@ -3617,11 +4192,22 @@ const VB = [
   ['finir', ['finis', 'finis', 'finit', 'finissons', 'finissez', 'finissent'], ['son travail', 'ses devoirs', 'le dessin'], 2],
   ['prendre', ['prends', 'prends', 'prend', 'prenons', 'prenez', 'prennent'], ['l’autobus', 'une collation', 'son manteau'], 2],
   ['venir', ['viens', 'viens', 'vient', 'venons', 'venez', 'viennent'], ['à la fête', 'de l’école', 'chez moi'], 2],
-  ['pouvoir', ['peux', 'peux', 'peut', 'pouvons', 'pouvez', 'peuvent'], ['jouer dehors', 'nager', 'aider'], 3],
-  ['vouloir', ['veux', 'veux', 'veut', 'voulons', 'voulez', 'veulent'], ['un biscuit', 'jouer', 'du chocolat chaud'], 3],
-  ['dire', ['dis', 'dis', 'dit', 'disons', 'dites', 'disent'], ['bonjour', 'la vérité', 'merci'], 3],
-  ['voir', ['vois', 'vois', 'voit', 'voyons', 'voyez', 'voient'], ['un orignal', 'le lac', 'un film'], 3],
-  ['savoir', ['sais', 'sais', 'sait', 'savons', 'savez', 'savent'], ['nager', 'la réponse', 'lire'], 3],
+  ['pouvoir', ['peux', 'peux', 'peut', 'pouvons', 'pouvez', 'peuvent'], ['jouer dehors', 'nager', 'aider'], 2],
+  ['vouloir', ['veux', 'veux', 'veut', 'voulons', 'voulez', 'veulent'], ['un biscuit', 'jouer', 'du chocolat chaud'], 2],
+  ['dire', ['dis', 'dis', 'dit', 'disons', 'dites', 'disent'], ['bonjour', 'la vérité', 'merci'], 1],
+  ['voir', ['vois', 'vois', 'voit', 'voyons', 'voyez', 'voient'], ['un orignal', 'le lac', 'un film'], 2],
+  ['savoir', ['sais', 'sais', 'sait', 'savons', 'savez', 'savent'], ['nager', 'la réponse', 'lire'], 2],
+  ['aimer', ['aime', 'aimes', 'aime', 'aimons', 'aimez', 'aiment'], ['le chocolat', 'la neige', 'chanter'], 1],
+  ['mettre', ['mets', 'mets', 'met', 'mettons', 'mettez', 'mettent'], ['la table', 'son manteau', 'ses bottes'], 2],
+  ['répondre', ['réponds', 'réponds', 'répond', 'répondons', 'répondez', 'répondent'], ['à la question', 'à son ami', 'bien'], 2],
+  ['attendre', ['attends', 'attends', 'attend', 'attendons', 'attendez', 'attendent'], ['l’autobus', 'son ami', 'le train'], 2],
+  ['sortir', ['sors', 'sors', 'sort', 'sortons', 'sortez', 'sortent'], ['de l’école', 'dehors', 'le chien'], 2],
+  ['lire', ['lis', 'lis', 'lit', 'lisons', 'lisez', 'lisent'], ['un livre', 'une histoire', 'le journal'], 2],
+  ['dormir', ['dors', 'dors', 'dort', 'dormons', 'dormez', 'dorment'], ['dans son lit', 'très bien', 'chez grand-maman'], 2],
+  ['choisir', ['choisis', 'choisis', 'choisit', 'choisissons', 'choisissez', 'choisissent'], ['un livre', 'un cadeau', 'sa place'], 3],
+  ['écrire', ['écris', 'écris', 'écrit', 'écrivons', 'écrivez', 'écrivent'], ['une lettre', 'une phrase', 'son nom'], 3],
+  ['comprendre', ['comprends', 'comprends', 'comprend', 'comprenons', 'comprenez', 'comprennent'], ['la question', 'la leçon', 'tout'], 3],
+  ['descendre', ['descends', 'descends', 'descend', 'descendons', 'descendez', 'descendent'], ['l’escalier', 'de l’autobus', 'la colline'], 3],
   ['manger', ['mange', 'manges', 'mange', 'mangeons', 'mangez', 'mangent'], ['une pomme', 'des crêpes', 'à midi'], 2],
   ['nager', ['nage', 'nages', 'nage', 'nageons', 'nagez', 'nagent'], ['dans le lac', 'très vite'], 2],
   ['ranger', ['range', 'ranges', 'range', 'rangeons', 'rangez', 'rangent'], ['sa chambre', 'ses jouets'], 2],
@@ -3717,6 +4303,7 @@ function f6xImp(R) {
     cols: 2,
   });
 }
+// Facile : verbes de la liste du MEQ de 1re et 2e année ; Moyen : + 3e année
 const VB_L1 = VB.filter((v) => v[3] === 1);
 const VB_L2 = VB.filter((v) => v[3] <= 2);
 const SUBJ6_NEW = [...SUBJ_ALL];
@@ -3748,7 +4335,7 @@ f6.generate = run({
     (R) => f6xImp(R),
   ],
 });
-f6.pfeq = 'Grammaire — le verbe : présent (être, avoir, aller, faire, verbes en -er et -ir, …), futur proche, passé composé, imparfait, infinitif (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+f6.pfeq = 'Grammaire — le verbe : présent (être, avoir, aller, dire, faire, venir, prendre, pouvoir, vouloir, verbes en -er et -ir, …), futur proche, passé composé, imparfait, infinitif; verbes et formes conjuguées de la liste orthographique du MEQ (2e/3e année) (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
 
 /* ---------------- f7 : types de phrases, négation, constituants ---------------- */
 const IMP7 = [
@@ -4174,199 +4761,225 @@ f8.generate = run({
 });
 f8.pfeq = 'Lecture — compréhension de textes de 40 à 120 mots : informations explicites, inférences, vocabulaire en contexte, vrai ou faux (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
 
-/* ---------------- f9 : vocabulaire ---------------- */
-// mot | définition | type | niveau minimal
+/* ---------------- f9 : vocabulaire (mots de la liste orthographique du MEQ) ---------------- */
+// Facile = 1re + 2e année ; Moyen = 2e + 3e année ; Difficile = 3e année.
+const lvOk = (level, g) => (level === 1 ? g <= 2 : level === 2 ? g >= 2 : g === 3);
+// mot | définition | type | année du mot dans la liste
 const DEFS_RAW = `
-minuscule|très, très petit|a|2
-énorme|très, très gros|a|2
-courageux|qui n’a pas peur du danger|a|2
-timide|qui n’ose pas parler aux autres|a|2
-généreux|qui aime donner aux autres|a|2
-gourmand|qui aime beaucoup manger|a|2
-paresseux|qui n’aime pas travailler|a|2
-bavard|qui parle tout le temps|a|2
-silencieux|qui ne fait pas de bruit|a|2
-curieux|qui veut tout savoir|a|2
-affamé|qui a très faim|a|2
-assoiffé|qui a très soif|a|2
-prudent|qui fait attention au danger|a|2
-inquiet|qui a peur qu’il arrive quelque chose|a|3
-apercevoir|voir un instant, de loin|v|2
-construire|bâtir quelque chose|v|2
-réparer|remettre en état ce qui est brisé|v|2
-cueillir|ramasser des fleurs ou des fruits|v|2
-hésiter|ne pas savoir quoi choisir|v|3
-chuchoter|parler tout bas|v|2
-se dépêcher|aller plus vite|v|2
-s’échapper|réussir à s’enfuir|v|3
-un sentier|un petit chemin dans la nature|n|2
-un trésor|un ensemble d’objets précieux caché quelque part|n|2
-une forêt|un grand terrain couvert d’arbres|n|2
-un sommet|le point le plus haut d’une montagne|n|2
-un volcan|une montagne qui peut cracher de la lave|n|2
-une île|une terre entourée d’eau|n|2
-un désert|un endroit très sec où il pleut très peu|n|3
-une tempête|un très mauvais temps, avec beaucoup de vent|n|3
-le verglas|une couche de glace sur le sol|n|3
-une recette|des instructions pour préparer un plat|n|3
-un horaire|un tableau qui indique les heures|n|3
-un exploit|une action extraordinaire, très difficile|n|3
-une légende|une histoire très ancienne qu’on se raconte|n|3
-un moteur|une machine qui fait avancer un véhicule|n|3
-un voisin|une personne qui habite près de chez nous|j|2
-un dentiste|une personne qui soigne les dents|j|2
-un menuisier|une personne qui travaille le bois|j|2
-un facteur|une personne qui livre le courrier|j|2
-un pêcheur|une personne qui attrape des poissons|j|2
-un cultivateur|une personne qui cultive la terre|j|3
-un inventeur|une personne qui crée un nouvel objet|j|3
-un bibliothécaire|une personne qui s’occupe des livres d’une bibliothèque|j|3
+un bébé|un très jeune enfant|p|1
+un roi|l’homme qui dirige un royaume|p|1
+une école|l’endroit où les enfants apprennent|l|1
+un lit|le meuble où l’on dort|o|1
+une fenêtre|une ouverture dans le mur pour regarder dehors|o|1
+une route|un chemin pour les autos|l|1
+un jardin|un endroit où poussent des fleurs et des légumes|l|1
+une forêt|un grand endroit avec beaucoup d’arbres|l|1
+un livre|des pages qu’on lit|o|1
+un oiseau|un animal qui a des ailes et des plumes|a|1
+un mouton|l’animal qui donne la laine|a|1
+un lapin|un animal qui a de longues oreilles|a|1
+une montagne|une très haute colline|l|1
+un vélo|un véhicule à deux roues qu’on pédale|o|1
+un train|un véhicule qui roule sur des rails|o|1
+la lune|ce qu’on voit briller dans le ciel la nuit|l|1
+une dent|ce qu’on brosse dans la bouche|o|1
+la neige|de l’eau gelée qui tombe en hiver|l|1
+la pluie|de l’eau qui tombe des nuages|l|1
+une brebis|la femelle du mouton|a|2
+une cane|la femelle du canard|a|2
+un coq|le mâle de la poule|a|2
+une jument|la femelle du cheval|a|2
+une truie|la femelle du porc|a|2
+un fantôme|un esprit qui fait peur|f|2
+une fée|un personnage magique qui a une baguette|f|2
+un monstre|une créature qui fait peur|f|2
+un prince|le fils d’un roi|p|2
+une reine|la femme d’un roi|p|2
+un oncle|le frère de ton père ou de ta mère|p|2
+une tante|la sœur de ton père ou de ta mère|p|2
+un cousin|l’enfant de ton oncle ou de ta tante|p|2
+un élève|une personne qui apprend à l’école|p|2
+une semaine|sept jours|l|2
+l’hiver|la saison la plus froide de l’année|l|2
+une paire|deux choses qui vont ensemble|o|2
+une chanson|des paroles qu’on chante sur de la musique|o|2
+un tableau|une grande surface où l’on écrit en classe|o|2
+la campagne|l’endroit loin de la ville|l|2
+un agneau|le petit du mouton|a|3
+un adulte|une personne qui n’est plus un enfant|p|3
+un abri|un endroit pour se protéger de la pluie|l|3
+un cadeau|ce qu’on offre à quelqu’un pour lui faire plaisir|o|3
+un voisin|une personne qui habite tout près de chez toi|p|3
+un docteur|une personne qui soigne les malades|p|3
+un professeur|une personne qui enseigne aux élèves|p|3
+un chasseur|une personne qui chasse les animaux|p|3
+un hôpital|l’endroit où l’on soigne les malades|l|3
+un bureau|une table pour travailler|o|3
+une bouteille|un contenant pour l’eau ou le jus|o|3
+un camion|un gros véhicule qui transporte des objets|o|3
+un journal|des pages qui racontent les nouvelles|o|3
+un avion|un véhicule qui vole dans le ciel|o|3
+un bateau|un véhicule qui flotte sur l’eau|o|3
+le lendemain|le jour qui suit|l|3
+minuit|le milieu de la nuit|l|3
+une minute|soixante secondes|l|3
+un mètre|une unité pour mesurer la longueur|o|3
+une clé|ce qui ouvre une porte|o|3
+une chaise|un meuble pour s’asseoir|o|3
+une botte|une chaussure qui monte haut sur la jambe|o|3
+un cinéma|l’endroit où l’on voit des films|l|3
+un restaurant|un endroit où l’on mange|l|3
 `;
 const DEFS = DEFS_RAW.trim().split('\n').map((l) => {
-  const [w, d, t, lv] = l.split('|');
-  return { w, d, t, lv: Number(lv) };
+  const [w, d, t, g] = l.split('|');
+  return { w, d, t, g: Number(g) };
 });
-function f9xDef(R, level) {
-  const x = R.pick(DEFS.filter((d) => d.lv <= level));
-  const same = DEFS.filter((d) => d.t === x.t && d !== x);
-  const wrong = R.sample(same.length >= 3 ? same : DEFS.filter((d) => d !== x), 3);
-  return mkChoice(R, `f9x-d-${x.w}`, `Que veut dire « ${x.w} »?`, spk(x.d), wrong.map((d) => spk(d.d)), {
+function f9mDef(R, level) {
+  const pool = DEFS.filter((d) => lvOk(level, d.g));
+  const x = R.pick(pool);
+  const same = pool.filter((d) => d.t === x.t && d !== x);
+  const wrong = R.sample(same.length >= 3 ? same : pool.filter((d) => d !== x), 3);
+  return mkChoice(R, `f9m-d-${x.w}`, `Que veut dire « ${x.w} »?`, spk(x.d), wrong.map((d) => spk(d.d)), {
     say: say(`Que veut dire ${x.w}?`),
     cols: 1,
   });
 }
+// phrase à compléter : phrase | bon mot | 3 mauvais mots | année (la plus élevée des mots)
 const CLOZE9 = [
-  ['Le dentiste soigne nos ___.', 'dents', 'yeux', 'pieds', 'oreilles'],
-  ['Pour traverser la rivière, nous avons construit un ___.', 'pont', 'toit', 'puits', 'four'],
-  ['Un ___ est une personne qui livre le courrier.', 'facteur', 'voisin', 'pêcheur', 'cuisinier'],
-  ['J’ai très soif : je voudrais un grand verre d’___.', 'eau', 'huile', 'encre', 'essence'],
-  ['Pour atteindre le sommet, il faut ___ la montagne.', 'escalader', 'descendre', 'creuser', 'nager'],
-  ['Quand on est ___, on a envie de dormir.', 'fatigué', 'affamé', 'joyeux', 'pressé'],
-  ['Le soleil est très fort : je mets de la crème ___.', 'solaire', 'sucrée', 'salée', 'glacée'],
-  ['Mon frère est très ___ : il ne dit jamais un mot en classe.', 'timide', 'bavard', 'gourmand', 'bruyant'],
-  ['Ma sœur est très ___ : elle parle sans arrêt.', 'bavarde', 'silencieuse', 'endormie', 'timide'],
-  ['Le chien aboie pour ___ la famille qu’un étranger arrive.', 'avertir', 'réparer', 'cuisiner', 'peindre'],
-  ['Je dois ___ ce livre à la bibliothèque avant vendredi.', 'rendre', 'planter', 'éteindre', 'cuisiner'],
-  ['Avant de traverser la rue, il faut ___ des deux côtés.', 'regarder', 'chanter', 'ranger', 'écrire'],
-  ['Cet exercice est très ___ : personne ne réussit à le résoudre.', 'difficile', 'facile', 'court', 'sucré'],
-  ['Pour faire un gâteau, il faut suivre une ___.', 'recette', 'adresse', 'chanson', 'carte'],
-  ['Le randonneur suit un ___ dans la forêt.', 'sentier', 'plafond', 'dessert', 'chapeau'],
-  ['Les pompiers ont éteint ___ très rapidement.', 'l’incendie', 'la chanson', 'le sable', 'le trésor'],
-  ['La mer était ___ : il n’y avait aucune vague.', 'calme', 'agitée', 'houleuse', 'bruyante'],
-  ['Papa met des gants pour ___ ses mains du froid.', 'protéger', 'laver', 'couper', 'compter'],
-  ['L’oiseau ___ ses ailes et s’envole.', 'déploie', 'mange', 'creuse', 'cuisine'],
-  ['Le menuisier travaille le ___.', 'bois', 'courrier', 'poisson', 'sable'],
-  ['Il y a eu du verglas : les trottoirs sont couverts de ___.', 'glace', 'sable', 'herbe', 'feuilles'],
-  ['Pour savoir à quelle heure part l’autobus, je consulte l’___.', 'horaire', 'dessert', 'orage', 'été'],
+  ['Le bébé dort dans son ___.', 'lit', 'arbre', 'livre', 'jardin', 1],
+  ['Je mange une ___ rouge.', 'pomme', 'chaise', 'porte', 'main', 1],
+  ['Papa lit un ___ avant de dormir.', 'livre', 'oiseau', 'nuage', 'sac', 1],
+  ['Le ___ brille dans le ciel le jour.', 'soleil', 'lit', 'pain', 'train', 1],
+  ['Il y a de la ___ en hiver.', 'neige', 'fleur', 'robe', 'main', 1],
+  ['Les enfants vont à l’___.', 'école', 'arbre', 'oiseau', 'neige', 1],
+  ['Le ___ vole dans le ciel.', 'oiseau', 'poisson', 'loup', 'chat', 1],
+  ['Le ___ nage dans l’eau.', 'poisson', 'lapin', 'chien', 'cheval', 1],
+  ['Je mets mon ___ sur ma tête.', 'chapeau', 'robe', 'pied', 'sac', 1],
+  ['Elle porte une jolie ___.', 'robe', 'bouche', 'porte', 'dent', 1],
+  ['Nous mangeons du ___ au déjeuner.', 'pain', 'train', 'loup', 'lit', 1],
+  ['Il fait très ___ en hiver.', 'froid', 'joli', 'petit', 'rouge', 2],
+  ['Mon ___ est le frère de mon père.', 'oncle', 'prince', 'bébé', 'roi', 2],
+  ['La ___ est la femme du roi.', 'reine', 'fée', 'tante', 'dame', 2],
+  ['Le ___ est un esprit qui fait peur.', 'fantôme', 'prince', 'élève', 'oncle', 2],
+  ['Maman prend un ___ chaud.', 'café', 'train', 'robe', 'arbre', 2],
+  ['La ___ est la femelle du mouton.', 'brebis', 'cane', 'jument', 'truie', 2],
+  ['Il y a sept jours dans une ___.', 'semaine', 'dent', 'route', 'main', 2],
+  ['Mon ___ habite dans la maison à côté de la mienne.', 'voisin', 'cadeau', 'bureau', 'avion', 3],
+  ['Le ___ soigne les gens à l’hôpital.', 'docteur', 'ballon', 'camion', 'sentier', 3],
+  ['Pour son anniversaire, elle a reçu un beau ___.', 'cadeau', 'abri', 'voisin', 'journal', 3],
+  ['Nous prenons l’___ pour voyager loin.', 'avion', 'abri', 'adulte', 'argent', 3],
+  ['Il faut ___ la porte quand il fait froid.', 'fermer', 'avaler', 'glisser', 'verser', 3],
+  ['Il va ___ de l’eau dans le verre.', 'verser', 'frapper', 'avaler', 'garder', 3],
+  ['Les élèves vont ___ à la porte.', 'frapper', 'verser', 'avaler', 'glisser', 3],
+  ['Maman va ___ une robe pour moi.', 'acheter', 'avaler', 'sauver', 'chasser', 3],
+  ['Je range mes jouets dans la ___.', 'boîte', 'route', 'neige', 'dent', 3],
+  ['Dans la classe, le ___ écrit au tableau.', 'professeur', 'camion', 'ballon', 'bureau', 3],
+  ['Nous allons au ___ voir un film.', 'cinéma', 'hôpital', 'abri', 'bureau', 3],
+  ['Papa travaille à son ___.', 'bureau', 'cinéma', 'bateau', 'cadeau', 3],
+  ['La ___ est remplie d’eau.', 'bouteille', 'chaise', 'minute', 'barbe', 3],
+  ['Mon frère est très ___ : il aide tout le monde.', 'gentil', 'méchant', 'triste', 'horrible', 3],
+  ['Il est ___ : il a perdu son chien.', 'triste', 'heureux', 'gentil', 'fort', 3],
+  ['Le bateau avance ___ sur l’eau calme.', 'lentement', 'jamais', 'assez', 'surtout', 3],
 ];
-function f9xCloze(R) {
-  const [s, ok, ...bad] = R.pick(CLOZE9);
-  return mkChoice(R, `f9x-c-${s}`, 'Quel mot complète bien la phrase?', spk(ok), R.sample(bad, 3).map(spk), {
+function f9mCloze(R, level) {
+  const [s, ok, ...rest] = R.pick(CLOZE9.filter((c) => lvOk(level, c[5])));
+  const bad = rest.slice(0, 3);
+  return mkChoice(R, `f9m-c-${s}`, 'Quel mot complète bien la phrase?', spk(ok), bad.map(spk), {
     say: say(s.replace('___', ' … ')),
     stimulus: { text: s },
     cols: 2,
   });
 }
-// catégories : nom | étiquette | membres
+// catégories : nom | étiquette | membres (mot:année dans la liste du MEQ)
 const HYPER_RAW = `
-véhicules|les véhicules|auto camion autobus vélo motoneige train bateau avion métro tracteur
-instruments de musique|les instruments de musique|guitare piano violon trompette tambour flûte saxophone harmonica clarinette
-outils|les outils|marteau scie tournevis pelle râteau pince perceuse hache
-meubles|les meubles|table chaise lit bureau armoire canapé commode
-vêtements|les vêtements|manteau pantalon chandail tuque mitaine bottes jupe foulard chemise
-sports|les sports|hockey soccer tennis natation ski patinage basketball golf boxe
-métiers|les métiers|pompier médecin boulanger facteur pilote dentiste plombier menuisier
-insectes|les insectes|fourmi abeille papillon coccinelle moustique mouche sauterelle libellule
-oiseaux|les oiseaux|hibou aigle outarde moineau cardinal pingouin perroquet colibri
-arbres|les arbres|érable bouleau sapin chêne pin saule peuplier épinette
-boissons|les boissons|lait jus eau thé tisane limonade cacao café
-planètes|les planètes|Mars Vénus Jupiter Saturne Neptune Mercure Uranus
-sentiments|les sentiments|joie colère peur tristesse surprise fierté jalousie honte
-fournitures|les fournitures scolaires|crayon cartable règle cahier ciseaux colle stylo compas
-fruits|les fruits|pomme poire banane fraise cerise orange raisin melon
-légumes|les légumes|carotte chou brocoli oignon patate navet poireau céleri
-ferme|les animaux de la ferme|vache cochon poule mouton cheval chèvre dindon âne
-marins|les animaux marins|baleine requin dauphin phoque morse pieuvre crabe homard
-pays|les pays|Canada France Mexique Chine Brésil Italie Japon Maroc
-formes|les figures géométriques|carré triangle rectangle losange ovale hexagone cercle
+animaux|les animaux|chat:1 chien:1 lapin:1 cheval:1 mouton:1 loup:1 souris:1 poisson:1 oiseau:1 poule:1 canard:2 coq:2 ours:3 lion:3 renard:3 rat:3 poussin:3
+jours de la semaine|les jours de la semaine|lundi:1 mardi:1 mercredi:1 jeudi:1 vendredi:1 samedi:1 dimanche:1
+mois|les mois de l’année|janvier:3 février:3 mars:3 avril:3 juin:3 juillet:3 septembre:3 octobre:3 novembre:3 décembre:3
+saisons|les saisons|printemps:2 été:2 automne:2 hiver:2
+couleurs|les couleurs|rouge:1 bleu:1 vert:1 jaune:1 noir:1 blanc:1 brun:1 gris:1 rose:2
+nombres|les nombres|deux:1 trois:1 quatre:1 cinq:1 six:1 sept:1 huit:1 neuf:1 dix:1 onze:2 douze:2 quinze:2 vingt:2 trente:2 cent:2 mille:3
+corps|les parties du corps|main:1 nez:1 bouche:1 oreille:1 dent:1 pied:1 tête:1 cheveu:1 visage:1 jambe:3 doigt:3 langue:3 ventre:3 gorge:3
+famille|les membres de la famille|maman:1 papa:1 frère:1 sœur:1 mère:1 père:1 grand-mère:2 grand-père:2 oncle:2 tante:2 cousin:2
+maison|les objets de la maison|porte:1 fenêtre:1 lit:1 table:1 chambre:1 chaise:3 bureau:3
+transports|les moyens de transport|train:1 vélo:1 auto:2 autobus:3 avion:3 bateau:3 camion:3
+vêtements|les vêtements|robe:1 chapeau:1 pantalon:3 botte:3 costume:3
+nature|les éléments de la nature|soleil:1 lune:1 neige:1 pluie:1 vent:1 arbre:1 fleur:1 montagne:1 étoile:3 nuage:3 herbe:3
+lieux|les lieux|école:1 ville:1 jardin:1 forêt:1 campagne:2 hôpital:3 cinéma:3 restaurant:3 magasin:3
+sentiments|les sentiments|joie:1 peur:2 chagrin:3 bonheur:3 amour:3
+personnes|les personnes|roi:1 reine:2 prince:2 princesse:2 élève:2 docteur:3 professeur:3 chasseur:3 voisin:3 adulte:3
 `;
 const HYPER = HYPER_RAW.trim().split('\n').map((l) => {
   const [id, label, m] = l.split('|');
-  return { id, label, members: m.split(' ') };
+  return { id, label, members: m.split(' ').map((x) => { const [t, g] = x.split(':'); return { t, g: Number(g) }; }) };
 });
-const HYP_EASY = ['fruits', 'légumes', 'ferme', 'vêtements', 'véhicules', 'meubles', 'boissons', 'sports'];
-function f9xHyper(R, n, ids) {
-  const pool = ids ? HYPER.filter((h) => ids.includes(h.id)) : HYPER;
-  const cat = R.pick(pool);
-  const three = R.sample(cat.members, 3);
+const hyperAt = (level, min) => HYPER.filter((h) => h.members.filter((m) => lvOk(level, m.g)).length >= min);
+const hyperMembers = (h, level) => h.members.filter((m) => lvOk(level, m.g)).map((m) => m.t);
+function f9mHyper(R, level, n) {
+  const cat = R.pick(hyperAt(level, 3));
+  const three = R.sample(hyperMembers(cat, level), 3);
   const others = R.sample(HYPER.filter((h) => h !== cat), n - 1);
-  return mkChoice(R, `f9x-h-${cat.id}-${nameKey(three)}`, 'Quel groupe contient tous ces mots?', spk(cat.label), others.map((h) => spk(h.label)), {
+  return mkChoice(R, `f9m-h-${cat.id}-${nameKey(three)}`, 'Quel groupe contient tous ces mots?', spk(cat.label), others.map((h) => spk(h.label)), {
     say: say('Quel groupe contient tous ces mots?'),
     stimulus: { text: three.join(' · ') },
     cols: 2,
   });
 }
-function f9xIntruder(R, ids) {
-  const pool = ids ? HYPER.filter((h) => ids.includes(h.id)) : HYPER;
-  const cat = R.pick(pool);
-  const three = R.sample(cat.members, 3);
-  const other = R.pick(HYPER.filter((h) => h !== cat));
-  const odd = R.pick(other.members);
-  return mkChoice(R, `f9x-i-${cat.id}-${nameKey(three)}-${odd}`, 'Quel mot ne va pas avec les autres?', spk(odd), three.map(spk), {
+function f9mIntruder(R, level) {
+  const cat = R.pick(hyperAt(level, 3));
+  const three = R.sample(hyperMembers(cat, level), 3);
+  const other = R.pick(hyperAt(level, 1).filter((h) => h !== cat));
+  const odd = R.pick(hyperMembers(other, level));
+  return mkChoice(R, `f9m-i-${cat.id}-${nameKey(three)}-${odd}`, 'Quel mot ne va pas avec les autres?', spk(odd), three.map(spk), {
     say: say('Quel mot ne va pas avec les autres?'),
     cols: 2,
   });
 }
-function f9xSortCat(R, nb, counts, ids) {
-  const pool = ids ? HYPER.filter((h) => ids.includes(h.id)) : HYPER;
-  const cats = R.sample(pool, nb);
-  const groups = cats.map((c, i) => R.sample(c.members, counts[i]).map(spk));
+function f9mSortCat(R, level, nb, counts) {
+  const cats = R.sample(hyperAt(level, Math.max(...counts)), nb);
+  const groups = cats.map((c, i) => R.sample(hyperMembers(c, level), counts[i]).map(spk));
   return mkSort(
     R,
-    `f9x-s-${cats.map((c) => c.id).join('+')}-${nameKey(groups.flat().map((x) => x.text))}`,
+    `f9m-s-${cats.map((c) => c.id).join('+')}-${nameKey(groups.flat().map((x) => x.text))}`,
     'Classe chaque mot dans le bon groupe.',
     cats.map((c) => ({ text: cap1(c.label) })),
     groups,
     { say: say('Classe chaque mot dans le bon groupe.') },
   );
 }
-function f9xWhichIs(R, ids) {
-  const pool = ids ? HYPER.filter((h) => ids.includes(h.id)) : HYPER;
-  const cat = R.pick(pool);
-  const w = R.pick(cat.members);
-  const wrong = R.sample(HYPER.filter((h) => h !== cat), 3).map((h) => R.pick(h.members));
-  return mkChoice(R, `f9x-w-${cat.id}-${w}`, `Lequel de ces mots fait partie du groupe « ${cat.label} »?`, spk(w), uniq(wrong).filter((t) => t !== w).map(spk), {
-    say: say(`Lequel de ces mots fait partie du groupe ${cat.label}?`),
-    cols: 2,
-  });
-}
 f9.generate = run({
   1: [
-    (R) => f9AntonymLetters(R),
-    (R) => f9Sort(R, 3, R.shuffle([2, 3, 3])),
-    (R) => f9Image(R, 3),
-    (R) => f9Intruder(R),
-    (R) => f9xHyper(R, 3, HYP_EASY),
-    (R) => f9xIntruder(R, HYP_EASY),
+    (R) => f9Antonym(R, 3, 1),
+    (R) => f9Sort(R, 1, 2, [2, 2], ['animal', 'fruit']),
+    (R) => f9Image(R, 1),
+    (R) => f9mDef(R, 1),
+    (R) => f9mCloze(R, 1),
+    (R) => f9mHyper(R, 1, 3),
+    (R) => f9mIntruder(R, 1),
   ],
   2: [
-    (R) => f9xDef(R, 2),
-    (R) => f9xCloze(R),
-    (R) => f9xHyper(R, 4),
-    (R) => f9xIntruder(R),
-    (R) => f9xWhichIs(R),
-    (R) => f9xSortCat(R, 2, [3, 3]),
+    (R) => f9Antonym(R, 4, 2),
+    (R) => f9Image(R, 2),
+    (R) => f9Which(R, 2),
+    (R) => f9mDef(R, 2),
+    (R) => f9mCloze(R, 2),
+    (R) => f9mHyper(R, 2, 4),
+    (R) => f9mIntruder(R, 2),
+    (R) => f9mSortCat(R, 2, 2, [3, 3]),
   ],
   3: [
-    (R) => f9xDef(R, 3),
-    (R) => f9xDef(R, 3),
-    (R) => f9xCloze(R),
-    (R) => f9xHyper(R, 4),
-    (R) => f9xIntruder(R),
-    (R) => f9xSortCat(R, 3, R.shuffle([3, 3, 2])),
+    (R) => f9AntonymLetters(R, 3),
+    (R) => f9Antonym(R, 4, 3),
+    (R) => f9Image(R, 3),
+    (R) => f9Intruder(R, 3),
+    (R) => f9mDef(R, 3),
+    (R) => f9mDef(R, 3),
+    (R) => f9mCloze(R, 3),
+    (R) => f9mHyper(R, 3, 4),
+    (R) => f9mIntruder(R, 3),
+    (R) => f9mSortCat(R, 3, 3, R.shuffle([3, 3, 2])),
   ],
 });
-f9.pfeq = 'Lecture / écriture — vocabulaire : sens des mots, mot juste en contexte, mot générique et catégories (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+f9.pfeq = 'Lecture / écriture — vocabulaire : contraires, sens des mots, mot juste en contexte, catégories et image-mot; mots de la liste orthographique du MEQ (2e/3e année) (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
 
 /* ---------------- f10 : ordre alphabétique, 2e et 3e lettre, mots-repères ---------------- */
 const EXTRA10 = bag(`
