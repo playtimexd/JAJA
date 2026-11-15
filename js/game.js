@@ -103,6 +103,8 @@ export const BADGES = [
   { id: 'curieux', icon: '🔭', t: { fr: 'Curieux', en: 'Curious' }, d: { fr: 'Découvre 10 « Pourquoi? »', en: 'Discover 10 “Why?”' }, ok: () => Object.keys(store.why || {}).length >= 10 },
   { id: 'savant', icon: '🧪', t: { fr: 'Petit savant', en: 'Little scientist' }, d: { fr: 'Découvre 50 « Pourquoi? »', en: 'Discover 50 “Why?”' }, ok: () => Object.keys(store.why || {}).length >= 50 },
   { id: 'panda', icon: '🐼', t: { fr: 'Petit panda', en: 'Little panda' }, d: { fr: 'Gagne 20 étoiles en chinois', en: 'Earn 20 stars in Chinese' }, ok: () => Object.entries(store.progress).filter(([k]) => /^c\d+$/.test(k)).reduce((a, [, v]) => a + Object.values(v).reduce((b, x) => b + (x.stars || 0), 0), 0) >= 20 },
+  { id: 'lecteur', icon: '📚', t: { fr: 'Lecteur', en: 'Reader' }, d: { fr: 'Lis 3 livres', en: 'Read 3 books' }, ok: () => Object.keys(store.books || {}).length >= 3 },
+  { id: 'bibliotheque', icon: '📖', t: { fr: 'Rat de bibliothèque', en: 'Bookworm' }, d: { fr: 'Lis les 10 livres', en: 'Read all 10 books' }, ok: () => Object.keys(store.books || {}).length >= 10 },
   { id: 'shop', icon: '🛍️', t: { fr: 'Coquet', en: 'Stylish' }, d: { fr: 'Achète un accessoire', en: 'Buy an accessory' }, ok: () => store.owned.length >= 1 },
   { id: 'missions', icon: '🎯', t: { fr: 'Mission accomplie', en: 'Mission done' }, d: { fr: 'Réussis 10 missions', en: 'Complete 10 missions' }, ok: () => S('missions') >= 10 },
 ];

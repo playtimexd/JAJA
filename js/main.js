@@ -46,6 +46,7 @@ const SECTIONS = {
     { id: 'mots', icon: '📝', t: { fr: 'Mots et orthographe', en: 'Words & spelling' }, ids: ['f3', 'f9', 'f10', 'f12', 'f13'], boss: '🦈' },
     { id: 'gram', icon: '✏️', t: { fr: 'Grammaire', en: 'Grammar' }, ids: ['f4', 'f5', 'f6'], boss: '🦖' },
     { id: 'phr', icon: '💬', t: { fr: 'Phrases et ponctuation', en: 'Sentences & punctuation' }, ids: ['f7', 'f11'], boss: '🐙' },
+    { id: 'livres', icon: '📚', t: { fr: 'Mes livres', en: 'My books' }, ids: [], books: true },
   ],
   anglais: [
     { id: 'read', icon: '📖', t: { fr: 'Lire et répéter', en: 'Read & repeat' }, ids: ['e20', 'e19', 'e34'], boss: '🐉' },
@@ -66,7 +67,7 @@ function sectionsOf(s) {
   const used = new Set(secs.flatMap((x) => x.ids));
   const rest = list.filter((u) => !used.has(u.id));
   if (rest.length) secs[secs.length - 1].units.push(...rest);   // never lose a unit
-  return secs.filter((x) => x.units.length || x.talk);
+  return secs.filter((x) => x.units.length || x.talk || x.books);
 }
 const unitStars = (u) => [1, 2, 3].reduce((b, l) => b + (levelStats(u.id, l)?.stars ?? 0), 0);
 const subjectStars = (s) => units[s.id].reduce((a, u) => a + unitStars(u), 0);
@@ -143,6 +144,7 @@ function subject(s) {
     el('header', { class: 'bar' }, backBtn(home), el('h1', {}, s.icon, ' ', t(s.id)), wallet()),
     el('div', { class: 'sec-grid' },
       secs.map((x) => {
+        if (x.books) return tile(x.icon, tr(x.t), `${Object.keys(store.books || {}).length} ✔ · 10 📖`, 'books', async () => (await import('./livres.js')).libraryHome(() => subject(s)));
         const got = x.units.reduce((a, u) => a + unitStars(u), 0), max = x.units.length * 9;
         const troph = store.trophies[`${s.id}-${x.id}`];
         return tile(x.icon, tr(x.t), `${x.units.length} ${t('games')} · ★ ${got}/${max}${troph ? ' · 🏆' : ''}`, '', () => section(s, x.id));

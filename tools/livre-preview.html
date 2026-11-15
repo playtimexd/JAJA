@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8"><title>Livre preview</title>
+<style>body{font-family:system-ui;margin:12px;background:#f4f1ea}.row{display:flex;flex-wrap:wrap;gap:8px}.st{width:300px;background:#fff;border-radius:10px;padding:6px;font-size:13px}.st svg{width:288px;height:auto;display:block}</style>
+<div id="o"></div>
+<script type="module">
+const q = new URLSearchParams(location.search), id = q.get('id'), from = +(q.get('from') || 0), n = +(q.get('n') || 99);
+const { book: b } = await import(`../js/content/livres/${id}.js?${Date.now()}`);
+document.getElementById('o').innerHTML = `<h2>${b.emoji} ${b.title} (niv ${b.level})</h2><div class="row">` + (from === 0 ? `<div class="st">${b.cover}<b>Couverture</b></div>` : '') + b.pages.slice(from, from + n).map((p, i) => `<div class="st">${p.svg}<div><b>${from + i + 1}.</b> ${p.text}</div></div>`).join('') + '</div>';
+</script>
