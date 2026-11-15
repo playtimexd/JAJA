@@ -448,3 +448,15 @@
 .diff-seg .sugg { font-size: 13px; font-weight: 800; opacity: .9; }
 .res-tip { background: #fff3c4; border-radius: 16px; padding: 10px 18px; font-weight: 800; font-size: 19px; }
 .btn.pulse { animation: pulse 1s ease infinite; }
+/* full-paragraph pages */
+.book-side { max-height: calc(100dvh - 120px); }
+.book-text { overflow-y: auto; padding-right: 6px; }
+.book-text.l { font-size: clamp(21px, 2.3vw, 27px); line-height: 1.6; }
+.book-text.xl { font-size: clamp(17px, 1.7vw, 21px); line-height: 1.6; }
+.book-body:has(.book-text.xl) { grid-template-columns: 1.15fr 1fr; }
+/* long reading texts in exercises: text left (scrolls), questions right */
+.stim-text.long { white-space: pre-line; }
+@media (orientation: landscape) and (min-width: 901px) {
+  .q:has(.stim-text.long):has(.t-choice) .stim-text.long { max-height: 62vh; overflow-y: auto; font-size: clamp(18px, 1.8vw, 22px); }
+}
+@media (max-width: 600px) { .book-text.l, .book-text.xl { font-size: 18px; } .book-side { max-height: none; } }

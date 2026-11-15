@@ -204,7 +204,7 @@ const pages = [
     + mia(100, 268, 1.55, { mood: 'laugh', ar: 'u', al: 'u', hat: null, coat: '#f7a8c6', pants: '#f7a8c6', boots: '#fff', shadow: false })
     + theo(204, 272, 1.5, { mood: 'laugh', ar: 'u', al: 'u', hat: null, coat: '#8cc4f0', pants: '#8cc4f0', boots: '#fff', shadow: false })
     + maman(322, 298, 1.5, { mood: 'happy', al: [-40, -62], ar: [36, -44], holdR: mug(0, 6, 0.7, { marsh: false }) })
-    + star4(160, 96, 3, '#f4c430') + star4(248, 100, 2.4, '#f4c430') + star4(62, 108, 2.2, '#f4c430')), text: "Ce matin, la neige tombe à gros flocons. À la radio, on annonce : « Les écoles sont fermées! » Mia et son petit frère Théo sautent de joie." },
+    + star4(160, 96, 3, '#f4c430') + star4(248, 100, 2.4, '#f4c430') + star4(62, 108, 2.2, '#f4c430')), text: "Ce matin-là, Mia se réveille dans une maison étrangement silencieuse. Par la fenêtre, elle voit la neige tomber à gros flocons, si épais qu’on ne distingue même plus la maison d’en face. En bas, la radio annonce d’une voix grave : « Les écoles sont fermées à cause de la tempête! » Mia et son petit frère Théo se regardent une seconde, puis ils sautent de joie dans le salon. Une journée entière de congé, quelle chance!" },
   // 2 — getting dressed
   { svg: svg(inside({ wall: '#efe0c6', floor: '#9a7050', y: 220, wain: '#d9c09a' })
     + G(R(20, 40, 210, 12, '#8a5a3c', 4) + [46, 100, 154, 206].map((px, i) => C(px, 56, 4.4, '#f4c430', 'stroke-width="2"') + P(`M${px - 9} 60Q${px - 14} 62 ${px - 22} 70L${px - 30} 122L${px - 19} 124L${px - 17} 96L${px - 17} 142L${px + 17} 142L${px + 17} 96L${px + 19} 124L${px + 30} 122L${px + 22} 70Q${px + 14} 62 ${px + 9} 60Z`, ['#3fa34d', '#8a5cc7', '#e8c14a', '#4a8fe0'][i]) + P(`M${px - 9} 60Q${px - 14} 62 ${px - 22} 70L${px - 30} 122L${px - 19} 124L${px - 17} 96L${px - 17} 142L${px + 17} 142L${px + 17} 96L${px + 19} 124L${px + 30} 122L${px + 22} 70Q${px + 14} 62 ${px + 9} 60Z`, 'url(#sh)', NS) + E(px, 66, 12, 8, '#000', NS + ' opacity=".15"') + P(`M${px} 68V140`, 'none', 'stroke-width="1.6" opacity=".4"') + R(px - 16, 60, 32, 8, '#fff', 3, 'opacity=".25" stroke="none"')).join('') + P('M60 52q6 4 12 0', 'none', 'stroke-width="2"'), '', 2.4)
@@ -213,28 +213,28 @@ const pages = [
     + G(PS('M20 282Q80 296 150 284L146 300H24Z', '#c8372d') + P('M30 288h110', 'none', 'stroke="#f4c430" stroke-width="2" opacity=".7"'), '', 2)
     + mia(104, 292, 1.6, { mood: 'happy', ar: [46, -22], al: 'd' })
     + theo(214, 296, 1.55, { mood: 'worried', al: [-24, -62], holdR: boot(0, 4, 0.55, false, '#2e8fd0'), front: RS(-16, -10, 15, 10, '#fff', 3.5, 'stroke-width="2.4"') + P('M-15 -6h13', 'none', 'stroke="#e8556a" stroke-width="2"') })
-    + star4(318, 244, 3.4, '#f4c430') + star4(298, 250, 2, '#f4c430') + star4(344, 242, 2, '#f4c430')), text: "Mia met sa tuque, ses mitaines et ses bottes. Théo cherche encore sa deuxième botte. Elle est sous le banc!" },
+    + star4(318, 244, 3.4, '#f4c430') + star4(298, 250, 2, '#f4c430') + star4(344, 242, 2, '#f4c430')), text: "Après un bon déjeuner, Mia se prépare avec soin : elle met sa tuque, ses mitaines, ses bottes, et elle enroule son foulard autour de son cou. Théo, lui, tourne en rond dans l’entrée, car il cherche sa deuxième botte. « Je l’ai perdue! gémit-il. Elle a disparu! » Mia rit et regarde partout. Finalement, elle l’aperçoit : elle est cachée sous le banc, à moitié enterrée sous un tas de manteaux. Vite, on peut sortir!" },
   // 3 — Samir waits outside
   { svg: svg(outdoor({ mode: 'storm', seed: 3 }) + house(62, 214, 0.78, { open: true, steps: 'clear' })
     + mia(152, 296, 1.5, { mood: 'laugh', ar: 'u', al: 'd' }) + theo(220, 298, 1.45, { mood: 'laugh', al: 'u', ar: 'd' })
     + samir(336, 296, 1.5, { flip: true, mood: 'happy', al: [-36, -50], holdL: G(shovel(62), 'rotate(-12)') })
-    + snowfall(22, 7, 1.2) + wind(8, 3)), text: "Dehors, le voisin Samir les attend avec une pelle. — On construit un fort? demande-t-il. — Oui! crient Mia et Théo." },
+    + snowfall(22, 7, 1.2) + wind(8, 3)), text: "Dehors, l’air froid pique les joues, mais la neige est épaisse et parfaite. Le voisin Samir les attend déjà au milieu de la rue, une grande pelle à la main. « J’ai une idée, dit-il avec un clin d’œil. On construit un fort? » Mia et Théo n’hésitent pas une seconde. « Oui! » crient-ils en même temps, en courant dans la neige jusqu’aux genoux. Leur grand projet de la journée est lancé, et personne ne veut perdre de temps." },
   // 4 — building the fort
   { svg: svg(outdoor({ mode: 'storm', seed: 4, flakeN: 34 }) + fort(206, 254, 1.4, { flag: false, rows: 3 })
     + G(PS('M20 296L44 270L84 270L98 296Z', '#e8564a') + P('M26 288h66', 'none', 'stroke="#fff" stroke-width="2" opacity=".5"'), '', 2.4) + blk(60, 262, 30, 22) + blk(100, 270, 30, 22) + blk(24, 282, 34, 22)
     + samir(54, 298, 1.45, { mood: 'happy', ar: [38, -44], holdR: shovel(52) })
     + theo(268, 298, 1.45, { mood: 'laugh', ar: [30, -64], holdR: G(shovel(46), 'rotate(-20)') })
     + mia(348, 298, 1.5, { flip: true, mood: 'happy', ar: [34, -62], al: [-34, -54], holdR: blk(-17, -14, 34, 24) })
-    + snowfall(20, 9, 1.2) + wind(6, 4) + C(256, 214, 3, '#fff', NS) + C(240, 206, 2.4, '#fff', NS)), text: "Ils font de gros blocs de neige avec des seaux. Mia les empile. Théo les tape avec sa pelle." },
+    + snowfall(20, 9, 1.2) + wind(6, 4) + C(256, 214, 3, '#fff', NS) + C(240, 206, 2.4, '#fff', NS)), text: "Pour bâtir le fort, ils se partagent le travail. D’abord, Samir et Théo remplissent des seaux de neige bien tassée et les renversent pour faire de gros blocs. Ensuite, Mia les empile avec soin, l’un sur l’autre, comme de vraies briques de glace. Théo tape sur chaque bloc avec sa petite pelle pour le rendre solide. Leurs joues sont rouges et leurs mitaines mouillées, mais ils travaillent avec tant de plaisir qu’ils ne sentent même plus le froid." },
   // 5 — fort finished
   { svg: svg(outdoor({ mode: 'storm', seed: 5, flakeN: 28 }) + fort(204, 262, 1.25, { flag: true, rows: 4 })
     + mia(56, 298, 1.55, { mood: 'laugh', ar: 'u', al: 'd' }) + theo(122, 300, 1.5, { mood: 'laugh', al: 'u' })
     + samir(350, 298, 1.6, { flip: true, mood: 'happy', al: [-14, -44], ar: [36, -62] })
-    + snowfall(14, 2, 1.1) + star4(300, 112, 3, '#f4c430') + star4(318, 100, 2, '#f4c430') + star4(108, 120, 2.4, '#f4c430')), text: "Le fort a quatre murs, une porte et un drapeau rouge. Samir est fier. C'est le plus beau fort de la rue!" },
+    + snowfall(14, 2, 1.1) + star4(300, 112, 3, '#f4c430') + star4(318, 100, 2, '#f4c430') + star4(108, 120, 2.4, '#f4c430')), text: "Au bout d’une heure, le fort est enfin terminé. Il a quatre murs épais, une porte voûtée par laquelle on peut entrer à quatre pattes, et même un petit drapeau rouge au sommet. Samir recule de quelques pas et il croise les bras, fier comme un roi. « C’est le plus beau fort de toute la rue! » déclare-t-il. Mia et Théo sont d’accord, et ils se promettent de le défendre contre toute attaque de boules de neige." },
   // 6 — Madame Odette is stuck
   { svg: svg(outdoor({ mode: 'storm', seed: 6 }) + house(272, 238, 1.05, { wall: '#9ec4a8', roof: '#7a5a6a', steps: 'buried', winL: odette(-51, -54, 0.46, { bust: true, shadow: false, mood: 'worried', ar: 'w' }) })
     + mia(70, 298, 1.6, { mood: 'worried', ar: [44, -52] }) + theo(146, 300, 1.5, { mood: 'worried' })
-    + snowfall(24, 4, 1.2) + wind(8, 6)), text: "Mia regarde la maison d'en face. Madame Odette est à sa fenêtre. Ses marches sont cachées sous la neige. Elle ne peut pas sortir." },
+    + snowfall(24, 4, 1.2) + wind(8, 6)), text: "Pendant que Samir ajoute un dernier bloc, Mia lève les yeux vers la maison d’en face. Madame Odette, la voisine âgée, est debout à sa fenêtre et elle regarde la neige avec un air un peu triste. Ses marches sont complètement cachées sous un épais tapis blanc, et le sentier a disparu. Elle ne peut pas sortir. Mia sent un petit pincement au cœur : elle sait que Madame Odette vit seule et qu’elle a sûrement besoin d’aide." },
   // 7 — shovelling
   { svg: svg(outdoor({ mode: 'storm', seed: 7, flakeN: 30 }) + house(306, 212, 0.9, { wall: '#9ec4a8', steps: 'clear' })
     + P('M0 262Q120 246 230 252T340 232L352 238Q240 262 120 282Q40 292 0 296Z', '#cfd9e6', NS) + P('M0 264Q120 248 230 254', 'none', 'stroke="#fff" stroke-width="3" opacity=".7"')
@@ -243,12 +243,12 @@ const pages = [
     + mia(170, 298, 1.55, { mood: 'happy', ar: [30, -40], al: [-10, -44], holdR: G(shovel(32), 'rotate(155)') })
     + theo(250, 300, 1.55, { mood: 'laugh', ar: [28, -38], al: [-10, -42], holdR: G(shovel(30), 'rotate(155)') })
     + G(P('M110 238q14 -26 34 -10M196 236q16 -28 38 -8M274 244q12 -22 32 -8', 'none', 'stroke="#fff" stroke-width="4"'), '') + C(128, 214, 4, '#fff', NS) + C(214, 212, 3.6, '#fff', NS) + C(288, 226, 3.4, '#fff', NS)
-    + snowfall(16, 5, 1.1)), text: "Les trois amis courent chez Madame Odette. Pelletée après pelletée, ils déneigent les marches et le trottoir." },
+    + snowfall(16, 5, 1.1)), text: "« Venez, les amis, on va l’aider! » dit Mia. Les trois enfants abandonnent leur fort et traversent la rue en pataugeant. Chacun prend une pelle, et ils se mettent au travail. Pelletée après pelletée, ils dégagent d’abord les marches, puis le trottoir, jusqu’à la rue. Théo, tout petit qu’il est, pousse la neige avec acharnement. Après une longue demi-heure, un chemin bien net mène enfin jusqu’à la porte de la voisine." },
   // 8 — Odette says thank you
   { svg: svg(outdoor({ mode: 'storm', seed: 8, flakeN: 22 }) + house(262, 262, 1.5, { wall: '#9ec4a8', open: true, steps: 'clear' })
     + odette(262, 270, 1.42, { mood: 'happy', al: [-18, -44], ar: [18, -44] })
     + samir(64, 298, 1.5, { mood: 'happy', ar: [26, -40], holdR: G(shovel(52), 'rotate(-10)') }) + mia(138, 300, 1.55, { mood: 'happy', ar: 'd' }) + theo(204, 302, 1.5, { mood: 'laugh', al: 'u' })
-    + snowfall(12, 6, 1.1)), text: "Madame Odette ouvre sa porte. — Merci, mes chers enfants! Vous êtes bien gentils, dit-elle. — Ce n'est rien, répond Mia en souriant." },
+    + snowfall(12, 6, 1.1)), text: "La porte s’ouvre, et Madame Odette sort sur le perron, les mains jointes. Elle n’en croit pas ses yeux. — Merci, mes chers enfants! dit-elle d’une voix émue. Vous êtes bien gentils, vraiment. Je n’aurais pas pu sortir toute seule aujourd’hui. — Ce n’est rien, répond Mia en souriant, un peu gênée. On est contents de vous aider. Madame Odette lui pince doucement la joue, et ses yeux brillent de reconnaissance." },
   // 9 — hot chocolate
   { svg: svg(inside({ wall: '#f6e3c8', floor: '#b8825a', y: 222, wain: '#e0b98a' })
     + windowFrame(150, 40, 100, 80, 'url(#skyS)', stormGlass(150, 40, 100, 80, 3)) + curtainPair(150, 40, 100, 80, '#4a8fe0')
@@ -256,7 +256,7 @@ const pages = [
     + odette(66, 250, 1.4, { mood: 'happy', ar: [18, -46], al: [-18, -46] }) + mia(166, 250, 1.4, { mood: 'laugh', hat: null, ar: [18, -46], al: [-18, -46] }) + samir(250, 250, 1.4, { mood: 'happy', hat: null, ar: [18, -46], al: [-18, -46] }) + theo(332, 254, 1.4, { mood: 'laugh', hat: null, ar: [18, -46], al: [-18, -46] })
     + G(RS(10, 212, 380, 22, '#d9a066', 8) + R(14, 232, 372, 70, '#c8372d', 0, NS) + P('M14 232h372M14 244h372M14 258h372', 'none', 'stroke="#fff" stroke-width="2.4" opacity=".35"') + [60, 120, 180, 240, 300, 360].map((q) => P(`M${q} 232V300`, 'none', 'stroke="#fff" stroke-width="2.4" opacity=".35"')).join(''), '', 2.6)
     + mug(66, 226, 0.95) + mug(166, 228, 1.0) + mug(250, 228, 1.0) + mug(332, 226, 0.95)
-    + steam(60, 186, 0.62) + steam(160, 188, 0.62) + steam(244, 188, 0.62) + steam(326, 186, 0.62) + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "Madame Odette les invite à entrer. Elle prépare du chocolat chaud avec des guimauves. Ça fait du bien aux mains froides!" },
+    + steam(60, 186, 0.62) + steam(160, 188, 0.62) + steam(244, 188, 0.62) + steam(326, 186, 0.62) + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "Pour les remercier, Madame Odette les invite à entrer et à se réchauffer. Elle prépare du chocolat chaud dans une grosse casserole et elle ajoute des guimauves qui flottent sur le dessus comme de petits nuages. Les enfants enlèvent leurs bottes, s’assoient autour de la table de la cuisine et tiennent leur tasse à deux mains. Ça fait du bien aux doigts engourdis! Dehors, le vent siffle, mais à l’intérieur, tout est chaud et paisible." },
   // 10 — afternoon play
   { svg: svg(outdoor({ mode: 'clear', seed: 10 }) + fort(318, 226, 0.78, { flag: true, rows: 4 })
     + E(104, 272, 96, 24, '#cfdeee', NS) + P('M58 250Q74 236 100 260Q128 236 150 252Q130 272 118 290L92 290Q74 272 58 250Z', '#c4d6ea', NS) + E(104, 268, 80, 8, '#e8f1f9', NS)
@@ -265,7 +265,7 @@ const pages = [
     + snowball(290, 160, 10) + P('M272 176l-28 12M276 186l-26 12M282 168l-28 4', 'none', 'stroke="#fff" stroke-width="3" opacity=".7"')
     + samir(350, 298, 1.55, { flip: true, mood: 'surprised', ar: [36, -64], al: [-30, -50] })
     + G(C(350, 130, 9, '#fff', NS) + C(366, 124, 5, '#fff', NS) + C(334, 122, 5, '#fff', NS) + C(352, 114, 3.6, '#fff', NS) + C(372, 138, 4, '#fff', NS) + C(332, 136, 3.4, '#fff', NS) + P('M326 112l-8 -8M352 104l2 -10M374 120l8 -4', 'none', 'stroke="#fff" stroke-width="3"'), '')
-    + snowfall(10, 8, 1)), text: "Tout l'après-midi, ils jouent dans la neige. Théo fait un ange de neige. Mia lance une boule à Samir : plouf!" },
+    + snowfall(10, 8, 1)), text: "Tout l’après-midi, les trois amis continuent de jouer dans la neige. Théo se couche sur le dos et fait des mouvements de bras et de jambes pour dessiner un ange de neige aux grandes ailes. Plus loin, Mia roule une boule bien ronde et la lance à Samir. Plouf! Elle l’atteint en plein dans le dos. Samir se retourne en poussant un cri de guerre, et la bataille de boules de neige commence, dans les éclats de rire." },
   // 11 — bedtime
   { svg: svg(inside({ wall: '#7568ae', floor: '#8a6a54', y: 220, wain: '#5f5496' })
     + windowFrame(146, 34, 108, 88, 'url(#skyN)', C(204, 58, 14, '#fff1b8', NS) + C(210, 55, 11, '#2b3a74', `${NS} opacity=".3"`) + stormGlass(146, 34, 108, 88, 9)) + curtainPair(146, 34, 108, 88, '#e8556a')
@@ -276,48 +276,49 @@ const pages = [
     + theo(280, 262, 1.8, { mood: 'sleepy', hat: null, tilt: 4, bust: true, shadow: false, coat: '#8cc4f0', al: [-12, -34], ar: [14, -36] })
     + G(PS('M16 218Q18 206 60 204L152 206Q160 210 158 300H12Z', '#e8556a') + P('M26 224Q86 236 150 222M24 240Q86 252 152 238', 'none', 'stroke="#fff" stroke-width="2.4" opacity=".4"') + C(64, 214, 3, '#fff', 'opacity=".5" stroke="none"') + C(110, 220, 3, '#fff', 'opacity=".5" stroke="none"'), '', 2.6)
     + G(PS('M216 214Q222 202 262 202L346 204Q352 210 350 300H210Z', '#4a8fe0') + P('M222 224Q284 236 346 222M222 240Q284 252 348 238', 'none', 'stroke="#fff" stroke-width="2.4" opacity=".4"') + C(262, 214, 3, '#fff', 'opacity=".5" stroke="none"') + C(310, 220, 3, '#fff', 'opacity=".5" stroke="none"'), '', 2.6)
-    + P('M170 60q-8 6 -4 14M232 66q8 6 4 14', 'none', 'stroke="#fff" stroke-width="2" opacity=".3"') + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "Le soir, Mia et Théo sont fatigués. Dans leur lit, ils écoutent le vent. Dehors, la neige tombe encore." },
+    + P('M170 60q-8 6 -4 14M232 66q8 6 4 14', 'none', 'stroke="#fff" stroke-width="2" opacity=".3"') + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "Le soir, Mia et Théo sont tellement fatigués qu’ils s’endorment presque dans leur bain. Une fois blottis dans leur lit, ils écoutent le vent qui hurle contre la fenêtre. Mia pense à son fort, à Madame Odette et à tout ce qu’ils ont fait aujourd’hui. Dehors, la neige tombe encore, doucement, sans faire de bruit, et elle recouvre peu à peu la rue d’un grand drap blanc. Mia ferme les yeux, le sourire aux lèvres." },
   // 12 — the snowplough
   { svg: svg(outdoor({ mode: 'night', seed: 12, road: true, flakeN: 30 }) + house(76, 210, 0.92, { wall: '#b98a5e', night: true, steps: 'clear', winL: mia(-51, -54, 0.46, { bust: true, shadow: false, mood: 'surprised', hat: null, coat: '#f7a8c6', ar: 'w' }) })
     + plough(244, 292, 1.4, { night: true })
     + G(P('M52 252Q40 224 70 214Q54 238 80 250ZM30 262Q12 240 38 228Q26 246 46 258Z', '#f2f7fb', NS + ' opacity=".9"'), '') + E(60, 280, 36, 10, '#e8f0fa', NS) + C(36, 232, 4, '#fff', NS) + C(56, 218, 3, '#fff', NS) + C(24, 250, 3, '#fff', NS)
-    + P('M6 120h14M10 130h18M0 140h12', 'none', 'stroke="#fff" stroke-width="2" opacity="0"') + snowfall(26, 3, 1.2) + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "Au milieu de la nuit, un gros bruit réveille Mia. Une déneigeuse jaune passe dans la rue. Ses lumières orange tournent." },
+    + P('M6 120h14M10 130h18M0 140h12', 'none', 'stroke="#fff" stroke-width="2" opacity="0"') + snowfall(26, 3, 1.2) + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "Au milieu de la nuit, un gros bruit réveille Mia en sursaut. Elle se glisse jusqu’à la fenêtre et elle écarte le rideau. Dans la rue, une grande déneigeuse jaune avance lentement, en poussant d’énormes tas de neige devant elle. Ses lumières orange tournent et éclairent les maisons endormies par éclairs. Mia la regarde passer, fascinée, puis elle retourne se coucher en se disant que les déneigeuses travaillent pendant que tout le monde dort." },
   // 13 — morning after
   { svg: svg(outdoor({ mode: 'clear', seed: 13, road: true }) + house(226, 198, 0.55, { wall: '#d9a066', steps: 'clear', smoke: true }) + fort(308, 252, 0.82, { flag: true, rows: 4 })
     + theo(170, 298, 1.35, { mood: 'happy', al: 'w' })
     + mia(88, 298, 1.75, { mood: 'happy', ar: 'd', al: 'd' })
-    + star4(40, 110, 3, '#f4c430') + star4(150, 100, 2.4, '#f4c430')), text: "Le lendemain, la rue est bien dégagée sous le soleil. Le fort est toujours là. Mia sourit : quelle belle journée de tempête!" },
+    + star4(40, 110, 3, '#f4c430') + star4(150, 100, 2.4, '#f4c430')), text: "Le lendemain, quand Mia ouvre les yeux, la rue est bien dégagée sous un soleil éclatant. Le ciel est d’un bleu pur, et la neige scintille de mille étoiles. Le fort est toujours là, fier et solide, avec son drapeau rouge qui flotte au vent. Les marches de Madame Odette sont encore propres. Mia sourit en regardant tout ça. « Quelle belle journée de tempête! » pense-t-elle en se préparant pour aller jouer." },
 ];
 
 export const book = {
   id: 'jour-de-tempete',
   title: 'Le jour de tempête',
   emoji: '❄️',
-  level: 2,
-  minutes: 9,
+  level: 3,
+  minutes: 18,
   cover: svg(outdoor({ mode: 'storm', seed: 14, flakeN: 34 }) + fort(214, 254, 1.25, { flag: true, rows: 4 })
     + mia(64, 298, 1.5, { mood: 'laugh', ar: 'u' }) + theo(128, 300, 1.35, { mood: 'happy', al: 'u' }) + samir(346, 298, 1.55, { flip: true, mood: 'happy', ar: 'u' })
     + snowfall(12, 4, 1.1)),
   pages,
   words: [
-    { word: 'une tempête', emoji: '🌨️', def: 'Un très gros mauvais temps, avec beaucoup de neige et de vent.' },
-    { word: 'fermé', emoji: '🔒', def: "Qui n'est pas ouvert. Ce jour-là, il n'y a pas d'école." },
-    { word: 'une tuque', emoji: '🧶', def: 'Un bonnet de laine pour garder la tête au chaud.' },
-    { word: 'une pelle', emoji: '⛏️', def: 'Un outil pour ramasser et lancer la neige.' },
-    { word: 'un fort', emoji: '🏰', def: 'Une cachette avec de gros murs. Ici, il est fait de blocs de neige.' },
-    { word: 'déneiger', emoji: '❄️', def: 'Enlever la neige d’un endroit.' },
-    { word: 'un voisin', emoji: '🏘️', def: 'Une personne qui habite tout près de chez toi.' },
-    { word: 'une guimauve', emoji: '🍡', def: 'Une petite friandise blanche et molle qui fond dans le chocolat chaud.' },
-    { word: 'une déneigeuse', emoji: '🚜', def: 'Un gros camion qui pousse la neige hors de la rue.' },
+    {"word":"une tempête","emoji":"🌨️","def":"Un très gros mauvais temps, avec beaucoup de vent ou de neige."},
+    {"word":"un fort","emoji":"🏰","def":"Une petite construction qui sert d’abri ou de cachette pour jouer."},
+    {"word":"épais","emoji":"❄️","def":"Très gros ou très profond, qui forme une grosse couche."},
+    {"word":"tasser","emoji":"🧊","def":"Presser pour rendre plus dur et plus compact."},
+    {"word":"pelleter","emoji":"⛏️","def":"Déplacer de la neige avec une pelle."},
+    {"word":"déneiger","emoji":"🧹","def":"Enlever la neige d’un endroit."},
+    {"word":"la reconnaissance","emoji":"💛","def":"Un grand merci qu’on ressent dans son cœur."},
+    {"word":"engourdi","emoji":"🥶","def":"Qui ne bouge plus bien parce qu’il a trop froid."},
+    {"word":"une guimauve","emoji":"🍡","def":"Une petite friandise blanche, molle et sucrée."},
+    {"word":"une déneigeuse","emoji":"🚜","def":"Un gros camion qui pousse la neige hors de la rue."},
   ],
   quiz: [
-    { q: 'Pourquoi Mia et Théo sautent-ils de joie?', options: ["Il n'y a pas d'école.", "C'est leur anniversaire.", 'Papa fait des crêpes.'], answer: 0 },
-    { q: 'Qui attend Mia et Théo dehors?', options: ['Madame Odette', 'Samir, le voisin', 'Maman'], answer: 1 },
-    { q: 'Que font les enfants en premier?', options: ['Ils boivent du chocolat chaud.', 'Ils déneigent les marches.', 'Ils construisent un fort.'], answer: 2 },
-    { q: 'Pourquoi Madame Odette ne peut-elle pas sortir?', options: ['Ses marches sont cachées sous la neige.', 'Elle est endormie.', "Elle n'a pas de manteau."], answer: 0 },
-    { q: 'Que veut dire « déneiger »?', options: ['Faire tomber la neige', 'Enlever la neige', 'Jouer dans la neige'], answer: 1 },
-    { q: 'Que boivent les enfants chez Madame Odette?', options: ['Du lait froid', 'Du jus', 'Du chocolat chaud'], answer: 2 },
-    { q: "Comment se sent Madame Odette quand les enfants ont fini?", options: ['Fâchée', 'Contente et reconnaissante', 'Fatiguée'], answer: 1 },
-    { q: "Qu'est-ce qui réveille Mia pendant la nuit?", options: ['Une déneigeuse', 'Le chat', 'Un orage'], answer: 0 },
+    {"q":"Pourquoi Mia et Théo sautent-ils de joie le matin?","options":["Ils ont congé parce que les écoles sont fermées","Ils vont à la cabane à sucre","Ils partent en voyage"],"answer":0},
+    {"q":"Où Théo retrouve-t-il sa deuxième botte?","options":["Sous le banc","Dans la neige","Dans le salon"],"answer":0},
+    {"q":"Que veut dire « tasser » la neige dans un seau?","options":["La jeter loin","La presser pour qu’elle devienne plus dure","La faire fondre"],"answer":1},
+    {"q":"Dans quel ordre les enfants font-ils ces activités?","options":["Ils déneigent chez Madame Odette, puis ils bâtissent le fort","Ils bâtissent le fort, puis ils déneigent chez Madame Odette","Ils boivent du chocolat chaud, puis ils bâtissent le fort"],"answer":1},
+    {"q":"Pourquoi les enfants vont-ils chez Madame Odette?","options":["Elle ne peut pas sortir à cause de la neige sur ses marches","Elle les a appelés","Ils veulent boire du chocolat"],"answer":0},
+    {"q":"Comment sait-on que Madame Odette est reconnaissante?","options":["Elle les invite à entrer et leur prépare du chocolat chaud","Elle ferme sa porte","Elle appelle la police"],"answer":0},
+    {"q":"Qu’est-ce qui réveille Mia pendant la nuit?","options":["Le tonnerre","Une déneigeuse jaune","Son petit frère"],"answer":1},
+    {"q":"Comment Mia se sent-elle à la fin de l’histoire?","options":["Ennuyée","Contente et fière de sa belle journée","Inquiète pour son fort"],"answer":1},
   ],
 };

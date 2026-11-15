@@ -22,7 +22,7 @@ for (const id of ids) {
   (b.pages || []).forEach((p, i) => {
     svgOk(`${id}/p${i + 1}`, p.svg);
     const n = (p.text || '').split(/\s+/).filter(Boolean).length;
-    if (!n || n > 45) fail(`${id}/p${i + 1}`, `text words ${n}`);
+    if (n < 35 || n > 130) fail(`${id}/p${i + 1}`, `text words ${n} (want a 35–130 word paragraph)`);
   });
   if (!Array.isArray(b.words) || b.words.length < 5) fail(id, 'words');
   (b.words || []).forEach((w) => { if (!w.word || !w.def) fail(id, 'word/def'); });

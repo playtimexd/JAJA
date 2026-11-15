@@ -172,7 +172,7 @@ export const book = {
   title: 'Le robot de la bibliothèque',
   emoji: '🤖',
   level: 3,
-  minutes: 10,
+  minutes: 24,
   cover: couverture,
   pages: [
     // 1
@@ -183,7 +183,7 @@ ${tableBasse(212, 232, 188).replace(/<ellipse[^>]*\/>/, '')}
 ${[[240, 236, '#e8604c'], [270, 236, '#4a8fd0'], [336, 236, '#f5c542']].map(([x, y, c]) => `<rect x="${x}" y="${y - 12}" width="16" height="12" rx="2" fill="${c}" ${O2}/>`).join('')}
 <path d="M236 160q6 -10 12 0M300 146q6 -10 12 0M352 158q6 -10 12 0" class="ln" stroke="#3a3f55" stroke-width="3"/>
 ${felix(88, 298, 1.7, 'shy', 'hold', livre(0, -42, .7))}`),
-      text: 'Félix est un garçon timide. Quand il y a trop de monde, ses mots se cachent au fond de sa gorge. Il aime donc la bibliothèque, où tout est silencieux. Pendant que les autres rient autour d\'une table, il cherche un livre tout seul.' },
+      text: "Félix est un garçon timide. Quand il y a trop de monde autour de lui, ses mots se cachent tout au fond de sa gorge et refusent de sortir. Il rougit, il baisse les yeux, et il préfère se taire. C’est pourquoi il aime tant la bibliothèque, où tout est calme et silencieux. Pendant que les autres enfants rient autour d’une table, Félix se faufile entre les rayons pour chercher un livre, tout seul, dans son petit coin." },
     // 2
     { svg: svg(`${biblio({ win: 'dim', tapis: false, sombre: true, lampe: false })}
 <path d="M300 118L255 292H345Z" fill="#fff6c9" opacity=".22"/>${motes(14, 5)}
@@ -191,54 +191,54 @@ ${bobine(305, 296, 1.45, 'off', 'down', { toiles: true })}
 <g transform="translate(305 296) scale(1.45)"><path d="M-14 -40q-3 8 0 14M-4 -40q3 10 0 16" class="ln" stroke="#d9d5e3" stroke-width="1.2" opacity=".6"/></g>
 <g fill="#d9d5e3" opacity=".8"><circle cx="250" cy="270" r="4"/><circle cx="262" cy="282" r="3"/><circle cx="352" cy="276" r="4"/><ellipse cx="305" cy="296" rx="52" ry="4" opacity=".4"/></g>
 ${felix(98, 298, 1.6, 'wow', 'pointR')}`),
-      text: 'Un mardi, derrière la dernière étagère, Félix découvre un vieux robot couvert de poussière. Des toiles d\'araignée pendent à ses oreilles. Sur sa poitrine, une plaque rouillée dit : « Bobine, bibliothécaire ».' },
+      text: "Un mardi après l’école, derrière la toute dernière étagère, Félix découvre quelque chose d’étrange : un vieux robot, assis par terre, recouvert de poussière. Des toiles d’araignée pendent à ses oreilles, et ses grands yeux sont éteints. Sur sa poitrine, une plaque de métal un peu rouillée porte quelques mots à demi effacés : « Bobine, bibliothécaire ». Félix recule d’un pas, le cœur battant, mais sa curiosité est plus forte que sa peur." },
     // 3
     { svg: svg(`${biblio({ win: 'day' })}${felix(100, 298, 1.6, 'shy', 'wave')}${bobine(282, 298, 1.45, 'wide', 'hold', { talk: true, held: livre(0, -52, 1, 180).replace('<g transform="translate(0 0)', '<g') })}<g transform="translate(282 298) scale(1.45)">${livre(0, -52, 1, 180)}</g>
 ${sons(338, 220, 1)}${etoiles([[340, 110, 6], [214, 150, 5]])}<path d="M196 150l-8 -6M206 140l-6 -10M222 138l2 -10" class="ln" stroke="#ffb703" stroke-width="3"/>`),
-      text: '« Bonjour », murmure Félix. Les yeux du robot s\'allument en grinçant. — Bonjour, petit, dit-il. Je suis Bobine. Mais regarde, je tiens mon livre à l\'envers : je ne sais plus lire!' },
+      text: "« Bonjour », murmure Félix d’une toute petite voix. Aussitôt, les yeux du robot s’allument en grinçant, comme de vieilles lampes qui se réveillent. — Bonjour, petit, dit-il d’une voix un peu enrouée. Je suis Bobine. Mais regarde, je tiens mon livre à l’envers : je ne sais plus lire! Félix remarque en effet que le grand livre posé sur les genoux du robot est ouvert à l’envers. Il ne peut pas s’empêcher de sourire un peu." },
     // 4
     { svg: svg(`${biblio({ win: 'dim', tapis: false })}${felix(96, 298, 1.6, 'sad', 'throat')}${bobine(250, 298, 1.35, 'sad', 'down')}
 ${bulleDeReve(318, 88, 78, 52, -1)}<ellipse cx="318" cy="88" rx="70" ry="44" fill="#ffe9b8" opacity=".6"/><ellipse cx="318" cy="132" rx="52" ry="6" fill="#d9548a" opacity=".8"/>
 ${bobine(318, 128, .42, 'happy', 'hold', { talk: true })}${enfant(276, 130, .46, K1, 'smile', 'down', '', true)}${enfant(360, 130, .46, K2, 'smile', 'down', '', true)}${enfant(296, 126, .38, K3, 'laugh', 'down', '', true)}${enfant(344, 126, .38, K4, 'smile', 'down', '', true)}${livreOuvert(318, 104, .34)}`),
-      text: 'Bobine baisse la tête. — Je me suis endormi pendant des années. À mon réveil, j\'avais oublié les lettres. Autrefois, les enfants s\'assoyaient autour de moi pour écouter des histoires. Félix sent son cœur se serrer.' },
+      text: "Bobine baisse la tête, et son antenne retombe tristement. — Je me suis endormi pendant des années, explique-t-il. À mon réveil, j’avais oublié toutes les lettres. Autrefois, les enfants s’assoyaient autour de moi, par terre, pour écouter des histoires. Je les entendais rire, et je faisais toutes les voix. Maintenant, je ne suis plus qu’un vieux tas de ferraille. Félix sent son cœur se serrer, parce qu’il comprend ce que c’est que de se sentir seul." },
     // 5
     { svg: svg(`${biblio({ win: 'day' })}${tableBasse(150, 236, 130)}${carte(180, 236, 'A', '#e8604c', 34, 46, -6)}${carte(215, 236, 'B', '#4a8fd0', 34, 46)}${carte(250, 236, 'C', '#2f9a62', 34, 46, 6)}${felix(84, 298, 1.65, 'laugh', 'up')}${bobine(330, 298, 1.45, 'moon', 'down', { talk: true })}${etoiles([[330, 90, 8], [150, 110, 6], [300, 70, 5]])}${sons(268, 150, -1).replace(/M2/, 'M2')}`),
-      text: 'Félix hésite, puis il prend une grande respiration. — Moi, je peux t\'apprendre! dit-il, d\'une voix plus forte qu\'il ne le croyait. Les yeux de Bobine s\'agrandissent comme deux lunes.' },
+      text: "Félix hésite un long moment, puis il prend une grande respiration. — Moi, je peux t’apprendre! dit-il d’une voix plus forte qu’il ne le croyait. Il est le premier surpris, car il n’avait pas parlé aussi fort depuis très longtemps. Les yeux de Bobine s’agrandissent comme deux lunes, et son antenne se redresse d’un coup. « Vraiment? Tu ferais ça pour moi? » demande le robot, plein d’espoir. Félix hoche la tête, un peu rouge." },
     // 6
     { svg: svg(`${biblio({ win: null, tapis: false })}${tableauNoir(118, 44, 164, 134)}<text class="lt" x="170" y="150" font-size="96" fill="#fff">A</text>${arbre(238, 160, 1.7)}${felix(78, 298, 1.6, 'smile', 'pointR')}${bobine(334, 298, 1.45, 'sparkle', 'down', { talk: true })}${sons(300, 190, -1)}`),
-      text: 'Ils commencent par la lettre A. — Cette lettre fait le son « a », comme dans arbre, explique Félix. — Aaaa, répète Bobine. Il est si content que son antenne se met à clignoter.' },
+      text: "Ils commencent par la lettre A, dessinée en gros sur une feuille. — Cette lettre fait le son « a », comme dans « arbre », explique Félix en pointant du doigt. — Aaaa, répète Bobine, en forçant sa voix rouillée. Il est si content qu’il en perd presque le souffle, et que son antenne se met à clignoter toute seule, comme un petit phare. Félix rit tout bas : jamais il n’a eu autant de plaisir à jouer à l’école." },
     // 7
     { svg: svg(`${biblio({ win: null, tapis: false })}${tableauNoir(96, 44, 208, 134)}<text class="lt" x="165" y="150" font-size="96" fill="#f9d36b">M</text><text class="lt" x="242" y="150" font-size="96" fill="#fff">A</text><path d="M122 164Q200 196 280 164" class="ln" stroke="#ff7a59" stroke-width="4"/>${felix(60, 298, 1.6, 'laugh', 'pointR')}${bobine(338, 298, 1.45, 'sparkle', 'up', { talk: true })}${sons(308, 210, -1)}`),
-      text: 'Le lendemain, Félix colle un M et un A l\'un contre l\'autre. — Mmm… aaa… ma! lit Bobine. Il vient de lire sa première syllabe!' },
+      text: "Le lendemain, Félix revient avec des blocs en bois pour construire des syllabes. Il colle un M et un A l’un contre l’autre, avec un grand sourire. — Mmm… aaa… ma! lit Bobine, en suivant les lettres avec son doigt de métal. Il vient de lire sa toute première syllabe! Il lève les bras en l’air et il fait un petit tour sur lui-même en grinçant de joie, pendant que Félix applaudit en riant." },
     // 8
     { svg: svg(`${biblio({ win: 'sunset', tapis: false })}
 <g transform="translate(336 48) scale(.85)"><rect x="-44" y="-30" width="88" height="82" rx="4" fill="#fffdf4" ${O}/><rect x="-44" y="-30" width="88" height="14" rx="4" fill="#e8604c" ${O2}/><circle cx="-24" cy="-32" r="3" fill="#3a3f55"/><circle cx="24" cy="-32" r="3" fill="#3a3f55"/>${[0, 1, 2, 3, 4].map((c) => [0, 1, 2].map((r) => `<rect x="${-38 + c * 16}" y="${-10 + r * 20}" width="14" height="17" fill="none" stroke="#c9ccd8"/>`).join('')).join('')}${[[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [0, 1], [1, 1], [2, 1], [3, 1]].map(([c, r]) => `<path d="M${-36 + c * 16} ${-8 + r * 20}l10 13M${-26 + c * 16} ${-8 + r * 20}l-10 13" class="ln" stroke="#e03a3a" stroke-width="2.4"/>`).join('')}</g>
 ${tableBasse(120, 236, 190)}${bloc(150, 236, 'B', '#4a8fd0')}${bloc(182, 236, 'O', '#e8604c')}${bloc(214, 236, 'N', '#2f9a62')}${bloc(250, 236, 'S', '#9b6fb5')}${bloc(284, 236, 'R', '#f08a3c')}
 
 ${felix(64, 298, 1.6, 'laugh', 'up')}${bobine(352, 298, 1.4, 'happy', 'down')}`),
-      text: 'Les jours passent, et chaque après-midi, après l\'école, la leçon recommence. Bobine apprend les lettres, les sons et les syllabes. Sur le calendrier, Félix coche chaque journée avec un crayon rouge.' },
+      text: "Les jours passent, et chaque après-midi, après l’école, la leçon recommence au fond de la bibliothèque. Petit à petit, Bobine apprend les lettres, les sons et les syllabes. Il fait de gros efforts, et il ne se décourage jamais. Sur le calendrier accroché au mur, Félix coche chaque journée avec un crayon rouge, pour se rappeler tout le chemin parcouru. Les marques rouges s’alignent, nombreuses, et Félix en est très fier." },
     // 9
     { svg: svg(`${biblio({ win: 'day' })}${tableBasse(120, 236, 160)}${carte(168, 236, 'b', '#4a8fd0', 50, 66)}${carte(238, 236, 'd', '#e8604c', 50, 66)}<path d="M150 172V200M222 172V200" class="ln" stroke="#ffd84a" stroke-width="0"/>${felix(74, 298, 1.6, 'laugh', 'pointR')}${bobine(336, 298, 1.45, 'dizzy', 'up')}<g transform="translate(336 160)"><circle cx="0" cy="0" r="30" fill="none" stroke="#ffd84a" stroke-width="2.5" stroke-dasharray="3 8" stroke-linecap="round"/>${etoiles([[-30, 0, 6], [24, -16, 5], [10, 26, 5]])}</g>`),
-      text: 'Un jour, Bobine mélange le b et le d. Ses yeux tournent comme des toupies! — Regarde, lui dit Félix en riant doucement, le b a son bâton à gauche et son ventre à droite. Bobine essaie, essaie encore, et finit par comprendre.' },
+      text: "Un jour, Bobine mélange le b et le d. Ses yeux tournent comme des toupies, et il se met à grincer très fort! — Ne t’en fais pas, lui dit Félix en riant doucement. Regarde : le b a son bâton à gauche et son ventre à droite. Bobine essaie, essaie encore, se trompe deux fois, puis soudain il s’écrie : « J’ai compris! » Félix constate qu’il a beaucoup de patience, lui qui avait si peur d’enseigner." },
     // 10
     { svg: svg(`${biblio({ win: 'day' })}${tableBasse(110, 236, 190)}${bloc(142, 236, 'C', '#e8604c')}${bloc(174, 236, 'H', '#4a8fd0')}${bloc(206, 236, 'A', '#2f9a62')}${bloc(238, 236, 'T', '#9b6fb5')}
 <g transform="translate(278 236)"><rect x="-20" y="-56" width="40" height="56" rx="4" fill="#fffdf4" ${O2}/><circle cx="0" cy="-30" r="13" fill="#f5a84a" ${O2}/><path d="M-11 -38L-13 -52L-4 -43M11 -38L13 -52L4 -43Z" fill="#f5a84a" ${O2}/><circle cx="-5" cy="-32" r="1.8" fill="#3a3f55"/><circle cx="5" cy="-32" r="1.8" fill="#3a3f55"/><path d="M-4 -25Q0 -22 4 -25" fill="none" stroke="#3a3f55" stroke-width="1.5"/><path d="M-12 -28h-8M12 -28h8" stroke="#3a3f55" stroke-width="1"/></g>
 ${felix(64, 298, 1.6, 'joy', 'up')}${bobine(342, 298, 1.45, 'sparkle', 'up', { talk: true })}${etoiles([[300, 100, 8], [366, 118, 6], [96, 100, 6], [220, 90, 5]])}`),
-      text: 'Quelques semaines plus tard, Félix aligne quatre blocs : C, H, A, T. Bobine les lit lentement, puis plus vite. — Chat! s\'écrie-t-il, les yeux brillants comme des étoiles. Il vient de lire son premier mot!' },
+      text: "Quelques semaines plus tard, Félix aligne quatre blocs sur la table : C, H, A, T. Bobine les lit lentement, une lettre à la fois, puis plus vite, en rassemblant les sons dans sa tête. — Chat! s’écrie-t-il enfin, les yeux brillants comme des étoiles. Il vient de lire son premier mot! Félix lui tape dans la main, et la poussière qui reste sur Bobine s’envole en un petit nuage, ce qui les fait éclater de rire." },
     // 11
     { svg: svg(`${biblio({ win: 'night', tapis: true })}${bobine(262, 298, 1.45, 'normal', 'hold', { lunettes: true, held: livreOuvert(0, -46, .7) })}
 ${felix(120, 298, 1.6, 'joy', 'clap', '<circle cx="-5" cy="-56" r="6.5" fill="#ff6a4a" class="k2"/><circle cx="5" cy="-56" r="6.5" fill="#ff6a4a" class="k2"/><path d="M-16 -68l-7 -6M0 -72v-9M16 -68l7 -6" class="ln" stroke="#ffb703" stroke-width="3"/>')}
 ${etoiles([[330, 130, 7], [196, 120, 6], [60, 130, 5]])}${sons(160, 200, 0).replace(/./, '')}`),
-      text: 'Peu à peu, les mots deviennent des phrases, et les phrases, des pages. Un soir, Bobine ouvre un petit album et le lit jusqu\'à la fin, sans se tromper. Félix applaudit si fort que ses mains rougissent.' },
+      text: "Peu à peu, les mots deviennent des phrases, et les phrases, des pages entières. Un soir, Bobine ouvre un petit album illustré et il le lit jusqu’à la fin, sans se tromper une seule fois, d’une voix claire et chaude. Félix, qui l’écoute, applaudit si fort que ses mains en rougissent. « Tu es devenu un vrai lecteur! » lui dit-il. Bobine répond que c’est surtout grâce à son ami, qui n’a jamais cessé de croire en lui." },
     // 12
     { svg: svg(`${biblio({ win: 'day', tapis: true, tapisPos: [200, 262, 190, 34] })}
 ${enfant(160, 236, .9, K1, 'smile', 'down', '', true)}${enfant(262, 234, .9, K3, 'smile', 'down', '', true)}
 ${enfant(124, 284, 1.15, K3, 'smile', 'down', '', true)}${enfant(200, 292, 1.2, K4, 'laugh', 'down', '', true)}${enfant(272, 288, 1.15, K2, 'smile', 'down', '', true)}
 ${felix(44, 298, 1.4, 'shy', 'throat')}${bobine(352, 298, 1.35, 'wide', 'hold', { sueur: true, held: livre(0, -50, 1) })}`),
-      text: 'Le samedi, c\'est l\'heure du conte. Les enfants arrivent en grand nombre et s\'installent sur le tapis. Bobine panique : — Et si je me trompais devant tout le monde? Félix, lui, a la gorge serrée à cause de tous ces regards.' },
+      text: "Le samedi, c’est l’heure du conte. Les enfants arrivent en grand nombre et s’installent sur le grand tapis, en se bousculant gentiment. Soudain, Bobine panique : — Et si je me trompais devant tout le monde? murmure-t-il, la voix tremblante. Félix, lui, a la gorge serrée à cause de tous ces regards qui se tournent vers eux. Il sent que ses mots veulent encore se cacher, mais il sait que son ami a besoin de lui." },
     // 13
     { svg: svg(`${biblio({ win: 'dim', tapis: false })}${felix(112, 298, 1.9, 'smile', 'reachR')}${bobine(290, 298, 1.7, 'sad', 'reachL')}<circle cx="200" cy="208" r="26" fill="url(#glow)"/>${etoiles([[200, 160, 7]])}${coeur(200, 168, .9)}`),
-      text: 'Félix prend la pince froide du robot dans sa main. — Moi aussi, j\'ai peur, avoue-t-il. Mais tu es prêt, Bobine, et je reste à côté de toi. Le robot respire un grand coup, et son antenne cesse de trembler.' },
+      text: "Félix prend la pince froide du robot dans sa main. — Moi aussi, j’ai peur, avoue-t-il, tout bas. Mais tu es prêt, Bobine, je le sais, parce que je t’ai vu apprendre. Et je reste à côté de toi, tout le temps. Le robot respire un grand coup, avec un petit bruit de soufflet, et son antenne cesse enfin de trembler. Il redresse les épaules, regarde tous les enfants qui attendent, puis il hoche la tête." },
     // 14
     { svg: svg(`${biblio({ win: 'day', tapis: true, tapisPos: [200, 270, 170, 26] })}
 <g transform="translate(200 250)"><path d="M-62 0V-38Q-62 -56 -44 -56H44Q62 -56 62 -38V0Z" fill="#9b6fb5" ${O}/><rect x="-70" y="-30" width="22" height="34" rx="9" fill="#8a5fa6" ${O}/><rect x="48" y="-30" width="22" height="34" rx="9" fill="#8a5fa6" ${O}/><rect x="-64" y="-8" width="128" height="14" rx="5" fill="#a97fc0" ${O}/></g>
@@ -248,34 +248,35 @@ ${bobine(200, 250, 1.3, 'happy', 'hold', { talk: true, held: livreOuvert(0, -46,
 <g transform="translate(200 78)"><circle r="15" fill="#f5a84a" ${O2}/><path d="M-10 -10L-12 -22L-3 -14M10 -10L12 -22L3 -14Z" fill="#f5a84a" ${O2}/><circle cx="-5" cy="-3" r="2" fill="#3a3f55"/><circle cx="5" cy="-3" r="2" fill="#3a3f55"/><path d="M-4 4Q0 7 4 4" fill="none" stroke="#3a3f55" stroke-width="1.6"/></g>
 ${etoiles([[150, 90, 5], [250, 96, 5], [330, 80, 5]])}
 ${enfant(62, 292, 1.2, K1, 'laugh', 'up', '', true)}${enfant(134, 296, 1.2, K2, 'wow', 'down', '', true)}${enfant(268, 296, 1.2, K3, 'laugh', 'clap', '', true)}${enfant(344, 292, 1.2, K4, 'joy', 'up', '', true)}`),
-      text: 'Bobine ouvre le livre et lit l\'histoire d\'une souris qui voulait aller sur la lune. Il fait la voix de la souris, puis celle du chat, puis celle de la fusée. Les enfants rient aux éclats, et personne ne bouge.' },
+      text: "Bobine ouvre le livre et lit l’histoire d’une souris qui voulait aller sur la lune. Il fait la voix de la souris, toute fine et aiguë, puis celle du chat, grave et traînante, puis celle de la fusée, qui fait « vrrrouuum! » en s’élevant. Les enfants rient aux éclats, et personne ne bouge, tant l’histoire est drôle. Félix, assis à côté, écoute lui aussi, et il oublie complètement qu’il est entouré de monde." },
     // 15
     { svg: svg(`${biblio({ win: 'sunset', tapis: true, tapisPos: [200, 266, 170, 26] })}
 ${bobine(200, 232, 1.15, 'happy', 'up')}${enfant(58, 246, 1.0, K1, 'laugh', 'clap')}${enfant(112, 240, 1.0, K2, 'joy', 'up')}${enfant(290, 240, 1.0, K3, 'laugh', 'clap')}${enfant(344, 246, 1.0, K4, 'joy', 'up')}
 ${etoiles([[160, 70, 8], [245, 80, 7], [200, 52, 6], [326, 110, 6], [78, 108, 6]])}${coeur(200, 40, 1.3)}
 <g transform="translate(300 150)"><ellipse rx="26" ry="20" fill="#fff" ${O2}/><circle cx="-8" cy="-2" r="4" fill="#ffd84a"/><circle cx="6" cy="-2" r="4" fill="#ff7a59"/><path d="M-14 22L-22 32L-4 22Z" fill="#fff" ${O2}/></g>
 ${felix(110, 300, 1.55, 'laugh', 'pointR')}${enfant(268, 300, 1.55, K4, 'laugh', 'wave')}${coeur(190, 188, .9, '#ff8fa8')}`),
-      text: 'Quand le robot referme le livre, toute la salle applaudit. — Merci, Félix, dit Bobine. Tu m\'as rendu les mots. Ce soir-là, Félix bavarde sans rougir avec un nouvel ami, et il découvre que ses mots ne se cachent plus.' },
+      text: "Quand le robot referme le livre, toute la salle applaudit à tout rompre, et certains enfants se lèvent même pour l’acclamer. — Merci, Félix, dit Bobine, ému. Tu m’as rendu les mots. Ce soir-là, Félix bavarde sans rougir avec un nouvel ami de sa classe, qui voulait lui parler du robot. Et il découvre, avec étonnement, que ses mots ne se cachent plus au fond de sa gorge." },
   ],
   words: [
-    { word: 'la bibliothèque', emoji: '📚', def: 'Un endroit calme où l\'on peut lire et emprunter des livres.' },
-    { word: 'timide', emoji: '😳', def: 'Quelqu\'un qui a de la difficulté à parler devant les autres.' },
-    { word: 'la poussière', emoji: '🌫️', def: 'De minuscules saletés grises qui se posent sur les objets oubliés.' },
-    { word: 'rouillé', emoji: '🔩', def: 'Couvert de rouille, la tache brune qui ronge le métal.' },
-    { word: 'une syllabe', emoji: '🔤', def: 'Un petit morceau de mot qu\'on dit d\'un seul coup, comme « ma ».' },
-    { word: 'hésiter', emoji: '🤔', def: 'Prendre du temps avant de se décider, parce qu\'on n\'est pas sûr.' },
-    { word: 'autrefois', emoji: '⏳', def: 'Dans le passé, il y a longtemps.' },
-    { word: 'l\'heure du conte', emoji: '📖', def: 'Le moment où l\'on lit une histoire à voix haute aux enfants.' },
-    { word: 'applaudir', emoji: '👏', def: 'Frapper dans ses mains pour dire bravo.' },
+    {"word":"timide","emoji":"😳","def":"Qui n’ose pas parler ou se montrer devant les autres."},
+    {"word":"un rayon","emoji":"📚","def":"Une planche où l’on range les livres, dans une bibliothèque."},
+    {"word":"rouillé","emoji":"🔩","def":"Recouvert de rouille, une poudre brune qui abîme le métal."},
+    {"word":"la poussière","emoji":"🌫️","def":"De petites saletés très fines qui se déposent sur les objets."},
+    {"word":"une bibliothécaire","emoji":"👩‍🏫","def":"La personne qui s’occupe d’une bibliothèque."},
+    {"word":"une syllabe","emoji":"🔤","def":"Un petit morceau d’un mot qu’on dit en une seule fois, comme « ma »."},
+    {"word":"une antenne","emoji":"📡","def":"Une tige de métal sur la tête d’un robot, qui peut s’allumer."},
+    {"word":"se décourager","emoji":"😔","def":"Perdre l’envie d’essayer parce que c’est trop difficile."},
+    {"word":"paniquer","emoji":"😰","def":"Avoir très peur d’un coup, au point de ne plus penser."},
+    {"word":"acclamer","emoji":"👏","def":"Applaudir très fort pour féliciter quelqu’un."},
   ],
   quiz: [
-    { q: 'Pourquoi Félix aime-t-il la bibliothèque?', options: ['Parce qu\'on y joue', 'Parce que tout y est silencieux', 'Parce qu\'on y mange'], answer: 1 },
-    { q: 'Comment s\'appelle le robot?', options: ['Bobine', 'Gadget', 'Rouli'], answer: 0 },
-    { q: 'Pourquoi Bobine ne sait-il plus lire?', options: ['Il n\'a jamais appris', 'Il a oublié après avoir dormi longtemps', 'Son livre est trop petit'], answer: 1 },
-    { q: 'Quelle est la première lettre que Félix enseigne à Bobine?', options: ['M', 'C', 'A'], answer: 2 },
-    { q: 'Quelles lettres Bobine mélange-t-il?', options: ['Le b et le d', 'Le m et le a', 'Le c et le h'], answer: 0 },
-    { q: 'Quel est le premier mot que Bobine lit en entier?', options: ['Chat', 'Livre', 'Lune'], answer: 0 },
-    { q: 'Pourquoi Bobine panique-t-il le samedi?', options: ['Il a perdu son livre', 'Il a peur de se tromper devant les enfants', 'Il est fâché contre Félix'], answer: 1 },
-    { q: 'Comment Félix a-t-il changé à la fin de l\'histoire?', options: ['Il parle plus facilement, même avec un nouvel ami', 'Il déteste la bibliothèque', 'Il n\'aime plus lire'], answer: 0 },
+    {"q":"Pourquoi Félix aime-t-il la bibliothèque?","options":["Parce qu’il y joue avec des amis","Parce que sa maman y travaille","Parce que c’est un endroit calme où il n’a pas à parler"],"answer":2},
+    {"q":"Que veut dire « timide » dans l’histoire?","options":["Qui a peur du noir","Qui n’ose pas parler ni se montrer devant les autres","Qui est toujours en colère"],"answer":1},
+    {"q":"Quel problème Bobine a-t-il au début?","options":["Il est cassé","Il ne sait plus lire","Il a perdu sa plaque"],"answer":1},
+    {"q":"Comment Félix se sent-il quand Bobine lui raconte son histoire?","options":["Il a envie de rire","Il s’ennuie","Il a le cœur serré, car il comprend ce que c’est d’être seul"],"answer":2},
+    {"q":"Dans quel ordre Bobine apprend-il?","options":["Des lettres, puis des syllabes, puis un mot, puis un livre","Un livre, puis des lettres, puis un mot","Un mot, puis des lettres, puis des syllabes"],"answer":0},
+    {"q":"Pourquoi Bobine panique-t-il le samedi?","options":["Il est malade","Il a peur de se tromper devant tous les enfants","Il a perdu son livre"],"answer":1},
+    {"q":"Comment Félix aide-t-il Bobine à retrouver son calme?","options":["Il lui promet un cadeau","Il lit à sa place","Il lui prend la main et lui dit qu’il a peur aussi, mais qu’il reste à côté de lui"],"answer":2},
+    {"q":"Comment Félix a-t-il changé à la fin de l’histoire?","options":["Il est devenu plus à l’aise et il parle avec un nouvel ami","Il a déménagé","Il n’aime plus la bibliothèque"],"answer":0},
   ],
 };

@@ -32,3 +32,6 @@ Pictures
 - No words in pictures (signs may use simple symbols). No `<script>`, events, external refs, `<image>`. ≤ 40 000 characters per SVG (each picture is shown as an isolated image, so `<style>`, `<defs>`, gradients and ids are safe).
 
 Check: `node tools/check-livres.mjs [id…]`. Preview: `http://localhost:5180/tools/livre-preview.html?id=trois-petits-cochons` (silent screenshots with tools/shot.mjs).
+
+## Reading level (updated 2026-11-15 — parent: "too easy, like kindergarten")
+End of 2e année to 3e année. Each page is a FULL PARAGRAPH of 35–130 words (typically 60–100): narration with details, feelings and dialogue (« » and —), varied sentence length, connectors (d’abord, ensuite, pourtant, soudain, finalement), a few rich words explained by context. Quiz: 6–8 questions mixing literal, inference (pourquoi? comment le sait-on?), vocabulary in context, sequence and the character's feelings. 4 options when helpful.

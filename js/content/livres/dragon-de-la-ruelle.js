@@ -264,64 +264,64 @@ const pages = [
     + P('M60 150q-6 -10 2 -18t0 -18M76 154q-6 -10 2 -18t0 -18', 'none', 'stroke="#fff" stroke-width="3" opacity=".55"')
     + spiral(334, 268, 1.15, 150)
     + C(220, 150, 100, 'url(#glow)', `${NS} opacity=".25"`)
-    + camille(118, 294, 1.5, { mood: 'happy', ar: [34, -60], al: 'd' }) + P('M60 82l6 -6M300 96l6 -6', 'none', 'stroke="#fff3b0" stroke-width="2"')), text: "Derrière la maison de Camille, la ruelle sent le pain grillé et l'herbe chaude. Des escaliers en colimaçon grimpent jusqu'aux balcons, et des cordes à linge relient les fenêtres comme de longues toiles d'araignée. Demain, c'est la fête des voisins." },
+    + camille(118, 294, 1.5, { mood: 'happy', ar: [34, -60], al: 'd' }) + P('M60 82l6 -6M300 96l6 -6', 'none', 'stroke="#fff3b0" stroke-width="2"')), text: "Derrière la maison de Camille, la ruelle sent le pain grillé et l’herbe chaude. Des escaliers en colimaçon grimpent jusqu’aux balcons, et des cordes à linge relient les fenêtres d’un côté à l’autre, comme de longues toiles d’araignée. Les chats dorment sur les clôtures, et les enfants jouent à la marelle sur le pavé. Tout le monde se connaît, ici. Et demain, c’est la grande fête des voisins, que toute la ruelle prépare depuis des semaines!" },
   // 2 — recycling bin, a spark
   { svg: svg(alley({ time: 'dusk', seed: 2 }) + laundryLine([0, 66], [400, 86], 20, 1)
     + poubelle(56, 266, 1.25) + poubelle(104, 258, 1.1, '#7a8490') + C(80, 232, 60, 'url(#orange)', `${NS} opacity=".7"`) + sparkGlow(80, 230, 22)
     + camille(236, 296, 1.55, { mood: 'surprised', al: 'd', ar: [14, -58] })
-    + bacBleu(326, 296, 1.5) + C(196, 240, 4, '#ffe066', NS) + spk(116, 244, 6, '#ffe066') + P('M150 226q-8 -6 -2 -14', 'none', 'stroke="#fff3b0" stroke-width="2" opacity=".6"')), text: "Ce soir-là, Camille sort le bac de recyclage. Soudain, elle entend un petit « Atchoum! » derrière les poubelles. Une étincelle orange jaillit dans la pénombre." },
+    + bacBleu(326, 296, 1.5) + C(196, 240, 4, '#ffe066', NS) + spk(116, 244, 6, '#ffe066') + P('M150 226q-8 -6 -2 -14', 'none', 'stroke="#fff3b0" stroke-width="2" opacity=".6"')), text: "Ce soir-là, après le souper, Camille sort le bac de recyclage et le traîne jusqu’au bout de l’allée. La nuit tombe doucement, et la ruelle est silencieuse. Soudain, elle entend un petit « Atchoum! » derrière les poubelles. Elle s’arrête net, le cœur battant. Qui a éternué? Une étincelle orange jaillit tout à coup dans la pénombre, puis s’éteint aussitôt. Camille retient son souffle et avance à pas de loup." },
   // 3 — tiny curled dragon behind the blue bin
   { svg: svg(alley({ time: 'dusk', seed: 3 }) + R(0, 0, 400, 300, 'rgba(20,16,60,.25)', 0, NS)
     + dragon(226, 292, 0.95, { pose: 'curl', mood: 'cry', headTilt: 6 })
     + bacBleu(112, 298, 1.9) + poubelle(300, 262, 0.9, '#7a8490')
     + crouched(340, 298, 1.55, { flip: true, mood: 'happy', al: [-28, -50], ar: [40, -34] })
-    + C(226, 230, 50, 'url(#orange)', `${NS} opacity=".25"`) + P('M200 226q-3 6 0 9', 'none', 'stroke="none"')), text: "Derrière le bac bleu, un minuscule dragon vert est recroquevillé. Il est à peine plus gros qu'un chat, et ses yeux sont pleins de larmes. Camille s'accroupit doucement près de lui." },
+    + C(226, 230, 50, 'url(#orange)', `${NS} opacity=".25"`) + P('M200 226q-3 6 0 9', 'none', 'stroke="none"')), text: "Derrière le bac bleu, un minuscule dragon vert est recroquevillé sur lui-même, la tête entre les pattes. Il est à peine plus gros qu’un chat, et ses yeux brillants sont pleins de larmes. Il tremble de froid et de frayeur. Camille, qui n’a jamais vu de dragon de sa vie, n’a pas peur du tout. Elle s’accroupit doucement près de lui, sans faire de gestes brusques, pour ne pas l’effrayer davantage." },
   // 4 — dialogue
   { svg: svg(alley({ time: 'dusk', seed: 4 }) + R(0, 0, 400, 300, 'rgba(20,16,60,.2)', 0, NS) + bacBleu(52, 300, 1.7) + C(200, 190, 110, 'url(#glow)', `${NS} opacity=".2"`)
     + dragon(150, 296, 1.22, { mood: 'sad', arms: 'c' }) + spk(186, 214, 7, '#ffe066')
-    + crouched(318, 298, 1.9, { flip: true, mood: 'happy', al: [-24, -48], ar: [40, -30] })), text: "— N'aie pas peur, murmure Camille. Comment t'appelles-tu? — Pouf, répond le dragon d'une toute petite voix. Un coup de vent m'a emporté loin de ma famille. Atchoum!" },
+    + crouched(318, 298, 1.9, { flip: true, mood: 'happy', al: [-24, -48], ar: [40, -30] })), text: "— N’aie pas peur, murmure Camille. Je ne te ferai pas de mal. Comment t’appelles-tu? Le petit dragon renifle, puis il répond d’une toute petite voix : — Pouf. Un coup de vent m’a emporté loin de ma famille, et je me suis perdu dans cette ville. J’ai si froid! Atchoum! Camille remarque qu’il a le nez tout rouge. Elle comprend que Pouf n’est pas seulement perdu : il est aussi enrhumé!" },
   // 5 — biscuit, blanket, cardboard box under the stairs
   { svg: svg(alley({ time: 'night', seed: 5 }) + spiral(110, 262, 1.5, 150) + R(60, 200, 110, 4, '#2a2d3e', 0, NS)
     + C(150, 232, 90, 'url(#glow)', `${NS} opacity=".55"`) + G(R(150, 136, 6, 40, '#2a2d3e', 2, NS) + E(153, 182, 14, 10, '#ffe9a8', 'stroke-width="2"') + P('M138 182h30', 'none', 'stroke-width="2"'), '')
     + cardboard(160, 296, 1.6)
     + dragon(160, 284, 0.95, { pose: 'curl', mood: 'sleepy', shadow: false }) + blanketD(160, 300, 1.45) + biscuit(206, 240, 1.0)
-    + crouched(316, 298, 1.6, { flip: true, mood: 'happy', al: [-34, -40], ar: [20, -44] }) + P('M232 226q4 -8 10 -2', 'none', 'stroke="none"')), text: "Camille lui apporte un biscuit et une vieille couverture. Pouf grignote en frissonnant, puis il s'endort dans une boîte de carton, sous l'escalier. Camille promet de garder son secret." },
+    + crouched(316, 298, 1.6, { flip: true, mood: 'happy', al: [-34, -40], ar: [20, -44] }) + P('M232 226q4 -8 10 -2', 'none', 'stroke="none"')), text: "Camille court à la maison et elle revient avec un biscuit et une vieille couverture. Pouf grignote le biscuit en frissonnant, puis il se laisse envelopper dans la laine chaude. Bientôt, ses paupières se ferment, et il s’endort dans une boîte de carton, sous l’escalier. Camille le borde doucement. Elle lui promet de garder son secret, car elle craint que les adultes de la ruelle s’affolent s’ils découvrent un dragon." },
   // 6 — party preparations, Pouf hides in the basket
   { svg: svg(alley({ time: 'day', seed: 6 }) + bunting([0, 30], [400, 44], 14, 14) + lanternLine([10, 62], [390, 80], 22, 6, false, 1.05, 0) + lanternLine([4, 118], [396, 110], 16, 4, true, 0.9, 1)
     + ladder(60, 270, 1.3) + longTable(246, 262, 0.95) + chair(150, 276, 0.9, false) + chair(346, 278, 0.9, true)
     + lacasse(70, 288, 1.25, { mood: 'happy', ar: [30, -90], al: 'd', holdR: lantern(0, -12, 0.9, 0, false) })
     + dimitri(230, 270, 1.05, { mood: 'happy', al: [-30, -44], ar: [30, -44] })
-    + camille(342, 298, 1.45, { mood: 'happy', ar: 'd', al: 'd' }) + basket(300, 296, 1.1, { peek: true })), text: "Le lendemain, toute la ruelle prépare la fête. Madame Lacasse suspend des lanternes en papier, et monsieur Dimitri installe de longues tables. Camille arrive avec un panier, et Pouf se cache dedans." },
+    + camille(342, 298, 1.45, { mood: 'happy', ar: 'd', al: 'd' }) + basket(300, 296, 1.1, { peek: true })), text: "Le lendemain, toute la ruelle se met en branle pour la fête. Madame Lacasse suspend des lanternes en papier le long des cordes à linge, et monsieur Dimitri installe de longues tables avec des nappes à carreaux. Des enfants courent partout avec des ballons. Camille arrive avec un grand panier d’osier couvert d’un linge. Elle n’a pas eu le cœur de laisser Pouf tout seul, et il s’y est caché en se faisant le plus petit possible." },
   // 7 — sneeze in the basket, burnt tablecloth
   { svg: svg(alley({ time: 'day', seed: 7 }) + lanternLine([10, 62], [390, 80], 22, 6, false, 1.05, 0) + longTable(210, 248, 1.1) + burnt(150, 206, 1.4)
     + dimitri(330, 262, 1.0, { mood: 'surprised', ar: [30, -70], al: [-30, -70] })
     + lacasse(86, 292, 1.5, { mood: 'shout', ar: [34, -86], al: [-34, -86] }) + ladleD(150, 168, 1.3, 40)
     + dragon(262, 264, 0.95, { mood: 'sneeze', arms: 'u', headTilt: -8 }) + sparks(300, 150, 1.2) + spk(236, 168, 8, '#ffe066') + spk(214, 188, 6)
     + basket(262, 296, 1.5, { shake: true })
-    + camille(366, 298, 1.3, { flip: true, mood: 'surprised', ar: [30, -40], al: 'd' })), text: "Tout à coup, le panier se met à trembler : « Atchoum! » Des étincelles volent partout et brûlent un coin de nappe. — Un dragon! hurle Madame Lacasse en lâchant sa louche." },
+    + camille(366, 298, 1.3, { flip: true, mood: 'surprised', ar: [30, -40], al: 'd' })), text: "Tout à coup, le panier se met à trembler : « Atchoum! » Des étincelles volent partout, et l’une d’elles brûle un coin de nappe, qui se met à fumer! La couverture de lin tombe, et on voit apparaître le museau vert de Pouf. — Un dragon! hurle Madame Lacasse en lâchant sa louche, qui roule par terre dans un grand fracas. Les enfants poussent des cris, et tout le monde recule de plusieurs pas." },
   // 8 — Camille protects Pouf
   { svg: svg(alley({ time: 'day', seed: 8 }) + lanternLine([10, 62], [390, 80], 22, 6, false, 1.05, 0) + longTable(300, 252, 0.9)
     + dimitri(70, 300, 1.35, { mood: 'surprised', bust: true, shadow: false }) + chair(70, 304, 1.5)
     + neighbor(150, 270, 1.15, 0, { mood: 'surprised', ar: 'u', al: 'u' }) + neighbor(350, 268, 1.1, 2, { mood: 'surprised', al: 'u', ar: [-10, -60] }) + neighbor(318, 280, 1.2, 4, { mood: 'shy', al: 'u', ar: 'u' })
     + dragon(262, 296, 0.8, { mood: 'shy', arms: 'c' })
-    + camille(212, 300, 1.85, { mood: 'shout', al: [-46, -52], ar: [46, -52] })), text: "Monsieur Dimitri se cache derrière une chaise et les voisins reculent. — Attendez! s'écrie Camille en ouvrant les bras. Il n'est pas méchant, il est perdu et il a le rhume!" },
+    + camille(212, 300, 1.85, { mood: 'shout', al: [-46, -52], ar: [46, -52] })), text: "Monsieur Dimitri se cache derrière une chaise, et les voisins reculent en se bousculant. — Attendez! s’écrie Camille en ouvrant les bras pour protéger Pouf. Il n’est pas méchant! Il est perdu, il s’ennuie de sa famille, et il a le rhume! Ses éternuements lui échappent, et il n’a jamais voulu faire de mal. Sa voix tremble un peu, mais elle ne bouge pas d’un pas, parce qu’elle sait qu’elle a raison." },
   // 9 — a big tear, Madame Lacasse offers a handkerchief
   { svg: svg(alley({ time: 'day', seed: 9 }) + lanternLine([10, 62], [390, 80], 22, 6, false, 1.05, 0)
     + neighbor(330, 262, 1.2, 1, { mood: 'shy', al: 'd', ar: 'd' }) + dimitri(372, 276, 1.05, { mood: 'shy', flip: true, ar: 'c', al: 'c' }) + neighbor(36, 262, 1.15, 3, { mood: 'shy' })
     + dragon(236, 296, 1.25, { mood: 'cry', headTilt: 8, arms: 'd' })
     + lacasse(96, 296, 1.5, { mood: 'happy', ar: [44, -48], holdR: handkerchief(2, -2, 1.0, -10) })
-    + camille(336, 298, 1.55, { mood: 'happy', al: [-34, -42] })), text: "Pouf baisse la tête, et une grosse larme roule sur son museau. Les voisins se regardent, un peu honteux. Madame Lacasse s'approche et lui tend un mouchoir." },
+    + camille(336, 298, 1.55, { mood: 'happy', al: [-34, -42] })), text: "Pouf baisse la tête, et une grosse larme roule sur son museau. Les voisins se regardent, un peu honteux de leur réaction. Ce petit dragon n’a vraiment pas l’air dangereux. Madame Lacasse, la première, s’approche à petits pas, et elle lui tend un mouchoir en tissu avec un sourire gêné. — Tiens, mon pauvre petit, dit-elle. Mouche-toi un bon coup. Pouf renifle, puis il la remercie, tout timide." },
   // 10 — power cut, dark alley
   { svg: svg(alley({ time: 'dark', seed: 10, glowEnd: true }) + bulbs([0, 40], [400, 60], 16, 14, false) + lanternLine([10, 84], [390, 100], 20, 6, false, 1.05, 0) + longTable(262, 256, 0.85) + C(262, 218, 40, 'url(#glow)', `${NS} opacity=".6"`) + R(256, 208, 5, 10, '#fff3c8', 1.5, NS)
     + neighbor(180, 270, 1.1, 5, { mood: 'shy' }) + neighbor(228, 268, 1.1, 3, { mood: 'shy' })
     + dragon(326, 296, 0.8, { mood: 'sad', arms: 'c' }) + camille(372, 298, 1.3, { flip: true, mood: 'worried', al: 'd' })
     + lacasse(150, 296, 1.35, { mood: 'shy', ar: 'd', al: 'd' })
-    + dimitri(66, 300, 1.55, { mood: 'shy', al: [-16, -60], ar: 'd' }) + R(0, 0, 400, 300, 'rgba(60,70,160,.1)', 0, NS)), text: "Au coucher du soleil, une panne de courant plonge tout le quartier dans le noir. Les guirlandes s'éteignent et les lanternes restent sombres. — Notre belle fête est gâchée, soupire monsieur Dimitri." },
+    + dimitri(66, 300, 1.55, { mood: 'shy', al: [-16, -60], ar: 'd' }) + R(0, 0, 400, 300, 'rgba(60,70,160,.1)', 0, NS)), text: "Au coucher du soleil, une panne de courant plonge tout le quartier dans le noir. Les guirlandes s’éteignent d’un seul coup, et les lanternes de papier pendent, sombres et tristes, au-dessus des tables. Les enfants se rapprochent de leurs parents, un peu inquiets. — Notre belle fête est gâchée, soupire monsieur Dimitri. On ne voit même plus ce qu’on mange! Un silence déçu tombe sur toute la ruelle." },
   // 11 — feather tickles
   { svg: svg(alley({ time: 'dark', seed: 11, glowEnd: true }) + bulbs([0, 40], [400, 60], 16, 14, false) + lanternLine([10, 84], [390, 100], 20, 6, false, 1.05, 0)
     + neighbor(60, 266, 1.15, 1, { mood: 'shy' }) + neighbor(110, 262, 1.1, 4, { mood: 'happy' }) + lacasse(40, 290, 1.2, { mood: 'happy' }) + dimitri(380, 280, 1.2, { mood: 'happy', flip: true })
     + dragon(150, 296, 1.45, { mood: 'squint', arms: 'c', headTilt: 4 }) + spk(118, 190, 7, '#ffb020') + spk(132, 178, 5, '#ffe066') + C(150, 186, 22, 'url(#orange)', `${NS} opacity=".6"`)
-    + camille(318, 298, 1.7, { flip: true, mood: 'happy', tilt: -2, ar: [50, -52], al: [-24, -40], holdR: feather(0, 2, 0.66, 100) })), text: "Pouf renifle, puis il se redresse. — Je pourrais allumer vos lanternes, propose-t-il, mais je ne sais pas éternuer sur commande. Camille ramasse une plume de pigeon et lui chatouille le nez." },
+    + camille(318, 298, 1.7, { flip: true, mood: 'happy', tilt: -2, ar: [50, -52], al: [-24, -40], holdR: feather(0, 2, 0.66, 100) })), text: "Pouf renifle, puis il se redresse lentement, les yeux brillants. — Je pourrais allumer vos lanternes avec mon souffle de feu, propose-t-il. Mais le problème, c’est que je ne sais pas éternuer sur commande. Camille a alors une idée. Elle ramasse une plume de pigeon qui traîne par terre, elle s’approche de lui sur la pointe des pieds, et elle lui chatouille doucement le museau, tout près des narines." },
   // 12 — sneezes light the lanterns
   { svg: svg(alley({ time: 'night', seed: 12, glowEnd: true }) + bulbs([0, 38], [400, 58], 16, 14, true)
     + lanternLine([6, 76], [394, 98], 24, 8, (k) => k < 7, 1.1, 0) + lanternLine([4, 128], [396, 120], 18, 6, (k) => k < 5, 1.0, 1)
@@ -329,25 +329,25 @@ const pages = [
     + neighbor(362, 270, 1.2, 4, { mood: 'laugh', ar: 'u', al: 'u' }) + neighbor(262, 262, 1.0, 5, { mood: 'happy', ar: 'u' })
     + lacasse(138, 292, 1.3, { mood: 'laugh', ar: 'u', al: 'u' }) + dimitri(312, 298, 1.35, { mood: 'laugh', ar: 'u', al: 'u' })
     + dragon(214, 298, 1.35, { mood: 'sneeze', arms: 'u', headTilt: -10 }) + sparks(246, 150, 1.2)
-    + camille(58, 300, 1.45, { mood: 'laugh', ar: 'u', al: 'u' }) + sparkles(10, 12, 150)), text: "Atchoum! Atchoum! Atchoum! À chaque éternuement, une étincelle file le long des cordes à linge. Les lanternes s'allument une à une, rouges, orange et dorées. La ruelle entière brille comme un ciel d'étoiles." },
+    + camille(58, 300, 1.45, { mood: 'laugh', ar: 'u', al: 'u' }) + sparkles(10, 12, 150)), text: "Atchoum! Atchoum! Atchoum! À chaque éternuement, une étincelle file le long des cordes à linge, comme une petite fusée dorée. Les lanternes s’allument une à une, rouges, orange et dorées, et la lumière danse sur les visages ébahis. La ruelle entière brille bientôt comme un ciel d’étoiles. Les enfants crient « Ooooh! » et les parents n’en croient pas leurs yeux. Jamais on n’a vu une fête aussi belle dans le quartier." },
   // 13 — applause, pie, apology
   { svg: svg(alley({ time: 'night', seed: 13, glowEnd: true }) + bulbs([0, 38], [400, 58], 16, 14, true) + lanternLine([6, 76], [394, 98], 24, 8, true, 1.1, 0) + lanternLine([4, 128], [396, 120], 18, 6, true, 1.0, 1)
     + P('M20 90q-8 4 0 8M16 100q-10 6 0 12M380 92q8 4 0 8M384 102q10 6 0 12', 'none', 'stroke="#fff" stroke-width="2.4" opacity=".5"')
     + neighbor(30, 262, 1.1, 1, { mood: 'laugh', al: 'c', ar: 'c' }) + neighbor(380, 262, 1.1, 5, { mood: 'laugh', al: 'c', ar: 'c' }) + neighbor(262, 250, 1.0, 4, { mood: 'laugh', al: 'c', ar: 'c' })
     + dragon(214, 298, 1.2, { mood: 'laugh', arms: 'c' }) + sparks(250, 180, 0.6)
     + lacasse(98, 298, 1.45, { mood: 'happy', ar: [52, -32], al: [-30, -34], holdR: tarteSlice(2, 4, 1.1), holdL: tarte(0, 8, 0.8) })
-    + dimitri(352, 300, 1.35, { mood: 'shy', al: 'c', ar: 'c', tilt: 6 }) + camille(292, 300, 1.0, { mood: 'laugh', ar: 'u' })), text: "Les voisins applaudissent! Madame Lacasse offre une part de tarte au sucre à Pouf, et monsieur Dimitri lui demande pardon pour sa frayeur. Soudain, un grondement lointain fait vibrer les vitres." },
+    + dimitri(352, 300, 1.35, { mood: 'shy', al: 'c', ar: 'c', tilt: 6 }) + camille(292, 300, 1.0, { mood: 'laugh', ar: 'u' })), text: "Les voisins applaudissent à tout rompre! Madame Lacasse offre une grosse part de tarte au sucre à Pouf, et monsieur Dimitri sort de sa cachette pour lui demander pardon de sa frayeur. Pouf, tout rouge de plaisir, mange la tarte à belles dents. Soudain, un grondement lointain fait vibrer les vitres des maisons, et la nappe se met à frémir. Tout le monde lève la tête vers le ciel étoilé, sans bouger." },
   // 14 — the dragon family
   { svg: svg(alley({ time: 'night', seed: 14, glowEnd: true }) + lanternLine([6, 104], [394, 124], 24, 8, true, 1.1, 0) + lanternLine([4, 150], [396, 142], 18, 4, true, 1.0, 1)
     + dragonMama(82, 150, 0.74, { pose: 'fly', mood: 'happy', lite: true }) + dragonPapa(318, 144, 0.74, { pose: 'fly', mood: 'happy', lite: true }) + dragonOld(200, 100, 0.72, { pose: 'fly', mood: 'surprised', lite: true })
     + lacasse(70, 300, 1.3, { mood: 'surprised', al: 'c', ar: 'c' }) + dimitri(330, 300, 1.3, { mood: 'surprised', al: 'c', ar: 'c' })
     + camille(200, 300, 1.7, { mood: 'happy', al: [-30, -44], ar: [30, -44] }) + dragon(200, 296, 0.8, { pose: 'fly', mood: 'laugh', arms: 'h', shadow: false })
-    ), text: "Trois grands dragons descendent entre les balcons, attirés par la lumière des lanternes. — Maman! Papa! s'écrie Pouf en battant des ailes. Il serre Camille dans ses bras avant de s'envoler." },
+    ), text: "Trois grands dragons descendent lentement entre les balcons, attirés par la lumière des lanternes. Leurs ailes immenses font bruire les feuilles des arbres. — Maman! Papa! s’écrie Pouf en battant des ailes de toutes ses forces. Il court se jeter dans leurs pattes, puis il revient serrer Camille dans ses bras, très fort, avant de s’envoler avec sa famille. « Merci, Camille! » crie-t-il, de plus en plus loin." },
   // 15 — farewell
   { svg: svg(alley({ time: 'night', seed: 15, stars: true }) + lanternLine([6, 76], [394, 98], 24, 8, true, 1.1, 0) + lanternLine([4, 130], [396, 122], 18, 6, true, 1.0, 1)
     + [[300, 34, 0.16], [336, 52, 0.13], [366, 30, 0.11]].map(([a, b, sc]) => C(a, b, 16, 'url(#glowG)', `${NS} opacity=".9"`) + dragon(a, b + 8, sc, { pose: 'fly', mood: 'happy', shadow: false, lite: true })).join('')
     + P('M24 100q40 -14 70 0t70 0M250 150q30 -10 60 0t60 0', 'none', 'stroke="#fff" stroke-width="2.4" opacity=".35"')
-    + camille(150, 300, 1.75, { mood: 'happy', ar: [34, -92], al: [44, -56], holdL: scale_(4, -10, 0.85, -10) }) + sparkles(10, 15, 150)), text: "Camille le salue longtemps, jusqu'à ce que les dragons ressemblent à de petites étoiles. Dans sa main, une écaille verte est encore tiède. Depuis ce soir-là, quand le vent chante dans les cordes à linge, elle sourit : peut-être que Pouf pense à elle." },
+    + camille(150, 300, 1.75, { mood: 'happy', ar: [34, -92], al: [44, -56], holdL: scale_(4, -10, 0.85, -10) }) + sparkles(10, 15, 150)), text: "Camille le salue longtemps de la main, jusqu’à ce que les dragons ressemblent à de petites étoiles parmi les autres. Elle sent une boule de tristesse dans sa gorge, mais aussi une grande joie, car Pouf a retrouvé les siens. Dans sa main, une petite écaille verte est encore tiède. Depuis ce soir-là, quand le vent chante dans les cordes à linge, Camille sourit : peut-être que Pouf pense à elle, lui aussi." },
 ];
 
 export const book = {
@@ -355,29 +355,30 @@ export const book = {
   title: 'Le dragon de la ruelle',
   emoji: '🐉',
   level: 3,
-  minutes: 12,
+  minutes: 22,
   cover: svg(alley({ time: 'night', seed: 16, glowEnd: true }) + bulbs([0, 40], [400, 60], 16, 14, true) + lanternLine([6, 84], [394, 106], 24, 8, true, 1.1, 0) + lanternLine([4, 136], [396, 128], 18, 6, true, 1.0, 1)
     + camille(190, 300, 1.8, { mood: 'laugh', ar: [28, -88], al: 'd' }) + dragon(244, 164, 0.62, { mood: 'happy', arms: 'u', shadow: false }) + sparks(262, 120, 0.9) + sparkles(14, 16, 150)),
   pages,
   words: [
-    { word: 'une ruelle', emoji: '🏘️', def: 'Une petite rue étroite, derrière les maisons.' },
-    { word: 'un escalier en colimaçon', emoji: '🌀', def: "Un escalier qui tourne autour d'un poteau, comme la coquille d'un escargot." },
-    { word: 'une corde à linge', emoji: '🧺', def: 'Une corde tendue où on suspend les vêtements pour les faire sécher.' },
-    { word: 'une lanterne', emoji: '🏮', def: 'Une lampe en papier ou en verre qui éclaire doucement.' },
-    { word: 'une étincelle', emoji: '✨', def: 'Une toute petite flamme brillante qui jaillit du feu.' },
-    { word: 'éternuer', emoji: '🤧', def: 'Faire « atchoum! » quand le nez chatouille.' },
-    { word: 'recroquevillé', emoji: '😟', def: 'Le corps replié sur soi pour avoir moins froid ou moins peur.' },
-    { word: 'une panne de courant', emoji: '🔌', def: "Un moment où l'électricité s'arrête et où tout s'éteint." },
-    { word: 'honteux', emoji: '😳', def: "Qui a un peu de honte parce qu'il a mal agi." },
+    {"word":"une ruelle","emoji":"🏘️","def":"Une petite rue étroite, derrière les maisons."},
+    {"word":"un colimaçon","emoji":"🐌","def":"Qui tourne en spirale, comme la coquille d’un escargot."},
+    {"word":"la pénombre","emoji":"🌑","def":"Une lumière très faible, presque le noir."},
+    {"word":"recroquevillé","emoji":"🥶","def":"Plié en boule, pour avoir moins froid ou moins peur."},
+    {"word":"frissonner","emoji":"🧥","def":"Trembler un peu à cause du froid ou de la peur."},
+    {"word":"une étincelle","emoji":"✨","def":"Une toute petite flamme qui jaillit et s’éteint vite."},
+    {"word":"éternuer","emoji":"🤧","def":"Souffler soudainement par le nez et la bouche, comme quand on est enrhumé."},
+    {"word":"honteux","emoji":"😳","def":"Qui se sent mal parce qu’il a fait quelque chose qui n’était pas gentil."},
+    {"word":"une panne de courant","emoji":"🔌","def":"Quand l’électricité s’arrête dans les maisons."},
+    {"word":"une écaille","emoji":"🐉","def":"Une petite plaque dure qui recouvre la peau d’un dragon ou d’un poisson."},
   ],
   quiz: [
-    { q: "Où se passe l'histoire?", options: ['Dans une forêt', 'Dans une ruelle de Montréal', "Dans une cour d'école"], answer: 1 },
-    { q: 'Comment Camille découvre-t-elle Pouf?', options: ['Elle le voit voler dans le ciel.', 'Il frappe à sa porte.', 'Elle entend un éternuement et voit une étincelle.'], answer: 2 },
-    { q: 'Pourquoi Pouf a-t-il de la peine au début?', options: ['Il est perdu et loin de sa famille.', "Il n'aime pas la ruelle.", 'Il a perdu son biscuit.'], answer: 0 },
-    { q: 'Pourquoi les voisins ont-ils peur de Pouf?', options: ['Il leur a volé leur tarte.', 'Ses éternuements font des étincelles et ils ne le connaissent pas.', 'Il crie très fort.'], answer: 1 },
-    { q: "Qu'est-ce qui gâche la fête des voisins?", options: ['La pluie', 'Une panne de courant', 'Un orage de grêle'], answer: 1 },
-    { q: 'Comment Pouf réussit-il à éternuer sur commande?', options: ['Camille lui chatouille le nez avec une plume.', 'Il sent du poivre.', 'Il avale un bonbon.'], answer: 0 },
-    { q: 'Pourquoi la famille de Pouf arrive-t-elle dans la ruelle?', options: ['Elle a entendu de la musique.', 'Elle est attirée par la lumière des lanternes.', 'Elle voulait de la tarte.'], answer: 1 },
-    { q: 'Que veut dire « une ruelle »?', options: ['Une grande autoroute', 'Une petite rue étroite derrière les maisons', 'Un escalier'], answer: 1 },
+    {"q":"Pourquoi la ruelle est-elle très animée le lendemain?","options":["Il y a une panne de courant","Un cirque est arrivé","C’est la fête des voisins"],"answer":2},
+    {"q":"Que veut dire « recroquevillé » quand on parle de Pouf?","options":["Il est plié en boule, pour avoir moins froid ou moins peur","Il saute de joie","Il dort sur le dos"],"answer":0},
+    {"q":"Pourquoi Pouf se trouve-t-il dans la ruelle?","options":["Il cherche à faire peur aux gens","Il a perdu sa famille à cause d’un coup de vent","Il a été invité à la fête"],"answer":1},
+    {"q":"Que fait Camille pour réconforter Pouf?","options":["Elle appelle la police","Elle le cache dans un arbre","Elle lui apporte un biscuit et une couverture"],"answer":2},
+    {"q":"Pourquoi les voisins ont-ils peur de Pouf à la fête?","options":["Ils voient les étincelles brûler la nappe et découvrent un dragon","Pouf leur crie dessus","Il les a poursuivis"],"answer":0},
+    {"q":"Comment sait-on que les voisins sont honteux?","options":["Ils crient plus fort","Madame Lacasse offre un mouchoir à Pouf et monsieur Dimitri s’excuse","Ils quittent la fête"],"answer":1},
+    {"q":"Comment Camille aide-t-elle Pouf à éternuer sur commande?","options":["Elle lui donne du poivre","Elle lui raconte une blague","Elle lui chatouille le nez avec une plume"],"answer":2},
+    {"q":"Pourquoi les voisins changent-ils d’avis au sujet de Pouf?","options":["Ils voient qu’il est triste, perdu et enrhumé, pas méchant","Il leur offre des cadeaux","Il quitte la fête"],"answer":0},
   ],
 };

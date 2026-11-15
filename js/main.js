@@ -11,7 +11,7 @@ import {
 import { wordPairs, mathPairs } from './content/pairs.js';
 
 const SUBJECTS = [
-  { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js'], speech: 'fr-CA', praise: 'fr' },
+  { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js', './content/francais2.js'], speech: 'fr-CA', praise: 'fr' },
   { id: 'math', icon: '🧮', color: 'blue', mods: ['./content/math.js'], speech: null, praise: null },
   { id: 'anglais', icon: '🍁', color: 'green', mods: ['./content/anglais.js', './content/anglais2.js'], speech: 'en-CA', praise: 'en' },
   { id: 'chinois', icon: '🐼', color: 'red', mods: ['./content/chinois.js', './content/chinois2.js'], speech: 'zh-CN', praise: 'zh' },
@@ -42,7 +42,7 @@ const SECTIONS = {
     { id: 'C', icon: '📙', t: { fr: 'Cahier C', en: 'Book C' }, ids: ['m11', 'm12', 'm15', 'm19'], boss: '🐙' },
   ],
   francais: [
-    { id: 'lect', icon: '🔤', t: { fr: 'Lecture et sons', en: 'Reading & sounds' }, ids: ['f1', 'f2', 'f8'], boss: '🐉' },
+    { id: 'lect', icon: '🔤', t: { fr: 'Lecture et sons', en: 'Reading & sounds' }, ids: ['f1', 'f2', 'f8', 'f14'], boss: '🐉' },
     { id: 'mots', icon: '📝', t: { fr: 'Mots et orthographe', en: 'Words & spelling' }, ids: ['f3', 'f9', 'f10', 'f12', 'f13'], boss: '🦈' },
     { id: 'gram', icon: '✏️', t: { fr: 'Grammaire', en: 'Grammar' }, ids: ['f4', 'f5', 'f6'], boss: '🦖' },
     { id: 'phr', icon: '💬', t: { fr: 'Phrases et ponctuation', en: 'Sentences & punctuation' }, ids: ['f7', 'f11'], boss: '🐙' },
@@ -353,7 +353,7 @@ async function play(opts) {
 
   // question supply
   let fixed = null;
-  if (mode === 'practice') fixed = buildFixed([{ unit: opts.unit, level, n: perSession() }], R);
+  if (mode === 'practice') fixed = opts.unit.session ? opts.unit.session(level, R).map((q) => ({ q, unit: opts.unit })) : buildFixed([{ unit: opts.unit, level, n: perSession() }], R);
   let reviewItems = null;
   if (mode === 'review') {
     reviewItems = R.shuffle(dueMistakes()).slice(0, Math.max(perSession(), 8));

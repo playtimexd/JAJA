@@ -95,7 +95,7 @@ export const book = {
   title: 'Le voyage de Perle, la goutte d\'eau',
   emoji: '💧',
   level: 3,
-  minutes: 9,
+  minutes: 22,
   cover: couverture,
   pages: [
     // 1 — dans le lac
@@ -104,20 +104,20 @@ export const book = {
 ${feuilleRoseau(30, 300, 70)}${feuilleRoseau(52, 300, 52)}${feuilleRoseau(368, 300, 66)}
 ${[[70, 170], [96, 252], [235, 150], [335, 190], [330, 268], [250, 262], [40, 225], [185, 145]].map(([x, y], i) => petiteGoutte(x, y, 0.5 + (i % 3) * 0.05, i % 2 ? 'smile' : 'laugh')).join('')}
 ${poisson(300, 228, 1.5, true)}${perle(158, 200, 2.1, 'goutte', 'smile')}${bulles([[225, 160, 6], [238, 135, 4], [120, 270, 6], [350, 148, 5]])}${ripple(158, 262, 34)}`),
-      text: 'Perle est une petite goutte d\'eau qui vit dans un grand lac, au pied des montagnes. Elle nage avec des milliers d\'autres gouttes et avec son ami Gaspard, le poisson. Chaque jour, elle se demande ce qu\'il y a au-delà de la rive.' },
+      text: "Perle est une petite goutte d’eau qui vit dans un grand lac, au pied des montagnes. Elle nage parmi des milliers d’autres gouttes, et elle joue souvent avec son ami Gaspard, un gros poisson argenté. Le lac est calme, joli et familier. Pourtant, chaque jour, Perle regarde la rive au loin et elle se demande ce qu’il peut bien y avoir au-delà. Un jour, se promet-elle, elle partira à la découverte du monde." },
     // 2 — le soleil réchauffe
     { svg: svg(`${lacScene('skyHot', 150, [320, 52, 30])}
 <path d="M60 135q10 -10 0 -20t0 -20M130 138q10 -10 0 -20t0 -20M245 138q10 -10 0 -20t0 -20M200 134q10 -10 0 -20t0 -20" class="ln" stroke="#fff" stroke-width="3" opacity=".6"/>
 <path d="M262 82l-40 40M284 98l-52 34M296 94l-34 46" class="ln" stroke="#ffb703" stroke-width="3" stroke-dasharray="2 9"/>
 ${ripple(170, 232, 44)}${poisson(78, 262, 1.2, false)}${perle(170, 185, 2.2, 'goutte', 'hot')}${bulles([[255, 220, 6], [270, 245, 4]])}${sparkle(120, 190, 6)}${sparkle(240, 175, 5)}`),
-      text: 'Un matin d\'été, le soleil brille très fort. Il réchauffe l\'eau du lac, et Perle se sent toute légère. Elle devient si chaude qu\'elle en est étourdie!' },
+      text: "Un matin d’été, le soleil brille très fort dans un ciel sans nuages. Ses rayons chauffent l’eau du lac, et la surface se met à scintiller comme de la poussière d’or. Perle sent une drôle de chaleur monter en elle. Elle devient de plus en plus légère, comme une bulle de savon. Elle devient si chaude qu’elle en est étourdie, et elle a l’impression qu’elle va s’envoler d’un instant à l’autre!" },
     // 3 — évaporation
     { svg: svg(`${lacScene('skyDay', 190, [58, 48, 24])}
 <path d="M120 188q-9 -9 0 -18t0 -18M170 188q-9 -9 0 -18t0 -18M270 188q-9 -9 0 -18t0 -18M330 190q-9 -9 0 -18t0 -18" class="ln" stroke="#3a3f55" stroke-width="7" opacity=".5"/><path d="M120 188q-9 -9 0 -18t0 -18M170 188q-9 -9 0 -18t0 -18M270 188q-9 -9 0 -18t0 -18M330 190q-9 -9 0 -18t0 -18" class="ln" stroke="#fff" stroke-width="4"/>
 ${ripple(95, 262, 40)}${poisson(95, 232, 1.4, false, 'laugh', -40)}${bulles([[60, 225, 5], [70, 205, 4]])}
 ${perle(222, 128, 2.0, 'vapeur', 'wow')}${sparkle(300, 70, 7)}${sparkle(140, 80, 6)}${sparkle(320, 120, 5)}
 <path d="M120 118l8 -8M126 100l8 -4" class="ln" stroke="#3a3f55" stroke-width="2"/>`),
-      text: 'Perle s\'évapore : elle se transforme en vapeur d\'eau, un gaz invisible, et monte dans les airs. Sa forme change, mais c\'est toujours elle! « Au revoir, Gaspard! » crie-t-elle.' },
+      text: "Perle s’évapore : elle se transforme en vapeur d’eau, un gaz invisible, et monte tout doucement dans les airs. Sa forme change, on ne la voit plus, mais c’est toujours elle! Elle n’a pas disparu, elle est seulement devenue très, très légère. « Au revoir, Gaspard! » crie-t-elle de toutes ses forces, en regardant le lac rapetisser sous elle. Le poisson, étonné, la salue avec sa nageoire avant de plonger." },
     // 4 — le nuage
     { svg: svg(`${sky('skyCold')}${sparkle(40, 40, 7)}${sparkle(350, 30, 6)}${sparkle(310, 150, 5)}${sparkle(80, 120, 5)}
 ${mont(110, 215, -60, 280, 300, '#9db3d8', '#6f86b8', true)}${mont(320, 235, 190, 460, 300, '#8aa1cf', '#5f78ae', true)}
@@ -125,7 +125,7 @@ ${nuageG(60, 60, .8)}${nuageG(345, 75, .8)}
 <path d="M95 160q40 -10 60 -20M305 165q-40 -10 -60 -20M120 225q40 -30 55 -45M285 225q-40 -30 -55 -45M200 250V205" class="ln" stroke="#fff" stroke-width="3" stroke-dasharray="2 8" opacity=".9"/>
 ${petiteGoutte(90, 165, .6, 'laugh')}${petiteGoutte(312, 170, .6, 'laugh')}${petiteGoutte(115, 232, .55, 'smile')}${petiteGoutte(285, 232, .55, 'smile')}${petiteGoutte(200, 262, .5, 'laugh')}
 ${perle(200, 128, 2.3, 'nuage', 'smile')}`),
-      text: 'Là-haut, l\'air est froid. La vapeur d\'eau se refroidit et redevient de minuscules gouttelettes. Perle retrouve ses amies, et ensemble elles forment un nuage tout blanc.' },
+      text: "Là-haut, l’air est beaucoup plus froid que près du lac. La vapeur d’eau se refroidit et redevient de minuscules gouttelettes, qu’on peut voir de nouveau. Perle retrouve ainsi des milliers d’amies, qui sont montées elles aussi depuis le lac, les rivières et les champs. Ensemble, serrées les unes contre les autres, elles forment un nuage tout blanc et moelleux, qui flotte dans le ciel comme un gros mouton." },
     // 5 — le vent
     { svg: svg(`${sky('skyDay')}${soleil(46, 40, 18)}${mont(320, 100, 200, 440, 230, '#9db3d8', '#6f86b8', true)}${mont(210, 150, 100, 320, 230, '#aebfe0', '#7d94c4', true)}
 <path d="M0 232Q100 214 200 226T400 218V300H0Z" fill="url(#grass)" ${O2}/>
@@ -135,14 +135,14 @@ ${[[34, 246], [56, 252], [76, 244]].map(([x, y]) => `<circle cx="${x}" cy="${y}"
 <path d="M10 70q70 -16 110 2M0 105q56 -14 90 4M20 138q46 -10 70 2" class="ln" stroke="#fff" stroke-width="5" opacity=".95"/><path d="M26 82q20 -4 30 6" class="ln" stroke="#fff" stroke-width="4"/>
 <path d="M310 28q10 -6 20 0q10 -6 20 0M345 52q8 -5 16 0q8 -5 16 0" class="ln" stroke="#3a3f55" stroke-width="3"/>
 ${perle(170, 108, 2.4, 'nuage', 'laugh')}`),
-      text: 'Le vent pousse le nuage vers les montagnes. En dessous, Perle voit des forêts, des villages et des routes minuscules. Quel voyage!' },
+      text: "Le vent se met à souffler, et il pousse le nuage vers les montagnes. En dessous, Perle voit défiler des forêts, des villages et des routes minuscules, comme dans un jeu miniature. Les voitures ressemblent à des fourmis, et les rivières à des rubans argentés. Perle n’en croit pas ses yeux, car elle n’a jamais vu autant de choses d’un seul coup. « Quel voyage extraordinaire! » s’exclame-t-elle." },
     // 6 — flocon
     { svg: svg(`${sky('skyStorm')}${mont(205, 140, 10, 400, 300, '#b3c0dc', '#8091b8', true)}<path d="M-20 300L60 222L120 250L200 214L300 246L420 206V300Z" fill="url(#snow)" ${O2}/>${sapin(60, 288, 1.1, true)}${sapin(340, 292, 1.2, true)}${sapin(300, 276, .8, true)}${sapin(100, 276, .7, true)}
 ${nuageG(95, 36, 1.5, '#aab3c9', '#8d97b2')}${nuageG(310, 40, 1.4, '#aab3c9', '#8d97b2')}
 <path d="M10 130q60 -14 100 4M290 100q50 -10 100 6" class="ln" stroke="#fff" stroke-width="4" opacity=".8"/>
 ${flocon(58, 120, 1.4, 10)}${flocon(130, 160, 1.1, 30)}${flocon(310, 118, 1.5, 0)}${flocon(345, 178, 1.1, 20)}${flocon(80, 205, 1.1, 5)}${flocon(280, 195, 1.3, 40)}${flocon(250, 95, 1.0, 15)}${flocon(160, 100, 1.0, 50)}
 ${perle(205, 140, 2.1, 'flocon', 'wow', 15)}`),
-      text: 'Près des sommets, il fait glacial. Les gouttelettes gèlent et deviennent des flocons de neige aux six branches. Perle est devenue un joli flocon, et elle tombe doucement en tournoyant.' },
+      text: "Près des sommets, il fait glacial. Les gouttelettes se mettent à geler, l’une après l’autre, et elles deviennent des flocons de neige aux six branches, délicats comme de la dentelle. Perle devient un joli flocon, tout léger, qui se détache du nuage. Elle tombe lentement, en tournoyant sur elle-même, au milieu de milliers d’autres flocons. Elle trouve cela magnifique : on dirait qu’elle danse dans le ciel!" },
     // 7 — l'hiver
     { svg: svg(`${sky('skyNight')}<circle cx="320" cy="58" r="52" fill="url(#moonG)"/><circle cx="320" cy="58" r="24" fill="#fff6c9" ${O2}/><circle cx="312" cy="52" r="4" fill="#e8dca0"/><circle cx="330" cy="68" r="3" fill="#e8dca0"/>
 ${[[40, 40, 3], [100, 80, 2.5], [160, 30, 3], [230, 62, 2.5], [270, 22, 3], [375, 125, 3], [60, 130, 2.5], [190, 115, 2], [20, 90, 2]].map(([x, y, r]) => sparkle(x, y, r * 2.2, '#fff6c9')).join('')}
@@ -153,7 +153,7 @@ ${perle(200, 218, 2.1, 'flocon', 'sleepy', -8)}
 ${sparkle(100, 262, 5)}${sparkle(330, 270, 4)}
 <circle cx="252" cy="172" r="4" fill="#fff" ${O2}/><circle cx="262" cy="150" r="7" fill="#fff" ${O2}/>
 <g transform="translate(300 118)"><ellipse cx="0" cy="0" rx="46" ry="30" fill="#fff" ${O2}/><circle cx="-12" cy="2" r="10" fill="#ffd84a" ${O2}/><path d="M-12 -14v-4M-12 18v4M-26 2h-4M2 2h4" class="ln" stroke="#ffb703" stroke-width="2.5"/><path d="M16 12v-14M16 -2q-8 -6 -4 -12M16 -2q8 -6 4 -12" class="ln" stroke="#3a8f4a" stroke-width="2.5"/><circle cx="16" cy="-16" r="5" fill="#f28fb0" ${O2}/></g>`),
-      text: 'Tout l\'hiver, Perle dort sous une épaisse couverture de neige. Au-dessus d\'elle, la lune brille et les sapins craquent de froid. Elle fait de beaux rêves en attendant le printemps.' },
+      text: "Tout l’hiver, Perle dort sous une épaisse couverture de neige, bien au chaud, au creux de la montagne. Au-dessus d’elle, la lune brille la nuit, et les sapins craquent de froid dans le silence. Perle ne s’ennuie pas : elle fait de beaux rêves en attendant le printemps. Dans ses rêves, elle revoit le lac, Gaspard et le soleil. Elle sait que ce long sommeil ne durera pas toujours." },
     // 8 — fonte
     { svg: svg(`${sky('skyDay')}${soleil(335, 45, 24)}${mont(110, 78, -60, 280, 205, '#9fb2d6', '#6f86b8', false)}<path d="M110 78L84 118L97 110L110 126L124 110L138 118Z" fill="url(#snow)" ${O2}/>
 <path d="M-10 300V205Q90 178 180 210Q260 240 410 224V300Z" fill="url(#grass)" ${O2}/>
@@ -162,7 +162,7 @@ ${sparkle(100, 262, 5)}${sparkle(330, 270, 4)}
 ${[[284, 270], [330, 282], [360, 262], [262, 292], [310, 252]].map(([x, y]) => `<g transform="translate(${x} ${y})"><path d="M0 0V-16" class="ln" stroke="#3a8f4a" stroke-width="3"/><path d="M-7 -16Q-9 -30 0 -32Q9 -30 7 -16Q0 -12 -7 -16Z" fill="#a87be0" ${O2}/><path d="M0 -30V-18" stroke="#ffd84a" stroke-width="2"/></g>`).join('')}
 ${sapin(380, 232, .8)}${sapin(350, 236, .6)}
 ${perle(205, 190, 2.1, 'goutte', 'laugh', 18)}${petiteGoutte(60, 270, .45)}${sparkle(260, 195, 6)}${sparkle(150, 170, 5)}`),
-      text: 'Au printemps, le soleil réchauffe la montagne et la neige commence à fondre. Perle redevient une goutte d\'eau et glisse en riant sur la pente. Déjà, des crocus violets sortent de la terre.' },
+      text: "Au printemps, le soleil revient et il réchauffe la montagne. La neige commence à fondre doucement, et de petites gouttes brillantes apparaissent partout. Perle se réveille, elle s’étire et redevient une goutte d’eau. Elle glisse en riant sur la pente, entraînée par les autres. Déjà, tout autour d’elle, des crocus violets sortent de la terre. Elle comprend que la neige qui fond nourrit le sol, et que la vie recommence partout." },
     // 9 — ruisseau
     { svg: svg(`${sky('skyDay')}${mont(120, 70, -40, 300, 200, '#b9c6d9', '#8091b8', true)}${mont(330, 90, 190, 460, 200, '#a1b5d8', '#6f86b8', true)}
 <path d="M0 200Q100 186 200 198T400 192V300H0Z" fill="url(#grass)" ${O2}/>${sapin(30, 222, 1.2)}${sapin(380, 224, 1.2)}${sapin(355, 230, .85)}${sapin(60, 230, .8)}
@@ -173,7 +173,7 @@ ${perle(205, 190, 2.1, 'goutte', 'laugh', 18)}${petiteGoutte(60, 270, .45)}${spa
 <path d="M162 232h42M146 262h60" class="ln" stroke="#fff" stroke-width="5" opacity=".9"/>
 ${perle(205, 190, 1.9, 'goutte', 'wow', 22)}${petiteGoutte(150, 130, .5)}${petiteGoutte(232, 128, .45)}${petiteGoutte(120, 250, .5)}${petiteGoutte(290, 250, .5)}${bulles([[235, 170, 5], [250, 200, 4], [170, 150, 4]])}
 <path d="M150 218q-6 -14 -14 -14M270 238q8 -14 16 -12M180 280q-6 -10 -14 -8" class="ln" stroke="#fff" stroke-width="3"/>`),
-      text: 'Perle dévale la montagne dans un ruisseau, entre les cailloux et les petites cascades. D\'autres gouttes la rejoignent, et le ruisseau grossit, grossit. Éclaboussée de partout, Perle crie de joie.' },
+      text: "Perle dévale la montagne dans un ruisseau, entre les cailloux et les petites cascades. L’eau frise et rebondit, et elle se sent comme dans un grand toboggan. D’autres gouttes la rejoignent à chaque tournant, et le ruisseau grossit, grossit, grossit. Éclaboussée de partout, Perle crie de joie en filant à toute vitesse. Elle a l’impression de voler, elle qui s’est tellement demandé ce qu’il y avait au-delà du lac." },
     // 10 — rivière
     { svg: svg(`${sky('skyDay')}${nuageG(80, 40, .7)}${nuageG(300, 30, .6)}
 <path d="M0 118Q80 96 170 112T400 104V160H0Z" fill="#8fcf74" ${O2}/>
@@ -185,7 +185,7 @@ ${maison(250, 126, 1.1, '#e3cfa0', '#c75a4a')}${maison(300, 128, 1.0, '#d7b8a8',
 <g transform="translate(318 238)"><ellipse cx="0" cy="8" rx="24" ry="11" fill="#f8d548" ${O2}/><path d="M-22 4q-8 -4 -8 -12q6 2 10 6" fill="#f8d548" ${O2}/><circle cx="18" cy="-8" r="12" fill="#f8d548" ${O2}/><path d="M27 -8l12 3l-12 4Z" fill="#f08a3c" ${O2}/><circle cx="20" cy="-11" r="2.6" fill="#2f3248"/><circle cx="21" cy="-12" r="1" fill="#fff"/><path d="M-4 6q8 6 16 0" fill="none" stroke="#e8b923" stroke-width="2"/></g>${ripple(318, 252, 34)}
 <g transform="translate(190 256) rotate(-6)"><path d="M-52 0Q-28 -26 0 -18Q34 -26 56 2Q30 22 0 14Q-30 22 -52 0Z" fill="#5fbe6a" ${O}/><path d="M-44 0Q0 -4 48 2" fill="none" stroke="#3a8f4a" stroke-width="2.5"/></g>
 ${perle(190, 218, 1.8, 'goutte', 'smile')}${ripple(190, 275, 56)}`),
-      text: 'Le ruisseau devient une rivière large et calme. Perle traverse des champs, passe sous un pont et croise un canard curieux. Installée sur une feuille, elle se laisse bercer en regardant le village au loin.' },
+      text: "Le ruisseau devient une rivière large et calme. Perle traverse des champs verts, passe sous un vieux pont de pierre et croise un canard curieux, qui lui lance un petit « coin! ». Installée sur une feuille, elle se laisse bercer en regardant le village au loin, avec ses toits rouges et ses cheminées qui fument. Elle voudrait presque que ce moment ne s’arrête jamais." },
     // 11 — usine et tuyaux
     { svg: svg(`${sky('skyDay')}${nuageG(300, 30, .6)}
 <rect y="112" width="400" height="188" fill="url(#earth)"/><path d="M0 112Q100 106 200 112T400 108V124H0Z" fill="url(#grass)" ${O2}/>
@@ -200,7 +200,7 @@ ${maison(284, 112, 1.5, '#e3cfa0', '#c75a4a')}${maison(350, 112, 1.2, '#d7b8a8',
 ${perle(215, 205, 1.2, 'goutte', 'wow')}${bulles([[130, 192, 5], [160, 215, 4], [270, 195, 4]])}
 <path d="M300 126l10 -8l10 8M310 118v-6" class="ln" stroke="#fff" stroke-width="3"/>
 <path d="M60 262q20 -10 40 0t40 0" class="ln" stroke="#5a3e28" stroke-width="3"/><g transform="translate(250 262)"><path d="M0 0q8 -8 16 0t14 0" class="ln" stroke="#e8a0a0" stroke-width="5"/></g>`),
-      text: 'Près de la ville, une usine nettoie l\'eau de la rivière avec de grands filtres. Ensuite, Perle s\'engage dans des tuyaux cachés sous la terre. Ils la mènent jusque dans les maisons.' },
+      text: "Près de la ville, une usine de traitement nettoie l’eau de la rivière avec de grands filtres, qui retiennent les saletés. Perle en ressort propre et claire comme du cristal. Ensuite, elle s’engage dans des tuyaux cachés sous la terre, longs et sombres, où l’on n’entend que le murmure de l’eau. Ils la mènent jusque dans les maisons, les écoles et les immeubles de la ville." },
     // 12 — le robinet
     { svg: svg(`${sky('skyKitchen')}${Array.from({ length: 8 }, (_, i) => `<path d="M${i * 54 + 20} 0V232" stroke="#f0c985" stroke-width="12" opacity=".45"/>`).join('')}
 <rect x="262" y="26" width="112" height="96" fill="#bfe4f6" ${O}/><path d="M318 26V122M262 74H374" stroke="#3a3f55" stroke-width="3"/><path d="M270 110q20 -30 40 -8" fill="#69b87a"/><path d="M256 20Q268 70 258 126M380 20Q368 70 378 126" fill="none" stroke="#e8604c" stroke-width="12" opacity=".85"/>
@@ -215,7 +215,7 @@ ${perle(206, 175, .85, 'goutte', 'wow')}
 ${louis(96, 298, 2.1, 'laugh', 'reachR', '', true)}
 <rect x="0" y="236" width="400" height="64" fill="url(#floorK)" ${O}/><rect x="0" y="236" width="400" height="14" fill="#f0c98e" ${O2}/><path d="M70 250V300M180 250V300M290 250V300M370 250V300" stroke="#a9794e" stroke-width="2"/>
 <path d="M130 220q8 -6 16 0" class="ln" stroke="#fff" stroke-width="3" opacity=".0"/>`),
-      text: 'Perle arrive dans un robinet! Louis tourne la poignée et l\'eau coule dans son verre. Plouf! Perle tombe en faisant des bulles, très surprise de se retrouver dans une cuisine.' },
+      text: "Perle arrive dans un robinet! Elle attend un moment, puis Louis tourne la poignée, et l’eau se met à couler dans son verre. Plouf! Perle tombe en faisant des bulles, très surprise de se retrouver dans une cuisine après avoir traversé tant de montagnes, de nuages et de rivières. Elle regarde autour d’elle les murs jaunes, la table, les chaises, et tout lui semble gigantesque." },
     // 13 — Louis boit
     { svg: svg(`${sky('skyKitchen')}${Array.from({ length: 8 }, (_, i) => `<path d="M${i * 54 + 20} 0V232" stroke="#f0c985" stroke-width="12" opacity=".45"/>`).join('')}
 <rect x="264" y="24" width="110" height="94" fill="#bfe4f6" ${O}/><path d="M319 24V118M264 71H374" stroke="#3a3f55" stroke-width="3"/><path d="M256 18Q268 68 258 124M382 18Q370 68 380 124" fill="none" stroke="#e8604c" stroke-width="12" opacity=".85"/>
@@ -238,41 +238,42 @@ ${arm(-15, -58, -21, -44, -22, -27, '#f5c542')}
 <g transform="translate(272 236)"><ellipse cx="0" cy="2" rx="40" ry="6" fill="#2b2b3a" opacity=".16"/><path d="M-36 0Q-30 -8 -20 -4Q0 -8 20 -4Q30 -8 36 0Q30 6 0 4Q-30 6 -36 0Z" fill="#9fd9fa" ${O2}/><path d="M-22 -2q10 -5 20 0" class="ln" stroke="#fff" stroke-width="3"/></g>
 ${perle(272, 222, 1.5, 'goutte', 'laugh')}
 <path d="M300 180q10 -6 20 0" class="ln" stroke="#fff" stroke-width="0"/>${sparkle(236, 190, 6, '#fff3a8')}${sparkle(320, 195, 5, '#fff3a8')}`),
-      text: 'Louis a soif. Glou, glou, glou! L\'eau désaltère son corps, qui en a besoin pour grandir et pour jouer. Puis Perle ressort et repart vers une autre usine qui la nettoiera.' },
+      text: "Louis a soif après avoir joué dehors. Glou, glou, glou! Il boit toute l’eau de son verre d’un seul trait. L’eau désaltère son corps, qui en a besoin pour grandir, pour jouer et pour penser. Un peu plus tard, Perle ressort de la maison par les tuyaux et repart vers une autre usine qui la nettoiera. Elle ne s’en inquiète pas : elle sait qu’elle fait partie d’un grand cycle qui continue." },
     // 14 — retour au lac
     { svg: svg(`${lacScene('skyDay', 140, [60, 45, 22])}
 <path d="M400 205Q340 180 290 204T215 240" class="ln" stroke="#3a3f55" stroke-width="42"/><path d="M400 205Q340 180 290 204T215 240" class="ln" stroke="#6ccbff" stroke-width="36"/><path d="M380 200Q340 190 296 208" class="ln" stroke="#fff" stroke-width="3" stroke-dasharray="10 12"/>
 ${feuilleRoseau(22, 300, 66)}${feuilleRoseau(44, 300, 46)}
 ${poisson(108, 178, 1.7, true, 'laugh', -28)}${ripple(104, 232, 50)}<path d="M62 148q8 -16 24 -10M90 128l-4 -12M114 134l6 -12M140 162q6 -12 18 -10" class="ln" stroke="#fff" stroke-width="3"/>
 ${perle(262, 210, 1.9, 'goutte', 'laugh')}${petiteGoutte(150, 255, .55)}${petiteGoutte(190, 215, .5)}${petiteGoutte(340, 250, .5)}${bulles([[215, 180, 6], [135, 245, 5]])}${sparkle(180, 170, 6)}${sparkle(310, 175, 5)}`),
-      text: 'Après un dernier nettoyage, Perle est rendue à la rivière, qui la ramène tout droit vers le lac. Elle reconnaît les montagnes et son vieil ami Gaspard. Il saute hors de l\'eau pour l\'accueillir.' },
+      text: "Après un dernier nettoyage, Perle est rendue à la rivière, qui la ramène tout droit vers le lac. Les montagnes réapparaissent à l’horizon, familières. Perle reconnaît la rive, les roseaux, et surtout son vieil ami Gaspard. Le poisson saute hors de l’eau pour l’accueillir, et fait mille éclaboussures de joie. « Perle! s’écrie-t-il. Où étais-tu passée? » Perle éclate de rire : elle a tant d’histoires à raconter!" },
     // 15 — fin
     { svg: svg(`${sky('skyDusk')}<circle cx="200" cy="150" r="70" fill="url(#sunG)"/>${mont(110, 70, -50, 290, 150, '#c98d9a', '#8a5f86', true)}${mont(310, 62, 190, 440, 150, '#b87b93', '#7a4f7e', true)}<circle cx="200" cy="150" r="42" fill="#ffd84a" ${O2}/>
 <rect y="150" width="400" height="150" fill="url(#lacDusk)"/><rect x="170" y="152" width="60" height="148" fill="#ffd84a" opacity=".35"/>${vagues(152, '#ffe0a8')}${vagues(190, '#ffd9a0')}${vagues(232, '#f5b98a')}${vagues(276, '#e89a86')}
 <g transform="translate(200 78) scale(.82)"><circle r="58" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="3 9" opacity=".85" stroke-linecap="round"/>
 <g transform="translate(-58 0)">${nuageG(0, 0, .42)}</g><g transform="translate(0 -58)">${flocon(0, 0, 1.4)}</g><g transform="translate(58 0) scale(.6)">${soleil(0, 0, 14)}</g><g transform="translate(0 58)"><path d="${DROP}" transform="scale(.42)" fill="url(#dropG)" ${O}/></g></g>
 ${poisson(82, 250, 1.4, false, 'laugh')}${perle(205, 215, 2.2, 'goutte', 'smile')}${petiteGoutte(320, 240, .55)}${petiteGoutte(345, 200, .45)}${ripple(205, 275, 60)}${sparkle(300, 190, 6, '#fff3a8')}${sparkle(110, 205, 5, '#fff3a8')}${sparkle(260, 175, 5, '#fff3a8')}`),
-      text: 'Perle est de retour chez elle, mais elle n\'a plus peur du voyage. Rien ne se perd : l\'eau voyage sans cesse, de lac en nuage, de neige en rivière. Demain, peut-être, elle repartira encore!' },
+      text: "Perle est de retour chez elle, mais elle n’a plus peur du voyage. Elle a compris un grand secret de la nature : rien ne se perd. L’eau voyage sans cesse, de lac en nuage, de neige en rivière, de robinet en verre, puis de nouveau vers le lac. Elle a fait le tour du monde sans jamais disparaître. Demain, peut-être, quand le soleil sera chaud, elle repartira encore!" },
   ],
   words: [
-    { word: 's\'évaporer', emoji: '💨', def: 'Quand l\'eau chauffée se transforme en vapeur et monte dans l\'air.' },
-    { word: 'la vapeur d\'eau', emoji: '♨️', def: 'De l\'eau sous forme de gaz, qu\'on ne voit pas.' },
-    { word: 'un nuage', emoji: '☁️', def: 'Un amas de millions de minuscules gouttelettes dans le ciel.' },
-    { word: 'un flocon', emoji: '❄️', def: 'Un petit cristal de glace qui tombe du ciel en hiver.' },
-    { word: 'fondre', emoji: '🫠', def: 'Passer de la glace ou de la neige à l\'eau, quand il fait plus chaud.' },
-    { word: 'un sommet', emoji: '🏔️', def: 'Le point le plus haut d\'une montagne.' },
-    { word: 'un ruisseau', emoji: '🏞️', def: 'Un tout petit cours d\'eau qui descend la montagne.' },
-    { word: 'une usine', emoji: '🏭', def: 'Un grand bâtiment où l\'on fabrique ou transforme quelque chose.' },
-    { word: 'désaltérer', emoji: '🥤', def: 'Faire passer la soif en buvant.' },
+    {"word":"une goutte","emoji":"💧","def":"Une toute petite quantité de liquide qui tombe en forme de perle."},
+    {"word":"la rive","emoji":"🏞️","def":"Le bord d’un lac ou d’une rivière."},
+    {"word":"s’évaporer","emoji":"♨️","def":"Se transformer en vapeur et monter dans l’air, quand il fait chaud."},
+    {"word":"la vapeur d’eau","emoji":"☁️","def":"De l’eau sous forme de gaz invisible."},
+    {"word":"geler","emoji":"🧊","def":"Devenir de la glace ou de la neige à cause du froid."},
+    {"word":"un flocon","emoji":"❄️","def":"Un petit morceau de neige qui tombe du ciel."},
+    {"word":"un ruisseau","emoji":"🏞️","def":"Une petite rivière qui descend d’une colline."},
+    {"word":"une usine","emoji":"🏭","def":"Un grand bâtiment où l’on fabrique ou nettoie quelque chose."},
+    {"word":"désaltérer","emoji":"🥤","def":"Faire passer la soif en buvant."},
+    {"word":"un cycle","emoji":"🔄","def":"Une suite d’étapes qui recommence toujours."},
   ],
   quiz: [
-    { q: 'Où Perle habite-t-elle au début de l\'histoire?', options: ['Dans un grand lac', 'Dans une rivière', 'Dans un nuage'], answer: 0 },
-    { q: 'Que fait le soleil à Perle?', options: ['Il la gèle', 'Il la réchauffe et elle devient vapeur', 'Il la fait tomber'], answer: 1 },
-    { q: 'Pourquoi la vapeur d\'eau redevient-elle des gouttelettes là-haut?', options: ['Parce que l\'air y est froid', 'Parce que le soleil est plus chaud', 'Parce que Gaspard la rappelle'], answer: 0 },
-    { q: 'Que devient Perle près des sommets glacés?', options: ['Une bulle', 'Un flocon de neige', 'Un caillou'], answer: 1 },
-    { q: 'Quel est le bon ordre du voyage de Perle?', options: ['Lac, nuage, neige, ruisseau, rivière', 'Neige, lac, rivière, nuage, ruisseau', 'Rivière, nuage, lac, neige, ruisseau'], answer: 0 },
-    { q: 'Que veut dire « fondre » quand la neige fond au printemps?', options: ['Elle devient de l\'eau', 'Elle devient plus froide', 'Elle monte au ciel'], answer: 0 },
-    { q: 'Pourquoi une usine nettoie-t-elle l\'eau de la rivière?', options: ['Pour la colorer', 'Pour qu\'elle soit propre à boire dans les maisons', 'Pour la garder dans un nuage'], answer: 1 },
-    { q: 'Pourquoi peut-on dire que Perle n\'a pas disparu quand elle devient vapeur?', options: ['Elle a seulement changé de forme', 'Elle est tombée dans le lac', 'Elle est devenue un poisson'], answer: 0 },
+    {"q":"Que fait Perle quand le soleil réchauffe le lac?","options":["Elle gèle tout de suite","Elle tombe au fond du lac","Elle s’évapore et devient de la vapeur d’eau"],"answer":2},
+    {"q":"Pourquoi la vapeur d’eau redevient-elle des gouttelettes en haut?","options":["L’air y est très froid","Le vent la repousse","Elle veut retrouver ses amies"],"answer":0},
+    {"q":"Quelle est la bonne suite des étapes du voyage de Perle?","options":["Lac, neige, nuage, rivière, ruisseau, robinet","Lac, nuage, neige, ruisseau, rivière, robinet","Lac, rivière, nuage, neige, robinet, ruisseau"],"answer":1},
+    {"q":"Que veut dire « s’évaporer »?","options":["Tomber en pluie","Se mélanger à la boue","Se transformer en vapeur et monter dans l’air"],"answer":2},
+    {"q":"Pourquoi Perle devient-elle un flocon de neige?","options":["Il fait glacial près des sommets","Elle veut dormir plus longtemps","Le vent l’a poussée sur un glacier"],"answer":0},
+    {"q":"À quoi sert l’usine près de la ville?","options":["Elle chauffe l’eau du lac","Elle nettoie l’eau de la rivière","Elle fabrique des nuages"],"answer":1},
+    {"q":"Comment sait-on que Perle n’a pas peur du voyage à la fin?","options":["Elle refuse de quitter le lac","Elle pleure en voyant Gaspard","Elle se dit que demain elle repartira peut-être encore"],"answer":2},
+    {"q":"Pourquoi peut-on dire que Perle n’a pas disparu quand elle devient vapeur d’eau?","options":["Parce que l’eau change de forme mais reste de l’eau","Parce qu’elle est invisible pour toujours","Parce qu’elle s’est cachée derrière un nuage"],"answer":0},
   ],
 };

@@ -79,7 +79,8 @@ function cover(b, back) {
 
 // Words are tappable: each one speaks itself.
 function tappable(text) {
-  const box = el('div', { class: 'book-text' });
+  const n = text.split(/\s+/).length;
+  const box = el('div', { class: `book-text ${n > 70 ? 'xl' : n > 40 ? 'l' : ''}` });
   for (const part of text.split(/(\s+)/)) {
     if (/^\s+$/.test(part) || !part) { box.append(part); continue; }
     const clean = part.replace(/^[«»—“”"'(¡¿.,!?;:…]+|[«»—“”"'),.!?;:…]+$/g, '');

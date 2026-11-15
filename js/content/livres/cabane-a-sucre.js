@@ -216,17 +216,17 @@ const pages = [
       + R(134, 178, 24, 26, '#bfe3f5', 3) + C(386, 188, 5, '#fff3b0', 'stroke-width="2"') + C(386, 136, 4, '#ff7a2a', 'stroke-width="1.6"') + R(121, 150, 9, 22, '#c8372d', 2) + P('M128 196h258', 'none', 'stroke="#6b6b78" stroke-width="7"')
       + C(172, 218, 25, '#33364a') + C(172, 218, 11, '#b9c3cc') + C(172, 218, 4, '#6b6b78', NS) + C(342, 218, 25, '#33364a') + C(342, 218, 11, '#b9c3cc') + C(342, 218, 4, '#6b6b78', NS) + P('M126 180Q122 160 128 150', 'none', 'stroke-width="3"'))
     + P('M122 214q-20 6 -34 -2', 'none', 'stroke="#fff" stroke-width="6" opacity=".5"') + E(100, 218, 14, 8, '#fff', `${NS} opacity=".7"`) + E(82, 212, 9, 6, '#fff', `${NS} opacity=".6"`)
-    + lea(82, 288, 1.5, { ar: 'u', mood: 'laugh' }) + noe(168, 292, 1.35, { al: 'w', mood: 'happy' }) + leaf(250, 58, 1.1, '#d9472f', 20) + leaf(100, 78, 0.8, '#e8864a', -30)), text: "En mars, la classe de Léa part à la cabane à sucre. Léa porte sa tuque jaune et ses mitaines rouges. Elle est si contente!" },
+    + lea(82, 288, 1.5, { ar: 'u', mood: 'laugh' }) + noe(168, 292, 1.35, { al: 'w', mood: 'happy' }) + leaf(250, 58, 1.1, '#d9472f', 20) + leaf(100, 78, 0.8, '#e8864a', -30)), text: "En mars, quand la neige commence à fondre et que le soleil réchauffe l’air, la classe de Léa part en excursion à la cabane à sucre. Léa a mis sa tuque jaune et ses mitaines rouges, celles que sa grand-mère a tricotées. Dans l’autobus, elle chante avec ses amis et elle regarde les champs défiler par la fenêtre. Elle est si contente qu’elle ne tient plus en place sur son banc!" },
   // 2 — maple trees and buckets
   { svg: svg(winter({ sun: false, seed: 2 }) + pine(36, 178, 0.7) + maple(76, 206, 0.62, { buck: true }) + maple(356, 208, 0.7, { buck: true })
     + maple(256, 266, 1.7, { buck: true, drip: false, open: true }) + G(P('M300 218q-2 5 0 8q2 -3 0 -8', '#8fd0f6', 'stroke="#5aa8d8" stroke-width="1.3"') + E(302, 234, 3, 1, 'none', 'stroke="#fff" stroke-width="1" opacity=".8"'), '')
     + G(P('M311 244q8 -3 16 0M315 249q4 -2 8 0', 'none', 'stroke="#5aa8d8" stroke-width="2"'), '')
-    + lea(116, 292, 1.55, { mood: 'surprised', ar: [38, -56], al: 'd' }) + noe(188, 294, 1.4, { mood: 'happy', al: 'd', ar: 'd' }) + sparkles(8, 4, 220)), text: "Dans la forêt, un seau est accroché à chaque érable. Plic! Plic! L'eau d'érable coule goutte à goutte dans le seau." },
+    + lea(116, 292, 1.55, { mood: 'surprised', ar: [38, -56], al: 'd' }) + noe(188, 294, 1.4, { mood: 'happy', al: 'd', ar: 'd' }) + sparkles(8, 4, 220)), text: "Dans la forêt, la guide les mène entre les grands arbres. À chaque érable, un seau est accroché au tronc, et un petit tuyau y laisse tomber l’eau d’érable. Plic! Plic! Plic! Les gouttes coulent une à une, avec un petit bruit clair. Léa se penche pour écouter. Elle n’aurait jamais cru que de l’eau pouvait sortir d’un arbre! « C’est comme si l’arbre pleurait de joie », dit-elle en riant." },
   // 3 — tasting the maple water
   { svg: svg(winter({ sun: false, seed: 3 }) + pine(30, 182, 0.7) + maple(354, 262, 1.5, { buck: true, drip: true })
     + gaston(108, 296, 1.7, { ar: [40, -56], al: 'd', mood: 'happy', holdR: G(thick('M0 4L10 -44', '#7a7a88', 3.6, '#4a4a58') + P('M-6 -46Q-8 -60 10 -62Q28 -60 26 -46Q18 -38 10 -40Q0 -40 -6 -46Z', 'url(#metal)', 'stroke-width="2.4"') + E(10, -52, 14, 4.2, '#e8a317', 'stroke-width="1.6"') + P('M2 -54q6 -3 12 -1', 'none', 'stroke="#fff" stroke-width="1.6" opacity=".8"') + P('M24 -44q3 5 0 9q-3 -4 0 -9', '#f2c14a', 'stroke="#c8861c" stroke-width="1"'), 'scale(1.25)', 2.2) })
     + lea(262, 294, 1.5, { flip: true, ar: [34, -56], mood: 'surprised', holdR: G(P('M-8 -14h16l-2 16h-12z', 'url(#metal)', 'stroke-width="2"') + E(0, -14, 8, 2.6, '#e8a317', 'stroke-width="1.5"') + P('M8 -9q7 0 6 5q-1 4 -7 3', 'none', 'stroke-width="2"'), 'translate(0 -4)') })
-    + sparkles(6, 3, 230)), text: "Monsieur Gaston goûte l'eau d'érable avec Léa. — Elle ressemble à de l'eau! dit Léa. — Oui, mais elle est un peu sucrée, répond-il." },
+    + sparkles(6, 3, 230)), text: "Monsieur Gaston, le propriétaire de la cabane, verse un peu d’eau d’érable dans un gobelet et le tend à Léa. Elle en prend une petite gorgée, puis fronce les sourcils. — Elle ressemble à de l’eau! dit-elle, un peu déçue. — Oui, mais goûte bien, elle est légèrement sucrée, répond-il avec un sourire. Léa goûte de nouveau, et elle remarque une saveur douce et fraîche, presque cachée au fond de sa bouche." },
   // 4 — inside the shack: steam and boiling
   { svg: svg(R(0, 0, 400, 205, '#c98b50') + R(0, 0, 400, 205, 'url(#shv)', 0, NS) + R(0, 205, 400, 95, '#7a4a2c') + [0, 40, 80, 120, 160].map((q) => P(`M0 ${q + 20}h400`, 'none', 'stroke="#8a5428" stroke-width="2" opacity=".55"')).join('') + [30, 90, 170, 250, 330, 380].map((q, i) => P(`M${q} ${(i * 37) % 160 + 10}q8 4 14 0`, 'none', 'stroke="#8a5428" stroke-width="1.5" opacity=".5"')).join('')
     + P('M0 205h400', 'none', 'stroke="#5a3a24" stroke-width="3"') + [20, 80, 140, 200, 260, 320, 380].map((q) => P(`M${q} 208v92`, 'none', 'stroke="#5a3a24" stroke-width="1.5" opacity=".5"')).join('')
@@ -236,7 +236,7 @@ const pages = [
     + gaston(300, 216, 1.35, { ar: 'd', al: [-40, -42], mood: 'happy', holdL: G(thick('M0 0L-30 44', '#8a6a46', 4) + R(-48, 40, 30, 14, '#8a8a96', 3, 'transform="rotate(-40 -40 46)"'), '', 2.2) })
     + '<g transform="translate(44 0)">' + G(RS(106, 164, 250, 76, '#7a7a88', 8) + R(116, 170, 230, 36, '#d9941a', 4) + R(116, 170, 230, 36, 'url(#shv)', 4, NS) + P('M120 186q12 -9 24 0t24 0t24 0t24 0t24 0t24 0t24 0t24 0t24 0', 'none', 'stroke="#f7c95a" stroke-width="3"') + [140, 190, 230, 280, 320].map((q, i) => C(q, 182 + (i % 2) * 8, 5 + (i % 3), '#f7d57a', 'stroke="#f7ecb8" stroke-width="1.5"')).join('') + R(116, 214, 230, 26, '#2f2f3a', 4) + P('M134 240Q150 204 166 240Q182 200 198 240Q214 204 230 240Q246 208 262 240Q278 202 294 240Z', '#ff9a2a', 'stroke-width="2"') + P('M148 240Q158 218 168 240Q178 212 192 240Z', '#ffd84a', NS), '', 2.6) + '</g>'
     + G(thick('M248 156L214 190', '#8a6a46', 4.5) + P('M200 184L228 176L222 198L196 198Z', '#9a9aa6', 'stroke-width="2.4"'), '') + '<g opacity=".55">' + E(280, 168, 30, 14, '#fff', NS) + E(340, 160, 26, 12, '#fff', NS) + E(220, 172, 20, 10, '#fff', NS) + '</g>' + C(250, 230, 100, 'url(#glow)', `${NS} opacity=".3"`)
-    + lea(52, 298, 1.65, { mood: 'surprised', ar: 'd', al: 'd' }) + noe(128, 300, 1.5, { mood: 'happy' }) + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "Dans la cabane, l'eau d'érable bout dans un grand bassin. Il y a de la vapeur partout! Il faut beaucoup d'eau d'érable pour faire un peu de sirop." },
+    + lea(52, 298, 1.65, { mood: 'surprised', ar: 'd', al: 'd' }) + noe(128, 300, 1.5, { mood: 'happy' }) + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "À l’intérieur de la cabane, l’eau d’érable bout dans un grand bassin de métal. Il y a de la vapeur partout, et l’air sent bon le sucre chaud. Monsieur Gaston explique que, pour faire un seul petit pot de sirop, il faut une énorme quantité d’eau d’érable : environ quarante grands seaux! Léa écarquille les yeux. Elle comprend pourquoi le sirop d’érable est si précieux, et elle regarde les bulles éclater avec respect." },
   // 5 — tire sur la neige
   { svg: svg(winter({ sun: false, seed: 5 }) + maple(34, 198, 0.55) + maple(374, 196, 0.55)
     + gaston(96, 244, 1.55, { ar: [42, -52], al: 'd', mood: 'happy' })
@@ -247,41 +247,41 @@ const pages = [
     + G(PS('M-16 -6L16 -6L13 -34L-13 -34Z', '#6b6b78') + R(-15, -38, 30, 6, '#8a8a96', 3) + P('M-14 -30Q-6 -26 -2 -30', 'none', 'stroke="#fff" stroke-width="2" opacity=".4"') + P('M13 -26Q26 -30 28 -14L24 -10', 'none', 'stroke-width="4"') + P('M-13 -26Q-26 -30 -28 -14', 'none', 'stroke-width="5"'), 'translate(156 164) rotate(26)', 2.2)
     + P('M170 176Q172 196 168 222', 'none', `stroke="${taffy}" stroke-width="5"`) + P('M170 176Q172 196 168 222', 'none', 'stroke="#fbd877" stroke-width="1.6" opacity=".8"')
     + G(PS('M12 226L388 226L396 268L4 268Z', '#a8672f') + R(2, 264, 396, 10, '#8a5428', 3) + P('M24 232Q70 216 120 230T214 228T300 224T376 230V240H24Z', '#fff', NS) + P('M40 244q30 -4 60 0M200 246q40 -4 70 0M300 242q30 -4 60 0', 'none', 'stroke="#dcebf7" stroke-width="3"') + [20, 368].map((q) => R(q, 272, 10, 28, '#7a4a36')).join(''), '')
-    + G(P('M130 236Q144 222 158 236T186 234T214 230', 'none', `stroke="${taffy}" stroke-width="7"`) + P('M130 236Q144 222 158 236T186 234T214 230', 'none', 'stroke="#fbd877" stroke-width="2.4" opacity=".8"') + P('M262 240q14 -12 28 0t24 -2', 'none', `stroke="${taffy}" stroke-width="6"`), '', 1.2) + sparkles(8, 5, 270)), text: "C'est l'heure de la tire sur la neige! Monsieur Gaston verse du sirop chaud sur la neige. Léa l'enroule autour d'un bâton." },
+    + G(P('M130 236Q144 222 158 236T186 234T214 230', 'none', `stroke="${taffy}" stroke-width="7"`) + P('M130 236Q144 222 158 236T186 234T214 230', 'none', 'stroke="#fbd877" stroke-width="2.4" opacity=".8"') + P('M262 240q14 -12 28 0t24 -2', 'none', `stroke="${taffy}" stroke-width="6"`), '', 1.2) + sparkles(8, 5, 270)), text: "Et voici le moment que tout le monde attendait : c’est l’heure de la tire sur la neige! Monsieur Gaston fait chauffer du sirop dans une casserole, puis il le verse en minces rubans sur la neige propre. Le sirop épaissit tout de suite et devient presque comme un bonbon. Léa prend un petit bâton de bois, elle commence à enrouler la tire autour, et elle tourne, tourne, tourne, en tirant un peu la langue." },
   // 6 — sticky Noé
   { svg: svg(winter({ sun: false, seed: 6 }) + shack(330, 196, 0.62) + pine(34, 186, 0.7)
     + lea(112, 300, 1.85, { mood: 'laugh', ar: [40, -62], holdR: G(thick('M0 0L14 -42', '#a8672f', 3) + C(15, -48, 10.5, taffy, 'stroke-width="2.4"') + C(11, -51, 3, '#fff', `${NS} opacity=".6"`) + P('M13 -38Q4 -30 10 -20', 'none', `stroke="${taffy}" stroke-width="4"`), '', 2.2) })
     + noe(280, 302, 1.85, { mood: 'laugh', al: [-34, -62], ar: [26, -46], holdL: G(thick('M0 0L-8 -36', '#a8672f', 3) + C(-8, -42, 8, taffy, 'stroke-width="2.4"'), '', 2.2),
       extra: P('M-3 -52Q-6 -40 -2 -30', 'none', `stroke="${taffy}" stroke-width="4.5"`) + C(-2, -29, 3.4, taffy, 'stroke-width="1.6"') + C(-5, -62, 3.4, taffy, 'stroke-width="1.4"'),
       front: C(10, -30, 4, taffy, 'stroke-width="1.6"') + C(-9, -22, 3.2, taffy, 'stroke-width="1.4"') + P('M8 -34Q12 -26 10 -22', 'none', `stroke="${taffy}" stroke-width="2.4"`) })
-    + dropS(0, 0, 0) + sparkles(10, 6, 215)), text: "Miam! La tire est molle et collante. Noé en a sur le menton et même sur son manteau!" },
+    + dropS(0, 0, 0) + sparkles(10, 6, 215)), text: "Miam! La tire est molle, chaude et collante, et elle fond sur la langue. Léa en veut déjà une deuxième. À côté d’elle, Noé a tellement de tire sur le menton qu’on dirait qu’il a une barbe dorée. Et il en a même sur son manteau et sur sa tuque! « Je suis tout collant! » dit-il en riant. Les enfants éclatent de rire, et la maîtresse leur donne des mouchoirs pour s’essuyer." },
   // 7 — sleigh ride
   { svg: svg(winter({ seed: 7 }) + pine(30, 178, 0.8) + pine(86, 172, 0.58) + pine(372, 166, 0.7)
     + P('M-2 262Q160 252 402 258', 'none', 'stroke="#bcd3e4" stroke-width="5" opacity=".8"') + P('M-2 274Q160 264 402 270', 'none', 'stroke="#bcd3e4" stroke-width="4" opacity=".7"')
     + sleigh(-4, 262, 1.1) + E(40, 266, 20, 6, '#fff', `${NS} opacity=".8"`) + P('M360 256l12 6M366 248l14 2', 'none', 'stroke="#fff" stroke-width="3" opacity=".8"')
-    + star4(300, 60, 2, '#f4c430') + star4(318, 70, 1.4, '#f4c430')), text: "Ensuite, un grand cheval tire la traîne. Les enfants se couvrent avec une couverture. Ding, ding! Les clochettes sonnent." },
+    + star4(300, 60, 2, '#f4c430') + star4(318, 70, 1.4, '#f4c430')), text: "Ensuite, un grand cheval aux sabots lourds tire la traîne le long du sentier enneigé. Les enfants montent à bord et se serrent sous une grande couverture de laine, pour se tenir au chaud. Ding, ding, ding! Les clochettes du harnais sonnent joyeusement à chaque pas du cheval. Léa a l’impression d’être dans un livre d’histoires d’autrefois. La forêt est calme, la neige scintille, et on n’entend que le doux crissement des patins." },
   // 8 — mitten falls
   { svg: svg(winter({ seed: 8 }) + pine(36, 176, 0.8) + pine(360, 160, 0.6)
     + P('M-2 262Q100 254 402 262', 'none', 'stroke="#bcd3e4" stroke-width="5" opacity=".8"') + P('M-2 276Q100 268 402 276', 'none', 'stroke="#bcd3e4" stroke-width="4" opacity=".7"')
     + `<g transform="translate(86 270) scale(1.55)">` + sleighBody() + lea(44, -34, 1.12, { bust: true, shadow: false, al: [38, -92], ar: 'd', mitt: null, mittR: '#e23b3b', mood: 'surprised' }) + noe(100, -34, 1.1, { bust: true, shadow: false, mood: 'happy' }) + kidB(150, -34, 1.1, { bust: true, shadow: false, ar: 'w' })
     + blanket() + sleighFront() + '</g>'
     + mitten(48, 276, 1.6, -50) + E(46, 281, 20, 5, '#fff', `${NS} opacity=".9"`) + P('M62 240l-8 18M72 248l-8 16M40 238l-4 16', 'none', 'stroke="#fff" stroke-width="2.6" opacity=".8"') + star4(22, 268, 3, '#fff') + star4(78, 282, 2.4, '#fff')
-    + P('M60 206q-4 -10 6 -14', 'none', 'stroke="#e8a317" stroke-width="3"')), text: "Léa salue les arbres en levant la main. Oups! Sa mitaine tombe dans la neige. Personne ne la voit." },
+    + P('M60 206q-4 -10 6 -14', 'none', 'stroke="#e8a317" stroke-width="3"')), text: "Pendant la promenade, Léa salue les grands arbres en levant la main, comme s’ils étaient de vieux amis. Oups! Sa mitaine, qui n’était pas bien enfoncée, glisse de sa main et tombe dans la neige, sans bruit. Personne ne la voit tomber : ni Noé, ni la maîtresse, ni le conducteur. La traîne continue lentement son chemin, et la petite mitaine rouge reste toute seule au bord du sentier." },
   // 9 — sad Léa
   { svg: svg(winter({ sun: false, seed: 9 }) + shack(330, 192, 0.8) + pine(30, 186, 0.7)
     + lea(180, 296, 1.9, { mood: 'sad', ar: [14, -44], al: [-10, -56], mittR: null, mitt: '#e23b3b', holdR: C(0, 0, 0.1, 'none') })
-    + rose(290, 298, 1.55, { mood: 'worried', al: [-34, -64] }) + noe(66, 298, 1.45, { mood: 'worried', ar: [34, -50] }) + P('M168 168q-6 4 -2 10M180 164q-4 6 0 12', 'none', 'stroke="#7cc4f0" stroke-width="2.4" opacity=".7"')), text: "Plus tard, Léa a froid à la main. Elle ne trouve plus sa mitaine et elle a de la peine. — On va la chercher, dit madame Rose." },
+    + rose(290, 298, 1.55, { mood: 'worried', al: [-34, -64] }) + noe(66, 298, 1.45, { mood: 'worried', ar: [34, -50] }) + P('M168 168q-6 4 -2 10M180 164q-4 6 0 12', 'none', 'stroke="#7cc4f0" stroke-width="2.4" opacity=".7"')), text: "Un peu plus tard, Léa sent que sa main gauche est devenue froide, très froide. Elle regarde et se rend compte qu’elle n’a plus sa mitaine! Elle fouille dans ses poches et sous la couverture, mais elle ne la trouve nulle part. Ses yeux se remplissent de larmes, car cette mitaine est un cadeau de sa grand-mère. — Ne pleure pas, on va la chercher, dit madame Rose en lui prenant la main pour la réchauffer." },
   // 10 — Biscuit arrives
   { svg: svg(winter({ sun: false, seed: 10 }) + pine(28, 184, 0.7) + pine(376, 190, 0.7)
     + P('M0 268Q120 256 240 262', 'none', 'stroke="#bcd3e4" stroke-width="4" opacity=".6"') + E(30, 286, 26, 8, '#fff', NS) + E(60, 292, 16, 6, '#fff', NS) + C(22, 262, 5, '#fff', NS) + C(40, 250, 4, '#fff', NS) + C(10, 276, 3.4, '#fff', NS)
     + dog(118, 284, 1.95, { mitt: true, run: true }) + P('M6 224h-6M10 244h-10M16 262h-12', 'none', 'stroke="#9fb8cc" stroke-width="3.4"')
-    + lea(310, 296, 1.6, { flip: true, mood: 'surprised', al: [36, -88], mitt: null, mittR: '#e23b3b' }) + rose(374, 298, 1.35, { flip: true, mood: 'surprised', al: [-30, -56] })), text: "Tout à coup, un chien brun arrive en courant. C'est Biscuit, le chien de la cabane. Dans sa gueule, il y a une mitaine rouge!" },
+    + lea(310, 296, 1.6, { flip: true, mood: 'surprised', al: [36, -88], mitt: null, mittR: '#e23b3b' }) + rose(374, 298, 1.35, { flip: true, mood: 'surprised', al: [-30, -56] })), text: "Tout à coup, un chien brun arrive en courant à travers les arbres, la langue au vent. C’est Biscuit, le chien de la cabane, qui connaît tous les recoins de la forêt. Il bondit dans la neige, il freine devant Léa et il lui montre fièrement ce qu’il tient. Dans sa gueule, il y a une mitaine rouge! Les enfants poussent des cris de surprise, et Biscuit remue la queue, très fier de lui." },
   // 11 — joy: Léa hugs Biscuit
   { svg: svg(winter({ seed: 11 }) + shack(330, 192, 0.6) + pine(30, 182, 0.7)
     + rose(26, 280, 0.95, { mood: 'laugh', al: [-30, -78] }) + noe(74, 292, 1.1, { mood: 'laugh', al: 'w' })
     + lea(112, 298, 1.9, { mood: 'laugh', tilt: 9, ar: [44, -34], al: [-50, -40], mitt: '#e23b3b', mittR: '#e23b3b' })
     + dog(272, 298, 1.9, { flip: true, mood: 'happy' }) + G(thick('M140 232Q190 252 240 244', '#8a5cc7', 8.5) + hand(246, 242, -8, '#e23b3b', '#f1c6a0'), '')
-    + mitten(78, 290, 1.4, 70, '#e23b3b', true) + dropS(88, 268, 0.9) + dropS(70, 280, 0.7) + sparkles(8, 11, 230)), text: "C'est la mitaine de Léa! Elle est mouillée et pleine de bave, mais Léa s'en fiche. Elle serre Biscuit dans ses bras et tout le monde rit." },
+    + mitten(78, 290, 1.4, 70, '#e23b3b', true) + dropS(88, 268, 0.9) + dropS(70, 280, 0.7) + sparkles(8, 11, 230)), text: "C’est la mitaine de Léa! Elle est toute mouillée et pleine de bave de chien, mais Léa s’en fiche complètement. Elle la serre contre son cœur, puis elle prend Biscuit dans ses bras, pour le remercier. Biscuit lui lèche la joue, et tout le monde se met à rire. « Tu es mon héros, Biscuit! » dit Léa. La maîtresse sort un biscuit de sa poche, et le chien en profite pour le croquer." },
   // 12 — sleepy bus ride home
   { svg: svg(R(0, 0, 400, 300, '#e9d3a0') + R(0, 0, 400, 300, 'url(#shv)', 0, NS)
     + G(R(30, 24, 340, 168, 'url(#skyI)', 12) + C(290, 126, 60, 'url(#sun)', NS) + C(290, 126, 18, '#fff1c8', NS) + P('M30 130Q110 108 200 126T370 118V192H30Z', '#c9a6b8', NS) + farTrees(150, 2, '#5a4a6a') + P('M30 150Q120 134 210 148T370 142V192H30Z', '#f3e6ee', NS) + pine(80, 186, 0.8) + pine(150, 190, 1.0) + pine(328, 188, 0.85) + flakes(14, 1.6) + P('M200 24V192', 'none', 'stroke-width="5"') + R(30, 20, 340, 8, '#6b6b78', 3, NS), '', 4)
@@ -289,7 +289,7 @@ const pages = [
     + noe(246, 294, 1.95, { mood: 'sleepy', tilt: -7, al: [-24, -46], ar: [22, -44], mitt: null, bust: true, shadow: false, extra: C(8, -56, 3.8, taffy, NS), front: C(-22, -40, 5, taffy, NS) + C(18, -37, 4, taffy, NS) })
     + G(PS('M54 252Q54 236 78 236H322Q346 236 346 252V300H54Z', '#3f7a5c') + R(54, 240, 292, 10, '#4b8a6a', 5, NS) + P('M110 254V300M200 254V300M290 254V300', 'none', 'stroke="#2f5a46" stroke-width="2" opacity=".5"'), '', 2.8)
     + G(PS('M0 198Q0 186 14 186H34V300H0Z', '#4b8a6a') + R(0, 0, 400, 14, '#d7c48a', 0, NS), '', 2.8)
-    + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "Dans l'autobus, il fait chaud. Léa et Noé ont les mains collantes et les yeux qui se ferment. Bientôt, ils s'endorment." },
+    + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "Dans l’autobus du retour, il fait bien chaud, et le ronron du moteur est comme une berceuse. Léa et Noé ont les mains encore collantes, les joues rouges et les yeux qui se ferment tout seuls. Bientôt, la tête de Léa tombe doucement sur l’épaule de Noé, qui s’est déjà endormi lui aussi. Tout au long du chemin, on n’entend plus que de petits ronflements, et les autres enfants chuchotent pour ne pas les réveiller." },
   // 13 — home
   { svg: svg(R(0, 0, 400, 300, '#f6d6a8') + R(0, 0, 400, 205, '#f3c88e') + [30, 90, 150, 210, 270, 330, 390].map((q) => P(`M${q} 0V205`, 'none', 'stroke="#e8b070" stroke-width="10" opacity=".4"')).join('') + R(0, 205, 400, 95, '#a86f46') + [0, 25, 50, 75].map((q) => P(`M0 ${222 + q}H400`, 'none', 'stroke="#8a5a3c" stroke-width="1.6" opacity=".6"')).join('') + R(0, 200, 400, 12, '#6b4a3a', 0, NS)
     + G(R(262, 36, 112, 124, '#26325e', 6) + C(318, 78, 17, '#fff1a8', 'stroke-width="2"') + P('M262 96h112M318 36V160', 'none', 'stroke-width="4"') + star4(290, 60, 2, '#fff') + star4(346, 126, 1.6, '#fff') + R(250, 26, 136, 12, '#8a5a3c', 4) + P('M250 36Q272 96 254 160L240 160Q256 96 244 36Z', '#e8556a', 'stroke-width="2"') + P('M386 36Q364 96 382 160L396 160Q380 96 392 36Z', '#e8556a', 'stroke-width="2"'), '', 2.6)
@@ -298,7 +298,7 @@ const pages = [
     + C(150, 130, 120, 'url(#glow)', `${NS} opacity=".25"`)
     + maman(100, 280, 1.75, { mood: 'happy', ar: [40, -42], al: [-30, -50] })
     + lea(262, 298, 1.7, { mood: 'yawn', hat: null, al: [50, -80], ar: [38, -78], mitt: null, mittR: null, holdL: G(syrupCan(), 'translate(0 10) scale(1.15)', 2.4), holdR: mitten(0, 8, 0.85, -6, '#e23b3b') })
-    + leaf(196, 56, 1.2, '#d9472f', 20) + leaf(178, 90, 0.9, '#e8864a', -20) + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "À la maison, Léa montre sa mitaine et sa petite canne de sirop à maman. Elle sent l'érable de la tête aux pieds. — Quelle belle journée! dit-elle en bâillant." },
+    + leaf(196, 56, 1.2, '#d9472f', 20) + leaf(178, 90, 0.9, '#e8864a', -20) + R(0, 0, 400, 300, 'url(#vig)', 0, NS)), text: "À la maison, Léa montre fièrement à sa maman sa mitaine retrouvée et sa petite canne de sirop. Elle lui raconte tout : la tire, le cheval, la perte de sa mitaine et, bien sûr, Biscuit. Léa sent l’érable de la tête aux pieds, et ses cheveux sont encore tout collants! — Quelle belle journée! dit-elle en bâillant. Maman la serre dans ses bras, et Léa s’endort avec un sourire sucré sur les lèvres." },
 ];
 
 export const book = {
@@ -306,28 +306,29 @@ export const book = {
   title: 'Une journée à la cabane à sucre',
   emoji: '🍁',
   level: 2,
-  minutes: 9,
+  minutes: 18,
   cover: svg(winter({ seed: 14 }) + pine(36, 186, 0.8) + shack(298, 196, 0.95) + maple(68, 268, 1.5, { buck: true, drip: true }) + lea(176, 292, 1.75, { mood: 'laugh', ar: [38, -88] }) + noe(252, 296, 1.6, { mood: 'happy', al: 'd' }) + leaf(344, 78, 1.8, '#d9472f', 15) + leaf(60, 70, 1.2, '#e8864a', -25) + leaf(220, 60, 1, '#d9472f', 40)),
   pages,
   words: [
-    { word: 'un érable', emoji: '🍁', def: "Un grand arbre. On fait le sirop avec son eau sucrée." },
-    { word: "l'eau d'érable", emoji: '💧', def: "Le liquide sucré qui coule de l'érable au printemps." },
-    { word: 'un seau', emoji: '🪣', def: "Un récipient avec une anse, pour recueillir ou transporter un liquide." },
-    { word: 'la cabane à sucre', emoji: '🛖', def: "Le petit bâtiment où l'on fait bouillir l'eau d'érable." },
-    { word: 'la vapeur', emoji: '♨️', def: "Un nuage blanc qui sort d'un liquide très chaud." },
-    { word: 'la tire sur la neige', emoji: '🍬', def: "Du sirop d'érable chaud, versé sur la neige, qui devient une friandise molle." },
-    { word: 'la traîne', emoji: '🛷', def: "Une grande voiture sans roues qu'un cheval tire sur la neige." },
-    { word: 'la mitaine', emoji: '🧤', def: "Un gant sans doigts séparés qui garde la main bien au chaud." },
-    { word: 'collant', emoji: '🍯', def: "Qui reste collé aux doigts, comme le sirop." },
+    {"word":"un érable","emoji":"🍁","def":"Un grand arbre. On fait le sirop avec son eau sucrée."},
+    {"word":"l’eau d’érable","emoji":"💧","def":"Le liquide sucré qui coule de l’érable au printemps."},
+    {"word":"un seau","emoji":"🪣","def":"Un récipient avec une anse, pour recueillir un liquide."},
+    {"word":"la cabane à sucre","emoji":"🛖","def":"Le petit bâtiment où l’on fait bouillir l’eau d’érable."},
+    {"word":"la vapeur","emoji":"♨️","def":"Un nuage blanc qui sort d’un liquide très chaud."},
+    {"word":"la tire sur la neige","emoji":"🍬","def":"Du sirop d’érable chaud, versé sur la neige, qui devient une friandise molle."},
+    {"word":"la traîne","emoji":"🛷","def":"Une grande voiture sans roues qu’un cheval tire sur la neige."},
+    {"word":"une mitaine","emoji":"🧤","def":"Un gant sans doigts séparés qui garde la main bien au chaud."},
+    {"word":"écarquiller","emoji":"👀","def":"Ouvrir très grand les yeux, par surprise."},
+    {"word":"collant","emoji":"🍯","def":"Qui reste collé aux doigts, comme le sirop."},
   ],
   quiz: [
-    { q: 'À quel moment de l\'année la classe va-t-elle à la cabane à sucre?', options: ['En juillet', 'En mars', 'En octobre'], answer: 1 },
-    { q: "Qu'est-ce qui est accroché à chaque érable?", options: ['Une lanterne', 'Une mitaine', 'Un seau'], answer: 2 },
-    { q: 'Que verse Monsieur Gaston sur la neige?', options: ['Du sirop chaud', "De l'eau froide", 'Du lait'], answer: 0 },
-    { q: 'Qui tire la traîne?', options: ['Un chien', 'Un grand cheval', 'Un tracteur'], answer: 1 },
-    { q: 'Que perd Léa dans la neige?', options: ['Sa tuque jaune', 'Une botte', 'Sa mitaine rouge'], answer: 2 },
-    { q: 'Qui retrouve la mitaine de Léa?', options: ['Biscuit, le chien', 'Noé', 'Madame Rose'], answer: 0 },
-    { q: 'Comment Léa se sent-elle quand elle ne trouve plus sa mitaine?', options: ['Elle a de la peine.', 'Elle est très fâchée contre Noé.', "Elle n'a pas remarqué."], answer: 0 },
-    { q: "Que font Léa et Noé dans l'autobus, au retour?", options: ['Ils chantent fort.', "Ils s'endorment.", 'Ils mangent de la tire.'], answer: 1 },
+    {"q":"À quel moment de l’année la classe va-t-elle à la cabane à sucre?","options":["En juillet","En mars","En octobre"],"answer":1},
+    {"q":"Qu’est-ce qui est accroché à chaque érable?","options":["Une lanterne","Une mitaine","Un seau"],"answer":2},
+    {"q":"Pourquoi Léa est-elle un peu déçue en goûtant l’eau d’érable?","options":["Elle est trop salée","Elle ressemble à de l’eau","Elle est trop chaude"],"answer":1},
+    {"q":"Que veut dire « écarquiller les yeux »?","options":["Fermer fort les yeux","Ouvrir très grand les yeux, par surprise","Se frotter les yeux"],"answer":1},
+    {"q":"Pourquoi le sirop d’érable est-il précieux?","options":["Il faut beaucoup d’eau d’érable pour en faire un peu","Il est très rare dans les magasins","Il est fabriqué en Europe"],"answer":0},
+    {"q":"Que se passe-t-il d’abord, pendant la promenade en traîne?","options":["Léa perd sa mitaine sans que personne le voie","Biscuit apporte la mitaine","Le cheval s’arrête"],"answer":0},
+    {"q":"Comment Léa se sent-elle quand elle ne trouve plus sa mitaine?","options":["Elle a de la peine, et ses yeux se remplissent de larmes","Elle est très fâchée contre Noé","Elle n’a rien remarqué"],"answer":0},
+    {"q":"Qui retrouve la mitaine de Léa?","options":["Noé","Biscuit, le chien","Madame Rose"],"answer":1},
   ],
 };
