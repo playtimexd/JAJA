@@ -2181,7 +2181,7 @@ function m19Q(R, L) {
 // ---------- the three units ----------
 const _m17 = {
   id: 'm17', icon: '🕵️',
-  title: T('Je résous — cahier A', 'Problem solving — book A'),
+  title: T('Je résous 1', 'Problem solving 1'),
   pfeq: 'Résoudre une situation-problème — nombres jusqu’à 100, addition et soustraction, pair/impair, régularités, figures (Numérik 2e année, « J’apprends à résoudre »)',
   generate(level, R) {
     const r = R.int(1, 100);
@@ -2193,13 +2193,13 @@ const _m17 = {
 };
 const _m18 = {
   id: 'm18', icon: '🧠',
-  title: T('Je résous — cahier B', 'Problem solving — book B'),
+  title: T('Je résous 2', 'Problem solving 2'),
   pfeq: 'Résoudre une situation-problème — nombres jusqu’à 1 000, valeur de position, fractions, groupes égaux et partage, repérage dans un quadrillage (Numérik 2e année)',
   generate(level, R) { return m18Q(R, level); },
 };
 const _m19 = {
   id: 'm19', icon: '🏆',
-  title: T('Je résous — cahier C', 'Problem solving — book C'),
+  title: T('Je résous 3', 'Problem solving 3'),
   pfeq: 'Résoudre une situation-problème — mesure (cm, m), temps, argent canadien, tableaux et diagrammes, problèmes à deux étapes (Numérik 2e année)',
   generate(level, R) { return m19Q(R, level); },
 };

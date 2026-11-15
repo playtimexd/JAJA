@@ -38,3 +38,10 @@ Short sentences a 7–8-year-old understands when read aloud. French is Québec 
 - `node tools/check-arts.mjs` validates every file.
 - Preview all pictures: with `node tools/serve.mjs` running, open `http://localhost:5180/tools/arts-preview.html?cat=dessin`;
   silent screenshot: `node tools/shot.mjs <outDir> "http://localhost:5180/tools/arts-preview.html?cat=dessin&from=0&n=8" <steps.json>` with steps `[{"wait":800,"shot":"p0"}]` and env `H=2400` for a tall page.
+
+## Big generated libraries (OpenMoji, Quick, Draw!)
+- `js/content/arts/openmoji.js` (id `om-<hex>`, `gen: 'parts'`) and `quickdraw.js` (id `qd-<word>-<n>`, `gen: 'strokes'`) store NO `steps`. `js/arts-gen.js` builds them when a project is opened (`ensureSteps`) and a thumbnail (`thumbSvg`) for cards. Both files are loaded only when the « Animaux (bibliothèque) » / « Bibliothèque » tabs or the search are used.
+- `parts`: `line` = black outline as only `<path>` (72x72; `t="f"` filled, `t="b"` filled+stroked, `w` stroke width, `e` evenodd), `color` = coloured SVG (72x72, `~l` = usual outline attributes). Steps: pieces sorted big to small, 3-7 groups, old parts #3a3f55 / new #ff5d8f, last step = `color`. Very simple drawings split an outline in halves with dashes.
+- `strokes`: `"x,y x,y|x,y …"`, 4-14 strokes in a 256 box; 1-2 strokes per step, fitted into 400x300.
+- Generated step pictures may be up to 12 KB (limit in check-arts). Each such project shows a credit line (`CREDIT` in arts-gen.js; see docs/CREDITS.md).
+- Regenerating: these files were built by scripts outside the repo from the OpenMoji npm package (SVGs), hand-written French/English titles, and Quick, Draw! ndjson samples (first ~1.8 MB per category).

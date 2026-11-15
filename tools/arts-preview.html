@@ -5,6 +5,8 @@
 <script type="module">
 const q = new URLSearchParams(location.search), cat = q.get('cat') || 'dessin', from = +(q.get('from') || 0), n = +(q.get('n') || 999), id = q.get('id'), fin = q.get('final');
 const { projects } = await import(`../js/content/arts/${cat}.js?${Date.now()}`);
+const { ensureSteps } = await import('../js/arts-gen.js');
+projects.forEach((p) => p.gen && ensureSteps(p));   // generated libraries (openmoji, quickdraw) build their steps here
 const list = id ? projects.filter((p) => p.id === id) : projects.slice(from, from + n);
 document.getElementById('o').innerHTML = list.map((p) => `<h2>${p.emoji} ${p.id} — ${p.title.fr} (niv ${p.level}, ${p.minutes} min)</h2><div class="row">${(fin ? p.steps.slice(-1) : p.steps).map((s, i) => `<div class="st">${s.svg}<div><b>${i + 1}.</b> ${s.text.fr}</div></div>`).join('')}</div>`).join('');
 </script>

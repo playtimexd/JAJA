@@ -13,7 +13,7 @@ import { wordPairs, mathPairs } from './content/pairs.js';
 const SUBJECTS = [
   { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js', './content/francais2.js', './content/francais3.js'], speech: 'fr-CA', praise: 'fr' },
   { id: 'math', icon: '🧮', color: 'blue', mods: ['./content/math.js'], speech: null, praise: null },
-  { id: 'anglais', icon: '🍁', color: 'green', mods: ['./content/anglais.js', './content/anglais2.js', './content/anglais3.js'], speech: 'en-CA', praise: 'en' },
+  { id: 'anglais', icon: '🍁', color: 'green', mods: ['./content/anglais-catch.js', './content/anglais.js', './content/anglais2.js', './content/anglais3.js'], speech: 'en-CA', praise: 'en' },
   { id: 'chinois', icon: '🐼', color: 'red', mods: ['./content/chinois.js', './content/chinois2.js', './content/chinois3.js'], speech: 'zh-CN', praise: 'zh' },
 ];
 const perSession = () => store.settings.perSession || 8;
@@ -37,9 +37,12 @@ const owl = (cls = '') => dressedOwl(cls);
 const range = (p, a, b) => Array.from({ length: b - a + 1 }, (_, i) => `${p}${a + i}`);
 const SECTIONS = {
   math: [
-    { id: 'A', icon: '📘', t: { fr: 'Cahier A', en: 'Book A' }, ids: ['m1', 'm4', 'm5', 'm6', 'm8', 'm10', 'm14', 'm17'], boss: '🐲' },
-    { id: 'B', icon: '📗', t: { fr: 'Cahier B', en: 'Book B' }, ids: ['m2', 'm3', 'm7', 'm9', 'm13', 'm16', 'm18'], boss: '🦖' },
-    { id: 'C', icon: '📙', t: { fr: 'Cahier C', en: 'Book C' }, ids: ['m11', 'm12', 'm15', 'm19'], boss: '🐙' },
+    { id: 'nombres', icon: '🔢', t: { fr: 'Les nombres', en: 'Numbers' }, ids: ['m1', 'm2', 'm3', 'm4', 'm8'], boss: '🐲' },
+    { id: 'calcul', icon: '➕', t: { fr: 'Addition, soustraction et calcul mental', en: 'Adding, subtracting, mental math' }, ids: ['m5', 'm6', 'm14'], boss: '🦖' },
+    { id: 'multi', icon: '✖️', t: { fr: 'Multiplication, division et fractions', en: 'Multiplication, division, fractions' }, ids: ['m13', 'm9'], boss: '🐙' },
+    { id: 'geo', icon: '📐', t: { fr: 'Géométrie, mesure et argent', en: 'Geometry, measurement, money' }, ids: ['m10', 'm16', 'm11', 'm15'], boss: '🦁' },
+    { id: 'stats', icon: '📊', t: { fr: 'Statistique et probabilité', en: 'Data and probability' }, ids: ['m12'], boss: '🐯' },
+    { id: 'probl', icon: '🕵️', t: { fr: 'Je résous des problèmes', en: 'Problem solving' }, ids: ['m7', 'm17', 'm18', 'm19'], boss: '🐉' },
   ],
   francais: [
     { id: 'lect', icon: '🔤', t: { fr: 'Lecture et sons', en: 'Reading & sounds' }, ids: ['f1', 'f2', 'f8', 'f14'], boss: '🐉' },
@@ -50,6 +53,7 @@ const SECTIONS = {
     { id: 'livres', icon: '📚', t: { fr: 'Mes livres', en: 'My books' }, ids: [], books: true },
   ],
   anglais: [
+    { id: 'catch', icon: '📗', t: { fr: 'Catch · 2e année', en: 'Catch · Grade 2' }, ids: range('k', 0, 9), boss: '🦊' },
     { id: 'read', icon: '📖', t: { fr: 'Lire et répéter', en: 'Read & repeat' }, ids: ['e20', 'e19', 'e34'], boss: '🐉' },
     { id: 'words', icon: '🔤', t: { fr: 'Les mots', en: 'Words' }, ids: ['e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10', 'e11', 'e13', 'e14', 'e15', 'e16', 'e17', 'e18'], boss: '🦖' },
     { id: 'gram', icon: '✍️', t: { fr: 'Phrases et grammaire', en: 'Sentences & grammar' }, ids: [...range('e', 21, 33)], boss: '🐙' },
