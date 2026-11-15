@@ -33,7 +33,7 @@ export default {
       return json(v ? JSON.parse(v) : {}, 200, cors);
     }
     if (req.method !== 'POST') return json({ error: 'method' }, 405, cors);
-    const body = await req.json().catch(() => ({}));
+    const body = url.pathname === '/ai/talk' ? {} : await req.json().catch(() => ({}));
 
     // ---- Free path (Cloudflare Workers AI daily allowance): same API as the family PC (localvoice/server.py) ----
     if (url.pathname === '/ai/start' || url.pathname === '/ai/talk') {
@@ -41,7 +41,7 @@ export default {
       try {
         let lang = 'en', instructions = '', history = [], heard = '';
         if (url.pathname === '/ai/start') {
-          const b = await req.json();
+          const b = body;
           lang = ['en', 'fr', 'zh'].includes(b.lang) ? b.lang : 'en'; instructions = String(b.instructions || '').slice(0, 6000);
         } else {
           const fd = await req.formData();
