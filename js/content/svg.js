@@ -239,3 +239,74 @@ export function symFigure(inner, right, { axis = true, half = false, color = C.p
   const ax = axis ? `<line x1="70" y1="0" x2="70" y2="140" stroke="${C.ink}" stroke-width="2.5" stroke-dasharray="7 6"/>` : '';
   return svg(140, 140, poly + ax);
 }
+
+// ---- helpers added for the harder (3e année) math levels ----
+
+// Bar chart with a custom vertical scale. data = [{label, value}], max/step = axis (e.g. max 50, step 10).
+export function barChartScaled(data, { max = 50, step = 10 } = {}) {
+  const W = 70 + data.length * 78, H = 270, base = 220, top = 20, unit = (base - top) / max;
+  let out = `<rect x="0" y="0" width="${W}" height="${H}" fill="${C.paper}" rx="12"/>`;
+  for (let v = 0; v <= max; v += step) {
+    const y = base - v * unit;
+    out += `<line x1="50" y1="${y}" x2="${W - 10}" y2="${y}" stroke="#dde3f0" stroke-width="${v ? 1 : 3}"/>`;
+    out += `<text x="42" y="${y + 5}" font-size="14" text-anchor="end" fill="${C.ink}" font-family="system-ui">${v}</text>`;
+  }
+  const cols = [C.blue, C.orange, C.green, C.pink, C.purple, C.yellow];
+  data.forEach((d, i) => {
+    const x = 66 + i * 78, h = d.value * unit;
+    out += `<rect x="${x}" y="${base - h}" width="50" height="${h}" fill="${cols[i % cols.length]}" stroke="${C.ink}" stroke-width="2" rx="3"/>`;
+    out += `<text x="${x + 25}" y="${base + 28}" font-size="${d.emoji ? 26 : 14}" text-anchor="middle" fill="${C.ink}" font-family="system-ui">${d.emoji || d.label}</text>`;
+  });
+  return svg(W, H, out);
+}
+
+// Pictogram: each row has `value / per` symbols; per = value of one symbol (2, 5, 10). A half symbol is not used.
+export function pictogram(data, per, symbol = '⭐') {
+  const rowH = 46, left = 112;
+  const maxN = Math.max(...data.map((d) => d.value / per));
+  const W = left + maxN * 40 + 20, H = data.length * rowH + 52;
+  let out = `<rect x="0" y="0" width="${W}" height="${H}" fill="${C.paper}" rx="12"/>`;
+  data.forEach((d, i) => {
+    const y = 12 + i * rowH;
+    out += `<text x="${left - 10}" y="${y + 29}" font-size="17" font-weight="700" text-anchor="end" fill="${C.ink}" font-family="system-ui">${d.label}</text>`;
+    for (let j = 0; j < d.value / per; j++) out += `<text x="${left + j * 40 + 18}" y="${y + 31}" font-size="30" text-anchor="middle">${symbol}</text>`;
+  });
+  out += `<text x="${W / 2}" y="${H - 14}" font-size="16" font-weight="700" text-anchor="middle" fill="${C.ink}" font-family="system-ui">${symbol} = ${per}</text>`;
+  return svg(W, H, out);
+}
+
+// Rectangle with labelled side lengths (in `unit`).
+export function rectSides(w, h, unit = 'cm') {
+  const sw = 60 + Math.min(w, 20) * 9, sh = 40 + Math.min(h, 14) * 8, x = 50, y = 30;
+  let out = `<rect x="${x}" y="${y}" width="${sw}" height="${sh}" fill="${C.light}" stroke="${C.ink}" stroke-width="4"/>`;
+  out += `<text x="${x + sw / 2}" y="${y - 8}" font-size="20" font-weight="800" text-anchor="middle" fill="${C.ink}" font-family="system-ui">${w} ${unit}</text>`;
+  out += `<text x="${x + sw + 10}" y="${y + sh / 2 + 7}" font-size="20" font-weight="800" fill="${C.ink}" font-family="system-ui">${h} ${unit}</text>`;
+  return svg(x + sw + 90, y + sh + 14, out);
+}
+
+// Shape drawn on a unit-square grid. rows = array of strings, '#' = filled square, '.' = empty.
+export function areaGrid(rows, color = C.blue) {
+  const cs = 34, ox = 8, oy = 8, h = rows.length, w = Math.max(...rows.map((r) => r.length));
+  let out = '';
+  rows.forEach((r, j) => [...r].forEach((ch, i) => {
+    if (ch === '#') out += `<rect x="${ox + i * cs}" y="${oy + j * cs}" width="${cs}" height="${cs}" fill="${color}" stroke="${C.ink}" stroke-width="2" opacity="0.85"/>`;
+  }));
+  return svg(ox * 2 + w * cs, oy * 2 + h * cs, out);
+}
+
+// Cartesian plane, first quadrant 0..n. points = [{x, y, label}] drawn as dots with a letter.
+export function coordPlane(n, points = []) {
+  const cs = 40, ox = 34, oy = 20;
+  let out = '';
+  for (let i = 0; i <= n; i++) {
+    out += `<line x1="${ox + i * cs}" y1="${oy}" x2="${ox + i * cs}" y2="${oy + n * cs}" stroke="#c9d3ea" stroke-width="${i ? 1.5 : 3}"/>`;
+    out += `<line x1="${ox}" y1="${oy + i * cs}" x2="${ox + n * cs}" y2="${oy + i * cs}" stroke="#c9d3ea" stroke-width="${i === n ? 3 : 1.5}"/>`;
+    out += `<text x="${ox + i * cs}" y="${oy + n * cs + 20}" font-size="15" font-weight="700" text-anchor="middle" fill="${C.ink}" font-family="system-ui">${i}</text>`;
+    out += `<text x="${ox - 10}" y="${oy + (n - i) * cs + 5}" font-size="15" font-weight="700" text-anchor="end" fill="${C.ink}" font-family="system-ui">${i}</text>`;
+  }
+  for (const p of points) {
+    out += `<circle cx="${ox + p.x * cs}" cy="${oy + (n - p.y) * cs}" r="9" fill="${C.orange}" stroke="${C.ink}" stroke-width="2.5"/>`;
+    out += `<text x="${ox + p.x * cs + 13}" y="${oy + (n - p.y) * cs - 11}" font-size="18" font-weight="800" fill="${C.ink}" font-family="system-ui">${p.label}</text>`;
+  }
+  return svg(ox + n * cs + 20, oy + n * cs + 30, out);
+}

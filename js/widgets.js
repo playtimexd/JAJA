@@ -377,7 +377,8 @@ function write(q, area, ctx) {
   });
 }
 
-export const WIDGETS = { choice, sort, order, keypad, base10, numberline, write };
+import { hand } from './hand.js';
+export const WIDGETS = { choice, sort, order, keypad, base10, numberline, write, hand };
 
 // Render a question; resolves with a score in [0, 1].
 export function runQuestion(q, root, R, hooks) {

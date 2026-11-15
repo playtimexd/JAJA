@@ -460,3 +460,19 @@
   .q:has(.stim-text.long):has(.t-choice) .stim-text.long { max-height: 62vh; overflow-y: auto; font-size: clamp(18px, 1.8vw, 22px); }
 }
 @media (max-width: 600px) { .book-text.l, .book-text.xl { font-size: 18px; } .book-side { max-height: none; } }
+/* handwriting pad */
+.hand-wrap { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 980px; margin: 0 auto; }
+.hand-words { font-size: 20px; font-weight: 800; } .hand-words b { background: #fff3c4; border-radius: 10px; padding: 2px 10px; margin: 0 4px; }
+.hand-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+.hand-tool { background: var(--card); border-radius: 14px; padding: 6px 12px; box-shadow: var(--shadow); font-size: 22px; display: flex; align-items: center; gap: 6px; border: 3px solid transparent; }
+.hand-tool small { font-size: 14px; font-weight: 800; } .hand-tool.on { border-color: var(--acc); background: var(--acc-l); }
+.hand-pad { width: 100%; border-radius: 18px; box-shadow: var(--shadow); touch-action: none; background: #fff; cursor: crosshair; }
+.hand-ta { width: 100%; font: inherit; font-size: 26px; border-radius: 18px; border: 3px solid var(--line); padding: 12px 16px; resize: vertical; }
+.hand-pad.hidden, .hand-ta.hidden { display: none; }
+.hand-out { display: flex; flex-direction: column; gap: 8px; font-size: 20px; }
+.hand-read .ok-w { color: #1f8a52; } .hand-read .bad-w { color: var(--red); text-decoration: underline wavy; }
+.hand-fix .fx { display: inline-block; background: #fff; border-radius: 10px; padding: 2px 10px; margin: 2px 4px; }
+.hand-fb { background: #eef6ff; border-radius: 14px; padding: 10px 14px; font-weight: 700; }
+.hand-model { background: #e8f7ee; border-radius: 14px; padding: 10px 14px; }
+.hand-wait { font-weight: 800; color: var(--ink2); }
+.q:has(.t-hand) .stim-text.long { max-height: 34vh; overflow-y: auto; }

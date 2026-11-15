@@ -1011,7 +1011,7 @@ const ER = [
   ['dessiner', 'dessin', 'un chat'],
   ['aimer', 'aim', 'le chocolat'],
   ['donner', 'donn', 'un cadeau'],
-  ['laver', 'lav', 'ses mains'],
+  ['laver', 'lav', 'la vaisselle'],
   ['porter', 'port', 'un manteau'],
   ['arriver', 'arriv', 'à l’école'],
   ['trouver', 'trouv', 'une clé'],
@@ -2585,5 +2585,2441 @@ const f13 = {
     ],
   }),
 };
+
+
+/* ================================================================== */
+/*  NIVEAUX RELEVÉS (v2)                                               */
+/*  Facile = bonne fin de 2e année · Moyen = 3e année ·                */
+/*  Difficile = 3e année forte / début de 4e année                     */
+/*  Les fonctions ci-dessous remplacent les tables generate() plus haut */
+/* ================================================================== */
+const bag = (s) => s.trim().split(/\s+/);
+const spk = (t) => ({ text: t, say: say(t) });
+const nameKey = (arr) => sortedKey(arr);
+
+/* ---------------- f1 : sons complexes ---------------- */
+const NEUT = W.map((w) => w.text).filter(
+  (t) => !/(gn|ion|oin|ouin|ph|ç|ss|[aeiouyéèêô]s[aeiouyéèêô]|c[eiéèêy]|qu|k|g[eiéèêy]|ill|ail|eil|euil|ouill|ay|oy|eau)/.test(t) && !/ /.test(t),
+);
+const Y_GROUPS = {
+  ail: bag('travail détail chandail portail éventail épouvantail bétail vitrail gouvernail'),
+  eil: bag('soleil abeille oreille réveil conseil sommeil vieille bouteille corbeille merveille pareil appareil'),
+  euil: bag('écureuil fauteuil feuille chevreuil seuil deuil'),
+  ouill: bag('grenouille citrouille brouillard patrouille rouille nouille chatouille fouille bouillon'),
+  ill: bag('fille famille gentille brillant coquillage chenille papillon pastille vanille cheville béquille billet juillet'),
+};
+const Y_LABEL = { ail: 'ail', eil: 'eil / eille', euil: 'euil / euille', ouill: 'ouille', ill: 'ille' };
+const P1 = {
+  gn: {
+    p: 'le son « gn » (comme dans « montagne »)',
+    s: 'gné, comme dans montagne',
+    good: bag('montagne signe ligne peigne champignon oignon agneau araignée gagner baignoire cygne vigne campagne'),
+    bad: NEUT,
+  },
+  tion: {
+    p: 'le son « sion » (comme dans « attention »)',
+    s: 'sion, comme dans attention',
+    good: bag('attention addition natation récréation invitation station solution nation fraction collection réaction conversation'),
+    bad: NEUT,
+  },
+  oin: {
+    p: 'le son « oin » (comme dans « coin »)',
+    s: 'oin, comme dans coin',
+    good: bag('coin besoin témoin rejoindre joindre lointain point pointe moins loin soin'),
+    bad: NEUT,
+  },
+  ph: {
+    p: 'le son « f » écrit avec « ph »',
+    s: 'f, écrit avec p h',
+    good: bag('photo éléphant phrase téléphone dauphin alphabet orphelin pharmacie phoque trophée géographie'),
+    bad: bag('fleur fraise fromage feu fée café fenêtre fusée farine frite forêt fatigué fourmi'),
+  },
+  z: {
+    p: 'le son « z » écrit avec la lettre « s » (comme dans « maison »)',
+    s: 'z, écrit avec la lettre s, comme dans maison',
+    good: bag('maison cuisine visage fusée oiseau musée chemise église usine vase blouse valise raisin framboise télévision'),
+    bad: bag('classe tasse message passage mousse brosse dessin glisser soleil sirop salade soupe serpent sac sorcière sable'),
+  },
+  cs: {
+    p: 'la lettre « c » qui fait le son « s »',
+    s: 'la lettre c qui fait le son s',
+    good: bag('cerise cinéma citron ceinture ciel centre cigogne recette glace place merci'),
+    bad: bag('cadeau côté culotte canard couleur copain café cahier camion cochon cube caramel cartable colline'),
+  },
+  k: {
+    p: 'le son « k » (comme dans « canard »)',
+    s: 'k, comme dans canard',
+    good: bag('cadeau côté culotte canard couleur copain cahier camion quatre quand musique banque raquette requin disque masque bouquet kiwi koala kayak karaté ski parka kilomètre'),
+    bad: bag('cerise cinéma citron ceinture ciel centre cigogne recette glace garçon leçon glaçon maison poisson orange gentil photo montagne attention'),
+  },
+  gj: {
+    p: 'la lettre « g » qui fait le son « j » (comme dans « rouge »)',
+    s: 'la lettre g qui fait le son j, comme dans rouge',
+    good: bag('girafe nageoire orange plage image gentil magie village manger étage rouge fromage gilet énergie nuage'),
+    bad: bag('gâteau gomme guitare bague gorille langue vague glace grand gant dragon grenouille'),
+  },
+  y: {
+    p: 'le son « ye » (comme dans « fille »)',
+    s: 'ye, comme dans fille',
+    good: Object.values(Y_GROUPS).flat(),
+    bad: bag('chat maison tortue pomme livre bateau fleur voiture banane lune nuage fusée tomate carotte lapin cochon'),
+  },
+};
+function f1xContains(R, n, ids) {
+  const id = R.pick(ids);
+  const sp = P1[id];
+  const good = R.pick(sp.good);
+  const bad = R.sample(sp.bad.filter((t) => !sp.good.includes(t)), n - 1);
+  return mkChoice(R, `f1x-c-${id}-${good}`, `Touche le mot où tu entends ${sp.p}.`, spk(good), bad.map(spk), {
+    say: say(`Touche le mot où tu entends ${sp.s}.`),
+    cols: 2,
+  });
+}
+const F1_YE = [
+  ['fam', 'ill', 'e'], ['chen', 'ill', 'e'], ['gent', 'ill', 'e'], ['pap', 'ill', 'on'], ['coqu', 'ill', 'age'], ['br', 'ill', 'ant'],
+  ['van', 'ill', 'e'], ['chev', 'ill', 'e'], ['bout', 'eill', 'e'], ['ab', 'eill', 'e'], ['or', 'eill', 'e'], ['vi', 'eill', 'e'],
+  ['corb', 'eill', 'e'], ['merv', 'eill', 'e'], ['gren', 'ouill', 'e'], ['citr', 'ouill', 'e'], ['patr', 'ouill', 'e'],
+  ['br', 'ouill', 'ard'], ['b', 'ouill', 'on'], ['chat', 'ouill', 'e'],
+];
+const F1_YB = [
+  ['trav', 'ail'], ['dét', 'ail'], ['chand', 'ail'], ['port', 'ail'], ['évent', 'ail'], ['sol', 'eil'], ['rév', 'eil'],
+  ['cons', 'eil'], ['somm', 'eil'], ['écur', 'euil'], ['faut', 'euil'], ['chevr', 'euil'], ['s', 'euil'],
+];
+const F1_N = [
+  ['c', 'oin', ''], ['bes', 'oin', ''], ['tém', 'oin', ''], ['rej', 'oin', 'dre'], ['j', 'oin', 'dre'], ['l', 'oin', 'tain'],
+  ['tr', 'ain', ''], ['dem', 'ain', ''], ['b', 'ain', ''], ['m', 'ain', 'tenant'], ['vil', 'ain', ''], ['améric', 'ain', ''],
+  ['p', 'ein', 'ture'], ['c', 'ein', 'ture'], ['fr', 'ein', ''], ['ét', 'ein', 'dre'], ['att', 'ein', 'dre'], ['p', 'ein', 'dre'],
+  ['lap', 'in', ''], ['jard', 'in', ''], ['mat', 'in', ''], ['vois', 'in', ''], ['magas', 'in', ''], ['moul', 'in', ''],
+  ['sap', 'in', ''], ['dauph', 'in', ''], ['chem', 'in', ''],
+];
+const F1_S = [
+  ['gar', 'ç', 'on', ['ç', 'c', 's', 'ss']], ['le', 'ç', 'on', ['ç', 'c', 's', 'ss']], ['gla', 'ç', 'on', ['ç', 'c', 's', 'ss']],
+  ['fa', 'ç', 'on', ['ç', 'c', 's', 'ss']], ['ma', 'ç', 'on', ['ç', 'c', 's', 'ss']], ['balan', 'ç', 'oire', ['ç', 'c', 's', 'ss']],
+  ['fran', 'ç', 'ais', ['ç', 'c', 's', 'ss']], ['re', 'ç', 'u', ['ç', 'c', 's', 'ss']],
+  ['chemi', 's', 'e', ['s', 'ss', 'z', 'c']], ['égli', 's', 'e', ['s', 'ss', 'z', 'c']], ['oi', 's', 'eau', ['s', 'ss', 'z', 'c']],
+  ['fu', 's', 'ée', ['s', 'ss', 'z', 'c']], ['vi', 's', 'age', ['s', 'ss', 'z', 'c']], ['mai', 's', 'on', ['s', 'ss', 'z', 'c']],
+  ['cui', 's', 'ine', ['s', 'ss', 'z', 'c']], ['mu', 's', 'ée', ['s', 'ss', 'z', 'c']], ['u', 's', 'ine', ['s', 'ss', 'z', 'c']],
+  ['rai', 's', 'in', ['s', 'ss', 'z', 'c']], ['ceri', 's', 'e', ['s', 'ss', 'z', 'c']], ['framboi', 's', 'e', ['s', 'ss', 'z', 'c']],
+  ['va', 's', 'e', ['s', 'ss', 'z', 'c']], ['blou', 's', 'e', ['s', 'ss', 'z', 'c']], ['vali', 's', 'e', ['s', 'ss', 'z', 'c']],
+  ['cla', 'ss', 'e', ['ss', 's', 'z', 'c']], ['ta', 'ss', 'e', ['ss', 's', 'z', 'c']], ['me', 'ss', 'age', ['ss', 's', 'z', 'c']],
+  ['pa', 'ss', 'age', ['ss', 's', 'z', 'c']], ['mou', 'ss', 'e', ['ss', 's', 'z', 'c']], ['bro', 'ss', 'e', ['ss', 's', 'z', 'c']],
+  ['de', 'ss', 'in', ['ss', 's', 'z', 'c']], ['gli', 'ss', 'er', ['ss', 's', 'z', 'c']], ['pou', 'ss', 'ière', ['ss', 's', 'z', 'c']],
+  ['cai', 'ss', 'e', ['ss', 's', 'z', 'c']], ['adre', 'ss', 'e', ['ss', 's', 'z', 'c']], ['gro', 'ss', 'e', ['ss', 's', 'z', 'c']],
+  ['a', 'ss', 'iette', ['ss', 's', 'z', 'c']], ['pa', 'ss', 'er', ['ss', 's', 'z', 'c']],
+  ['', 'c', 'erise', ['c', 's', 'ss', 'ç']], ['', 'c', 'inéma', ['c', 's', 'ss', 'ç']], ['', 'c', 'itron', ['c', 's', 'ss', 'ç']],
+  ['', 'c', 'einture', ['c', 's', 'ss', 'ç']], ['', 'c', 'iel', ['c', 's', 'ss', 'ç']], ['', 'c', 'igogne', ['c', 's', 'ss', 'ç']],
+  ['re', 'c', 'ette', ['c', 's', 'ss', 'ç']], ['gla', 'c', 'e', ['c', 's', 'ss', 'ç']], ['pla', 'c', 'e', ['c', 's', 'ss', 'ç']],
+  ['', 'c', 'entre', ['c', 's', 'ss', 'ç']],
+];
+const F1_G = [
+  ['ora', 'ge', ''], ['pla', 'ge', ''], ['ima', 'ge', ''], ['villa', 'ge', ''], ['froma', 'ge', ''], ['man', 'ge', 'r'],
+  ['na', 'ge', 'oire'], ['', 'ge', 'ntil'], ['', 'gi', 'rafe'], ['', 'gi', 'let'], ['ba', 'gue', ''], ['va', 'gue', ''],
+  ['', 'gui', 'tare'], ['', 'gui', 'rlande'], ['fati', 'gue', ''], ['ma', 'gi', 'e'],
+];
+function f1xFill(R, table, opts, tag) {
+  const [pre, core, post = '', own] = R.pick(table);
+  const word = pre + core + post;
+  const options = own || opts;
+  const wrong = R.sample(options.filter((o) => o !== core), 3);
+  return mkChoice(R, `f1x-f${tag}-${word}`, `Complète le mot : ${pre}__${post}`, { text: core }, wrong.map((t) => ({ text: t })), {
+    say: say(word),
+    cols: 2,
+  });
+}
+const f1xFillYE = (R) => f1xFill(R, F1_YE, ['ill', 'eill', 'ouill', 'euill'], 'y');
+const f1xFillYB = (R) => f1xFill(R, F1_YB, ['ail', 'eil', 'euil', 'ouil'], 'b');
+const f1xFillN = (R) => f1xFill(R, F1_N, ['oin', 'ain', 'ein', 'in'], 'n');
+const f1xFillS = (R) => f1xFill(R, F1_S, null, 's');
+const f1xFillG = (R) => f1xFill(R, F1_G, ['ge', 'gue', 'j', 'gi', 'gui'], 'g');
+function f1xSortY(R, nb) {
+  const ids = R.sample(Object.keys(Y_GROUPS), nb);
+  const per = nb === 3 ? [2, 2, 3] : [3, 3];
+  const sh = R.shuffle(per);
+  const groups = ids.map((id, i) => R.sample(Y_GROUPS[id], sh[i]).map(spk));
+  const names = groups.flat().map((x) => x.text);
+  return mkSort(
+    R,
+    `f1x-sy-${ids.join('+')}-${nameKey(names)}`,
+    'Écoute chaque mot. Classe-le selon la façon d’écrire le son « ye ».',
+    ids.map((id) => ({ text: Y_LABEL[id] })),
+    groups,
+    { say: say('Écoute chaque mot. Classe-le selon la façon d’écrire le son ye.') },
+  );
+}
+function f1xSortSound(R) {
+  const defs = [
+    ['gn', 'gn'], ['tion', 'tion'], ['oin', 'oin'], ['ph', 'ph'],
+  ];
+  const pick = R.sample(defs, 2);
+  const groups = pick.map(([id]) => R.sample(P1[id].good, 3).map(spk));
+  const names = groups.flat().map((x) => x.text);
+  return mkSort(
+    R,
+    `f1x-ss-${pick.map((p) => p[0]).join('+')}-${nameKey(names)}`,
+    'Classe chaque mot selon la lettre ou le groupe de lettres qu’il contient.',
+    pick.map(([, lab]) => ({ text: lab })),
+    groups,
+    { say: say('Classe chaque mot selon le groupe de lettres qu’il contient.') },
+  );
+}
+f1.generate = run({
+  1: [
+    (R) => f1Contains(R, 4, false, true),
+    (R) => f1Sort(R, 3, R.shuffle([2, 3, 3]), false),
+    (R) => f1Fill(R, true),
+    (R) => f1xContains(R, 3, ['gn', 'tion', 'oin', 'ph', 'y']),
+    (R) => f1xFillN(R),
+    (R) => f1xSortSound(R),
+  ],
+  2: [
+    (R) => f1xContains(R, 4, ['gn', 'tion', 'oin', 'ph', 'z', 'cs', 'k', 'gj', 'y']),
+    (R) => f1xContains(R, 4, ['z', 'cs', 'k', 'gj', 'ph', 'tion']),
+    (R) => f1xFillYE(R),
+    (R) => f1xFillN(R),
+    (R) => f1xFillS(R),
+    (R) => f1xFillG(R),
+    (R) => f1xSortY(R, 2),
+  ],
+  3: [
+    (R) => f1xContains(R, 4, ['z', 'cs', 'k', 'gj', 'ph', 'tion', 'oin', 'gn']),
+    (R) => f1xFillYE(R),
+    (R) => f1xFillYB(R),
+    (R) => f1xFillN(R),
+    (R) => f1xFillS(R),
+    (R) => f1xFillG(R),
+    (R) => f1xSortY(R, 3),
+    (R) => f1xSortY(R, 3),
+  ],
+});
+f1.pfeq = 'Lecture / écriture — correspondances lettres-sons : gn, ill, ail, eil, euil, oin, tion, ç, g/ge/gu, s/ss, c/qu/k (PFEQ 1er cycle, 2e–3e année)';
+
+/* ---------------- f2 : syllabes, mots longs ---------------- */
+const NEWSYL = `
+chocolat|cho-co-lat
+kangourou|kan-gou-rou
+canapé|ca-na-pé
+animal|a-ni-mal
+ordinateur|or-di-na-teur
+éléphant|é-lé-phant
+abricot|a-bri-cot
+restaurant|res-tau-rant
+alphabet|al-pha-bet
+orignal|o-ri-gnal
+tourbillon|tour-bil-lon
+saucisson|sau-cis-son
+autobus|au-to-bus
+rhinocéros|rhi-no-cé-ros
+parasol|pa-ra-sol
+cinéma|ci-né-ma
+ananas|a-na-nas
+carnaval|car-na-val
+carrefour|car-re-four
+autocar|au-to-car
+hôpital|hô-pi-tal
+électricité|é-lec-tri-ci-té
+municipal|mu-ni-ci-pal
+merveilleux|mer-veil-leux
+accélérateur|ac-cé-lé-ra-teur
+inventeur|in-ven-teur
+imprimeur|im-pri-meur
+tabouret|ta-bou-ret
+boulanger|bou-lan-ger
+explorateur|ex-plo-ra-teur
+montagnard|mon-ta-gnard
+champignon|cham-pi-gnon
+hérisson|hé-ris-son
+perroquet|per-ro-quet
+pantalon|pan-ta-lon
+tournevis|tour-ne-vis
+aéroport|a-é-ro-port
+ambassadeur|am-bas-sa-deur
+agriculteur|a-gri-cul-teur
+moustachu|mous-ta-chu
+dangereux|dan-ge-reux
+courageux|cou-ra-geux
+cauchemar|cau-che-mar
+abandonné|a-ban-don-né
+`;
+const SYL2 = NEWSYL.trim().split('\n').map((l) => {
+  const [text, s] = l.split('|');
+  return { text, syl: s.split('-') };
+});
+const SYL2_TEXT = new Set([...SYL2.map((w) => w.text), ...W.map((w) => w.text)]);
+const SYL2_ALL = uniq([...SYL2.flatMap((w) => w.syl), ...ALLSYL]);
+function f2xBuild(R, lo, hi, nExtra) {
+  const w = R.pick(SYL2.filter((x) => x.syl.length >= lo && x.syl.length <= hi && uniq(x.syl).length === x.syl.length));
+  return {
+    type: 'order',
+    key: `f2x-b-${w.text}`,
+    prompt: 'Écoute le mot. Remets les syllabes dans l’ordre.',
+    say: say(w.text),
+    tiles: w.syl.slice(),
+    extra: R.sample(SYL2_ALL.filter((s) => !w.syl.includes(s)), nExtra),
+    joiner: '',
+  };
+}
+function f2xCount(R, lo, hi) {
+  const w = R.pick(SYL2.filter((x) => x.syl.length >= lo && x.syl.length <= hi));
+  const labels = ['1', '2', '3', '4', '5'].slice(0, Math.max(4, hi));
+  return {
+    type: 'choice',
+    key: `f2x-n-${w.text}`,
+    prompt: `Combien de syllabes entends-tu dans « ${w.text} » ?`,
+    say: say(w.text),
+    options: labels.map((t) => ({ text: t })),
+    answer: w.syl.length - 1,
+    fixedOrder: true,
+    cols: labels.length,
+  };
+}
+function splitVariants(syl) {
+  const out = new Set();
+  for (let i = 0; i < syl.length - 1; i++) {
+    const a = syl[i];
+    const b = syl[i + 1];
+    if (a.length > 1) {
+      const s = syl.slice();
+      s[i] = a.slice(0, -1);
+      s[i + 1] = a.slice(-1) + b;
+      out.add(s.join('-'));
+    }
+    if (b.length > 1) {
+      const s = syl.slice();
+      s[i] = a + b[0];
+      s[i + 1] = b.slice(1);
+      out.add(s.join('-'));
+    }
+  }
+  out.delete(syl.join('-'));
+  return [...out];
+}
+function f2xCut(R, lo, hi) {
+  const w = R.pick(SYL2.filter((x) => x.syl.length >= lo && x.syl.length <= hi));
+  const wrong = R.sample(splitVariants(w.syl), 3);
+  return mkChoice(R, `f2x-cut-${w.text}`, `Quel est le bon découpage en syllabes de « ${w.text} » ?`, { text: w.syl.join('-') }, wrong.map((t) => ({ text: t })), {
+    say: say(w.text),
+    cols: 2,
+  });
+}
+function f2xMissing(R, lo, hi) {
+  for (let t = 0; t < 40; t++) {
+    const w = R.pick(SYL2.filter((x) => x.syl.length >= lo && x.syl.length <= hi));
+    const i = R.int(0, w.syl.length - 1);
+    const shown = w.syl.map((s, k) => (k === i ? '__' : s)).join('-');
+    const cands = SYL2_ALL.filter((s) => s !== w.syl[i] && !SYL2_TEXT.has(w.syl.map((x, k) => (k === i ? s : x)).join('')));
+    const wrong = R.sample(cands, 3);
+    if (wrong.length < 3) continue;
+    return mkChoice(R, `f2x-m-${w.text}-${i}`, 'Quelle syllabe manque dans le mot ?', { text: w.syl[i] }, wrong.map((x) => ({ text: x })), {
+      say: say(w.text),
+      stimulus: { text: shown },
+      cols: 2,
+    });
+  }
+  return f2xCount(R, 3, 5);
+}
+function f2xWhich(R, N) {
+  const w = R.pick(SYL2.filter((x) => x.syl.length === N));
+  const wrong = R.sample(SYL2.filter((x) => x.syl.length !== N), 3);
+  return mkChoice(R, `f2x-w-${N}-${w.text}`, `Touche le mot qui a ${N} syllabes.`, spk(w.text), wrong.map((x) => spk(x.text)), {
+    say: say(`Touche le mot qui a ${N} syllabes.`),
+    cols: 2,
+  });
+}
+function f2xSort(R) {
+  const lens = [3, 4, 5];
+  const groups = lens.map((n, i) => R.sample(SYL2.filter((x) => x.syl.length === n), [2, 3, 2][i]).map((x) => spk(x.text)));
+  return mkSort(
+    R,
+    `f2x-s-${nameKey(groups.flat().map((x) => x.text))}`,
+    'Écoute chaque mot. Classe-le selon son nombre de syllabes.',
+    lens.map((n) => ({ text: `${n} syllabes` })),
+    groups,
+    { say: say('Écoute chaque mot. Classe-le selon son nombre de syllabes.') },
+  );
+}
+f2.generate = run({
+  1: [
+    (R) => f2Build(R, 3, 4, 2, false),
+    (R) => f2xBuild(R, 3, 3, 2),
+    (R) => f2Count(R, 4),
+    (R) => f2xCount(R, 3, 4),
+    (R) => f2Which(R, [2, 3]),
+    (R) => f2xCut(R, 3, 3),
+  ],
+  2: [
+    (R) => f2xBuild(R, 3, 4, 2),
+    (R) => f2xCount(R, 3, 5),
+    (R) => f2xCut(R, 3, 4),
+    (R) => f2xMissing(R, 3, 4),
+    (R) => f2xWhich(R, R.pick([3, 4])),
+  ],
+  3: [
+    (R) => f2xBuild(R, 4, 5, 3),
+    (R) => f2xBuild(R, 3, 5, 3),
+    (R) => f2xCut(R, 4, 5),
+    (R) => f2xMissing(R, 4, 5),
+    (R) => f2xSort(R),
+    (R) => f2xWhich(R, R.pick([4, 5])),
+  ],
+});
+f2.pfeq = 'Lecture / écriture — découpage en syllabes de mots longs (3 à 5 syllabes), assemblage et syllabe manquante (PFEQ 1er cycle, 2e–3e année)';
+
+/* ---------------- f3 : orthographe d’usage ---------------- */
+const ORTHO_RAW = `
+appartement|apartement,appartemant
+attention|atention,attantion
+aujourd’hui|aujourdhui,aujourd’huit
+bibliothèque|bibliotèque,bibiothèque
+camarade|camerade,camarad
+chaussure|chossure,chausure
+exercice|exercise,éxercice
+gentil|gentill,jentil
+histoire|histoir,istoire
+hiver|hivaire,yver
+jardin|jardain,jardein
+lumière|lumiaire,lumièr
+mélange|mélenge,méllange
+musique|musik,musiqu
+nettoyer|netoyer,nettoier
+pharmacie|farmacie,pharmassie
+problème|problême,problaime
+question|quéstion,kestion
+quelquefois|quelquefoit,quelcquefois
+rapidement|rapidemant,rapidment
+réponse|réponce,répons
+semaine|semène,semaîne
+tableau|tablo,tabeau
+travail|travaille,travaïl
+vacances|vacanses,vaccances
+voyage|voiyage,voyaje
+voisin|voisain,voizin
+vêtement|vêtemant,vètement
+magasin|magazin,magasain
+mouchoir|mouchoire,mouchoar
+comprendre|comprandre,compendre
+anniversaire|aniversaire,anniverssaire
+bouteille|boutelle,bouteile
+chanson|chançon,chenson
+chercher|chercer,chèrcher
+classe|clase,classse
+devoir|devoire,dévoir
+difficile|dificile,difficille
+douleur|douleure,dolleur
+famille|famile,familie
+fatigué|fatigé,fattigué
+fleuve|fleuv,fleuvre
+garage|garaje,garrage
+général|jénéral,généralle
+habiter|abiter,habitter
+immeuble|imeuble,immeubble
+inviter|enviter,invitter
+janvier|janvié,jenvier
+lentement|lentemant,lentment
+neige|neije,nège
+propre|propr,prope
+raconter|racconter,raconnter
+regarder|reguarder,regardder
+saison|saizon,saisson
+trouver|trouvere,trouvair
+vraiment|vraimant,vrèment
+écouter|ecouter,écoutter
+électricité|électricitée,életricité
+courageux|courageu,couragieux
+dangereux|dangeureux,danjereux
+bonheur|bonheure,bonneur
+attendre|atandre,attendrre
+acheter|achetter,ashéter
+allumer|alumer,allummer
+apporter|aporter,apportter
+arrêter|arréter,arêter
+bruit|brui,bruitt
+chaque|chacque,chaqe
+début|débu,debut
+déjà|dèja,déja
+depuis|depui,depuit
+derrière|dérrière,deriere
+dessin|desin,dessain
+devant|devent,dévant
+espace|éspace,espase
+lettre|letre,lettr
+longtemps|longtemp,lontemps
+magnifique|magnifik,manifique
+pendant|pandant,pendent
+personne|persone,personnne
+plusieurs|plusieur,plusieures
+prendre|prandre,prendrre
+réussir|réusir,réussire
+sentir|santir,sentire
+tempête|tempète,tempette
+terminer|termminer,terminner
+tomber|tonber,tombber
+éléphant|élèphant,éléfant
+orchestre|orquestre,orchestr
+spectacle|spectacl,spéctacle
+quartier|cartier,quartié
+`;
+const ORTHO = ORTHO_RAW.trim().split('\n').map((l) => {
+  const [text, b] = l.split('|');
+  return { text, bad: b.split(',') };
+});
+const ORTHO_LONG = ORTHO.filter((x) => x.text.length >= 8);
+const F3_DBL = [
+  ['allumer', 'a', 'umer', 'll', 'l'], ['attendre', 'a', 'endre', 'tt', 't'], ['apporter', 'a', 'orter', 'pp', 'p'],
+  ['attention', 'a', 'ention', 'tt', 't'], ['classe', 'cla', 'e', 'ss', 's'], ['dessin', 'de', 'in', 'ss', 's'],
+  ['lettre', 'le', 're', 'tt', 't'], ['personne', 'perso', 'e', 'nn', 'n'], ['nettoyer', 'ne', 'oyer', 'tt', 't'],
+  ['appartement', 'a', 'artement', 'pp', 'p'], ['anniversaire', 'a', 'iversaire', 'nn', 'n'], ['difficile', 'di', 'icile', 'ff', 'f'],
+  ['pomme', 'po', 'e', 'mm', 'm'], ['passer', 'pa', 'er', 'ss', 's'], ['grosse', 'gro', 'e', 'ss', 's'], ['assiette', 'a', 'iette', 'ss', 's'],
+  ['appétit', 'a', 'étit', 'pp', 'p'], ['accident', 'a', 'ident', 'cc', 'c'], ['occupé', 'o', 'upé', 'cc', 'c'], ['ballon', 'ba', 'on', 'll', 'l'],
+  ['immeuble', 'i', 'euble', 'mm', 'm'], ['commencer', 'co', 'encer', 'mm', 'm'], ['sonner', 'so', 'er', 'nn', 'n'], ['bonne', 'bo', 'e', 'nn', 'n'],
+];
+function f3xSpell(R, pool) {
+  const w = R.pick(pool);
+  return mkChoice(R, `f3x-s-${w.text}`, 'Écoute le mot. Touche la bonne façon de l’écrire.', { text: w.text }, R.sample(w.bad, 2).map((t) => ({ text: t })), {
+    say: say(w.text),
+  });
+}
+function f3xSpot(R, pool) {
+  const w = R.pick(pool);
+  const others = R.sample(pool.filter((x) => x !== w), 3);
+  const bad = R.pick(w.bad);
+  return mkChoice(R, `f3x-e-${w.text}-${bad}`, 'Un seul mot est mal écrit. Lequel ?', { text: bad }, others.map((x) => ({ text: x.text })), {
+    say: say('Un seul mot est mal écrit. Lequel ?'),
+    cols: 2,
+  });
+}
+function f3xDouble(R, n) {
+  const [word, pre, post, dbl, sgl] = R.pick(F3_DBL);
+  const opts = [dbl, sgl, 'z', 'h'].slice(0, n);
+  return mkChoice(R, `f3x-d-${word}`, `Complète le mot : ${pre}__${post}`, { text: dbl }, opts.slice(1).map((t) => ({ text: t })), {
+    say: say(word),
+    cols: 2,
+  });
+}
+function f3xLetters(R, lo, hi, nExtra) {
+  const w = R.pick(ORTHO.filter((x) => LETTERS_ONLY.test(x.text) && x.text.length >= lo && x.text.length <= hi));
+  return {
+    type: 'order',
+    key: `f3x-o-${w.text}`,
+    prompt: 'Écoute le mot. Remets les lettres dans l’ordre.',
+    say: say(w.text),
+    tiles: Array.from(w.text),
+    extra: R.sample(ALPHA.filter((c) => !w.text.includes(c)), nExtra),
+    joiner: '',
+  };
+}
+f3.generate = run({
+  1: [
+    (R) => f3Spell(R, 3),
+    (R) => f3Letters(R, 3),
+    (R) => f3xSpell(R, ORTHO.filter((x) => x.text.length <= 8)),
+    (R) => f3xSpot(R, ORTHO.filter((x) => x.text.length <= 8)),
+    (R) => f3xDouble(R, 3),
+  ],
+  2: [
+    (R) => f3xSpell(R, ORTHO),
+    (R) => f3xSpell(R, ORTHO),
+    (R) => f3xSpot(R, ORTHO),
+    (R) => f3xDouble(R, 4),
+    (R) => f3xLetters(R, 7, 9, 2),
+  ],
+  3: [
+    (R) => f3xSpell(R, ORTHO_LONG),
+    (R) => f3xSpot(R, ORTHO_LONG),
+    (R) => f3xSpot(R, ORTHO),
+    (R) => f3xDouble(R, 4),
+    (R) => f3xLetters(R, 9, 13, 3),
+  ],
+});
+f3.pfeq = 'Écriture — orthographe d’usage : mots fréquents de 2e et 3e année, lettres doubles, accents (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+
+/* ---------------- f4 : groupe du nom, déterminants ---------------- */
+const ADJ_PRE = [['petit', 'petite'], ['grand', 'grande'], ['gros', 'grosse'], ['joli', 'jolie'], ['bon', 'bonne']];
+const ADJ_POST = [
+  ['noir', 'noire'], ['blanc', 'blanche'], ['gris', 'grise'], ['bleu', 'bleue'], ['vert', 'verte'], ['froid', 'froide'],
+  ['chaud', 'chaude'], ['sucré', 'sucrée'], ['lourd', 'lourde'], ['fort', 'forte'], ['doux', 'douce'], ['brun', 'brune'],
+  ['content', 'contente'], ['fatigué', 'fatiguée'], ['rouge', 'rouge'], ['jaune', 'jaune'],
+];
+const NOT_ADJ_NOUN = new Set(['orange', 'violet', 'vert', 'blanc', 'noir', 'brun', 'gris', 'rose']);
+const N4 = W.filter((w) => !isElided(w) && !NOT_ADJ_NOUN.has(w.text) && pluralOk(w) && w.text !== 'dé');
+const detSing = (w, R) => R.pick(w.g === 'm' ? ['le', 'un', 'mon', 'son', 'ce'] : ['la', 'une', 'ma', 'sa', 'cette']);
+function f4xGroup(R, size, roles) {
+  const w = R.pick(N4);
+  const det = detSing(w, R);
+  const pre = R.pick(ADJ_PRE);
+  const post = R.pick(ADJ_POST);
+  const fem = w.g === 'f';
+  let tokens;
+  let role;
+  if (size === 3) {
+    const useAdj = R.chance(0.5) ? pre : post;
+    const adj = fem ? useAdj[1] : useAdj[0];
+    tokens = useAdj === pre ? [det, adj, w.text] : [det, w.text, adj];
+    const r = R.pick(roles);
+    role = r === 'nom' ? w.text : r === 'det' ? det : adj;
+    if (r === 'adj') role = adj;
+  } else {
+    const a1 = fem ? pre[1] : pre[0];
+    const a2 = fem ? post[1] : post[0];
+    tokens = [det, a1, w.text, a2];
+    role = R.pick(roles.filter((r) => r !== 'adj')) === 'nom' ? w.text : det;
+    if (role !== w.text && role !== det) role = w.text;
+  }
+  const wanted = role === w.text ? 'nom' : role === det ? 'déterminant' : 'adjectif';
+  const label = { nom: 'le nom', 'déterminant': 'le déterminant', adjectif: 'l’adjectif' }[wanted];
+  const phrase = tokens.join(' ');
+  const idx = tokens.indexOf(role);
+  return {
+    type: 'choice',
+    key: `f4x-g-${wanted}-${phrase}`,
+    prompt: `Dans « ${phrase} », quel mot est ${label} ?`,
+    say: say(phrase),
+    options: tokens.map((t) => ({ text: t })),
+    answer: idx,
+    cols: 2,
+  };
+}
+function f4xDemo(R, plural) {
+  const w = R.pick(W.filter(pluralOk));
+  if (plural) {
+    const pl = pluralOf(w.text);
+    return mkChoice(R, `f4x-d-pl-${w.text}`, `Complète : ___ ${pl}`, { text: 'ces' }, [{ text: 'ce' }, { text: 'cet' }, { text: 'cette' }], {
+      say: say(`ces ${pl}`),
+      cols: 4,
+    });
+  }
+  const ok = w.g === 'f' ? 'cette' : isElided(w) ? 'cet' : 'ce';
+  return {
+    type: 'choice',
+    key: `f4x-d-${w.text}`,
+    prompt: `Complète : ___ ${w.text}`,
+    say: say(`${ok} ${w.text}`),
+    options: ['ce', 'cet', 'cette', 'ces'].map((t) => ({ text: t })),
+    answer: ['ce', 'cet', 'cette', 'ces'].indexOf(ok),
+    fixedOrder: true,
+    cols: 4,
+  };
+}
+const POSS = {
+  moi: { ctx: 'C’est à moi', f: ['mon', 'ma', 'mes'] },
+  toi: { ctx: 'C’est à toi', f: ['ton', 'ta', 'tes'] },
+  lui: { ctx: 'C’est à Léa', f: ['son', 'sa', 'ses'] },
+};
+function f4xPoss(R, trap) {
+  const k = R.pick(Object.keys(POSS));
+  const P = POSS[k];
+  const pool = trap ? W.filter((w) => w.g === 'f' && isElided(w) && pluralOk(w)) : W.filter(pluralOk);
+  const w = R.pick(pool);
+  const plural = !trap && R.chance(0.3);
+  const text = plural ? pluralOf(w.text) : w.text;
+  const ok = plural ? P.f[2] : w.g === 'm' || isElided(w) ? P.f[0] : P.f[1];
+  const options = [...P.f, R.pick(['ce', 'cet', 'cette', 'ces'].filter((x) => !P.f.includes(x)))];
+  return {
+    type: 'choice',
+    key: `f4x-p-${k}-${text}`,
+    prompt: `${P.ctx} : ___ ${text}`,
+    say: say(`${P.ctx}. ${ok} ${text}`),
+    options: options.map((t) => ({ text: t })),
+    answer: options.indexOf(ok),
+    fixedOrder: true,
+    cols: 4,
+  };
+}
+const CONTR_FR = [
+  ['Léa pense ___ ', 'à'], ['Léa s’intéresse ___ ', 'à'], ['Léa se souvient ___ ', 'de'], ['Léa s’occupe ___ ', 'de'],
+];
+function f4xContr(R, plural) {
+  const [frame, kind] = R.pick(CONTR_FR);
+  const w = R.pick(W.filter((x) => pluralOk(x) && !x.text.includes(' ')));
+  const sets = { à: ['au', 'à la', 'à l’', 'aux'], de: ['du', 'de la', 'de l’', 'des'] };
+  const set = sets[kind];
+  const text = plural ? pluralOf(w.text) : w.text;
+  const ok = plural ? set[3] : isElided(w) ? set[2] : w.g === 'm' ? set[0] : set[1];
+  return {
+    type: 'choice',
+    key: `f4x-c-${kind}-${text}`,
+    prompt: `Complète : ${frame}${text}.`,
+    say: say(`${frame.replace('___', '')}${ok}${ok.endsWith('’') ? '' : ' '}${text}`),
+    options: set.map((t) => ({ text: t })),
+    answer: set.indexOf(ok),
+    fixedOrder: true,
+    cols: 4,
+  };
+}
+const DET_LIST = ['le', 'la', 'les', 'un', 'une', 'des', 'mon', 'ma', 'mes', 'son', 'sa', 'ses', 'ton', 'ce', 'cet', 'cette', 'ces', 'notre', 'leur'];
+const ADJ_FLAT = [...ADJ_PRE, ...ADJ_POST].flatMap((a) => a).filter((t) => t !== 'rouge' && t !== 'jaune').concat(['rouge', 'jaune']);
+function f4xSort3(R, per) {
+  const cnt = per === 3 ? R.shuffle([3, 3, 2]) : [2, 2, 2];
+  const dets = R.sample(DET_LIST, cnt[0]);
+  const nouns = R.sample(W.filter((w) => !NOT_ADJ_NOUN.has(w.text) && !DET_LIST.includes(w.text)), cnt[1]).map((w) => w.text);
+  const adjs = R.sample(uniq(ADJ_FLAT), cnt[2]);
+  const clash = new Set([...dets, ...nouns, ...adjs]);
+  if (clash.size < cnt[0] + cnt[1] + cnt[2]) return f4xSort3(R, per);
+  return mkSort(
+    R,
+    `f4x-s-${nameKey([...dets, ...nouns, ...adjs])}`,
+    'Classe chaque mot : déterminant, nom ou adjectif ?',
+    [{ text: 'Déterminant', emoji: '🔹' }, { text: 'Nom', emoji: '🏷️' }, { text: 'Adjectif', emoji: '🎨' }],
+    [dets.map(spk), nouns.map(spk), adjs.map(spk)],
+    { say: say('Classe chaque mot : déterminant, nom ou adjectif ?') },
+  );
+}
+f4.generate = run({
+  1: [
+    (R) => f4Plural(R),
+    (R) => f4Elide(R),
+    (R) => f4LeLa(R, true),
+    (R) => f4SortNom(R, 8),
+    (R) => f4xGroup(R, 3, ['nom', 'det']),
+    (R) => f4xDemo(R, false),
+  ],
+  2: [
+    (R) => f4xGroup(R, 3, ['nom', 'det', 'adj']),
+    (R) => f4xGroup(R, 4, ['nom', 'det']),
+    (R) => f4xDemo(R, false),
+    (R) => f4xPoss(R, false),
+    (R) => f4xContr(R, false),
+    (R) => f4xSort3(R, 2),
+  ],
+  3: [
+    (R) => f4xGroup(R, 4, ['nom', 'det']),
+    (R) => f4xDemo(R, R.chance(0.4)),
+    (R) => f4xPoss(R, true),
+    (R) => f4xPoss(R, false),
+    (R) => f4xContr(R, R.chance(0.4)),
+    (R) => f4xSort3(R, 3),
+  ],
+});
+f4.pfeq = 'Grammaire — le groupe du nom (déterminant, nom, adjectif), ce/cet/cette/ces, mon/ma/mes, au/du (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+
+/* ---------------- f5 : genre et nombre ---------------- */
+// singulier | pluriel | genre | type
+const PLUR_RAW = `
+journal|journaux|m|AUX
+animal|animaux|m|AUX
+cheval|chevaux|m|AUX
+hôpital|hôpitaux|m|AUX
+canal|canaux|m|AUX
+métal|métaux|m|AUX
+signal|signaux|m|AUX
+orignal|orignaux|m|AUX
+rival|rivaux|m|AUX
+cristal|cristaux|m|AUX
+local|locaux|m|AUX
+bateau|bateaux|m|XEAU
+gâteau|gâteaux|m|XEAU
+château|châteaux|m|XEAU
+chapeau|chapeaux|m|XEAU
+manteau|manteaux|m|XEAU
+couteau|couteaux|m|XEAU
+oiseau|oiseaux|m|XEAU
+tuyau|tuyaux|m|XEAU
+rideau|rideaux|m|XEAU
+tableau|tableaux|m|XEAU
+drapeau|drapeaux|m|XEAU
+marteau|marteaux|m|XEAU
+cadeau|cadeaux|m|XEAU
+feu|feux|m|XEU
+jeu|jeux|m|XEU
+neveu|neveux|m|XEU
+cheveu|cheveux|m|XEU
+bijou|bijoux|m|XOU
+caillou|cailloux|m|XOU
+chou|choux|m|XOU
+genou|genoux|m|XOU
+hibou|hiboux|m|XOU
+joujou|joujoux|m|XOU
+chat|chats|m|S
+chien|chiens|m|S
+ami|amis|m|S
+arbre|arbres|m|S
+livre|livres|m|S
+crayon|crayons|m|S
+lapin|lapins|m|S
+pomme|pommes|f|S
+école|écoles|f|S
+fleur|fleurs|f|S
+maison|maisons|f|S
+étoile|étoiles|f|S
+voiture|voitures|f|S
+montagne|montagnes|f|S
+trou|trous|m|SPIEGE
+clou|clous|m|SPIEGE
+verrou|verrous|m|SPIEGE
+pneu|pneus|m|SPIEGE
+matou|matous|m|SPIEGE
+bisou|bisous|m|SPIEGE
+coucou|coucous|m|SPIEGE
+kangourou|kangourous|m|SPIEGE
+carnaval|carnavals|m|SPIEGE
+festival|festivals|m|SPIEGE
+bal|bals|m|SPIEGE
+chacal|chacals|m|SPIEGE
+nez|nez|m|INV
+souris|souris|f|INV
+bras|bras|m|INV
+pays|pays|m|INV
+prix|prix|m|INV
+voix|voix|f|INV
+fois|fois|f|INV
+fils|fils|m|INV
+gaz|gaz|m|INV
+tapis|tapis|m|INV
+repas|repas|m|INV
+héros|héros|m|INV
+`;
+const PL = PLUR_RAW.trim().split('\n').map((l) => {
+  const [s, p, g, k] = l.split('|');
+  return { s, p, g, k };
+});
+const PL_SIMPLE = PL.filter((x) => ['AUX', 'XEAU', 'S', 'INV'].includes(x.k) && !['bras', 'prix', 'fois', 'fils', 'gaz', 'héros', 'pays'].includes(x.s));
+const PL_L3 = PL;
+const unOfG = (g) => (g === 'm' ? 'un' : 'une');
+function plDistractors(x) {
+  const c = new Set([x.s + 's', x.s + 'x', x.s + 'es']);
+  if (/al$/.test(x.s)) {
+    c.add(x.s.slice(0, -2) + 'aux');
+    c.add(x.s + 's');
+  }
+  if (/eau$/.test(x.s)) c.add(x.s + 's');
+  if (x.k === 'INV') c.add(x.s + 's');
+  if (x.k === 'SPIEGE' && /al$/.test(x.s)) c.add(x.s.slice(0, -2) + 'aux');
+  c.add(x.p + 's');
+  c.delete(x.p);
+  if (x.s === x.p) c.delete(x.s);
+  return [...c].filter((t) => t !== x.p);
+}
+function f5xPlural(R, pool) {
+  const x = R.pick(pool);
+  const wrong = R.sample(plDistractors(x), 3);
+  return mkChoice(R, `f5x-p-${x.s}`, `Écris au pluriel : ${unOfG(x.g)} ${x.s}`, { text: `des ${x.p}` }, wrong.map((t) => ({ text: `des ${t}` })), {
+    say: say(`${unOfG(x.g)} ${x.s}`),
+  });
+}
+function f5xEyes(R) {
+  const wrong = R.sample(['des œils', 'des œilx', 'des yeuxs', 'des œuils'], 3);
+  return mkChoice(R, 'f5x-p-œil', 'Écris au pluriel : un œil', { text: 'des yeux' }, wrong.map((t) => ({ text: t })), { say: say('un œil') });
+}
+const FEM_RAW = `
+chanteur|chanteuse|chanteure,chantrice
+acteur|actrice|acteuse,acteure
+boulanger|boulangère|boulangerre,boulangeuse
+danseur|danseuse|danseure,danceuse
+lion|lionne|lione,lionse
+chat|chatte|chate,chatse
+chien|chienne|chiene,chienze
+cuisinier|cuisinière|cuisiniere,cuisiniaire
+pâtissier|pâtissière|pâtissiere,pâtisseuse
+directeur|directrice|directeuse,directeure
+voisin|voisine|voisinne,voisone
+coiffeur|coiffeuse|coiffeure,coiffrice
+fermier|fermière|fermiere,fermiaire
+gentil|gentille|gentile,gentilh
+bon|bonne|bone,bonn
+blanc|blanche|blance,blanque
+doux|douce|douxe,douze
+long|longue|longe,longgue
+vieux|vieille|vieuxe,vielle
+beau|belle|beaue,bèle
+heureux|heureuse|heureuxe,heureuze
+sportif|sportive|sportife,sportiv
+canadien|canadienne|canadiene,canadienn
+premier|première|premiere,premièrre
+cruel|cruelle|cruele,cruell
+jaloux|jalouse|jalouxe,jalouze
+naïf|naïve|naïfe,naïfve
+mignon|mignonne|mignone,mignonn
+secret|secrète|secrete,secrette
+nouveau|nouvelle|nouveaue,nouvèle
+`;
+const FEM = FEM_RAW.trim().split('\n').map((l) => {
+  const [m, f, b] = l.split('|');
+  return { m, f, bad: b.split(',') };
+});
+function f5xFem(R, pool) {
+  const x = R.pick(pool);
+  return mkChoice(R, `f5x-f-${x.m}`, `Quel est le féminin de « ${x.m} » ?`, spk(x.f), R.sample(x.bad, 3).map(spk), {
+    say: say(`Quel est le féminin de ${x.m} ?`),
+    cols: 2,
+  });
+}
+// ms, fs, mp, fp, niveau minimal
+const ADJ4 = [
+  ['petit', 'petite', 'petits', 'petites', 1], ['grand', 'grande', 'grands', 'grandes', 1], ['joli', 'jolie', 'jolis', 'jolies', 1],
+  ['content', 'contente', 'contents', 'contentes', 1], ['noir', 'noire', 'noirs', 'noires', 1], ['fatigué', 'fatiguée', 'fatigués', 'fatiguées', 1],
+  ['froid', 'froide', 'froids', 'froides', 1], ['lourd', 'lourde', 'lourds', 'lourdes', 1], ['blanc', 'blanche', 'blancs', 'blanches', 2],
+  ['gentil', 'gentille', 'gentils', 'gentilles', 2], ['heureux', 'heureuse', 'heureux', 'heureuses', 2], ['doux', 'douce', 'doux', 'douces', 2],
+  ['long', 'longue', 'longs', 'longues', 2], ['léger', 'légère', 'légers', 'légères', 2], ['sportif', 'sportive', 'sportifs', 'sportives', 3],
+  ['beau', 'belle', 'beaux', 'belles', 3], ['vieux', 'vieille', 'vieux', 'vieilles', 3], ['nouveau', 'nouvelle', 'nouveaux', 'nouvelles', 3],
+  ['cruel', 'cruelle', 'cruels', 'cruelles', 3], ['jaloux', 'jalouse', 'jaloux', 'jalouses', 3], ['mignon', 'mignonne', 'mignons', 'mignonnes', 3],
+  ['gros', 'grosse', 'gros', 'grosses', 3],
+];
+const N5 = W.filter((w) => pluralOk(w) && !NOT_ADJ_NOUN.has(w.text));
+function f5xAdj(R, minLv, maxLv) {
+  const a = R.pick(ADJ4.filter((x) => x[4] >= minLv && x[4] <= maxLv));
+  const w = R.pick(N5);
+  const plural = R.chance(0.5);
+  const subj = plural ? `Les ${pluralOf(w.text)} sont` : `${withLe(w).replace(/^l’/, 'L’').replace(/^l /, 'L ')} est`;
+  const sentence = ((subj[0] === 'l' ? cap1(subj) : subj) + ' ___.').replace(/'/g, '’');
+  const ok = a[(w.g === 'm' ? 0 : 1) + (plural ? 2 : 0)];
+  const opts = uniq(a.slice(0, 4));
+  return mkChoice(R, `f5x-a-${sentence}-${a[0]}`, `Accorde l’adjectif « ${a[0]} » :`, { text: ok }, opts.filter((t) => t !== ok).map((t) => ({ text: t })), {
+    say: say(sentence.replace('___', a[0])),
+    stimulus: { text: sentence },
+    cols: 2,
+  });
+}
+function f5xGn(R, minLv, maxLv) {
+  const a = R.pick(ADJ4.filter((x) => x[4] >= minLv && x[4] <= maxLv && uniq(x.slice(0, 4)).length === 4));
+  const w = R.pick(['beau', 'vieux', 'nouveau'].includes(a[0]) ? N5.filter((x) => !isElided(x)) : N5);
+  const plural = R.chance(0.5);
+  const noun = plural ? pluralOf(w.text) : w.text;
+  const g = w.g;
+  const form = (gg, pl) => a[(gg === 'm' ? 0 : 1) + (pl ? 2 : 0)];
+  const pre = ['petit', 'grand', 'joli', 'beau', 'vieux', 'nouveau', 'gros', 'bon'].includes(a[0]);
+  const det = (gg, pl) => (pl ? 'des' : gg === 'm' ? 'un' : 'une');
+  const mk = (d, adj) => (pre ? `${d} ${adj} ${noun}` : `${d} ${noun} ${adj}`);
+  const ok = mk(det(g, plural), form(g, plural));
+  const og = g === 'm' ? 'f' : 'm';
+  const wrongs = uniq([
+    mk(det(g, plural), form(og, plural)),
+    mk(det(g, plural), form(g, !plural)),
+    plural ? mk(det(g, false), form(g, true)) : mk(det(og, false), form(g, false)),
+  ]).filter((t) => t !== ok);
+  if (wrongs.length < 3) return f5xGn(R, minLv, maxLv);
+  return mkChoice(R, `f5x-g-${ok}`, 'Quel groupe du nom est bien écrit ?', spk(ok), wrongs.map(spk), {
+    say: say('Quel groupe du nom est bien écrit ?'),
+    cols: 1,
+  });
+}
+function f5xSortPlural(R, per, hard) {
+  const bins = [
+    { text: 'Pluriel en -aux (comme cheval)' },
+    { text: 'Pluriel en -x (comme bateau)' },
+    { text: 'Pluriel en -s (comme chat)' },
+  ];
+  const pools = hard
+    ? [PL.filter((x) => x.k === 'AUX'), PL.filter((x) => ['XEAU', 'XEU', 'XOU'].includes(x.k)), PL.filter((x) => x.k === 'S' || x.k === 'SPIEGE')]
+    : [PL.filter((x) => x.k === 'AUX'), PL.filter((x) => ['XEAU', 'XEU'].includes(x.k)), PL.filter((x) => x.k === 'S')];
+  const cnt = per === 3 ? R.shuffle([3, 3, 2]) : [2, 2, 2];
+  const groups = pools.map((p, i) => R.sample(p, cnt[i]).map((x) => spk(x.s)));
+  return mkSort(
+    R,
+    `f5x-sp-${hard ? 3 : 2}-${nameKey(groups.flat().map((x) => x.text))}`,
+    'Au pluriel, comment se termine chaque mot ? Classe-le.',
+    bins,
+    groups,
+    { say: say('Au pluriel, comment se termine chaque mot ? Classe-le.') },
+  );
+}
+f5.generate = run({
+  1: [
+    (R) => f5Genre(R, 8, false),
+    (R) => f5Plural(R, 3),
+    (R) => f5SortNumber(R, 3),
+    (R) => f5xPlural(R, PL_SIMPLE.filter((x) => x.k !== 'INV')),
+    (R) => f5xAdj(R, 1, 1),
+    (R) => f5xFem(R, FEM.slice(0, 13)),
+  ],
+  2: [
+    (R) => f5xPlural(R, PL_SIMPLE),
+    (R) => f5xFem(R, FEM.slice(0, 20)),
+    (R) => f5xAdj(R, 1, 2),
+    (R) => f5xGn(R, 1, 2),
+    (R) => f5xSortPlural(R, 2, false),
+  ],
+  3: [
+    (R) => f5xPlural(R, PL_L3),
+    (R) => f5xPlural(R, PL_L3.filter((x) => ['XOU', 'SPIEGE', 'INV', 'XEU'].includes(x.k))),
+    (R) => f5xEyes(R),
+    (R) => f5xFem(R, FEM),
+    (R) => f5xAdj(R, 2, 3),
+    (R) => f5xGn(R, 2, 3),
+    (R) => f5xSortPlural(R, 3, true),
+  ],
+});
+f5.pfeq = 'Grammaire — genre et nombre du nom et de l’adjectif : féminins irréguliers, pluriels en -s, -x, -aux, accord dans le groupe du nom (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+
+/* ---------------- f6 : le verbe ---------------- */
+const SENT_V2 = [
+  ['Chaque matin, le facteur dépose le courrier dans la boîte.', 'dépose'],
+  ['Les enfants du quartier construisent un fort de neige.', 'construisent'],
+  ['Ma grand-mère prépare une délicieuse tourtière pour Noël.', 'prépare'],
+  ['Le vent d’automne emporte les feuilles mortes.', 'emporte'],
+  ['Mon oncle répare le toit de la cabane.', 'répare'],
+  ['Tous les élèves de la classe admirent le grand tableau.', 'admirent'],
+  ['Le petit chaton griffe doucement le vieux fauteuil.', 'griffe'],
+  ['Mes parents choisissent un nouveau tapis pour le salon.', 'choisissent'],
+  ['Dans la forêt, les écureuils cachent des noisettes.', 'cachent'],
+  ['La neige recouvre lentement les toits du village.', 'recouvre'],
+  ['Vous écoutez la musique dans l’autobus.', 'écoutez'],
+  ['Les musiciens jouent une belle mélodie au concert.', 'jouent'],
+  ['Léa et sa sœur grimpent sur la haute colline.', 'grimpent'],
+  ['Le boulanger vend des baguettes chaudes au village.', 'vend'],
+  ['Les canards traversent la route avec leurs petits.', 'traversent'],
+  ['Ma tante invente de drôles d’histoires pour les enfants.', 'invente'],
+  ['Au printemps, les outardes reviennent du sud.', 'reviennent'],
+  ['Le camion de livraison s’arrête devant la porte.', 's’arrête'],
+];
+const SENT_V3 = [
+  ['Mon frère ne mange jamais de légumes verts.', 'mange'],
+  ['Les élèves n’écoutent pas la musique trop forte.', 'écoutent'],
+  ['Nous ne prenons plus l’autobus depuis septembre.', 'prenons'],
+  ['Ma sœur ne trouve pas ses mitaines bleues.', 'trouve'],
+  ['Tu ne finis jamais ton assiette de pâtes.', 'finis'],
+  ['Les oiseaux ne chantent pas pendant la tempête.', 'chantent'],
+  ['Vous ne regardez plus la télévision le soir.', 'regardez'],
+  ['Léo n’oublie jamais son livre de lecture.', 'oublie'],
+  ['La petite fille ne veut pas sa soupe chaude.', 'veut'],
+  ['Il ne fait pas beau cet après-midi.', 'fait'],
+  ['Mes cousins ne viennent pas à la cabane à sucre.', 'viennent'],
+  ['Je ne peux pas ouvrir cette lourde porte.', 'peux'],
+];
+const SENT_G = [
+  ['Samedi dernier, nous avons visité le musée avec la classe.', 'avons visité'],
+  ['Hier soir, mon père a préparé un délicieux souper.', 'a préparé'],
+  ['Les enfants ont construit un fort de neige derrière la maison.', 'ont construit'],
+  ['Ma cousine a perdu sa mitaine rouge dans la cour.', 'a perdu'],
+  ['Nous avons mangé des crêpes au sirop d’érable.', 'avons mangé'],
+  ['Les élèves ont dessiné un grand dragon vert.', 'ont dessiné'],
+  ['Tu as gagné la partie de hockey.', 'as gagné'],
+  ['Vous avez fini votre dessin avant la récréation.', 'avez fini'],
+  ['Demain, la classe va visiter le zoo de Granby.', 'va visiter'],
+  ['Ce soir, mon frère va préparer le souper.', 'va préparer'],
+  ['Nous allons patiner sur le lac gelé.', 'allons patiner'],
+  ['Ils vont construire un igloo dans la cour.', 'vont construire'],
+  ['Je vais choisir un livre à la bibliothèque.', 'vais choisir'],
+  ['Mon oncle a réparé la clôture de la ferme.', 'a réparé'],
+];
+function f6xFind(R, table, group) {
+  const [s, v] = R.pick(table);
+  const tokens = s.replace(/[.,!?]/g, '').split(' ');
+  const verbToks = v.split(' ');
+  let wrong;
+  if (group) {
+    const pairs = [];
+    for (let i = 0; i < tokens.length - 1; i++) {
+      const p = `${tokens[i]} ${tokens[i + 1]}`;
+      if (!verbToks.some((x) => p.split(' ').includes(x))) pairs.push(p);
+    }
+    wrong = R.sample(uniq(pairs), 3);
+  } else {
+    wrong = R.sample(uniq(tokens.filter((t) => !verbToks.includes(t) && !t.toLowerCase().includes(v.toLowerCase()))), 3);
+  }
+  return mkChoice(R, `f6x-v-${s}`, group ? 'Touche le groupe de mots qui forme le verbe.' : 'Touche le verbe conjugué dans la phrase.', spk(v), wrong.map(spk), {
+    say: say(s),
+    stimulus: { text: s },
+    cols: 2,
+  });
+}
+const PERS = ['je', 'tu', 'il', 'nous', 'vous', 'ils'];
+const VB = [
+  ['aller', ['vais', 'vas', 'va', 'allons', 'allez', 'vont'], ['à l’école', 'au parc', 'au chalet'], 1],
+  ['faire', ['fais', 'fais', 'fait', 'faisons', 'faites', 'font'], ['du ski', 'un gâteau', 'ses devoirs'], 1],
+  ['finir', ['finis', 'finis', 'finit', 'finissons', 'finissez', 'finissent'], ['son travail', 'ses devoirs', 'le dessin'], 2],
+  ['prendre', ['prends', 'prends', 'prend', 'prenons', 'prenez', 'prennent'], ['l’autobus', 'une collation', 'son manteau'], 2],
+  ['venir', ['viens', 'viens', 'vient', 'venons', 'venez', 'viennent'], ['à la fête', 'de l’école', 'chez moi'], 2],
+  ['pouvoir', ['peux', 'peux', 'peut', 'pouvons', 'pouvez', 'peuvent'], ['jouer dehors', 'nager', 'aider'], 3],
+  ['vouloir', ['veux', 'veux', 'veut', 'voulons', 'voulez', 'veulent'], ['un biscuit', 'jouer', 'du chocolat chaud'], 3],
+  ['dire', ['dis', 'dis', 'dit', 'disons', 'dites', 'disent'], ['bonjour', 'la vérité', 'merci'], 3],
+  ['voir', ['vois', 'vois', 'voit', 'voyons', 'voyez', 'voient'], ['un orignal', 'le lac', 'un film'], 3],
+  ['savoir', ['sais', 'sais', 'sait', 'savons', 'savez', 'savent'], ['nager', 'la réponse', 'lire'], 3],
+  ['manger', ['mange', 'manges', 'mange', 'mangeons', 'mangez', 'mangent'], ['une pomme', 'des crêpes', 'à midi'], 2],
+  ['nager', ['nage', 'nages', 'nage', 'nageons', 'nagez', 'nagent'], ['dans le lac', 'très vite'], 2],
+  ['ranger', ['range', 'ranges', 'range', 'rangeons', 'rangez', 'rangent'], ['sa chambre', 'ses jouets'], 2],
+  ['commencer', ['commence', 'commences', 'commence', 'commençons', 'commencez', 'commencent'], ['la lecture', 'son dessin', 'à lire'], 3],
+  ['lancer', ['lance', 'lances', 'lance', 'lançons', 'lancez', 'lancent'], ['la balle', 'un ballon'], 3],
+  ['placer', ['place', 'places', 'place', 'plaçons', 'placez', 'placent'], ['les chaises', 'ses livres'], 3],
+  ['appeler', ['appelle', 'appelles', 'appelle', 'appelons', 'appelez', 'appellent'], ['son ami', 'sa grand-mère'], 3],
+  ['jeter', ['jette', 'jettes', 'jette', 'jetons', 'jetez', 'jettent'], ['le papier', 'une balle'], 3],
+  ['acheter', ['achète', 'achètes', 'achète', 'achetons', 'achetez', 'achètent'], ['du pain', 'un cadeau', 'des fraises'], 3],
+];
+function f6xConj(R, pool, subjects) {
+  const [inf, forms, comps] = R.pick(pool);
+  return conjQuestion(R, inf, forms, R.pick(comps), inf, R.pick(subjects));
+}
+function f6xInf(R, pool) {
+  const [inf, forms] = R.pick(pool);
+  const p = R.int(0, 5);
+  const form = forms[p];
+  const shown = `${PERS[p] === 'je' && /^[aeiouéèh]/i.test(form) ? 'j’' : PERS[p] + ' '}${form}`.replace('j’ ', 'j’');
+  const others = pool.filter((v) => v[0] !== inf && v[1][p] !== form);
+  const wrong = R.sample(others, 3).map((v) => v[0]);
+  return mkChoice(R, `f6x-i-${shown}`, `Quel est l’infinitif du verbe dans « ${shown} » ?`, spk(inf), wrong.map(spk), {
+    say: say(`Quel est l’infinitif du verbe dans ${shown} ?`),
+    cols: 2,
+  });
+}
+// inf, il, ils, a+pp, ont+pp, imparfait il, imparfait ils, complément, participe
+const TT = [
+  ['manger', 'mange', 'mangent', 'mangé', 'mangeait', 'mangeaient', 'une pomme'],
+  ['chanter', 'chante', 'chantent', 'chanté', 'chantait', 'chantaient', 'une chanson'],
+  ['jouer', 'joue', 'jouent', 'joué', 'jouait', 'jouaient', 'au hockey'],
+  ['regarder', 'regarde', 'regardent', 'regardé', 'regardait', 'regardaient', 'un film'],
+  ['dessiner', 'dessine', 'dessinent', 'dessiné', 'dessinait', 'dessinaient', 'un chat'],
+  ['finir', 'finit', 'finissent', 'fini', 'finissait', 'finissaient', 'son travail'],
+  ['choisir', 'choisit', 'choisissent', 'choisi', 'choisissait', 'choisissaient', 'un livre'],
+  ['prendre', 'prend', 'prennent', 'pris', 'prenait', 'prenaient', 'l’autobus'],
+  ['faire', 'fait', 'font', 'fait', 'faisait', 'faisaient', 'un gâteau'],
+  ['voir', 'voit', 'voient', 'vu', 'voyait', 'voyaient', 'un orignal'],
+  ['dire', 'dit', 'disent', 'dit', 'disait', 'disaient', 'bonjour'],
+];
+const S3S = ['Léa', 'Papa', 'Mon frère', 'Le chat', 'Ma tante', 'La maîtresse'];
+const S3P = ['Les enfants', 'Mes amis', 'Léa et Max', 'Les élèves', 'Mes parents'];
+function tenseSentence(row, plural, subj, tense) {
+  const [inf, il, ils, pp, imS, imP, comp] = row;
+  const v =
+    tense === 'p' ? (plural ? ils : il)
+    : tense === 'f' ? `${plural ? 'vont' : 'va'} ${inf}`
+    : tense === 'c' ? `${plural ? 'ont' : 'a'} ${pp}`
+    : plural ? imP : imS;
+  return `${subj} ${v} ${comp}.`;
+}
+function f6xTense(R, withImp) {
+  const row = R.pick(TT);
+  const plural = R.chance(0.5);
+  const subj = R.pick(plural ? S3P : S3S);
+  const tenses = withImp ? ['p', 'f', 'c', 'i'] : ['p', 'f', 'c'];
+  const t = R.pick(tenses);
+  const s = tenseSentence(row, plural, subj, t);
+  const labels = { p: 'Présent', f: 'Futur proche', c: 'Passé composé', i: 'Imparfait' };
+  return {
+    type: 'choice',
+    key: `f6x-t-${s}`,
+    prompt: 'À quel temps est le verbe de cette phrase ?',
+    say: say(s),
+    stimulus: { text: s },
+    options: tenses.map((x) => ({ text: labels[x] })),
+    answer: tenses.indexOf(t),
+    fixedOrder: true,
+    cols: tenses.length === 4 ? 2 : 3,
+  };
+}
+function f6xPc(R) {
+  const row = R.pick(TT);
+  const plural = R.chance(0.5);
+  const subj = R.pick(plural ? S3P : S3S);
+  const [inf, il, ils, pp, , , comp] = row;
+  const ok = `${plural ? 'ont' : 'a'} ${pp}`;
+  const wrongs = uniq([`${plural ? 'ont' : 'a'} ${inf}`, `${plural ? 'a' : 'ont'} ${pp}`, plural ? ils : il]).filter((t) => t !== ok);
+  return mkChoice(R, `f6x-pc-${subj}-${inf}`, `Complète au passé composé : « ${subj} ___ ${comp}. » (${inf})`, spk(ok), wrongs.map(spk), {
+    say: say(`Complète au passé composé. ${subj} ${ok} ${comp}.`),
+    cols: 2,
+  });
+}
+function f6xImp(R) {
+  const row = R.pick(TT);
+  const plural = R.chance(0.5);
+  const subj = R.pick(plural ? S3P : S3S);
+  const [inf, il, ils, pp, imS, imP, comp] = row;
+  const ok = plural ? imP : imS;
+  const wrongs = uniq([plural ? ils : il, `${plural ? 'ont' : 'a'} ${pp}`, plural ? imS : imP]).filter((t) => t !== ok);
+  return mkChoice(R, `f6x-im-${subj}-${inf}`, `Autrefois… Complète à l’imparfait : « ${subj} ___ ${comp}. » (${inf})`, spk(ok), wrongs.map(spk), {
+    say: say(`Complète à l’imparfait. ${subj} ${ok} ${comp}.`),
+    cols: 2,
+  });
+}
+const VB_L1 = VB.filter((v) => v[3] === 1);
+const VB_L2 = VB.filter((v) => v[3] <= 2);
+const SUBJ6_NEW = [...SUBJ_ALL];
+f6.generate = run({
+  1: [
+    (R) => f6FindVerb(R, 3),
+    (R) => f6ConjEr(R),
+    (R) => f6BeHave(R, SUBJ_ALL),
+    (R) => f6SortVerb(R, 8),
+    (R) => f6xConj(R, VB_L1, SUBJ_PRON),
+    (R) => f6xFind(R, SENT_V2, false),
+  ],
+  2: [
+    (R) => f6xFind(R, SENT_V2, false),
+    (R) => f6xConj(R, VB_L2, SUBJ6_NEW),
+    (R) => f6xConj(R, VB_L2, SUBJ6_NEW),
+    (R) => f6xInf(R, VB_L2),
+    (R) => f6xTense(R, false),
+    (R) => f6xPc(R),
+  ],
+  3: [
+    (R) => f6xFind(R, SENT_V3, false),
+    (R) => f6xFind(R, SENT_G, true),
+    (R) => f6xConj(R, VB, SUBJ6_NEW),
+    (R) => f6xConj(R, VB, SUBJ6_NEW),
+    (R) => f6xInf(R, VB),
+    (R) => f6xTense(R, true),
+    (R) => f6xPc(R),
+    (R) => f6xImp(R),
+  ],
+});
+f6.pfeq = 'Grammaire — le verbe : présent (être, avoir, aller, faire, verbes en -er et -ir, …), futur proche, passé composé, imparfait, infinitif (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+
+/* ---------------- f7 : types de phrases, négation, constituants ---------------- */
+const IMP7 = [
+  'Range ta chambre.', 'Ferme la porte.', 'Écoute bien la consigne.', 'Mets ton manteau.', 'Viens ici.', 'Lave-toi les mains.',
+  'Prends ton sac.', 'Attends-moi devant l’école.', 'Regarde le beau dessin de Léa.', 'Sors de la piscine.', 'Finis ton assiette.',
+  'Pousse la porte doucement.', 'Allume la lumière.', 'Passe-moi le sel.', 'Lis cette page à voix haute.', 'Prépare ton sac pour demain.',
+  'Cherche ta mitaine sous le lit.', 'Éteins la télévision.', 'Range tes crayons.', 'Mange tes légumes.', 'Arrête de crier!', 'Viens vite!',
+];
+const ASK7 = ASK.filter((q) => q.split(' ').length >= 3);
+const EXC7 = EXC.filter((q) => q.split(' ').length >= 2);
+function f7xType(R, four) {
+  const kinds = four ? ['d', 'q', 'i', 'e'] : ['d', 'q', 'e'];
+  const k = R.pick(four ? ['d', 'q', 'i', 'e', 'i'] : ['d', 'q', 'e']);
+  let s;
+  if (k === 'd') s = R.pick(SENT[3]);
+  else if (k === 'q') s = R.pick(ASK7) + '?';
+  else if (k === 'e') s = R.pick(EXC7) + '!';
+  else s = R.pick(IMP7);
+  const labels = { d: 'Déclarative', q: 'Interrogative', i: 'Impérative', e: 'Exclamative' };
+  return {
+    type: 'choice',
+    key: `f7x-t-${s}`,
+    prompt: 'Quel est le type de cette phrase ?',
+    say: say(s),
+    stimulus: { text: s },
+    options: kinds.map((x) => ({ text: labels[x] })),
+    answer: kinds.indexOf(k),
+    fixedOrder: true,
+    cols: kinds.length === 4 ? 2 : 3,
+  };
+}
+const NEG7 = [
+  ['Léa', 'aime', 'la neige'], ['Mon frère', 'mange', 'ses légumes'], ['Max', 'joue', 'au hockey'], ['Ma sœur', 'porte', 'sa tuque'],
+  ['Papa', 'conduit', 'le camion'], ['Les enfants', 'regardent', 'la télévision'], ['Nous', 'écoutons', 'la radio'], ['Tu', 'as', 'ton cahier'],
+  ['Je', 'vois', 'le lac'], ['Zoé', 'ouvre', 'la fenêtre'], ['Tom', 'oublie', 'son sac'], ['Elle', 'aime', 'le chocolat'],
+  ['Ils', 'finissent', 'leur dessin'], ['Vous', 'prenez', 'l’autobus'], ['Mon chien', 'mord', 'le facteur'], ['Le chat', 'boit', 'son lait'],
+  ['Ma tante', 'habite', 'à Québec'], ['Les élèves', 'écoutent', 'la maîtresse'], ['Louis', 'range', 'sa chambre'], ['Nous', 'visitons', 'le musée'],
+];
+const vow7 = (v) => /^[aeiouéèêhâî]/i.test(v);
+function f7xNeg(R) {
+  const [s, v, rest] = R.pick(NEG7);
+  const aff = `${s} ${v} ${rest}.`;
+  const ne = vow7(v) ? `n’${v}` : `ne ${v}`;
+  const ok = `${s} ${ne} pas ${rest}.`;
+  const cands = uniq([
+    `${s} ${v} pas ${rest}.`,
+    `${s} ${ne} ${rest}.`,
+    `${s} ne pas ${v} ${rest}.`,
+    `${s} ${ne} ${rest} pas.`,
+  ]).filter((t) => t !== ok);
+  return mkChoice(R, `f7x-n-${aff}`, `Quelle est la phrase négative de « ${aff} » ?`, spk(ok), R.sample(cands, 3).map(spk), {
+    say: say(`Quelle est la phrase négative de ${aff} ?`),
+    cols: 1,
+  });
+}
+const INTER7 = [
+  ['Aimes-tu', 'la neige'], ['As-tu', 'faim'], ['Veux-tu', 'un biscuit'], ['Peux-tu', 'm’aider'], ['Prends-tu', 'l’autobus'], ['Fais-tu', 'du ski'],
+  ['Vas-tu', 'à l’école'], ['Connais-tu', 'cette chanson'], ['Parles-tu', 'français'], ['Aimez-vous', 'le chocolat'], ['Avez-vous', 'un chien'],
+  ['Voulez-vous', 'du gâteau'], ['Allez-vous', 'au parc'], ['Habitez-vous', 'à Québec'], ['Regardes-tu', 'ce film'], ['Joues-tu', 'au hockey'],
+];
+function f7xInter(R) {
+  const [v, rest] = R.pick(INTER7);
+  const ok = `${v} ${rest}?`;
+  const wrongs = [`${v.replace('-', ' ')} ${rest}?`, `${v} ${rest}.`, `${v} ${rest}`];
+  return mkChoice(R, `f7x-q-${ok}`, 'Quelle question est bien écrite ?', spk(ok), wrongs.map(spk), {
+    say: say('Quelle question est bien écrite ?'),
+    cols: 1,
+  });
+}
+// sujet | verbe | complément du verbe | complément de phrase | place du complément de phrase
+const CONST7 = [
+  ['Mon grand frère', 'répare', 'son vélo', 'dans le garage', 'end'],
+  ['Les élèves', 'écoutent', 'une belle histoire', 'chaque matin', 'start'],
+  ['Léa', 'range', 'ses jouets', 'après le souper', 'end'],
+  ['Ma tante', 'prépare', 'une tarte aux pommes', 'pour la fête', 'end'],
+  ['Les oiseaux', 'construisent', 'un nid', 'au printemps', 'start'],
+  ['Papa', 'lave', 'la voiture', 'le samedi', 'end'],
+  ['Zoé', 'cueille', 'des fraises', 'dans le jardin', 'end'],
+  ['Le facteur', 'apporte', 'une grosse boîte', 'ce matin', 'start'],
+  ['Mes cousins', 'jouent', 'au hockey', 'sur la patinoire', 'end'],
+  ['Les enfants', 'construisent', 'un fort de neige', 'après l’école', 'start'],
+  ['Maman', 'lit', 'une histoire', 'avant le dodo', 'start'],
+  ['Le chien de Max', 'mange', 'son os', 'dans la cour', 'end'],
+  ['La maîtresse', 'écrit', 'la date', 'au tableau', 'end'],
+  ['Nous', 'visitons', 'le musée', 'en mars', 'start'],
+  ['Sam', 'attend', 'l’autobus', 'devant l’école', 'end'],
+  ['Le boulanger', 'vend', 'du pain frais', 'tous les jours', 'end'],
+  ['Les élèves de deuxième année', 'visitent', 'la bibliothèque', 'jeudi prochain', 'end'],
+  ['Ma sœur', 'joue', 'du violon', 'le mardi soir', 'end'],
+  ['Mon père', 'répare', 'la clôture', 'pendant l’été', 'start'],
+  ['Le vent', 'emporte', 'les feuilles mortes', 'en octobre', 'start'],
+  ['Tom', 'mange', 'une crêpe', 'au déjeuner', 'end'],
+  ['Louis et Mia', 'dessinent', 'un dragon', 'pendant la récréation', 'end'],
+  ['Grand-papa', 'raconte', 'une légende', 'autour du feu', 'end'],
+  ['Les poules', 'pondent', 'des œufs', 'chaque jour', 'end'],
+  ['Le soleil', 'éclaire', 'la vallée', 'dès l’aube', 'start'],
+  ['Léo', 'porte', 'sa tuque rouge', 'quand il neige', 'end'],
+];
+const PROPER7 = ['Léa', 'Zoé', 'Sam', 'Tom', 'Papa', 'Maman', 'Louis', 'Léo', 'Grand-papa'];
+function const7Sentence(e) {
+  const [S, V, C, CP, pos] = e;
+  const subj = pos === 'start' && !PROPER7.some((n) => S.startsWith(n)) ? low1(S) : S;
+  return pos === 'start' ? `${cap1(CP)}, ${subj} ${V} ${C}.` : `${S} ${V} ${C} ${CP}.`;
+}
+function f7xConst(R, roles) {
+  const e = R.pick(CONST7);
+  const role = R.pick(roles);
+  const [S0, V, C, CP, pos] = e;
+  const S = pos === 'start' && !PROPER7.some((n) => S0.startsWith(n)) ? low1(S0) : S0;
+  const s = const7Sentence(e);
+  const pick = { S, V, C, CP }[role];
+  const label = {
+    S: 'le sujet (qui fait l’action ?)',
+    V: 'le verbe',
+    C: 'le complément du verbe (le groupe qui suit le verbe)',
+    CP: 'le complément de phrase (on peut le déplacer ou l’effacer)',
+  }[role];
+  const opts = uniq([S, V, C, CP]);
+  return mkChoice(R, `f7x-c-${role}-${s}`, `Dans « ${s} », quel groupe de mots est ${label} ?`, spk(pick), opts.filter((t) => t !== pick).map(spk), {
+    say: say(`Dans la phrase ${s}, quel groupe de mots est ${label} ?`),
+    stimulus: { text: s },
+    cols: 2,
+  });
+}
+function f7xOrderConst(R) {
+  const e = R.pick(CONST7);
+  const [S, V, C] = e;
+  return {
+    type: 'order',
+    key: `f7x-oc-${S}-${V}-${C}`,
+    prompt: 'Remets les groupes de mots dans l’ordre : sujet, verbe, complément.',
+    say: say(`${S} ${V} ${C}.`),
+    tiles: [S, V, C],
+    joiner: ' ',
+  };
+}
+const LONG7 = [
+  'Après la classe, les enfants du quartier construisent un grand fort de neige.',
+  'Chaque dimanche, ma grand-mère prépare une délicieuse soupe aux pois pour toute la famille.',
+  'Pendant les vacances, mon frère et moi pêchons des truites dans la rivière.',
+  'Hier soir, ma cousine a lu une longue histoire de pirates à son petit frère.',
+  'Au printemps, les outardes reviennent du sud et se posent sur le lac.',
+  'Tous les matins, le boulanger du village sort des baguettes chaudes de son four.',
+  'Samedi dernier, la classe de madame Julie a visité le musée de la civilisation.',
+  'Quand il neige beaucoup, nous restons à la maison et nous jouons aux cartes.',
+  'Le grand orignal s’avance lentement dans l’eau calme du petit lac.',
+  'Mon père répare la vieille clôture du jardin avec des planches neuves.',
+  'À la récréation, les élèves de troisième année jouent au ballon dans la cour.',
+  'Hier, nous avons mangé des crêpes avec du sirop d’érable chez ma tante.',
+  'Pendant la tempête, les oiseaux se cachent dans les grands sapins verts.',
+  'Dans la forêt, les écureuils cachent des noisettes pour passer l’hiver.',
+  'Le soir, mon grand frère me raconte des histoires de fantômes avant de dormir.',
+  'Cet été, nous irons camper au bord du lac Saint-Jean avec nos cousins.',
+];
+function f7xOrderLong(R) {
+  const s = R.pick(LONG7);
+  return {
+    type: 'order',
+    key: `f7x-ol-${s}`,
+    prompt: 'Écoute la phrase. Remets les mots dans l’ordre.',
+    say: say(s),
+    tiles: s.split(' '),
+    joiner: ' ',
+  };
+}
+f7.generate = run({
+  1: [
+    (R) => f7Order(R, 3),
+    (R) => f7WellWritten(R, SENT[3]),
+    (R) => f7Type(R),
+    (R) => f7Sens(R, 3),
+    (R) => f7xType(R, false),
+    (R) => f7xOrderConst(R),
+  ],
+  2: [
+    (R) => f7xType(R, true),
+    (R) => f7xConst(R, ['S', 'V']),
+    (R) => f7xConst(R, ['S', 'V', 'C']),
+    (R) => f7xNeg(R),
+    (R) => f7xInter(R),
+    (R) => f7xOrderConst(R),
+    (R) => f7xOrderLong(R),
+  ],
+  3: [
+    (R) => f7xType(R, true),
+    (R) => f7xConst(R, ['S', 'C', 'CP']),
+    (R) => f7xConst(R, ['CP', 'CP', 'V', 'C']),
+    (R) => f7xNeg(R),
+    (R) => f7xInter(R),
+    (R) => f7xOrderLong(R),
+    (R) => f7xOrderLong(R),
+  ],
+});
+f7.pfeq = 'Écriture — la phrase : types (déclarative, interrogative, impérative, exclamative), forme négative, sujet, verbe et compléments (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+
+/* ---------------- f8 : textes plus longs, avec inférences ---------------- */
+const NEW_TEXTS2 = `
+## 2 chalet
+Samedi matin, Émile et son père partent en motoneige vers le chalet de grand-papa. La route est étroite et le vent souffle fort. Quand ils arrivent, la cheminée fume déjà : grand-papa a allumé le poêle à bois pour les attendre. Émile enlève ses bottes pleines de neige et s’assoit près du feu. Il tend ses mains rouges vers la chaleur. Son père sourit et prépare un chocolat chaud avec de la crème fouettée.
+? Comment Émile et son père vont-ils au chalet ?|En motoneige|En autobus|En voiture
+? Qui a allumé le poêle à bois ?|Grand-papa|Le père d’Émile|Émile
+? Pourquoi la cheminée fume-t-elle déjà ?|Parce que grand-papa a allumé le poêle|Parce qu’il y a un incendie|Parce que personne n’est arrivé
+? Pourquoi Émile tend-il ses mains vers le feu ?|Parce qu’il a froid|Parce qu’il a faim|Parce qu’il veut jouer
+? Que prépare le père d’Émile à la fin ?|Un chocolat chaud|Une soupe aux pois|Du café
+? Que peut-on deviner sur la journée ?|Qu’il fait froid dehors|Qu’il fait très chaud|Qu’il pleut beaucoup
+VF Émile voyage tout seul.|F
+VF Grand-papa attend Émile au chalet.|V
+
+## 2 biblio3
+Chaque jeudi, la classe de madame Lucie va à la bibliothèque de l’école. Les élèves ont le droit d’emprunter deux livres pour une semaine. Camille choisit toujours un livre sur les chevaux, mais cette fois, elle hésite devant une histoire de dragons. Son ami Hugo l’aide : il lui dit que la fin est surprenante. Camille décide de prendre les deux. Sur le chemin du retour, elle serre ses livres contre elle pour ne pas les perdre.
+? Quel jour la classe va-t-elle à la bibliothèque ?|Le jeudi|Le lundi|Le vendredi
+? Combien de livres les élèves peuvent-ils emprunter ?|Deux|Trois|Un
+? Qu’est-ce que Camille choisit d’habitude ?|Un livre sur les chevaux|Un livre sur les dragons|Un livre de recettes
+? Pourquoi Camille hésite-t-elle ?|Elle ne sait pas si elle prend les chevaux ou les dragons|Elle n’a plus de place dans son sac|Elle n’aime pas lire
+? Pourquoi Camille serre-t-elle ses livres contre elle ?|Pour ne pas les perdre|Pour les cacher à Hugo|Parce qu’elle a froid
+? Qui aide Camille à décider ?|Hugo|Madame Lucie|Son père
+VF Camille prend les deux livres.|V
+VF Camille laisse le livre de chevaux à la bibliothèque.|F
+
+## 2 verglas
+Ce matin, il y a eu du verglas. Les arbres brillent comme des bijoux de cristal, mais les trottoirs sont très glissants. Madame Roy marche lentement avec ses petits pas. Soudain, son chien Pitou tire sur la laisse et elle glisse sur les fesses. Un garçon qui passait court l’aider à se relever. Madame Roy rit, un peu gênée, puis elle remercie le garçon. Elle décide de rentrer et de jeter du sel devant sa porte.
+? Qu’est-ce qui a recouvert les arbres ?|Du verglas|De la neige poudreuse|De la rosée
+? Pourquoi madame Roy marche-t-elle lentement ?|Parce que les trottoirs sont glissants|Parce qu’elle est fâchée|Parce qu’elle cherche son chien
+? Que fait Pitou ?|Il tire sur la laisse|Il dort|Il s’enfuit dans la rue
+? Qui l’aide à se relever ?|Un garçon qui passait|Son mari|Un policier
+? Pourquoi madame Roy est-elle un peu gênée ?|Parce qu’elle est tombée devant tout le monde|Parce qu’elle a perdu son chien|Parce qu’elle a oublié son sac
+? Pourquoi madame Roy jette-t-elle du sel devant sa porte ?|Pour faire fondre la glace|Pour décorer l’entrée|Pour nourrir les oiseaux
+VF Les arbres sont couverts de glace.|V
+VF Madame Roy reste dehors toute la journée.|F
+
+## 2 pique
+Pour l’anniversaire de Mia, toute la famille fait un pique-nique près du lac. Papa étend une grande couverture à carreaux sous un érable. Maman sort les sandwichs et les fruits du panier. Pendant que les adultes jasent, Mia et son cousin Nico cherchent des cailloux plats pour les lancer sur l’eau. Tout à coup, un nuage noir cache le soleil et les premières gouttes tombent. Tout le monde ramasse les assiettes en vitesse et court vers l’auto en riant.
+? Pourquoi la famille fait-elle un pique-nique ?|C’est l’anniversaire de Mia|C’est la fête de Noël|C’est la fin de l’école
+? Où papa étend-il la couverture ?|Sous un érable|Sur le quai|Dans l’auto
+? Que cherchent Mia et Nico ?|Des cailloux plats|Des coquillages|Des pommes
+? Pourquoi tout le monde court-il vers l’auto ?|Parce qu’il commence à pleuvoir|Parce que le pique-nique est fini|Parce qu’un chien les poursuit
+? Comment la famille réagit-elle quand la pluie commence ?|Elle rit et se dépêche|Elle pleure|Elle reste sous la pluie
+? Comment était le temps au début de la journée ?|Il faisait beau|Il neigeait|Il y avait du brouillard
+VF Maman sort les sandwichs du panier.|V
+VF Les adultes lancent des cailloux sur l’eau.|F
+
+## 2 ourse
+Dans la forêt, une maman ourse se prépare pour l’hiver. Tout l’automne, elle mange beaucoup de baies, de poissons et de noix pour faire des réserves de gras. Quand les nuits deviennent glaciales, elle choisit une grotte sèche et y entre avec ses deux petits. Elle dort la majeure partie de la saison, mais elle ne dort pas d’un sommeil complet : si un bruit la dérange, elle ouvre un œil. Au printemps, elle sortira, maigre mais fière, avec ses oursons.
+? Pourquoi l’ourse mange-t-elle beaucoup à l’automne ?|Pour faire des réserves de gras|Parce qu’elle s’ennuie|Pour nourrir les loups
+? Que mange l’ourse ?|Des baies, des poissons et des noix|Du fromage et du pain|Des carottes
+? Où dort l’ourse ?|Dans une grotte sèche|Dans un arbre|Au fond d’un lac gelé
+? Combien de petits l’ourse a-t-elle ?|Deux|Trois|Un
+? Pourquoi l’ourse sera-t-elle maigre au printemps ?|Parce qu’elle aura utilisé ses réserves pendant l’hiver|Parce qu’elle n’aime pas manger|Parce qu’elle sera malade
+? Que fait l’ourse si un bruit la dérange ?|Elle ouvre un œil|Elle s’enfuit|Elle se met à chanter
+VF L’ourse dort d’un sommeil très profond tout l’hiver.|F
+VF L’ourse sort de sa grotte au printemps.|V
+
+## 2 defi
+Le défi de lecture commence lundi à l’école de Jade. Pendant un mois, chaque élève doit lire quinze minutes par soir et noter le titre de son livre sur une carte. Jade n’aime pas beaucoup lire parce qu’elle trouve ça long. Son grand frère lui prête un roman d’aventures avec des pirates. Le soir même, elle lit dix pages sans s’en rendre compte. Le lendemain, elle demande à sa maîtresse si elle peut emprunter la suite.
+? Combien de temps dure le défi de lecture ?|Un mois|Une semaine|Un an
+? Combien de minutes faut-il lire chaque soir ?|Quinze|Dix|Trente
+? Pourquoi Jade n’aime-t-elle pas lire au début ?|Elle trouve ça long|Elle ne sait pas lire|Elle a mal aux yeux
+? Qui prête un livre à Jade ?|Son grand frère|Sa maîtresse|Sa meilleure amie
+? Pourquoi Jade demande-t-elle la suite du livre ?|Parce qu’elle a aimé l’histoire|Parce qu’elle a perdu le premier|Parce que son frère le veut
+? Que montre l’expression « sans s’en rendre compte » ?|Qu’elle était très prise par l’histoire|Qu’elle était fâchée|Qu’elle dormait
+VF Jade note le titre de son livre sur une carte.|V
+VF Le roman parle de dragons.|F
+
+## 2 sirene
+Hier soir, la sirène des pompiers a réveillé tout le quartier. Un camion rouge a tourné au coin de la rue Beaulieu et s’est arrêté devant une maison. Heureusement, il n’y avait pas de feu : le détecteur de fumée sonnait parce que quelqu’un avait oublié une casserole sur la cuisinière. Les pompiers sont entrés, ont ouvert les fenêtres et ont tout vérifié. La famille, un peu gênée, les a remerciés. Le plus jeune des enfants a même pu s’asseoir dans le gros camion.
+? Qu’est-ce qui a réveillé le quartier ?|La sirène des pompiers|Un orage|Un concert
+? Où le camion s’est-il arrêté ?|Devant une maison de la rue Beaulieu|Devant l’école|Devant le dépanneur
+? Pourquoi le détecteur de fumée sonnait-il ?|Quelqu’un avait oublié une casserole sur la cuisinière|La maison brûlait|Un enfant jouait avec une allumette
+? Que font les pompiers dans la maison ?|Ils ouvrent les fenêtres et vérifient tout|Ils éteignent un gros feu|Ils déménagent les meubles
+? Pourquoi la famille est-elle un peu gênée ?|Parce que c’était une fausse alerte|Parce que la maison est sale|Parce qu’elle est en retard
+? Qui a pu s’asseoir dans le camion ?|Le plus jeune des enfants|Le papa|La voisine
+VF Il y avait un gros incendie.|F
+VF La famille remercie les pompiers.|V
+
+## 2 monarque
+Chaque automne, des millions de papillons monarques quittent le Canada et s’envolent vers le Mexique. Le voyage dure plusieurs semaines et fait plus de trois mille kilomètres. Les monarques volent le jour et se reposent la nuit, accrochés aux arbres. Ils sont si légers qu’un petit vent les pousse comme des feuilles. Au printemps, ce ne sont pas les mêmes papillons qui reviennent : ce sont leurs enfants et leurs petits-enfants! Les scientifiques les suivent en collant de minuscules étiquettes sur leurs ailes.
+? Où vont les monarques à l’automne ?|Au Mexique|En Alaska|En France
+? Quand les monarques volent-ils ?|Le jour|La nuit|Seulement quand il pleut
+? Que font-ils la nuit ?|Ils se reposent accrochés aux arbres|Ils chassent|Ils construisent un nid
+? Pourquoi un petit vent peut-il les pousser ?|Parce qu’ils sont très légers|Parce qu’ils sont très gros|Parce qu’ils sont fatigués
+? Que veut dire « ce sont leurs enfants et leurs petits-enfants » ?|Que ce sont de nouvelles générations|Que ce sont les mêmes papillons|Que les papillons ont adopté des enfants
+? Comment les scientifiques suivent-ils les monarques ?|Avec de minuscules étiquettes sur les ailes|Avec des caméras sous l’eau|En les gardant dans des cages
+VF Le voyage dure quelques heures.|F
+VF Les monarques reviennent au Canada au printemps.|V
+`;
+const NEW_TEXTS3 = `
+## 3 cabane2
+Au mois de mars, la classe de madame Chantal visite une cabane à sucre. Il fait encore froid, mais le soleil brille et la neige commence à fondre. Un grand monsieur à la barbe grise explique comment on recueille l’eau d’érable dans des seaux accrochés aux arbres. Ensuite, il faut la faire bouillir très longtemps pour obtenir du sirop. Léa goûte la tire sur la neige et elle fait une grimace parce que c’est collant. Son ami Noé en mange trois! À la fin de la journée, tous les élèves ont les doigts tout sucrés et ils ont hâte de raconter leur sortie à la maison.
+? À quel moment de l’année a lieu la sortie ?|En mars|En juillet|En octobre
+? Comment recueille-t-on l’eau d’érable ?|Dans des seaux accrochés aux arbres|Dans des tuyaux sous la terre|Avec des cuillères
+? Pourquoi faut-il faire bouillir l’eau d’érable très longtemps ?|Pour obtenir du sirop|Pour la refroidir|Pour la rendre salée
+? Pourquoi Léa fait-elle une grimace ?|Parce que la tire est collante|Parce qu’elle déteste le sucre|Parce qu’elle a perdu sa mitaine
+? Que peut-on conclure au sujet de Noé ?|Qu’il adore la tire|Qu’il a peur de la neige|Qu’il est malade
+? Pourquoi les élèves ont-ils les doigts sucrés ?|Parce qu’ils ont mangé de la tire collante|Parce qu’ils ont joué dans la boue|Parce qu’ils ont fait de la peinture
+? Comment les élèves se sentent-ils à la fin de la journée ?|Contents d’avoir vécu une belle sortie|Fâchés et ennuyés|Inquiets pour le lendemain
+VF Il fait très chaud pendant la visite.|F
+
+## 3 tempete
+Hier, une grosse tempête de neige a surpris tout le monde. Les flocons tombaient si dru qu’on ne voyait plus la maison d’en face. À la radio, on annonçait la fermeture de toutes les écoles. Alice a sauté de joie, mais sa mère lui a rappelé qu’il faudrait d’abord déneiger l’entrée. Alors, malgré le vent glacial, toute la famille est sortie avec des pelles. Après une heure d’efforts, ils avaient dégagé l’auto, l’escalier et un petit sentier pour le chat. Quand ils sont rentrés, les joues rouges, un bon chocolat chaud les attendait.
+? Qu’est-ce qui a surpris tout le monde ?|Une grosse tempête de neige|Un orage d’été|Une panne d’électricité
+? Que disait la radio ?|Que toutes les écoles fermaient|Que la neige allait fondre|Que les magasins ouvraient plus tôt
+? Pourquoi Alice a-t-elle sauté de joie ?|Parce qu’il n’y avait pas d’école|Parce qu’elle voulait aller au cinéma|Parce que c’était son anniversaire
+? Pourquoi toute la famille sort-elle avec des pelles ?|Pour déneiger l’entrée|Pour jouer au hockey|Pour planter des arbres
+? Que veut dire « les flocons tombaient si dru » ?|Qu’ils tombaient en grande quantité|Qu’ils tombaient très lentement|Qu’ils étaient très chauds
+? Pourquoi les joues de la famille sont-elles rouges ?|À cause du froid et de l’effort|À cause d’un coup de soleil|Parce qu’ils ont pleuré
+? Pour qui dégagent-ils un petit sentier ?|Pour le chat|Pour le facteur|Pour le voisin
+VF La famille a déneigé pendant dix heures.|F
+
+## 3 camp
+Pour la première fois de sa vie, Félix part en camp d’été pendant une semaine. Dans l’autobus, il serre son toutou dans son sac à dos et fait semblant de regarder par la fenêtre, mais son cœur bat très fort. À son arrivée, un moniteur nommé Simon lui montre sa cabane et son lit en haut d’une couchette. Le premier soir, autour du feu, tout le monde chante et mange des guimauves grillées. Félix oublie vite son inquiétude. Quand sa mère téléphone, il lui dit qu’il n’a pas le temps de lui parler parce qu’on l’attend pour la pêche!
+? Combien de temps dure le camp ?|Une semaine|Un mois|Une fin de semaine
+? Que cache Félix dans son sac à dos ?|Son toutou|Sa console|Un sandwich
+? Pourquoi Félix regarde-t-il par la fenêtre ?|Pour cacher qu’il est nerveux|Pour voir les animaux|Parce qu’il a le mal des transports
+? Que veut dire « son cœur bat très fort » ?|Qu’il est nerveux|Qu’il est fatigué|Qu’il est malade
+? Qui lui montre sa cabane ?|Un moniteur nommé Simon|Sa mère|Un autre campeur
+? Que fait-on autour du feu le premier soir ?|On chante et on mange des guimauves|On joue aux cartes|On dort
+? Pourquoi Félix dit-il à sa mère qu’il n’a pas le temps ?|Parce qu’il s’amuse et qu’on l’attend pour la pêche|Parce qu’il est fâché contre elle|Parce que son téléphone est brisé
+VF Félix s’ennuie énormément à la fin du premier soir.|F
+
+## 3 recyclage
+Dans la classe de monsieur Karim, les élèves ont décidé de réduire leurs déchets. D’abord, ils ont placé trois bacs au fond de la classe : un pour le papier, un pour le plastique et un pour le compost. Ensuite, Rémi, le responsable de la semaine, vérifie que chacun trie bien. Au début, il y avait des erreurs : une pelure de banane dans le bac du papier, une bouteille dans le compost. Après trois semaines, la classe a pesé les déchets : il y en avait presque deux fois moins! Les élèves étaient très fiers et ils ont proposé le même projet à toute l’école.
+? Combien de bacs y a-t-il dans la classe ?|Trois|Deux|Quatre
+? Qui vérifie le tri cette semaine ?|Rémi|Monsieur Karim|Toute la classe en même temps
+? Où la pelure de banane a-t-elle été jetée par erreur ?|Dans le bac du papier|Dans le compost|Dans le bac du plastique
+? Pourquoi la classe a-t-elle pesé les déchets ?|Pour vérifier si le projet fonctionnait|Pour gagner un concours|Parce que la balance était neuve
+? Que montre le fait qu’il y avait presque deux fois moins de déchets ?|Que le projet a bien fonctionné|Que les élèves ont mangé moins|Que le tri était inutile
+? Pourquoi les élèves étaient-ils fiers ?|Parce que leur effort donnait des résultats|Parce qu’ils n’avaient plus de devoirs|Parce qu’ils avaient gagné un voyage
+? Que proposent-ils à la fin ?|Le même projet pour toute l’école|Un voyage au zoo|Un nouveau bac pour monsieur Karim
+VF Après trois semaines, il y avait deux fois plus de déchets.|F
+
+## 3 orignal
+Un soir de septembre, Camille et son père attendent en silence au bord d’un petit lac. Ils ont garé leur camion plus loin pour ne pas faire de bruit. Soudain, un craquement résonne dans les bois. Un énorme orignal sort des arbres, ses bois couverts de mousse, et s’avance dans l’eau peu profonde. Camille retient son souffle. Elle voudrait prendre une photo, mais elle n’ose pas bouger. Quelques minutes plus tard, l’animal disparaît aussi doucement qu’il est apparu. « On a eu de la chance », chuchote son père. Camille rentre à la maison avec des étoiles dans les yeux.
+? Où Camille et son père attendent-ils ?|Au bord d’un petit lac|Dans un champ|Dans une cabane
+? Pourquoi ont-ils garé leur camion plus loin ?|Pour ne pas faire de bruit|Parce que la route était fermée|Parce qu’il n’avait plus d’essence
+? Qu’est-ce qui annonce l’arrivée de l’orignal ?|Un craquement dans les bois|Un cri dans le ciel|Une odeur de fumée
+? Pourquoi Camille retient-elle son souffle ?|Elle est émerveillée et ne veut pas le faire fuir|Elle est malade|Elle a peur de tomber à l’eau
+? Pourquoi Camille ne prend-elle pas de photo ?|Elle n’ose pas bouger|Son appareil est cassé|Il fait trop noir
+? Que veut dire « des étoiles dans les yeux » ?|Qu’elle est ravie|Qu’elle est endormie|Qu’elle a pleuré
+? Que fait l’orignal à la fin ?|Il disparaît doucement|Il charge le camion|Il nage vers eux
+VF Camille prend plusieurs photos.|F
+
+## 3 musee
+Pour la sortie de fin d’année, la classe de troisième année visite le Musée de la civilisation à Québec. Dans la grande salle, un guide explique la vie des Premières Nations avant l’arrivée des Européens. Thomas écoute avec attention, mais Laurence, elle, regarde surtout une vitrine pleine de perles colorées. À midi, tout le monde mange sur la terrasse, face au fleuve. Un bateau-traversier passe lentement, et les enfants lui font de grands signes. Au retour, Laurence, qui n’avait pas écouté, demande à Thomas de lui résumer la visite. Il rit et lui répond : « Regarde dans mon cahier! »
+? Où se trouve le musée ?|À Québec|À Montréal|À Gatineau
+? Qu’est-ce que le guide explique ?|La vie des Premières Nations|Les dinosaures|Les voyages dans l’espace
+? Que regarde surtout Laurence ?|Une vitrine pleine de perles|Le guide|Le fleuve
+? Que fait la classe à midi ?|Elle mange sur la terrasse|Elle visite une autre salle|Elle retourne à l’école
+? Pourquoi Laurence demande-t-elle à Thomas de lui résumer la visite ?|Parce qu’elle n’avait pas écouté|Parce qu’elle est arrivée en retard|Parce qu’elle est la guide
+? Que peut-on deviner au sujet de Thomas ?|Qu’il a pris des notes|Qu’il s’est endormi|Qu’il n’a rien écouté
+? Pourquoi les enfants font-ils des signes au bateau ?|Parce qu’ils trouvent ça amusant|Parce qu’ils sont perdus|Parce qu’ils veulent monter à bord
+VF Tous les élèves écoutent le guide avec attention.|F
+
+## 3 poulailler
+Chez ma grand-mère, mon travail du matin consiste à nourrir les poules. J’ouvre la porte du poulailler, je verse le grain dans les mangeoires et je remplis l’abreuvoir d’eau fraîche. Ensuite, je cherche les œufs dans la paille. Hier, j’en ai trouvé neuf, dont un tout petit, presque rond. Grand-maman dit que c’est l’œuf d’une jeune poule qui apprend son métier. Je dépose les œufs dans mon panier avec précaution, car ils se cassent facilement. À la cuisine, elle me prépare toujours une omelette avec les plus frais.
+? Quel est le travail du matin du narrateur ?|Nourrir les poules|Traire les vaches|Ramasser les pommes
+? Que verse-t-il dans les mangeoires ?|Du grain|De l’eau|De la paille
+? Combien d’œufs a-t-il trouvés hier ?|Neuf|Six|Douze
+? Pourquoi l’un des œufs est-il tout petit ?|Il vient d’une jeune poule|Il est cassé|Il vient d’un canard
+? Pourquoi dépose-t-il les œufs avec précaution ?|Parce qu’ils se cassent facilement|Parce qu’ils sont chauds|Parce qu’ils sont lourds
+? Que prépare grand-maman avec les œufs ?|Une omelette|Un gâteau|Des crêpes
+? Que peut-on dire du narrateur ?|Qu’il aime aider sa grand-mère|Qu’il déteste les poules|Qu’il a peur des œufs
+VF Le narrateur ramasse les œufs dans la paille.|V
+
+## 3 finale
+Samedi, c’est la finale du tournoi de hockey mineur. Dans le vestiaire, l’entraîneur répète une dernière fois les consignes : « On passe la rondelle, on reste calmes et on s’amuse. » Pendant le match, l’équipe de Xavier perd 2 à 1 jusqu’à la troisième période. Puis Xavier reçoit une belle passe et marque le but égalisateur à vingt secondes de la fin. En prolongation, son ami Malik marque le but gagnant. Les joueurs lancent leurs gants en l’air et sautent sur la glace. Xavier, lui, sourit mais ne dit rien : il pense surtout à la passe qui lui a permis de marquer.
+? Quelle est la consigne de l’entraîneur ?|Passer la rondelle, rester calmes et s’amuser|Gagner à tout prix|Ne jamais passer la rondelle
+? Quel est le pointage au début de la troisième période ?|2 à 1 pour l’autre équipe|1 à 1|3 à 0 pour l’équipe de Xavier
+? Que fait Xavier à vingt secondes de la fin ?|Il marque le but égalisateur|Il reçoit une punition|Il blesse un joueur
+? Qui marque le but gagnant ?|Malik|Xavier|L’entraîneur
+? Pourquoi les joueurs lancent-ils leurs gants en l’air ?|Pour fêter la victoire|Pour montrer qu’ils sont fâchés|Parce qu’ils ont chaud
+? Pourquoi Xavier ne dit-il rien ?|Il pense à la belle passe qui l’a aidé|Il est triste d’avoir perdu|Il est blessé
+? À quel moment le match se termine-t-il ?|Pendant la prolongation|À la fin de la première période|Avant le début de la troisième période
+VF L’équipe de Xavier perd la finale.|F
+`;
+const POOLS2 = { 2: [], 3: [] };
+function parseTexts(src, pool) {
+  for (const block of src.split('\n## ').map((b, i) => (i === 0 ? b.replace(/^[\s\S]*?## /, '') : b)).filter((b) => b.trim())) {
+    const lines = block.split('\n').map((l) => l.trim()).filter(Boolean);
+    const [lvl, id] = lines[0].split(' ');
+    const entry = { id: `x-${id}`, t: lines[1], qs: [] };
+    for (const l of lines.slice(2)) {
+      if (l.startsWith('VF ')) {
+        const [s, v] = l.slice(3).split('|');
+        entry.qs.push({ vf: true, s, v: v === 'V' });
+      } else if (l.startsWith('? ')) {
+        const [p, ok, a, b] = l.slice(2).split('|');
+        entry.qs.push({ p, ok, w: [a, b] });
+      }
+    }
+    pool[Number(lvl)].push(entry);
+  }
+}
+parseTexts(NEW_TEXTS2, POOLS2);
+parseTexts(NEW_TEXTS3, POOLS2);
+function f8xRead(R, pool) {
+  const tx = R.pick(pool);
+  const qi = R.int(0, tx.qs.length - 1);
+  const q = tx.qs[qi];
+  const o = (t) => ({ text: t, say: say(t) });
+  if (q.vf) {
+    return {
+      type: 'choice',
+      key: `f8x-${tx.id}-${qi}`,
+      prompt: `Vrai ou faux ? ${q.s}`,
+      say: say(`${tx.t} Vrai ou faux ? ${q.s}`),
+      stimulus: { text: tx.t },
+      options: [o('Vrai'), o('Faux')],
+      answer: q.v ? 0 : 1,
+      fixedOrder: true,
+      cols: 2,
+    };
+  }
+  return mkChoice(R, `f8x-${tx.id}-${qi}`, q.p, o(q.ok), q.w.map(o), {
+    say: say(`${tx.t} ${q.p}`),
+    stimulus: { text: tx.t },
+  });
+}
+const POOL8_L1 = [...POOLS[2], ...POOLS[3]];
+f8.generate = run({
+  1: [(R) => f8xRead(R, POOL8_L1)],
+  2: [(R) => f8xRead(R, POOLS2[2])],
+  3: [(R) => f8xRead(R, POOLS2[3])],
+});
+f8.pfeq = 'Lecture — compréhension de textes de 40 à 120 mots : informations explicites, inférences, vocabulaire en contexte, vrai ou faux (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+
+/* ---------------- f9 : vocabulaire ---------------- */
+// mot | définition | type | niveau minimal
+const DEFS_RAW = `
+minuscule|très, très petit|a|2
+énorme|très, très gros|a|2
+courageux|qui n’a pas peur du danger|a|2
+timide|qui n’ose pas parler aux autres|a|2
+généreux|qui aime donner aux autres|a|2
+gourmand|qui aime beaucoup manger|a|2
+paresseux|qui n’aime pas travailler|a|2
+bavard|qui parle tout le temps|a|2
+silencieux|qui ne fait pas de bruit|a|2
+curieux|qui veut tout savoir|a|2
+affamé|qui a très faim|a|2
+assoiffé|qui a très soif|a|2
+prudent|qui fait attention au danger|a|2
+inquiet|qui a peur qu’il arrive quelque chose|a|3
+apercevoir|voir un instant, de loin|v|2
+construire|bâtir quelque chose|v|2
+réparer|remettre en état ce qui est brisé|v|2
+cueillir|ramasser des fleurs ou des fruits|v|2
+hésiter|ne pas savoir quoi choisir|v|3
+chuchoter|parler tout bas|v|2
+se dépêcher|aller plus vite|v|2
+s’échapper|réussir à s’enfuir|v|3
+un sentier|un petit chemin dans la nature|n|2
+un trésor|un ensemble d’objets précieux caché quelque part|n|2
+une forêt|un grand terrain couvert d’arbres|n|2
+un sommet|le point le plus haut d’une montagne|n|2
+un volcan|une montagne qui peut cracher de la lave|n|2
+une île|une terre entourée d’eau|n|2
+un désert|un endroit très sec où il pleut très peu|n|3
+une tempête|un très mauvais temps, avec beaucoup de vent|n|3
+le verglas|une couche de glace sur le sol|n|3
+une recette|des instructions pour préparer un plat|n|3
+un horaire|un tableau qui indique les heures|n|3
+un exploit|une action extraordinaire, très difficile|n|3
+une légende|une histoire très ancienne qu’on se raconte|n|3
+un moteur|une machine qui fait avancer un véhicule|n|3
+un voisin|une personne qui habite près de chez nous|j|2
+un dentiste|une personne qui soigne les dents|j|2
+un menuisier|une personne qui travaille le bois|j|2
+un facteur|une personne qui livre le courrier|j|2
+un pêcheur|une personne qui attrape des poissons|j|2
+un cultivateur|une personne qui cultive la terre|j|3
+un inventeur|une personne qui crée un nouvel objet|j|3
+un bibliothécaire|une personne qui s’occupe des livres d’une bibliothèque|j|3
+`;
+const DEFS = DEFS_RAW.trim().split('\n').map((l) => {
+  const [w, d, t, lv] = l.split('|');
+  return { w, d, t, lv: Number(lv) };
+});
+function f9xDef(R, level) {
+  const x = R.pick(DEFS.filter((d) => d.lv <= level));
+  const same = DEFS.filter((d) => d.t === x.t && d !== x);
+  const wrong = R.sample(same.length >= 3 ? same : DEFS.filter((d) => d !== x), 3);
+  return mkChoice(R, `f9x-d-${x.w}`, `Que veut dire « ${x.w} » ?`, spk(x.d), wrong.map((d) => spk(d.d)), {
+    say: say(`Que veut dire ${x.w} ?`),
+    cols: 1,
+  });
+}
+const CLOZE9 = [
+  ['Le dentiste soigne nos ___.', 'dents', 'yeux', 'pieds', 'oreilles'],
+  ['Pour traverser la rivière, nous avons construit un ___.', 'pont', 'toit', 'puits', 'four'],
+  ['Un ___ est une personne qui livre le courrier.', 'facteur', 'voisin', 'pêcheur', 'cuisinier'],
+  ['J’ai très soif : je voudrais un grand verre d’___.', 'eau', 'huile', 'encre', 'essence'],
+  ['Pour atteindre le sommet, il faut ___ la montagne.', 'escalader', 'descendre', 'creuser', 'nager'],
+  ['Quand on est ___, on a envie de dormir.', 'fatigué', 'affamé', 'joyeux', 'pressé'],
+  ['Le soleil est très fort : je mets de la crème ___.', 'solaire', 'sucrée', 'salée', 'glacée'],
+  ['Mon frère est très ___ : il ne dit jamais un mot en classe.', 'timide', 'bavard', 'gourmand', 'bruyant'],
+  ['Ma sœur est très ___ : elle parle sans arrêt.', 'bavarde', 'silencieuse', 'endormie', 'timide'],
+  ['Le chien aboie pour ___ la famille qu’un étranger arrive.', 'avertir', 'réparer', 'cuisiner', 'peindre'],
+  ['Je dois ___ ce livre à la bibliothèque avant vendredi.', 'rendre', 'planter', 'éteindre', 'cuisiner'],
+  ['Avant de traverser la rue, il faut ___ des deux côtés.', 'regarder', 'chanter', 'ranger', 'écrire'],
+  ['Cet exercice est très ___ : personne ne réussit à le résoudre.', 'difficile', 'facile', 'court', 'sucré'],
+  ['Pour faire un gâteau, il faut suivre une ___.', 'recette', 'adresse', 'chanson', 'carte'],
+  ['Le randonneur suit un ___ dans la forêt.', 'sentier', 'plafond', 'dessert', 'chapeau'],
+  ['Les pompiers ont éteint ___ très rapidement.', 'l’incendie', 'la chanson', 'le sable', 'le trésor'],
+  ['La mer était ___ : il n’y avait aucune vague.', 'calme', 'agitée', 'houleuse', 'bruyante'],
+  ['Papa met des gants pour ___ ses mains du froid.', 'protéger', 'laver', 'couper', 'compter'],
+  ['L’oiseau ___ ses ailes et s’envole.', 'déploie', 'mange', 'creuse', 'cuisine'],
+  ['Le menuisier travaille le ___.', 'bois', 'courrier', 'poisson', 'sable'],
+  ['Il y a eu du verglas : les trottoirs sont couverts de ___.', 'glace', 'sable', 'herbe', 'feuilles'],
+  ['Pour savoir à quelle heure part l’autobus, je consulte l’___.', 'horaire', 'dessert', 'orage', 'été'],
+];
+function f9xCloze(R) {
+  const [s, ok, ...bad] = R.pick(CLOZE9);
+  return mkChoice(R, `f9x-c-${s}`, 'Quel mot complète bien la phrase ?', spk(ok), R.sample(bad, 3).map(spk), {
+    say: say(s.replace('___', ' … ')),
+    stimulus: { text: s },
+    cols: 2,
+  });
+}
+// catégories : nom | étiquette | membres
+const HYPER_RAW = `
+véhicules|les véhicules|voiture camion autobus vélo motoneige train bateau avion métro tracteur
+instruments de musique|les instruments de musique|guitare piano violon trompette tambour flûte saxophone harmonica clarinette
+outils|les outils|marteau scie tournevis pelle râteau pince perceuse hache
+meubles|les meubles|table chaise lit bureau armoire canapé commode
+vêtements|les vêtements|manteau pantalon chandail tuque mitaine bottes jupe foulard chemise
+sports|les sports|hockey soccer tennis natation ski patinage basketball golf boxe
+métiers|les métiers|pompier médecin boulanger facteur pilote dentiste plombier menuisier
+insectes|les insectes|fourmi abeille papillon coccinelle moustique mouche sauterelle libellule
+oiseaux|les oiseaux|hibou aigle outarde moineau cardinal pingouin perroquet colibri
+arbres|les arbres|érable bouleau sapin chêne pin saule peuplier épinette
+boissons|les boissons|lait jus eau thé tisane limonade cacao café
+planètes|les planètes|Mars Vénus Jupiter Saturne Neptune Mercure Uranus
+sentiments|les sentiments|joie colère peur tristesse surprise fierté jalousie honte
+fournitures|les fournitures scolaires|crayon gomme règle cahier ciseaux colle stylo compas
+fruits|les fruits|pomme poire banane fraise cerise orange raisin melon
+légumes|les légumes|carotte chou brocoli oignon patate navet poireau céleri
+ferme|les animaux de la ferme|vache cochon poule mouton cheval chèvre dindon âne
+marins|les animaux marins|baleine requin dauphin phoque morse pieuvre crabe homard
+pays|les pays|Canada France Mexique Chine Brésil Italie Japon Maroc
+formes|les figures géométriques|carré triangle rectangle losange ovale hexagone cercle
+`;
+const HYPER = HYPER_RAW.trim().split('\n').map((l) => {
+  const [id, label, m] = l.split('|');
+  return { id, label, members: m.split(' ') };
+});
+const HYP_EASY = ['fruits', 'légumes', 'ferme', 'vêtements', 'véhicules', 'meubles', 'boissons', 'sports'];
+function f9xHyper(R, n, ids) {
+  const pool = ids ? HYPER.filter((h) => ids.includes(h.id)) : HYPER;
+  const cat = R.pick(pool);
+  const three = R.sample(cat.members, 3);
+  const others = R.sample(HYPER.filter((h) => h !== cat), n - 1);
+  return mkChoice(R, `f9x-h-${cat.id}-${nameKey(three)}`, 'Quel groupe contient tous ces mots ?', spk(cat.label), others.map((h) => spk(h.label)), {
+    say: say('Quel groupe contient tous ces mots ?'),
+    stimulus: { text: three.join(' · ') },
+    cols: 2,
+  });
+}
+function f9xIntruder(R, ids) {
+  const pool = ids ? HYPER.filter((h) => ids.includes(h.id)) : HYPER;
+  const cat = R.pick(pool);
+  const three = R.sample(cat.members, 3);
+  const other = R.pick(HYPER.filter((h) => h !== cat));
+  const odd = R.pick(other.members);
+  return mkChoice(R, `f9x-i-${cat.id}-${nameKey(three)}-${odd}`, 'Quel mot ne va pas avec les autres ?', spk(odd), three.map(spk), {
+    say: say('Quel mot ne va pas avec les autres ?'),
+    cols: 2,
+  });
+}
+function f9xSortCat(R, nb, counts, ids) {
+  const pool = ids ? HYPER.filter((h) => ids.includes(h.id)) : HYPER;
+  const cats = R.sample(pool, nb);
+  const groups = cats.map((c, i) => R.sample(c.members, counts[i]).map(spk));
+  return mkSort(
+    R,
+    `f9x-s-${cats.map((c) => c.id).join('+')}-${nameKey(groups.flat().map((x) => x.text))}`,
+    'Classe chaque mot dans le bon groupe.',
+    cats.map((c) => ({ text: cap1(c.label) })),
+    groups,
+    { say: say('Classe chaque mot dans le bon groupe.') },
+  );
+}
+function f9xWhichIs(R, ids) {
+  const pool = ids ? HYPER.filter((h) => ids.includes(h.id)) : HYPER;
+  const cat = R.pick(pool);
+  const w = R.pick(cat.members);
+  const wrong = R.sample(HYPER.filter((h) => h !== cat), 3).map((h) => R.pick(h.members));
+  return mkChoice(R, `f9x-w-${cat.id}-${w}`, `Lequel de ces mots fait partie du groupe « ${cat.label} » ?`, spk(w), uniq(wrong).filter((t) => t !== w).map(spk), {
+    say: say(`Lequel de ces mots fait partie du groupe ${cat.label} ?`),
+    cols: 2,
+  });
+}
+f9.generate = run({
+  1: [
+    (R) => f9AntonymLetters(R),
+    (R) => f9Sort(R, 3, R.shuffle([2, 3, 3])),
+    (R) => f9Image(R, 3),
+    (R) => f9Intruder(R),
+    (R) => f9xHyper(R, 3, HYP_EASY),
+    (R) => f9xIntruder(R, HYP_EASY),
+  ],
+  2: [
+    (R) => f9xDef(R, 2),
+    (R) => f9xCloze(R),
+    (R) => f9xHyper(R, 4),
+    (R) => f9xIntruder(R),
+    (R) => f9xWhichIs(R),
+    (R) => f9xSortCat(R, 2, [3, 3]),
+  ],
+  3: [
+    (R) => f9xDef(R, 3),
+    (R) => f9xDef(R, 3),
+    (R) => f9xCloze(R),
+    (R) => f9xHyper(R, 4),
+    (R) => f9xIntruder(R),
+    (R) => f9xSortCat(R, 3, R.shuffle([3, 3, 2])),
+  ],
+});
+f9.pfeq = 'Lecture / écriture — vocabulaire : sens des mots, mot juste en contexte, mot générique et catégories (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+
+/* ---------------- f10 : ordre alphabétique, 2e et 3e lettre, mots-repères ---------------- */
+const EXTRA10 = bag(`
+chanson chapitre charbon chariot chasseur chaton chaleur chaîne chambre chance champion
+comme commencer comprendre compter comparer commerce complet
+concert conduire confiture content conte conseil continuer
+parc parole parent partir partie parfum parti
+passage passer passion pastille
+prendre premier présent presque prince
+problème projet promenade propre protéger profond
+travail trace traîneau traverser tranquille
+pouvoir pourquoi poumon poussière
+soupir sourire sourd souvent souper
+marché marin marque mardi marron marcher
+merci mercredi merveille message
+boulanger boulevard bouton bouteille boucle
+carnaval carré carton cartable
+couleur coupe couteau cousin couvert courir cour
+grand grain graine grotte grenier
+lundi lunettes lueur
+animal anneau annonce année
+bonjour bonheur bonne bottine
+fabrique facile façon famille farine
+jardin jambon jaune jeudi jouet journal
+lapin larme laver lecture lettre
+neige nettoyer niveau noisette nuit
+raconter rapide rassembler ravi réponse
+silence simple sirop sortie spectacle
+vacances valise vendredi verglas village voyage
+`);
+const P10 = uniq([...W10.map((w) => w.text), ...EXTRA10]).filter((t) => /^[a-zéèêôâîûç]+$/.test(t));
+const prefixMap = (k) => {
+  const m = {};
+  for (const t of P10) {
+    const key = norm(t).slice(0, k);
+    if (key.length === k) (m[key] ||= []).push(t);
+  }
+  for (const key of Object.keys(m)) {
+    const seen = new Set();
+    m[key] = m[key].filter((t) => (seen.has(norm(t)) ? false : seen.add(norm(t))));
+  }
+  return m;
+};
+const PRE1 = prefixMap(1);
+const PRE2 = prefixMap(2);
+const PRE3 = prefixMap(3);
+const cmpW = (a, b) => (norm(a) < norm(b) ? -1 : norm(a) > norm(b) ? 1 : 0);
+const sortS = (ws) => ws.slice().sort(cmpW);
+function pickPre(R, pre, n) {
+  const keys = Object.keys(pre).filter((k) => pre[k].length >= n);
+  return R.sample(pre[R.pick(keys)], n);
+}
+function f10xOrder(R, pre, n) {
+  const sorted = sortS(pickPre(R, pre, n));
+  return {
+    type: 'order',
+    key: `f10x-o-${sorted.join('.')}`,
+    prompt: 'Range les mots dans l’ordre alphabétique, comme dans un dictionnaire.',
+    say: say('Range les mots dans l’ordre alphabétique, comme dans un dictionnaire.'),
+    tiles: sorted,
+    joiner: ' ',
+  };
+}
+function f10xFirstLast(R, pre, n) {
+  const ws = pickPre(R, pre, n);
+  const sorted = sortS(ws);
+  const first = R.chance(0.5);
+  const target = first ? sorted[0] : sorted[sorted.length - 1];
+  const q = first ? 'Quel mot vient en premier dans le dictionnaire ?' : 'Quel mot vient en dernier dans le dictionnaire ?';
+  return mkChoice(R, `f10x-x-${first ? 'p' : 'd'}-${sorted.join('.')}`, q, spk(target), ws.filter((w) => w !== target).map(spk), {
+    say: say(q),
+    cols: 2,
+  });
+}
+function f10xBeforeAfter(R, pre) {
+  const s = sortS(pickPre(R, pre, 5));
+  const after = R.chance(0.5);
+  if (after) {
+    const t = s[3];
+    return mkChoice(R, `f10x-ap-${t}-${s.join('.')}`, `Quel mot vient après « ${t} » dans l’ordre alphabétique ?`, spk(s[4]), [s[0], s[1], s[2]].map(spk), {
+      say: say(`Quel mot vient après ${t} dans l’ordre alphabétique ?`),
+      cols: 2,
+    });
+  }
+  const t = s[1];
+  return mkChoice(R, `f10x-av-${t}-${s.join('.')}`, `Quel mot vient avant « ${t} » dans l’ordre alphabétique ?`, spk(s[0]), [s[2], s[3], s[4]].map(spk), {
+    say: say(`Quel mot vient avant ${t} dans l’ordre alphabétique ?`),
+    cols: 2,
+  });
+}
+const ALL10 = sortS(P10);
+function f10xGuide(R, same) {
+  let list = ALL10;
+  if (same) {
+    const letters = Object.keys(PRE1).filter((l) => PRE1[l].length >= 22);
+    list = sortS(PRE1[R.pick(letters)]);
+  }
+  const n = list.length;
+  const i = R.int(8, n - 9);
+  const t = list[i];
+  const a = list[i - R.int(1, 3)];
+  const b = list[i + R.int(1, 3)];
+  const pair = (x, y) => `${x} — ${y}`;
+  const wrong = [pair(list[i - 8], list[i - 5]), pair(list[i + 4], list[i + 7]), R.chance(0.5) ? pair(list[i - 6], list[i - 2]) : pair(list[i + 2], list[i + 8])];
+  return mkChoice(R, `f10x-g-${t}-${a}-${b}-${wrong.join('|')}`, `Dans le dictionnaire, entre quels mots-repères trouve-t-on « ${t} » ?`, { text: pair(a, b) }, wrong.map((w) => ({ text: w })), {
+    say: say(`Dans le dictionnaire, entre quels mots-repères trouve-t-on ${t} ?`),
+    cols: 1,
+  });
+}
+f10.generate = run({
+  1: [
+    (R) => f10OrderLetters(R, 5, 0, 25),
+    (R) => f10OrderWords(R, pickDistinctFirst(R, 4)),
+    (R) => f10OrderWords(R, pickSameFirst(R, 3)),
+    (R) => f10OrderWords(R, pickSameFirst(R, 4)),
+    (R) => f10FirstWord(R, pickSameFirst(R, 4)),
+    (R) => f10xOrder(R, PRE2, 3),
+  ],
+  2: [
+    (R) => f10xOrder(R, PRE2, 3),
+    (R) => f10xOrder(R, PRE2, 4),
+    (R) => f10xFirstLast(R, PRE2, 4),
+    (R) => f10xBeforeAfter(R, PRE2),
+    (R) => f10xGuide(R, false),
+    (R) => f10xGuide(R, false),
+  ],
+  3: [
+    (R) => f10xOrder(R, PRE2, 5),
+    (R) => f10xOrder(R, PRE3, 4),
+    (R) => f10xFirstLast(R, PRE3, 4),
+    (R) => f10xBeforeAfter(R, PRE3),
+    (R) => f10xBeforeAfter(R, PRE2),
+    (R) => f10xGuide(R, true),
+    (R) => f10xGuide(R, true),
+  ],
+});
+f10.pfeq = 'Écriture — l’ordre alphabétique : classer des mots selon la 1re, la 2e et la 3e lettre, mots-repères du dictionnaire (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+
+/* ---------------- f11 : majuscule et ponctuation ---------------- */
+const ENUM11 = [
+  ['J’ai acheté', ['des pommes', 'des poires', 'des bananes', 'des raisins', 'des fraises', 'des oranges']],
+  ['Dans mon sac, il y a', ['un cahier', 'un crayon', 'une règle', 'une gomme', 'des ciseaux', 'un livre']],
+  ['Au zoo, nous avons vu', ['un lion', 'un singe', 'une girafe', 'un zèbre', 'un éléphant', 'un tigre']],
+  ['Pour le pique-nique, maman apporte', ['des sandwichs', 'du jus', 'des biscuits', 'des carottes', 'un melon']],
+  ['L’hiver, je porte', ['une tuque', 'un manteau', 'des mitaines', 'des bottes', 'une écharpe']],
+  ['À la ferme, on trouve', ['des vaches', 'des poules', 'des chevaux', 'des moutons', 'des cochons']],
+  ['Pour mon anniversaire, j’invite', ['Léa', 'Max', 'Zoé', 'Tom', 'Mia', 'Noé']],
+];
+function f11Enum(R) {
+  const [frame, items] = R.pick(ENUM11);
+  const [a, b, c] = R.sample(items, 3);
+  const ok = `${frame} ${a}, ${b} et ${c}.`;
+  const wrongs = [`${frame} ${a} ${b} et ${c}.`, `${frame} ${a}, ${b}, et ${c}.`, `${frame}, ${a}, ${b} et ${c}.`];
+  return mkChoice(R, `f11x-e-${frame}-${nameKey([a, b, c])}`, 'Quelle phrase est bien ponctuée ?', spk(ok), wrongs.map(spk), {
+    say: say('Quelle phrase est bien ponctuée ?'),
+    cols: 1,
+  });
+}
+const VOC11 = ['viens ici', 'ferme la porte', 'écoute bien', 'regarde ce dessin', 'range tes jouets', 'passe-moi le sel', 'attends-moi', 'mange ta soupe'];
+function f11Voc(R) {
+  const n = R.pick(NAMES);
+  const v = R.pick(VOC11);
+  if (R.chance(0.5)) {
+    const ok = `${n}, ${v}!`;
+    return mkChoice(R, `f11x-v-${ok}`, 'Quelle phrase est bien écrite ?', spk(ok), [`${n} ${v}!`, `${low1(n)}, ${v}!`, `${n}, ${cap1(v)}!`].map(spk), {
+      say: say('Quelle phrase est bien écrite ?'),
+      cols: 1,
+    });
+  }
+  const ok = `${cap1(v)}, ${n}!`;
+  return mkChoice(R, `f11x-v-${ok}`, 'Quelle phrase est bien écrite ?', spk(ok), [`${cap1(v)} ${n}!`, `${cap1(v)}, ${low1(n)}!`, `${v}, ${n}!`].map(spk), {
+    say: say('Quelle phrase est bien écrite ?'),
+    cols: 1,
+  });
+}
+function f11Two(R) {
+  const [s1, s2] = R.sample(SENT[2], 2);
+  const ok = `${s1} ${s2}`;
+  const wrongs = [`${s1} ${low1(s2)}`, `${s1.slice(0, -1)} ${s2}`, `${s1.slice(0, -1)} ${low1(s2)}`];
+  return mkChoice(R, `f11x-2-${s1}|${s2}`, 'Quel texte est bien écrit ?', spk(ok), wrongs.map(spk), {
+    say: say('Quel texte est bien écrit ?'),
+    cols: 1,
+  });
+}
+const PLACE11 = [
+  ['le lac Saint-Jean', ['le Lac Saint-Jean', 'le lac saint-jean', 'le lac Saint-jean']],
+  ['le fleuve Saint-Laurent', ['le Fleuve Saint-Laurent', 'le fleuve saint-laurent', 'le fleuve Saint-laurent']],
+  ['le mont Royal', ['le Mont Royal', 'le mont royal', 'le Mont royal']],
+  ['la rue Sainte-Catherine', ['la Rue Sainte-Catherine', 'la rue sainte-catherine', 'la rue Sainte-catherine']],
+  ['le boulevard Laurier', ['le Boulevard Laurier', 'le boulevard laurier', 'le Boulevard laurier']],
+  ['l’île d’Orléans', ['l’Île d’Orléans', 'l’île d’orléans', 'l’Île d’orléans']],
+  ['la ville de Québec', ['la Ville de Québec', 'la ville de québec', 'la Ville de québec']],
+  ['le parc Jean-Drapeau', ['le Parc Jean-Drapeau', 'le parc jean-drapeau', 'le parc Jean-drapeau']],
+  ['le pont Jacques-Cartier', ['le Pont Jacques-Cartier', 'le pont jacques-cartier', 'le pont Jacques-cartier']],
+  ['la rivière Saguenay', ['la Rivière Saguenay', 'la rivière saguenay', 'la Rivière saguenay']],
+  ['le Canada', ['le canada', 'Le canada']],
+  ['les Laurentides', ['les laurentides', 'Les laurentides']],
+  ['la Gaspésie', ['la gaspésie', 'La gaspésie']],
+  ['le Nouveau-Brunswick', ['le nouveau-brunswick', 'le Nouveau-brunswick', 'le nouveau-Brunswick']],
+  ['la Nouvelle-Écosse', ['la nouvelle-Écosse', 'la Nouvelle-écosse', 'la nouvelle-écosse']],
+  ['la place Jacques-Cartier', ['la Place Jacques-Cartier', 'la place jacques-cartier', 'la place Jacques-cartier']],
+];
+function f11Place(R, pool) {
+  const [ok, bad] = R.pick(pool);
+  return mkChoice(R, `f11x-p-${ok}`, 'Comment faut-il écrire ce nom de lieu ?', spk(ok), R.sample(bad, Math.min(3, bad.length)).map(spk), {
+    say: say('Comment faut-il écrire ce nom de lieu ?'),
+    cols: 2,
+  });
+}
+const LANG11 = [
+  ['Mon ami parle français et anglais.', ['Mon ami parle Français et Anglais.', 'Mon ami parle Français et anglais.', 'Mon ami parle français et Anglais.']],
+  ['Les Québécois adorent la poutine.', ['Les québécois adorent la poutine.', 'les Québécois adorent la poutine.', 'Les Québécois adorent la Poutine.']],
+  ['Nous partons en Gaspésie en juillet.', ['Nous partons en gaspésie en juillet.', 'Nous partons en Gaspésie en Juillet.', 'nous partons en Gaspésie en juillet.']],
+  ['Le lundi, la classe visite la bibliothèque.', ['Le Lundi, la classe visite la bibliothèque.', 'Le lundi, la classe visite la Bibliothèque.', 'le lundi, la classe visite la bibliothèque.']],
+  ['Cette chanson québécoise est très connue.', ['Cette chanson Québécoise est très connue.', 'cette chanson québécoise est très connue.', 'Cette Chanson québécoise est très connue.']],
+  ['Un Canadien a gagné la médaille d’or.', ['Un canadien a gagné la médaille d’or.', 'Un Canadien a gagné la Médaille d’or.', 'un Canadien a gagné la médaille d’or.']],
+  ['En février, il neige souvent à Montréal.', ['En Février, il neige souvent à Montréal.', 'En février, il neige souvent à montréal.', 'en février, il neige souvent à Montréal.']],
+  ['Ma voisine apprend l’espagnol le mardi soir.', ['Ma voisine apprend l’Espagnol le mardi soir.', 'Ma voisine apprend l’espagnol le Mardi soir.', 'ma voisine apprend l’espagnol le mardi soir.']],
+  ['Le Saint-Laurent traverse la ville de Québec.', ['Le saint-laurent traverse la ville de Québec.', 'Le Saint-Laurent traverse la Ville de Québec.', 'Le Saint-Laurent traverse la ville de québec.']],
+  ['Les Français et les Italiens visitent Québec en été.', ['Les français et les italiens visitent Québec en été.', 'Les Français et les Italiens visitent Québec en Été.', 'Les Français et les Italiens visitent québec en été.']],
+];
+function f11Lang(R) {
+  const [ok, bad] = R.pick(LANG11);
+  return mkChoice(R, `f11x-l-${ok}`, 'Quelle phrase est bien écrite ?', spk(ok), bad.map(spk), {
+    say: say('Quelle phrase est bien écrite ?'),
+    cols: 1,
+  });
+}
+f11.generate = run({
+  1: [
+    (R) => f11Sentence(R, 'decl'),
+    (R) => f11Sentence(R, 'ask'),
+    (R) => f11Sentence(R, 'exc'),
+    (R) => f11Sentence(R, 'day'),
+    (R) => f11SortProper(R, 8, true),
+    (R) => f11DayRule(R),
+  ],
+  2: [
+    (R) => f11Enum(R),
+    (R) => f11Two(R),
+    (R) => f11Place(R, PLACE11.slice(0, 10)),
+    (R) => f11Sentence(R, 'day'),
+    (R) => f11SortProper(R, 8, true),
+    (R) => f11Lang(R),
+  ],
+  3: [
+    (R) => f11Enum(R),
+    (R) => f11Voc(R),
+    (R) => f11Voc(R),
+    (R) => f11Place(R, PLACE11),
+    (R) => f11Lang(R),
+    (R) => f11Two(R),
+  ],
+});
+f11.pfeq = 'Écriture — majuscule (début de phrase, noms propres, noms de lieux), virgule (énumération, mot qu’on interpelle), ponctuation de fin de phrase (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+
+/* ---------------- f12 : homophones grammaticaux ---------------- */
+const HOM2 = {
+  a: {
+    forms: ['a', 'à'],
+    tip: 'a ou à ? (essaie avec « avait » : a = avait)',
+    s: [
+      ['Ma grand-mère ___ préparé une tourtière pour toute la famille.', 'a'], ['Nous allons ___ la cabane à sucre samedi prochain.', 'à'],
+      ['Mon frère ___ gagné la course de ski de fond.', 'a'], ['Elle pense souvent ___ ses vacances d’été.', 'à'],
+      ['Le facteur ___ laissé un colis devant la porte.', 'a'], ['Les élèves jouent ___ la balle au mur.', 'à'],
+      ['Zoé ___ une grande peur des araignées.', 'a'], ['Il parle ___ sa voisine par-dessus la clôture.', 'à'],
+      ['Ma cousine ___ perdu ses lunettes dans la neige.', 'a'], ['Nous arrivons ___ la maison vers cinq heures.', 'à'],
+    ],
+  },
+  e: {
+    forms: ['et', 'est'],
+    tip: 'et ou est ? (essaie avec « était » : est = était)',
+    s: [
+      ['Ce matin, mon petit frère ___ très fatigué.', 'est'], ['Nous avons mangé du pain ___ du fromage au dîner.', 'et'],
+      ['La soupe aux pois ___ prête depuis midi.', 'est'], ['Léa ___ sa meilleure amie jouent dans la neige.', 'et'],
+      ['Le lac ___ gelé depuis le mois de décembre.', 'est'], ['Il porte une tuque rouge ___ des mitaines vertes.', 'et'],
+      ['Où ___ passé le chat de la voisine ?', 'est'], ['Papa lave la vaisselle ___ maman range la cuisine.', 'et'],
+      ['Cette histoire ___ très drôle.', 'est'], ['Mon oncle ___ pompier depuis dix ans.', 'est'],
+    ],
+  },
+  s: {
+    forms: ['son', 'sont'],
+    tip: 'son ou sont ? (essaie avec « étaient » : sont = étaient)',
+    s: [
+      ['Mes cousins ___ arrivés hier soir.', 'sont'], ['Léa range ___ livre dans son sac.', 'son'],
+      ['Les poires ___ mûres et sucrées.', 'sont'], ['Le chat mange ___ repas du soir.', 'son'],
+      ['Les enfants ___ allés à la piscine.', 'sont'], ['Papa lave ___ gros camion bleu.', 'son'],
+      ['Les nuages ___ très noirs ce matin.', 'sont'], ['Max a perdu ___ chandail préféré.', 'son'],
+      ['Mes bottes ___ pleines de neige.', 'sont'], ['La maîtresse corrige ___ examen.', 'son'],
+    ],
+  },
+  o: {
+    forms: ['ou', 'où'],
+    tip: 'ou ou où ? (ou = ou bien ; où = un endroit ou un moment)',
+    s: [
+      ['Veux-tu du riz ___ des pâtes pour le souper ?', 'ou'], ['Voici le village ___ habite ma grand-mère.', 'où'],
+      ['___ as-tu rangé mes patins ?', 'Où'], ['Prends-tu l’autobus ___ le métro ?', 'ou'],
+      ['Je ne sais pas ___ est ma tuque.', 'où'], ['Il pleut ___ il neige ? Je ne sais pas.', 'ou'],
+      ['La ville ___ nous sommes nés est très jolie.', 'où'], ['Tu choisis le rouge ___ le jaune ?', 'ou'],
+      ['___ vont les outardes en hiver ?', 'Où'], ['Elle hésite entre la glace ___ la tarte.', 'ou'],
+    ],
+  },
+  n: {
+    forms: ['on', 'ont'],
+    tip: 'on ou ont ? (essaie avec « avaient » : ont = avaient)',
+    s: [
+      ['___ a gagné le match de hockey hier.', 'On'], ['Les voisins ___ ramassé les feuilles mortes.', 'ont'],
+      ['Hier, ils ___ visité le zoo de Granby.', 'ont'], ['Dans cette classe, ___ apprend à lire en riant.', 'on'],
+      ['Les oiseaux ___ construit un nid dans l’érable.', 'ont'], ['Quand ___ a faim, on mange une collation.', 'on'],
+      ['Mes parents ___ acheté un nouveau tapis.', 'ont'], ['___ ne voit plus rien dans ce brouillard.', 'On'],
+      ['Les enfants ___ chanté en chœur.', 'ont'], ['Ici, ___ parle français et anglais.', 'on'],
+    ],
+  },
+  c: {
+    forms: ['ces', 'ses'],
+    tip: 'ces ou ses ? (ses = à lui, à elle, comme « son » ; ces = ceux-ci)',
+    s: [
+      ['Regarde ___ nuages noirs au-dessus de la montagne!', 'ces'], ['Léa met ___ mitaines et sa tuque avant de sortir.', 'ses'],
+      ['Je n’aime pas ___ chaussures trop petites.', 'ces'], ['Le chat lèche ___ pattes après chaque repas.', 'ses'],
+      ['Qui a dessiné tous ___ beaux bonshommes sur le tableau ?', 'ces'], ['Max met son manteau, sa tuque et ___ bottes.', 'ses'],
+      ['Pourquoi aimes-tu tant ___ vieux jouets ?', 'ces'], ['La fillette serre ___ poupées contre son cœur.', 'ses'],
+      ['Tous ___ enfants ont reçu un cadeau.', 'ces'], ['L’oiseau déploie ___ ailes bleues et s’envole.', 'ses'],
+    ],
+  },
+  m: {
+    forms: ['mes', 'mais'],
+    tip: 'mes ou mais ? (mais = pourtant ; mes = à moi, comme « mon »)',
+    s: [
+      ['Je voulais sortir, ___ il pleut trop fort.', 'mais'], ['Où sont ___ mitaines rouges ?', 'mes'],
+      ['J’aime le hockey, ___ je préfère le ski.', 'mais'], ['J’ai rangé tous ___ jouets dans le coffre.', 'mes'],
+      ['Elle est petite ___ très rapide.', 'mais'], ['Ce sont ___ amis du camp d’été.', 'mes'],
+      ['Il est gentil, ___ il parle trop.', 'mais'], ['Je prête ___ crayons à Léa.', 'mes'],
+      ['Nous voulions un chien, ___ papa est allergique.', 'mais'], ['Aide-moi à ramasser ___ billes.', 'mes'],
+    ],
+  },
+  a3: {
+    forms: ['a', 'à', 'as'],
+    tip: 'a, à ou as ? (as va avec « tu » ; a = avait)',
+    s: [
+      ['Tu ___ oublié ton sac dans l’autobus.', 'as'], ['Tu ___ raison, c’est un exercice difficile.', 'as'],
+      ['Peux-tu aller ___ la bibliothèque pour moi ?', 'à'], ['Papa ___ réparé le vélo de ma sœur.', 'a'],
+      ['Tu ___ de beaux yeux bleus.', 'as'], ['Le chat saute ___ travers la clôture.', 'à'],
+      ['Quand tu ___ faim, dis-le-moi.', 'as'], ['Le bébé ___ dormi toute la nuit.', 'a'],
+      ['Nous parlons ___ la directrice demain.', 'à'], ['Tu ___ gagné la course ?', 'as'],
+    ],
+  },
+  e3: {
+    forms: ['et', 'est', 'es'],
+    tip: 'et, est ou es ? (es va avec « tu » ; est = était)',
+    s: [
+      ['Tu ___ le meilleur joueur de l’équipe.', 'es'], ['Tu ___ en retard ce matin.', 'es'],
+      ['Le gâteau ___ au chocolat.', 'est'], ['Mon père ___ ma mère travaillent à Québec.', 'et'],
+      ['Tu ___ très gentil avec ton petit frère.', 'es'], ['Elle chante ___ elle danse.', 'et'],
+      ['Où ___ ma tuque ?', 'est'], ['Quand tu ___ fatigué, repose-toi.', 'es'],
+      ['La neige ___ tombée toute la nuit.', 'est'], ['Le chien ___ le chat dorment ensemble.', 'et'],
+    ],
+  },
+};
+const sameCase = (ref, f) => (ref[0] === ref[0].toUpperCase() ? cap1(f) : f);
+function f12xFill(R, groups) {
+  const gk = R.pick(groups);
+  const g = HOM2[gk];
+  const [s, ok] = R.pick(g.s);
+  const wrongs = g.forms.filter((f) => f.toLowerCase() !== ok.toLowerCase()).map((f) => sameCase(ok, f));
+  return mkChoice(R, `f12x-f-${s}`, `Complète : ${g.tip}`, { text: ok }, wrongs.map((t) => ({ text: t })), {
+    say: say(fillIn(s, ok)),
+    stimulus: { text: s },
+    cols: wrongs.length + 1 === 3 ? 3 : 2,
+  });
+}
+function f12xSentence(R, groups) {
+  const gk = R.pick(groups);
+  const g = HOM2[gk];
+  const [s, ok] = R.pick(g.s);
+  const wrongs = g.forms.filter((f) => f.toLowerCase() !== ok.toLowerCase()).map((f) => fillIn(s, sameCase(ok, f)));
+  const good = fillIn(s, ok);
+  return mkChoice(R, `f12x-p-${s}`, 'Quelle phrase est bien écrite ?', spk(good), wrongs.map(spk), {
+    say: say('Quelle phrase est bien écrite ?'),
+    cols: 1,
+  });
+}
+function f12xCombo(R) {
+  const [g1, g2] = R.sample(['a', 'e', 's', 'o', 'n', 'c', 'm'], 2);
+  const [s1, ok1] = R.pick(HOM2[g1].s);
+  const [s2, ok2] = R.pick(HOM2[g2].s);
+  const fm = (g, s, f) => sameCase(s.startsWith('___') ? 'A' : 'a', f);
+  const combos = [];
+  for (const f1 of HOM2[g1].forms) for (const f2 of HOM2[g2].forms) combos.push([f1, f2]);
+  const lab = ([f1, f2]) => `${fm(g1, s1, f1)} — ${fm(g2, s2, f2)}`;
+  const okLabel = lab([ok1.toLowerCase(), ok2.toLowerCase()]);
+  const wrongs = combos.map(lab).filter((t) => t !== okLabel);
+  return mkChoice(R, `f12x-c-${s1}|${s2}`, 'Quels mots complètent les deux phrases ? (dans l’ordre)', { text: okLabel }, wrongs.map((t) => ({ text: t })), {
+    say: say(`${fillIn(s1, ok1)} ${fillIn(s2, ok2)}`),
+    stimulus: { text: `${s1}   ${s2}` },
+    cols: 2,
+  });
+}
+f12.generate = run({
+  1: [
+    (R) => f12Fill(R, ['a', 'e', 's', 'o', 'n']),
+    (R) => f12Fill(R, ['n', 's']),
+    (R) => f12Sentence(R, ['a', 'e', 's', 'o', 'n']),
+    (R) => f12Sentence(R, ['n', 'o', 's']),
+    (R) => f12xFill(R, ['a', 'e', 's', 'o', 'n']),
+  ],
+  2: [
+    (R) => f12xFill(R, ['a', 'e', 's', 'o', 'n', 'c', 'm']),
+    (R) => f12xFill(R, ['c', 'm']),
+    (R) => f12xSentence(R, ['a', 'e', 's', 'o', 'n', 'c', 'm']),
+    (R) => f12xSentence(R, ['c', 'm']),
+    (R) => f12xFill(R, ['a', 'e', 's', 'o', 'n', 'c', 'm']),
+  ],
+  3: [
+    (R) => f12xFill(R, ['a3', 'e3']),
+    (R) => f12xFill(R, ['a3', 'e3', 'c', 'm', 'n', 's']),
+    (R) => f12xSentence(R, ['a3', 'e3']),
+    (R) => f12xSentence(R, ['a', 'e', 's', 'o', 'n', 'c', 'm']),
+    (R) => f12xCombo(R),
+    (R) => f12xCombo(R),
+  ],
+});
+f12.pfeq = 'Écriture — homophones grammaticaux : a/à/as, et/est/es, son/sont, ces/ses, on/ont, ou/où, mes/mais (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
+
+/* ---------------- f13 : contraires, synonymes, familles, préfixes, suffixes ---------------- */
+const ANT3 = [
+  ['timide', 'audacieux'], ['généreux', 'avare'], ['rare', 'fréquent'], ['courageux', 'lâche'], ['ancien', 'moderne'], ['accepter', 'refuser'],
+  ['permettre', 'interdire'], ['ajouter', 'enlever'], ['augmenter', 'diminuer'], ['approcher', 'éloigner'], ['prudent', 'imprudent'],
+  ['calme', 'agité'], ['sombre', 'lumineux'], ['entrée', 'sortie'], ['accélérer', 'ralentir'], ['majorité', 'minorité'],
+  ['victoire', 'défaite'], ['obéir', 'désobéir'], ['présent', 'absent'], ['réussir', 'échouer'], ['honnête', 'malhonnête'],
+  ['intérieur', 'extérieur'], ['bavard', 'silencieux'], ['paresseux', 'travailleur'], ['maigre', 'gras'], ['aimable', 'désagréable'],
+  ['encourager', 'décourager'], ['tristesse', 'joie'], ['mentir', 'avouer'], ['ouvert', 'fermé'], ['profond', 'superficiel'], ['humble', 'orgueilleux'],
+];
+const ANT3_ITEMS = ANT3.flatMap(([a, b], i) => [{ q: a, a: b, i }, { q: b, a, i }]);
+const ANT3_WORDS = ANT3.flatMap(([a, b], i) => [{ t: a, i }, { t: b, i }]);
+const SYN2 = [
+  ['brave', 'courageux'], ['malin', 'rusé'], ['étrange', 'bizarre'], ['difficile', 'ardu'], ['tranquille', 'paisible'], ['souvent', 'fréquemment'],
+  ['avertir', 'prévenir'], ['aider', 'secourir'], ['cesser', 'arrêter'], ['garder', 'conserver'], ['combat', 'bataille'], ['peur', 'crainte'],
+  ['pays', 'nation'], ['habit', 'vêtement'], ['demeurer', 'habiter'], ['immense', 'gigantesque'], ['fâché', 'furieux'], ['rapide', 'prompt'],
+  ['entrer', 'pénétrer'], ['voyage', 'périple'], ['maison', 'habitation'], ['joli', 'charmant'], ['dire', 'prononcer'], ['effrayant', 'terrifiant'],
+];
+const SYN2_ITEMS = SYN2.flatMap(([a, b], i) => [{ q: a, a: b, i }, { q: b, a, i }]);
+const SYN2_WORDS = SYN2.flatMap(([a, b], i) => [{ t: a, i }, { t: b, i }]);
+const FAMS2 = [
+  ['main', ['manuel', 'manette', 'maniable', 'manuscrit'], ['mangue']],
+  ['cœur', ['courage', 'encourager', 'courageux'], ['courir']],
+  ['livre', ['librairie', 'libraire', 'livret'], ['libre']],
+  ['nuit', ['minuit', 'nuitée', 'nuitamment'], ['nuire']],
+  ['grand', ['grandir', 'grandeur', 'agrandir'], ['grain']],
+  ['chaud', ['chaleur', 'chauffer', 'chaleureux', 'réchauffer'], ['chauve']],
+  ['froid', ['froideur', 'refroidir', 'froidement'], ['frise']],
+  ['vie', ['vivant', 'vivre', 'survivre'], ['vigne']],
+  ['rouge', ['rougeur', 'rougir', 'rougeâtre', 'rougeole'], ['rouler']],
+  ['blanc', ['blancheur', 'blanchir', 'blanchâtre'], ['blague']],
+  ['noir', ['noirceur', 'noircir', 'noiraud'], ['noix']],
+  ['sang', ['sanglant', 'saigner', 'ensanglanté'], ['sans']],
+  ['ami', ['amitié', 'amical', 'amicalement'], ['amiral']],
+  ['fer', ['ferraille', 'ferronnier', 'ferrer'], ['fermer']],
+  ['lune', ['lunaire', 'alunir', 'lunatique'], ['lunch']],
+  ['forêt', ['forestier', 'déforestation', 'déforester'], ['foret']],
+  ['mur', ['muraille', 'emmurer', 'mural'], ['mûr']],
+  ['chasse', ['chasseur', 'chasseuse', 'chasser', 'pourchasser'], ['châsse']],
+  ['colle', ['coller', 'décoller', 'collant', 'collage'], ['col']],
+  ['plume', ['plumage', 'plumeau', 'déplumer'], ['pluie']],
+  ['pêche', ['pêcheur', 'pêcherie', 'pêcher'], ['péché']],
+  ['bijou', ['bijoutier', 'bijouterie'], ['bille']],
+];
+function f13FamX(R, pool, trap) {
+  const [root, fam, look] = R.pick(pool);
+  const members = [root, ...fam];
+  const stim = R.pick(members);
+  const ok = R.pick(members.filter((m) => m !== stim));
+  const others = uniq(R.sample(pool.filter((f) => f[0] !== root), 8).map((f) => R.pick([f[0], ...f[1]])));
+  const wrong = trap ? [look[0], ...others.slice(0, 2)] : others.slice(0, 3);
+  return mkChoice(R, `f13x-f-${stim}-${ok}`, `Quel mot est de la même famille que « ${stim} » ?`, spk(ok), wrong.map(spk), {
+    say: say(`Quel mot est de la même famille que ${stim} ?`),
+    cols: 2,
+  });
+}
+function f13IntruderX(R, pool) {
+  const [root, fam, look] = R.pick(pool);
+  const members = R.sample([root, ...fam], 3);
+  const odd = R.chance(0.65) ? look[0] : R.pick(R.pick(pool.filter((f) => f[0] !== root))[1]);
+  return mkChoice(R, `f13x-x-${sortedKey([...members, odd])}`, 'Quel mot n’est pas de la même famille que les autres ?', spk(odd), members.map(spk), {
+    say: say('Quel mot n’est pas de la même famille que les autres ?'),
+    cols: 2,
+  });
+}
+function f13SortFamX(R, pool) {
+  const [a, b] = R.sample(pool, 2);
+  const ga = R.sample(a[1], Math.min(3, a[1].length));
+  const gb = R.sample(b[1], Math.min(3, b[1].length));
+  return mkSort(
+    R,
+    `f13x-s-${a[0]}-${b[0]}-${sortedKey([...ga, ...gb])}`,
+    'Classe les mots dans la bonne famille.',
+    [{ text: `Famille de « ${a[0]} »`, emoji: '👪' }, { text: `Famille de « ${b[0]} »`, emoji: '👪' }],
+    [ga.map(spk), gb.map(spk)],
+    { say: say('Classe les mots dans la bonne famille.') },
+  );
+}
+// préfixes : base | préfixe | classe (N = in/im/il/ir, D = dé, M = mal/mé)
+const PREF_RAW = `
+possible|im|N
+poli|im|N
+patient|im|N
+mobile|im|N
+prévu|im|N
+parfait|im|N
+lisible|il|N
+légal|il|N
+logique|il|N
+réel|ir|N
+régulier|ir|N
+responsable|ir|N
+visible|in|N
+juste|in|N
+connu|in|N
+utile|in|N
+capable|in|N
+actif|in|N
+complet|in|N
+attentif|in|N
+faire|dé|D
+plier|dé|D
+coller|dé|D
+couvrir|dé|D
+boucher|dé|D
+charger|dé|D
+brancher|dé|D
+attacher|dé|D
+heureux|mal|M
+honnête|mal|M
+adroit|mal|M
+traité|mal|M
+`;
+const PREF = PREF_RAW.trim().split('\n').map((l) => {
+  const [base, p, c] = l.split('|');
+  return { base, p, c };
+});
+const PREF_OPTS = { N: ['in', 'im', 'il', 'ir'], D: ['dé', 're', 'in', 'mé'], M: ['mal', 'in', 'dé', 'im'] };
+function f13xPref(R, pool) {
+  const x = R.pick(pool);
+  const opts = PREF_OPTS[x.c];
+  return mkChoice(R, `f13x-p-${x.base}`, `Quel préfixe forme le contraire de « ${x.base} » ?`, { text: `${x.p}-` }, opts.filter((o) => o !== x.p).map((o) => ({ text: `${o}-` })), {
+    say: say(`Quel préfixe forme le contraire de ${x.base} ?`),
+    cols: 4,
+  });
+}
+const RE_LIST = [
+  ['faire', 'refaire'], ['lire', 'relire'], ['commencer', 'recommencer'], ['dire', 'redire'], ['mettre', 'remettre'], ['écrire', 'réécrire'],
+  ['voir', 'revoir'], ['planter', 'replanter'], ['construire', 'reconstruire'], ['charger', 'recharger'], ['lancer', 'relancer'], ['colorier', 'recolorier'],
+  ['compter', 'recompter'], ['démarrer', 'redémarrer'],
+];
+function f13xRe(R) {
+  const [inf, ok] = R.pick(RE_LIST);
+  const wrong = R.sample(RE_LIST.filter((x) => x[1] !== ok), 3).map((x) => x[1]);
+  return mkChoice(R, `f13x-re-${inf}`, `Quel mot veut dire « ${inf} de nouveau » ?`, spk(ok), wrong.map(spk), {
+    say: say(`Quel mot veut dire ${inf} de nouveau ?`),
+    cols: 2,
+  });
+}
+const AGENT = [
+  ['chante', 'chanteur'], ['danse', 'danseur'], ['nage', 'nageur'], ['court', 'coureur'], ['vend', 'vendeur'], ['joue', 'joueur'],
+  ['patine', 'patineur'], ['skie', 'skieur'], ['pêche', 'pêcheur'], ['lit', 'lecteur'], ['peint', 'peintre'], ['dessine', 'dessinateur'], ['livre', 'livreur'],
+];
+function f13xAgent(R) {
+  const [v, ok] = R.pick(AGENT);
+  const wrong = R.sample(AGENT.filter((x) => x[1] !== ok), 3).map((x) => x[1]);
+  return mkChoice(R, `f13x-ag-${ok}`, `Comment appelle-t-on la personne qui ${v} ?`, spk(ok), wrong.map(spk), {
+    say: say(`Comment appelle-t-on la personne qui ${v} ?`),
+    cols: 2,
+  });
+}
+const ABLE = [
+  ['qui peut être lavé', 'lavable'], ['qui peut être mangé', 'mangeable'], ['qui peut être lu', 'lisible'], ['qui peut être vu', 'visible'],
+  ['qui peut être plié', 'pliable'], ['qui peut être joué', 'jouable'], ['qui peut être bu', 'buvable'], ['qui peut être utilisé', 'utilisable'],
+  ['qui peut être cassé', 'cassable'], ['qui peut être réparé', 'réparable'],
+];
+function f13xAble(R) {
+  const [d, ok] = R.pick(ABLE);
+  const wrong = R.sample(ABLE.filter((x) => x[1] !== ok), 3).map((x) => x[1]);
+  return mkChoice(R, `f13x-ab-${ok}`, `Quel mot veut dire « ${d} » ?`, spk(ok), wrong.map(spk), {
+    say: say(`Quel mot veut dire ${d} ?`),
+    cols: 2,
+  });
+}
+const ADV = [
+  ['rapide', 'rapidement', 'rapidemment', 'rapidment', 'rapideement'],
+  ['doux', 'doucement', 'douxement', 'douement', 'doucemant'],
+  ['gentil', 'gentiment', 'gentillement', 'gentilment', 'gentimant'],
+  ['poli', 'poliment', 'polliment', 'polimment', 'polimant'],
+  ['vrai', 'vraiment', 'vraiement', 'vraisment', 'vrément'],
+  ['fort', 'fortement', 'fortment', 'forttement', 'fortemant'],
+  ['heureux', 'heureusement', 'heureuxement', 'heureusment', 'heureusemment'],
+  ['lent', 'lentement', 'lentment', 'lentemment', 'lentemant'],
+  ['simple', 'simplement', 'simplemant', 'simpelment', 'simplment'],
+  ['certain', 'certainement', 'certenement', 'certainnement', 'certainemment'],
+  ['sage', 'sagement', 'sagemment', 'sagment', 'sageement'],
+  ['joyeux', 'joyeusement', 'joyeuxement', 'joyeusment', 'joyeusemment'],
+  ['froid', 'froidement', 'froidment', 'froidemment', 'froitement'],
+];
+function f13xAdv(R) {
+  const [adj, ok, ...bad] = R.pick(ADV);
+  return mkChoice(R, `f13x-adv-${adj}`, `Quelle est la bonne façon d’écrire l’adverbe formé avec « ${adj} » ?`, spk(ok), bad.map(spk), {
+    say: say(`Quelle est la bonne façon d’écrire l’adverbe formé avec ${adj} ?`),
+    cols: 2,
+  });
+}
+function f13xAntLetters(R) {
+  const it = R.pick(ANT3_ITEMS.filter((x) => Array.from(x.a).length <= 10 && /^[a-zàâçéèêëîïôûùüœ]+$/.test(x.a)));
+  return {
+    type: 'order',
+    key: `f13x-al-${it.q}`,
+    prompt: `Écris le contraire de « ${it.q} ».`,
+    say: say(`Écris le contraire de ${it.q}.`),
+    tiles: Array.from(it.a),
+    extra: R.sample(ALPHA.filter((c) => !it.a.includes(c)), 3),
+    joiner: '',
+  };
+}
+const FAMS_ALL = [...FAMS, ...FAMS2];
+f13.generate = run({
+  1: [
+    (R) => f13Family(R, true),
+    (R) => f13Intruder(R),
+    (R) => f13SortFam(R),
+    (R) => f13Prefix(R),
+    (R) => f13AntLetters(R),
+    (R) => f13Ant(R, 4, ANT2_ITEMS, ANT2_WORDS, 'a'),
+  ],
+  2: [
+    (R) => f13Ant(R, 4, ANT3_ITEMS, ANT3_WORDS, 'a'),
+    (R) => f13Ant(R, 4, SYN2_ITEMS, SYN2_WORDS, 's'),
+    (R) => f13FamX(R, FAMS_ALL, false),
+    (R) => f13FamX(R, FAMS2, true),
+    (R) => f13xPref(R, PREF.filter((x) => x.c !== 'N')),
+    (R) => f13xRe(R),
+    (R) => f13xAgent(R),
+    (R) => f13xAntLetters(R),
+  ],
+  3: [
+    (R) => f13Ant(R, 4, ANT3_ITEMS, ANT3_WORDS, 'a'),
+    (R) => f13Ant(R, 4, SYN2_ITEMS, SYN2_WORDS, 's'),
+    (R) => f13FamX(R, FAMS_ALL, true),
+    (R) => f13IntruderX(R, FAMS_ALL),
+    (R) => f13SortFamX(R, FAMS_ALL),
+    (R) => f13xPref(R, PREF),
+    (R) => f13xAble(R),
+    (R) => f13xAdv(R),
+    (R) => f13xAgent(R),
+  ],
+});
+f13.pfeq = 'Lecture / écriture — vocabulaire : contraires, synonymes, familles de mots, préfixes (dé-, re-, in-/im-/il-/ir-, mal-) et suffixes (-eur, -able, -ment) (PFEQ 1er cycle, 2e année – 2e cycle, 3e année)';
 
 export const units = [f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13];

@@ -94,3 +94,19 @@ Simplified characters + Hanyu Pinyin with tone marks. The child speaks some Mand
 - Praise is spoken in Chinese automatically.
 - New type **write** (stroke order, Hanzi Writer, needs Internet):
   `{ type: 'write', key, prompt, say?, char: '人', py: 'rén' }` — shows the stroke animation, then the child traces each stroke.
+
+## Handwriting — type `hand` (French and English writing units)
+The child writes on a lined pad (Apple Pencil or finger); on « Vérifier » the image is transcribed and graded by AI (worker `/ai/write`).
+```js
+{ type: 'hand', key, lang: 'fr' | 'en',
+  mode: 'dictation' | 'answer' | 'sentence' | 'composition',
+  prompt,                      // instruction ({fr,en} or plain string in the course language)
+  say?: { text, lang },        // dictation: the exact sentence to dictate (read aloud, repeatable)
+  stimulus?,                   // answer: { text: <short text> }; sentence/composition: { emoji } or { svg }
+  expected?: 'Le chat dort.',  // dictation only: the exact text (graded word by word, accents count)
+  answerKey?: 'Parce qu’il a froid.',   // answer only: the gist of a correct answer
+  words?: ['neige', 'glisser'],         // sentence: words that must be used
+  minWords?: 5,                // sentence/composition: minimum length
+  lines?: 2 }                  // writing lines on the pad (1–8)
+```
+Units that use `hand` also export `allSay()` on the unit: an array of every fixed `say` object (for pre-recording with ElevenLabs).

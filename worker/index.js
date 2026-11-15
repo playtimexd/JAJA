@@ -83,6 +83,74 @@ export default {
       }
     }
 
+    // ---- Handwriting: transcribe the child's writing (image) and grade it. Free Workers AI first, OpenAI as backup. ----
+    if (url.pathname === '/ai/write') {
+      const lang = body.lang === 'en' ? 'en' : 'fr';
+      const mode = ['dictation', 'answer', 'sentence', 'composition'].includes(body.mode) ? body.mode : 'sentence';
+      const img = String(body.image || '').replace(/^data:image\/\w+;base64,/, '');
+      const typed = String(body.typed || '').slice(0, 2000);
+      if (!typed && (!img || img.length > 1_500_000)) return json({ error: 'image' }, 400, cors);
+      const L = lang === 'fr' ? 'French (Québec)' : 'English';
+      const clip = (x, n) => String(x || '').slice(0, n);
+      const task = mode === 'dictation' ? `The child was dictated: «${clip(body.expected, 300)}».`
+        : mode === 'answer' ? `Text the child read: «${clip(body.text, 1500)}»\nQuestion: ${clip(body.question, 300)}\nGist of a correct answer: ${clip(body.answerKey, 300)}`
+        : mode === 'sentence' ? `Instruction: ${clip(body.question, 300)}. Words that must be used: ${(body.words || []).join(', ')}. Minimum words: ${Number(body.minWords) || 3}.`
+        : `Writing prompt: ${clip(body.question, 400)}. Minimum words: ${Number(body.minWords) || 20}.`;
+      const okRule = mode === 'answer' ? 'the meaning answers the question correctly (spelling mistakes do not make it wrong)'
+        : mode === 'dictation' ? 'the text matches the dictation exactly (accents and plural endings count)'
+          : 'the instruction is followed (required words used, enough words, real sentences)';
+      const grade = `You are a kind ${L} teacher for a 7-8 year old (grade 2-3). ${task}
+Return ONLY compact JSON: {"ok":true|false,"score":0..1,"feedback":"2 short encouraging sentences in ${L} for the child: one thing done well, one thing to fix","corrections":[{"wrong":"...","right":"..."}]}.
+ok = ${okRule}. corrections = at most 6 spelling/grammar fixes, child's word -> correct word. Be gentle; never mock.`;
+      const readPrompt = `Transcribe exactly the handwritten ${L} text of a young child in this image. Keep their spelling mistakes; do not correct anything. Output only the text.`;
+      let text = '', result = null, via = '';
+      // 1) free: Workers AI vision + Qwen
+      try {
+        if (typed) text = typed;
+        else {
+        if (env.HIBOU_KV && !(await env.HIBOU_KV.get('llama-vision-agreed'))) {   // Meta license: one-time « agree » request
+          try { await env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct', { prompt: 'agree' }); } catch {}
+          await env.HIBOU_KV.put('llama-vision-agreed', '1');
+        }
+        const bytes = Uint8Array.from(atob(img), (c) => c.charCodeAt(0));
+        let v;
+        try { v = await env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct', { messages: [{ role: 'user', content: [{ type: 'text', text: readPrompt }, { type: 'image_url', image_url: { url: `data:image/png;base64,${img}` } }] }], max_tokens: 300 }); }
+        catch { v = await env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct', { prompt: readPrompt, image: [...bytes], max_tokens: 300 }); }
+        if (!v?.response) body._cfErr = 'vision empty: ' + JSON.stringify(v).slice(0, 200);
+        text = String(v?.response || '').trim().replace(/^["“«]\s*|\s*["”»]$/g, '');
+        if (/(image|handwrit|transcri|text reads|appears)/i.test(text)) { const m = text.match(/["“«]([^"”»]{2,})["”»]/); if (m) text = m[1].trim(); }
+        }
+        if (text) {
+          const g = await env.AI.run(env.AI_LLM || '@cf/qwen/qwen3-30b-a3b-fp8', { messages: [{ role: 'system', content: `${grade} /no_think` }, { role: 'user', content: `Child's writing: «${text}»` }], max_tokens: 900, temperature: 0.2 });
+          const resp = g?.response ?? g?.choices?.[0]?.message?.content ?? '';
+          if (resp && typeof resp === 'object') result = resp;
+          else {
+            const raw = String(resp).replace(/<think>[\s\S]*?<\/think>/g, '');
+            if (!raw.includes('{')) body._cfErr = 'grader: ' + JSON.stringify(g).slice(0, 220);
+            result = JSON.parse(raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1));
+          }
+          via = 'cloudflare';
+        }
+      } catch (e) { result = null; body._cfErr = (body._cfErr ? body._cfErr + ' | ' : '') + String(e?.message || e).slice(0, 160); }
+      // 2) backup: OpenAI (one call reads and grades)
+      if (!result && env.OPENAI_API_KEY) {
+        try {
+          const sys = grade.replace('Return ONLY compact JSON: {', 'Return ONLY compact JSON: {"text":"exact transcription of the handwriting, mistakes kept",');
+          const r = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST', headers: { authorization: `Bearer ${env.OPENAI_API_KEY}`, 'content-type': 'application/json' },
+            body: JSON.stringify({ model: env.WRITE_MODEL || 'gpt-4o-mini', response_format: { type: 'json_object' }, max_tokens: 500, temperature: 0.2,
+              messages: [{ role: 'system', content: sys }, (typed ? { role: 'user', content: `The child typed: «${typed}». Use it as the transcription.` } : { role: 'user', content: [{ type: 'text', text: readPrompt }, { type: 'image_url', image_url: { url: `data:image/png;base64,${img}`, detail: 'high' } }] })] }),
+          });
+          const j = await r.json();
+          result = JSON.parse(j.choices[0].message.content);
+          text = String(result.text || text);
+          via = 'openai';
+        } catch (e) { return json({ error: 'write', detail: String(e?.message || e).slice(0, 160) }, 502, cors); }
+      }
+      if (!result) return json({ error: 'write' }, 502, cors);
+      return json({ text, via, cfErr: via === 'openai' ? (body._cfErr || 'no text') : undefined, ok: !!result.ok, score: Math.max(0, Math.min(1, Number(result.score) || 0)), feedback: String(result.feedback || ''), corrections: Array.isArray(result.corrections) ? result.corrections.slice(0, 6) : [] }, 200, cors);
+    }
+
     if (url.pathname === '/realtime') {
       const instructions = String(body.instructions || '').slice(0, 6000);
       const r = await fetch('https://api.openai.com/v1/realtime/client_secrets', {
