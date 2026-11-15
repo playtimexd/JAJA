@@ -49,23 +49,34 @@ const sun = (x, y, rad) => { let d = ''; for (let a = 0; a < 360; a += 45) d += 
 const cloud = (x, y, s = 1, col = Wh) => p(`M${q(x - 26 * s)} ${q(y)}a${q(9 * s)} ${q(9 * s)} 0 0 1 ${q(3 * s)} ${q(-17 * s)}a${q(13 * s)} ${q(13 * s)} 0 0 1 ${q(24 * s)} ${q(-7 * s)}a${q(11 * s)} ${q(11 * s)} 0 0 1 ${q(21 * s)} ${q(5 * s)}a${q(9 * s)} ${q(9 * s)} 0 0 1 ${q(-2 * s)} ${q(19 * s)}Z`, F(col));
 const bird = (x, y, s = 1) => p(`M${q(x - 9 * s)} ${q(y)}q${q(4.5 * s)} ${q(-8 * s)} ${q(9 * s)} 0q${q(4.5 * s)} ${q(-8 * s)} ${q(9 * s)} 0`);
 const star5 = (x, y, R, col = Y) => pg(Array.from({ length: 10 }, (_, i) => pt(x, y, i % 2 ? R * 0.45 : R, -90 + i * 36).replace(' ', ',')).join(' '), F(col));
+const naturalPath = (x, y, s, d, col) => p(d.replace(/([MLQZ])([^MLQZ]*)/g, (_, cmd, values) => {
+  const nums = (values.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
+  return cmd + nums.map((v, i) => q((i % 2 ? y : x) + v * s)).join(' ');
+}), F(col));
 const pine = (x, y, s = 1, col = Gd) => [
-  r(x - 3 * s, y - 8 * s, 6 * s, 8 * s, 0, F(Br)),
-  pg(`${q(x - 18 * s)},${q(y - 8 * s)} ${x},${q(y - 34 * s)} ${q(x + 18 * s)},${q(y - 8 * s)}`, F(col)),
-  pg(`${q(x - 15 * s)},${q(y - 26 * s)} ${x},${q(y - 50 * s)} ${q(x + 15 * s)},${q(y - 26 * s)}`, F(col)),
-  pg(`${q(x - 11 * s)},${q(y - 42 * s)} ${x},${q(y - 64 * s)} ${q(x + 11 * s)},${q(y - 42 * s)}`, F(col)),
+  naturalPath(x, y, s, 'M-3 -15L-4 0L4 0L3 -15Z', Br),
+  naturalPath(x, y, s, 'M0 -64L-9 -46L-5 -47L-14 -31L-9 -33L-20 -8Q0 -4 20 -8L9 -33L14 -31L5 -47L9 -46Z', col),
 ];
-const tree = (x, y, s = 1, col = Gr) => [r(x - 4 * s, y - 20 * s, 8 * s, 20 * s, 1, F(Br)), c(x, y - 33 * s, 18 * s, F(col))];
+const tree = (x, y, s = 1, col = Gr) => [
+  naturalPath(x, y, s, 'M-5 0Q-2 -12 -4 -24L3 -25Q2 -12 6 0Z', Br),
+  naturalPath(x, y, s, 'M-5 -18Q-17 -15 -18 -25Q-26 -31 -17 -38Q-18 -48 -7 -47Q1 -56 9 -47Q20 -49 21 -38Q29 -30 19 -24Q17 -15 6 -18Z', col),
+];
 const person = (x, y, s, shirt, pants = Bl) => [
   r(x - 7 * s, y - 16 * s, 5.5 * s, 16 * s, 2 * s, F(pants)), r(x + 1.5 * s, y - 16 * s, 5.5 * s, 16 * s, 2 * s, F(pants)),
   r(x - 14 * s, y - 31 * s, 6 * s, 14 * s, 3 * s, F(shirt)), r(x + 8 * s, y - 31 * s, 6 * s, 14 * s, 3 * s, F(shirt)),
   r(x - 8 * s, y - 33 * s, 16 * s, 21 * s, 4 * s, F(shirt)), c(x, y - 42 * s, 8.5 * s, F(Sk)),
 ];
 const crenN = (x, t, b, w, n, d = 6, a = '') => { const m = w / (2 * n - 1); let s = `M${q(x)} ${q(b)}V${q(t)}`; for (let i = 0; i < n; i++) { s += `h${q(m)}`; if (i < n - 1) s += `v${d}h${q(m)}v${-d}`; } return p(`${s}V${q(b)}Z`, a); };
-const fish = (x, y, s, col, dir = 1) => [
-  pg(`${q(x - dir * 13 * s)},${q(y)} ${q(x - dir * 27 * s)},${q(y - 10 * s)} ${q(x - dir * 27 * s)},${q(y + 10 * s)}`, F(col)),
-  e(x, y, 17 * s, 11 * s, F(col)), c(x + dir * 9 * s, y - 2 * s, 2.6 * s, F(D)),
-];
+const fish = (x, y, s, col, dir = 1) => {
+  const shape = (d) => p(d.replace(/([MLQZ])([^MLQZ]*)/g, (_, cmd, values) => {
+    const nums = (values.match(/-?\d+(?:\.\d+)?/g) || []).map(Number);
+    return cmd + nums.map((v, i) => q(i % 2 ? y + v * s : x + dir * v * s)).join(' ');
+  }), F(col));
+  return [shape('M-13 -3L-27 -11L-23 0L-27 11L-13 3Z'),
+    shape('M-7 -7L0 -16L8 -8Z'),
+    shape('M18 0Q5 -17 -13 -3L-13 3Q5 17 18 0Z'),
+    c(x + dir * 10 * s, y - 2 * s, 1.5 * s, F(D))];
+};
 const L = [];
 
 // ───────── 1. La ferme ─────────
@@ -83,7 +94,7 @@ L.push(A('ferme', '🚜', 'La ferme', 'The farm', 3, 45, [
   S('Ajoute la grande porte avec un X et une petite fenêtre ronde.', 'Add the big door with an X and a small round window.', r(78, 114, 34, 40, 0, F(Cr)), p('M78 114L112 154M112 114L78 154'), c(95, 84, 7, F(Cr))),
   S('Dessine le silo à côté de la grange.', 'Draw the silo next to the barn.', r(168, 80, 30, 74, 0, F(Gy)), p('M168 80Q183 54 198 80Z', F(Gy))),
   S('Dessine le champ de blé : une bande ondulée avec une ligne.', 'Draw the wheat field: a wavy band with one line.', p('M-10 202Q200 184 410 200V226Q200 212 -10 230Z', F('#f3d36b')), p('M-10 216Q200 198 410 213')),
-  S('Dessine la clôture : cinq poteaux et deux barres.', 'Draw the fence: five posts and two bars.', [l(-6, 164, 178, 164), l(-6, 180, 178, 180)], [8, 50, 92, 134].map((x) => r(x - 6, 152, 12, 40, 3, F(Br)))),
+  S('Dessine la clôture : quatre poteaux et deux barres.', 'Draw the fence: four posts and two bars.', [l(-6, 164, 178, 164), l(-6, 180, 178, 180)], [8, 50, 92, 134].map((x) => r(x - 6, 152, 12, 40, 3, F(Br)))),
   S('Dessine le tracteur : le capot, la cabine et deux roues.', 'Draw the tractor: the hood, the cab and two wheels.', r(272, 182, 7, 18, 1, F(Dg)), r(262, 198, 58, 28, 4, F(O)), r(316, 172, 46, 48, 4, F(O)), r(324, 180, 30, 26, 3, F(Lb)), c(340, 230, 26, F('#555d78')), c(340, 230, 9, F(Y)), c(282, 240, 16, F('#555d78')), c(282, 240, 6, F(Y))),
   S('Dessine la vache : le corps, quatre pattes et la tête.', 'Draw the cow: the body, four legs and the head.', [82, 96, 124, 138].map((x, i) => r(x, 240 + (i % 2 ? 2 : 0), 9, 24, 2, F(Wh))), p('M152 218Q166 228 160 248'), e(112, 226, 42, 25, F(Wh)), e(122, 248, 10, 6, F(Pk)), pg('58,206 54,193 64,203', F(Cr)), pg('76,206 80,193 70,203', F(Cr)), e(66, 218, 17, 15, F(Wh)), e(53, 226, 11, 8, F(Pk))),
   S('Dessine le cochon rose près de la vache.', 'Draw the pink pig next to the cow.', r(198, 268, 8, 14, 2, F(Pk)), r(224, 268, 8, 14, 2, F(Pk)), p('M241 254q8-4 4-10q-6 0-2 6'), e(215, 258, 26, 17, F(Pk)), pg('188,243 197,237 198,247', F(Pk)), c(190, 254, 13, F(Pk)), e(180, 257, 6, 5, F('#ff7fa8'))),
@@ -117,7 +128,7 @@ L.push(A('mer', '🐙', 'Sous la mer', 'Under the sea', 3, 50, [
   S('Dessine le coffre au trésor sur le sable.', 'Draw the treasure chest on the sand.', r(172, 240, 66, 28, 3, F(Br)), p('M172 240Q172 212 205 212Q238 212 238 240Z', F('#a06a3b')), l(190, 214, 190, 268), l(220, 214, 220, 268), c(205, 244, 6, F(Y))),
   S('Dessine la pieuvre : une grosse tête et des bras.', 'Draw the octopus: a big head and arms.', p('M236 105Q230 150 246 158Q252 148 256 156Q260 168 267 157Q274 168 279 157Q283 148 290 158Q304 150 294 105Z', F(Pu)), e(265, 95, 30, 27, F(Pu)), p('M247 158Q236 168 244 177'), p('M267 160Q267 173 276 175'), p('M288 158Q300 167 294 177')),
   S('Dessine la tortue de mer avec sa carapace.', 'Draw the sea turtle with its shell.', e(350, 216, 15, 6, F(Gr)), e(300, 220, 13, 5, F(Gr)), pg('290,208 276,214 292,200', F(Gr)), c(380, 200, 9, F(Gr)), p('M290 210Q290 174 330 174Q370 174 370 210Z', F('#8cc084'))),
-  S('Dessine un gros poisson jaune.', 'Draw a big yellow fish.', fish(110, 95, 1.7, Y), p('M96 74Q112 60 124 76')),
+  S('Dessine un gros poisson jaune.', 'Draw a big yellow fish.', fish(110, 95, 1.7, Y)),
   S('Dessine un banc de petits poissons et un poisson rouge.', 'Draw a school of little fish and a red fish.', fish(190, 150, 0.8, Pk, -1), fish(228, 130, 0.8, Pk, -1), fish(212, 176, 0.8, Pk, -1), fish(345, 125, 1.1, Rd, -1)),
   S('Dessine une étoile de mer et des coquillages sur le sable.', 'Draw a starfish and shells on the sand.', star5(262, 276, 14, O), e(160, 282, 8, 6, F(Pk)), e(60, 284, 9, 6, F(Cr))),
   S('Ajoute plein de bulles qui montent.', 'Add lots of bubbles going up.', [[250, 40, 6], [264, 22, 4], [275, 50, 5], [140, 55, 6], [152, 35, 4], [205, 200, 5], [215, 182, 3.5], [60, 130, 5]].map(([x, y, rr]) => c(x, y, rr, F('#e6f7ff')))),

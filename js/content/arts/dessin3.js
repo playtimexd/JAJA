@@ -1,7 +1,7 @@
 // Arts plastiques — « Grandes scènes » (série B) : 12 grands dessins avec plusieurs éléments.
 // Chaque scène = liste d'étapes (groupes de formes) ; les images cumulatives (anciens traits foncés + nouveaux traits roses)
 // et le dessin colorié final sont générés (même principe que dessin.js).
-// Attributs spéciaux : f="couleur" (remplissage au coloriage), z="n" (ordre d'empilement au coloriage).
+// Attributs spéciaux : f="couleur" (remplissage au coloriage), z="n" (ordre d’empilement des étapes et du coloriage).
 const D = '#3a3f55', K = '#ff5d8f';
 const Ye = '#ffd34e', O = '#ff9f43', Rd = '#ff6b6b', Bl = '#6ec1ff', Gr = '#6fd08c', Pk = '#ff9ec4', Pu = '#b38cff';
 const Br = '#b97a4b', Tn = '#e8b878', Wh = '#ffffff', Gy = '#d5dbea', Cr = '#fff1d6', Lb = '#cdeeff', Sk = '#f6cfa8';
@@ -39,7 +39,6 @@ const bg = (x, y, w, h, col, z = -100) => `<rect x="${x}" y="${y}" width="${w}" 
 const strip = (s) => s.replace(/ (?:f|z)="[^"]*"/g, '');
 const info = (s) => ({ s: strip(s), f: (s.match(/ f="([^"]*)"/) || [])[1] || 'none', z: +((s.match(/ z="(-?\d+)"/) || [])[1] || 0) });
 const wrap = (inner) => `<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
-const grp = (els, col, w) => (els.length ? `<g fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${els.join('')}</g>` : '');
 const S = (fr, en, ...els) => ({ fr, en, els: els.flat(Infinity) });
 
 const MAT = [
@@ -52,8 +51,11 @@ const MAT = [
 const LIST = [];
 function A(id, emoji, fr, en, level, minutes, steps, cfr, cen, extras = []) {
   const out = steps.map((st, i) => {
-    const done = steps.slice(0, i).flatMap((s) => s.els).map(strip);
-    return { svg: wrap(grp(done, D, 6) + grp(st.els.map(strip), K, 8)), text: { fr: st.fr, en: st.en } };
+    // Même ordre de superposition au trait et en couleur ; le blanc masque les traits cachés.
+    const visible = steps.slice(0, i + 1).flatMap((step, j) => step.els.map((el) => ({ ...info(el), fresh: j === i })))
+      .map((el, order) => ({ ...el, order })).sort((a, b) => a.z - b.z || a.order - b.order);
+    const body = visible.map((el) => el.s.replace(/\s*\/>$/, ` fill="${el.f === 'none' ? 'none' : '#fff'}" stroke="${el.fresh ? K : D}" stroke-width="${el.fresh ? 8 : 6}"/>`)).join('');
+    return { svg: wrap(`<g stroke-linecap="round" stroke-linejoin="round">${body}</g>`), text: { fr: st.fr, en: st.en } };
   });
   const all = steps.flatMap((s) => s.els).concat(extras.flat(Infinity)).map(info).map((o, i) => ({ ...o, i }));
   all.sort((a, b) => a.z - b.z || a.i - b.i);
@@ -66,8 +68,14 @@ function A(id, emoji, fr, en, level, minutes, steps, cfr, cen, extras = []) {
 const cloud = (x, y, s = 1) => { const t = T(x, y, s); return [t.p('M-30 8Q-46 8-40-4Q-36-16-22-12Q-14-28 4-20Q18-30 30-14Q46-12 42 2Q46 10 30 8Z', F(Wh))]; };
 const sun = (x, y, s = 1) => { const t = T(x, y, s); return [t.c(0, 0, 14, F(Ye)), ...range(8, (i) => { const a = pt(0, 0, 20, i * 45), b = pt(0, 0, 28, i * 45); return t.l(a[0], a[1], b[0], b[1]); })]; };
 const bird = (x, y, s = 1) => T(x, y, s).p('M-9 2Q-4-6 0 1Q4-6 9 2');
-const tree = (x, y, s = 1, col = Gr) => { const t = T(x, y, s); return [t.r(-5, -3, 10, 24, 2, F(Br)), t.c(0, -22, 21, F(col))]; };
-const pine = (x, y, s = 1, col = Dg) => { const t = T(x, y, s); return [t.r(-4, -12, 8, 22, 1, F(Br)), t.pg('0,-62 -19,-32 19,-32', F(col)), t.pg('0,-46 -25,-10 25,-10', F(col))]; };
+const tree = (x, y, s = 1, col = Gr) => { const t = T(x, y, s); return [
+  t.p('M-6 21Q-2 8-4-13L3-14Q2 7 7 21Z', F(Br)),
+  t.p('M-5-6Q-17-3-19-14Q-27-20-18-29Q-19-40-7-38Q1-48 10-39Q22-41 23-29Q30-20 20-13Q18-3 6-6Z', F(col)),
+]; };
+const pine = (x, y, s = 1, col = Dg) => { const t = T(x, y, s); return [
+  t.p('M-3-14L-4 10H4L3-14Z', F(Br)),
+  t.p('M0-62L-10-43L-6-44L-18-26L-11-28L-25-10Q0-5 25-10L11-28L18-26L6-44L10-43Z', F(col)),
+]; };
 const person = (x, y, s, shirt, pants, hair, skin = Sk) => {
   const t = T(x, y, s);
   return [t.r(-8, -13, 7, 13, 2, F(pants)), t.r(1, -13, 7, 13, 2, F(pants)),

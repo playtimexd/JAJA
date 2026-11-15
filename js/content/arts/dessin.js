@@ -1,7 +1,7 @@
 // Arts plastiques — catégorie « dessin » : tutoriels « comment dessiner » étape par étape.
 // Chaque dessin est écrit UNE fois (liste d'étapes = groupes de formes) ; les images cumulatives
 // (traits foncés déjà tracés + traits roses nouveaux) et le dessin colorié final sont générés.
-// Attributs spéciaux dans les éléments : f="couleur" (remplissage au coloriage), z="n" (ordre d'empilement au coloriage).
+// Attributs spéciaux dans les éléments : f="couleur" (remplissage au coloriage), z="n" (ordre d’empilement des étapes et du coloriage).
 const D = '#3a3f55', K = '#ff5d8f';
 const Y = '#ffd34e', O = '#ff9f43', Rd = '#ff6b6b', Bl = '#6ec1ff', Gr = '#6fd08c', Pk = '#ff9ec4', Pu = '#b38cff';
 const Br = '#b97a4b', Tn = '#e8b878', Wh = '#ffffff', Gy = '#d5dbea', Cr = '#fff1d6', Lb = '#cdeeff', Dk = '#3a3f55';
@@ -21,7 +21,6 @@ const eyes = (a, b, y, rr = 7) => [c(a, y, rr, F(D)), c(b, y, rr, F(D))];
 const strip = (s) => s.replace(/ (?:f|z)="[^"]*"/g, '');
 const info = (s) => ({ s: strip(s), f: (s.match(/ f="([^"]*)"/) || [])[1] || 'none', z: +((s.match(/ z="(-?\d+)"/) || [])[1] || 0) });
 const wrap = (inner) => `<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
-const grp = (els, col, w) => (els.length ? `<g fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${els.join('')}</g>` : '');
 const S = (fr, en, ...els) => ({ fr, en, els: els.flat() });
 
 const MAT = [
@@ -33,11 +32,11 @@ const MAT = [
 
 function A(id, emoji, fr, en, level, minutes, theme, steps, cfr, cen, extras = [], season = null) {
   const out = steps.map((st, i) => {
-    const done = steps.slice(0, i).flatMap((s) => s.els).map(strip);
-    return {
-      svg: wrap(grp(done, D, 6) + grp(st.els.map(strip), K, 8)),
-      text: { fr: st.fr, en: st.en },
-    };
+    // Même ordre de superposition au trait et en couleur ; le blanc masque les traits cachés.
+    const visible = steps.slice(0, i + 1).flatMap((step, j) => step.els.map((el) => ({ ...info(el), fresh: j === i })))
+      .map((el, order) => ({ ...el, order })).sort((a, b) => a.z - b.z || a.order - b.order);
+    const body = visible.map((el) => el.s.replace(/\s*\/>$/, ` fill="${el.f === 'none' ? 'none' : '#fff'}" stroke="${el.fresh ? K : D}" stroke-width="${el.fresh ? 8 : 6}"/>`)).join('');
+    return { svg: wrap(`<g stroke-linecap="round" stroke-linejoin="round">${body}</g>`), text: { fr: st.fr, en: st.en } };
   });
   const all = steps.flatMap((s) => s.els).concat(extras).map(info).map((o, i) => ({ ...o, i }));
   all.sort((a, b) => a.z - b.z || a.i - b.i);
@@ -53,16 +52,14 @@ const L = [];
 
 // ───────────────────────── FACILE ─────────────────────────
 
-L.push(A('chat', '🐱', 'Un chat', 'A cat', 1, 8, 'animaux', [
-  S('Dessine un grand rond un peu aplati pour la tête.', 'Draw a big, slightly flat circle for the head.', e(200, 165, 100, 78, F(O))),
-  S('Ajoute deux triangles pointus pour les oreilles.', 'Add two pointy triangles for the ears.', pg('122,122 112,50 172,89', F(O, -1)), pg('278,122 288,50 228,89', F(O, -1))),
-  S('Dessine deux yeux ronds.', 'Draw two round eyes.', eyes(162, 238, 155, 8)),
-  S('Fais un petit triangle pour le nez et deux petites courbes pour la bouche.', 'Make a little triangle for the nose and two little curves for the mouth.', pg('188,178 212,178 200,192', F(Pk)), p('M200 192 Q200 208 182 208 M200 192 Q200 208 218 208')),
-  S('Trace deux moustaches de chaque côté.', 'Draw two whiskers on each side.', l(125, 180, 70, 170), l(125, 195, 70, 200), l(275, 180, 330, 170), l(275, 195, 330, 200)),
-], 'Colorie ton chat!', 'Color your cat!', [
-  pg('130,112 124,72 160,95', F(Pk, 1)), pg('270,112 276,72 240,95', F(Pk, 1)),
-  p('M200 90 V108 M178 94 L184 110 M222 94 L216 110'),
-]));
+L.push(A('chat', '🐱', 'Un chat', 'A cat', 1, 10, 'animaux', [
+  S('Trace les joues et le menton, en laissant le haut ouvert.', 'Draw the cheeks and chin, leaving the top open.', p('M132 112Q112 142 122 178Q134 218 176 230Q200 238 224 230Q266 218 278 178Q288 142 268 112')),
+  S('Relie les joues avec deux oreilles pointues et le dessus de la tête.', 'Join the cheeks with two pointed ears and the top of the head.', p('M132 112L126 52Q154 60 174 88Q200 80 226 88Q246 60 274 52L268 112')),
+  S('Dessine deux yeux en forme d’amande.', 'Draw two almond-shaped eyes.', p('M146 144Q162 130 180 144Q165 159 146 144Z', F('#a8c779')), p('M220 144Q238 130 254 144Q235 159 220 144Z', F('#a8c779')), l(164, 139, 164, 150), l(236, 139, 236, 150)),
+  S('Ajoute un petit nez et les courbes du museau.', 'Add a small nose and the curves of the muzzle.', p('M189 175Q200 171 211 175L200 185Z', F(Pk)), p('M200 185V192Q190 204 178 195M200 192Q210 204 222 195')),
+  S('Trace trois moustaches de chaque côté.', 'Draw three whiskers on each side.', p('M153 180L92 168M151 190L86 190M155 200L98 214M247 180L308 168M249 190L314 190M245 200L302 214')),
+  S('Dessine les plis à l’intérieur des oreilles.', 'Draw the folds inside the ears.', p('M141 100L138 70L160 91M259 100L262 70L240 91')),
+], 'Colorie le pelage de ton chat.', 'Color your cat’s fur.', [p('M132 112L126 52Q154 60 174 88Q200 80 226 88Q246 60 274 52L268 112Q288 142 278 178Q266 218 224 230Q200 238 176 230Q134 218 122 178Q112 142 132 112Z', F(O, -1))]));
 
 L.push(A('chien', '🐶', 'Un chien', 'A dog', 1, 12, 'animaux', [
   S('Dessine un rond un peu large pour la tête.', 'Draw a slightly wide circle for the head.', e(200, 115, 72, 64, F(Tn))),
@@ -103,15 +100,15 @@ L.push(A('hibou', '🦉', 'Un hibou', 'An owl', 1, 12, 'animaux', [
   e(200, 205, 50, 55, F(Cr, -2)),
 ]));
 
-L.push(A('poisson', '🐠', 'Un poisson', 'A fish', 1, 10, 'animaux', [
-  S('Dessine un grand ovale pour le corps.', 'Draw a big oval for the body.', e(180, 150, 100, 65, F(O))),
-  S('Ajoute un triangle pour la queue.', 'Add a triangle for the tail.', pg('272,150 345,95 345,205', F(Y, -1))),
-  S('Dessine un oeil rond et une petite bouche.', 'Draw a round eye and a little mouth.', c(120, 135, 10, F(Wh)), c(120, 135, 4, F(D)), p('M85 162 Q98 170 110 162')),
-  S('Trace une courbe pour la joue.', 'Draw a curve for the gill.', p('M140 105 Q118 150 140 195')),
-  S('Ajoute une nageoire en haut et une en bas.', 'Add one fin on top and one below.', p('M150 92 Q182 48 218 88', F(Y, -1)), p('M172 210 Q192 242 218 208', F(Y, -1))),
-  S('Fais des écailles avec des petites courbes.', 'Make scales with little curves.', p('M190 118 q14 12 0 26 M222 118 q14 12 0 26 M206 150 q14 12 0 26 M238 130 q12 10 0 22')),
-  S('Dessine des bulles.', 'Draw some bubbles.', c(60, 95, 8, F(Lb)), c(42, 65, 5, F(Lb)), c(78, 55, 6, F(Lb))),
-], 'Colorie ton poisson!', 'Color your fish!'));
+L.push(A('poisson', '🐠', 'Un poisson', 'A fish', 1, 12, 'animaux', [
+  S('Trace un corps allongé qui se rétrécit vers la queue.', 'Draw a long body that narrows toward the tail.', p('M78 150Q122 91 185 104Q238 110 280 139L280 161Q235 190 180 196Q116 202 78 150Z', F('#9bbdc5'))),
+  S('Ajoute une queue échancrée au bout du corps.', 'Add a forked tail at the end of the body.', p('M280 139L335 105L320 150L335 195L280 161', F('#7297a4', -1))),
+  S('Dessine un petit œil et une courte bouche.', 'Draw a small eye and a short mouth.', c(116, 140, 5, F(D)), p('M81 153L96 157')),
+  S('Trace la courbe des branchies derrière l’œil.', 'Draw the curved gill cover behind the eye.', p('M144 116Q158 150 143 184')),
+  S('Ajoute la nageoire du dos et celle du ventre.', 'Add the back fin and the belly fin.', p('M166 104Q180 73 214 78L230 119', F('#7297a4', -1)), p('M186 195L211 222L229 183', F('#7297a4', -1))),
+  S('Dessine une petite nageoire sur le côté.', 'Draw a small fin on the side.', p('M157 155Q181 148 198 164L168 177Z', F('#7297a4')), p('M166 159L186 165')),
+  S('Trace quelques rayons dans les nageoires.', 'Draw a few rays in the fins.', p('M181 102L188 87M198 108L205 87M291 140L320 120M291 160L320 180')),
+], 'Colorie ton poisson avec les couleurs de ton choix.', 'Color your fish with the colors you choose.'));
 
 L.push(A('tortue', '🐢', 'Une tortue', 'A turtle', 1, 10, 'animaux', [
   S('Dessine une grande demi-boule pour la carapace.', 'Draw a big half-ball for the shell.', p('M105 190 A95 85 0 0 1 295 190 Z', F('#5fbf6e'))),
@@ -182,15 +179,13 @@ L.push(A('soleil', '☀️', 'Un soleil', 'A sun', 1, 8, 'nature', [
   c(160, 160, 9, F('#ff9fb2', 1)), c(240, 160, 9, F('#ff9fb2', 1)),
 ], 'ete'));
 
-L.push(A('arbre', '🌳', 'Un arbre', 'A tree', 1, 10, 'nature', [
-  S('Dessine un grand tronc.', 'Draw a big trunk.', p('M178 290 V185 H222 V290', F(Br))),
-  S('Fais un gros nuage de feuilles au-dessus.', 'Draw a big cloud of leaves on top.', p('M125 150 A35 35 0 0 1 135 90 A45 45 0 0 1 215 55 A40 40 0 0 1 280 100 A35 35 0 0 1 275 160 A40 40 0 0 1 215 185 L185 185 A40 40 0 0 1 125 150 Z', F(Gr))),
-  S('Ajoute des branches dans le tronc.', 'Add branches on the trunk.', p('M200 262 V232 M200 245 L182 228 M200 245 L218 228')),
-  S('Dessine des pommes rondes.', 'Draw round apples.', c(165, 115, 9, F(Rd)), c(232, 100, 9, F(Rd)), c(210, 150, 9, F(Rd)), c(160, 150, 9, F(Rd))),
-  S('Trace le sol avec des brins d\'herbe.', 'Draw the ground with blades of grass.', l(40, 290, 360, 290), p('M80 290 l5 -14 l5 14 M115 290 l5 -14 l5 14 M285 290 l5 -14 l5 14 M320 290 l5 -14 l5 14')),
-], 'Colorie ton arbre!', 'Color your tree!', [
-  e(200, 292, 170, 6, F('#a8e08a', -2)),
-]));
+L.push(A('arbre', '🌳', 'Un arbre', 'A tree', 1, 12, 'nature', [
+  S('Dessine un tronc qui s’élargit près du sol.', 'Draw a trunk that widens near the ground.', p('M166 278Q183 256 184 218L181 160L197 170L208 151L216 163Q210 221 219 259L235 278', F(Br))),
+  S('Entoure le haut du tronc d’un feuillage irrégulier.', 'Surround the top of the trunk with an uneven leafy outline.', p('M181 180Q160 192 145 178Q116 184 110 163Q84 153 103 129Q89 104 115 93Q114 66 147 70Q163 43 190 57Q216 37 238 59Q270 54 280 83Q306 91 294 116Q316 139 294 155Q289 179 262 175Q239 193 216 180', F('#83b879'))),
+  S('Prolonge les branches vers le feuillage.', 'Extend the branches toward the leaves.', p('M184 205L163 169L148 151M210 210L237 173L254 159M197 170L193 137')),
+  S('Ajoute quelques groupes de feuilles avec de petites courbes.', 'Add a few clusters of leaves with short curves.', p('M123 117Q137 105 151 115M170 91Q184 79 198 90M239 111Q258 102 270 119M238 145Q254 136 268 145')),
+  S('Trace le sol et quelques racines.', 'Draw the ground and a few roots.', p('M45 280Q108 274 166 278M235 278Q297 274 355 280M192 260L180 279M209 263L218 278')),
+], 'Colorie l’écorce et les feuilles de ton arbre.', 'Color the bark and leaves of your tree.'));
 
 const petal = (a) => `<ellipse cx="200" cy="52" rx="19" ry="32" transform="rotate(${a} 200 100)" ${F(Pk, -1)}/>`;
 L.push(A('fleur', '🌼', 'Une fleur', 'A flower', 1, 10, 'nature', [
@@ -401,12 +396,12 @@ L.push(A('avion', '✈️', 'Un avion', 'An airplane', 2, 14, 'vehicules', [
 ], 'Colorie ton avion!', 'Color your airplane!'));
 
 L.push(A('bateau', '⛵', 'Un bateau à voile', 'A sailboat', 2, 14, 'vehicules', [
-  S('Dessine la coque du bateau avec un trapèze.', 'Draw the hull of the boat with a trapezoid.', pg('70,190 330,190 295,250 105,250', F(Br))),
-  S('Dessine un grand mât bien droit.', 'Draw a tall straight mast.', l(200, 40, 200, 190)),
-  S('Ajoute une grande voile en triangle.', 'Add a big triangle sail.', pg('206,48 206,176 300,176', F(Wh))),
-  S('Ajoute une plus petite voile de l\'autre côté.', 'Add a smaller sail on the other side.', pg('194,76 194,176 118,176', F(Y))),
+  S('Dessine une coque longue avec un dessous courbé.', 'Draw a long hull with a curved bottom.', p('M70 203Q200 214 330 199Q310 236 273 241H123Q87 236 70 203Z', F(Br))),
+  S('Dessine un grand mât bien droit.', 'Draw a tall straight mast.', l(200, 40, 200, 207)),
+  S('Dessine la grande voile gonflée par le vent.', 'Draw the large sail billowing in the wind.', p('M207 49Q266 106 300 184Q255 175 207 184Z', F(Wh))),
+  S('Ajoute une plus petite voile de l\'autre côté.', 'Add a smaller sail on the other side.', p('M190 77L111 185Q150 175 190 184Z', F(Cr))),
   S('Dessine un petit drapeau en haut.', 'Draw a little flag at the top.', pg('200,40 236,52 200,64', F(Rd))),
-  S('Ajoute trois hublots ronds.', 'Add three round portholes.', c(150, 218, 10, F(Lb)), c(200, 218, 10, F(Lb)), c(250, 218, 10, F(Lb))),
+  S('Relie le haut du mât aux deux bouts du bateau.', 'Join the top of the mast to both ends of the boat.', p('M200 43L83 204M200 43L319 201')),
   S('Trace des vagues sous le bateau.', 'Draw waves under the boat.', p('M20 258 q22 -14 44 0 q22 14 44 0 q22 -14 44 0 q22 14 44 0 q22 -14 44 0 q22 14 44 0 q22 -14 44 0 q22 14 44 0')),
 ], 'Colorie ton bateau!', 'Color your boat!', [
   p('M20 258 q22 -14 44 0 q22 14 44 0 q22 -14 44 0 q22 14 44 0 q22 -14 44 0 q22 14 44 0 q22 -14 44 0 q22 14 44 0 V292 H20 Z', F('#8fd0ff', -6)),
@@ -557,5 +552,76 @@ L.push(A('camion-pompier', '🚒', 'Un camion de pompier', 'A fire truck', 3, 20
   S('Dessine deux portes de rangement et un rouleau de tuyau.', 'Draw two storage doors and a hose reel.', r(145, 140, 45, 50, 3, F(Gy)), r(195, 140, 45, 50, 3, F(Gy)), c(100, 165, 24, F(Gy)), c(100, 165, 8, F(D))),
   S('Ajoute une sirène sur le toit et un phare.', 'Add a siren on the roof and a headlight.', c(285, 104, 8, F(Bl)), c(344, 185, 7, F(Y))),
 ], 'Colorie ton camion de pompier!', 'Color your fire truck!'));
+
+// ───────── Dessin d’observation et personnages — pour aller plus loin ─────────
+// Contours ouverts et formes de premier plan évitent les lignes de construction à effacer.
+L.push(A('portrait-face', '🧑', 'Portrait de face', 'Front-view portrait', 2, 25, 'personnages', [
+  S('Trace un visage ovale qui se resserre vers le menton.', 'Draw an oval face that narrows toward the chin.', p('M151 105Q146 58 174 43Q201 29 226 44Q253 58 249 105L243 143Q231 173 201 187Q171 174 157 144Z', F('#efc29e'))),
+  S('Ajoute les oreilles de chaque côté du visage.', 'Add the ears on each side of the face.', p('M153 109Q135 97 139 122Q141 140 156 140M247 109Q265 97 261 122Q259 140 244 140', F('#efc29e', -1))),
+  S('Prolonge le cou vers les épaules.', 'Extend the neck toward the shoulders.', p('M180 176L178 204Q156 210 128 226L109 275H291L272 226Q244 210 222 204L220 176', F('#efc29e', -2))),
+  S('Dessine deux yeux étroits à la même hauteur.', 'Draw two narrow eyes at the same height.', p('M164 112Q175 102 187 112Q175 120 164 112ZM213 112Q225 102 236 112Q225 120 213 112Z', F(Wh)), l(176, 109, 176, 115), l(224, 109, 224, 115)),
+  S('Place les sourcils au-dessus des yeux.', 'Place the eyebrows above the eyes.', p('M164 97Q176 91 188 97M212 97Q224 91 236 97')),
+  S('Trace le nez avec une petite courbe et deux narines.', 'Draw the nose with a small curve and two nostrils.', p('M201 115L195 139Q201 144 207 139M189 142L192 143M209 143L212 142')),
+  S('Dessine la bouche entre le nez et le menton.', 'Draw the mouth between the nose and chin.', p('M184 159Q193 154 201 158Q209 154 218 159M184 159Q201 166 218 159')),
+  S('Dessine les cheveux en grandes mèches.', 'Draw the hair in large sections.', p('M150 110Q135 68 155 45Q170 25 201 29Q239 24 252 55Q264 79 249 109L238 73Q220 85 195 72Q172 94 158 85Z', F('#695047')), p('M171 61Q194 41 222 47')),
+  S('Ajoute un chandail avec un col et des plis.', 'Add a sweater with a neckline and folds.', p('M178 204Q201 226 222 204L272 226L291 275H109L128 226Z', F('#7b9db4')), p('M150 238L141 260M250 238L259 260')),
+], 'Colorie le portrait avec les couleurs de ton choix.', 'Color the portrait with the colors you choose.'));
+
+L.push(A('portrait-profil', '👤', 'Portrait de profil', 'Side-view portrait', 3, 30, 'personnages', [
+  S('Trace le crâne arrondi et l’arrière de la tête.', 'Draw the rounded skull and the back of the head.', p('M235 77Q223 37 184 40Q142 41 139 89Q136 123 153 149', F('#efc29e'))),
+  S('Continue le front, le nez, les lèvres et le menton.', 'Continue with the forehead, nose, lips and chin.', p('M235 77L235 102L254 126Q255 130 239 132L243 143L237 150Q244 157 238 167Q225 180 204 179L180 169L153 149', F('#efc29e'))),
+  S('Dessine le cou et la pente des épaules.', 'Draw the neck and the slope of the shoulders.', p('M160 155L161 207L117 230L102 277H291L271 231L210 207L207 179', F('#efc29e', -2))),
+  S('Place une oreille au milieu de la tête.', 'Place an ear in the middle of the head.', p('M178 115Q164 102 160 116Q157 132 172 143L181 134', F('#efc29e')), p('M168 119Q176 115 173 130')),
+  S('Dessine l’œil vu de côté et son sourcil.', 'Draw the eye from the side and its eyebrow.', p('M213 111L230 116L215 120M213 101Q223 98 231 104'), l(225, 114, 225, 118)),
+  S('Ajoute la narine et la séparation des lèvres.', 'Add the nostril and the line between the lips.', p('M235 130L239 129M226 147L240 147')),
+  S('Dessine les cheveux autour du crâne.', 'Draw the hair around the skull.', p('M153 149Q133 132 133 94Q128 52 162 35Q198 20 226 42Q246 55 240 83L222 74Q209 88 186 90L178 113Q162 101 157 119L160 148Z', F('#493e42')), p('M155 72Q178 46 207 52')),
+  S('Ajoute la veste et son col rabattu.', 'Add a jacket and its folded collar.', p('M161 207L188 235L210 207L271 231L291 277H102L117 230Z', F('#7b9290')), p('M161 207L149 234L174 243L188 235L206 246L224 232L210 207M188 235V277')),
+], 'Colorie ton portrait de profil.', 'Color your side-view portrait.', [p('M235 77Q223 37 184 40Q142 41 139 89Q136 123 153 149L180 169L204 179Q225 180 238 167Q244 157 237 150L243 143L239 132Q255 130 254 126L235 102Z', F('#efc29e', -1))]));
+
+L.push(A('personnage-manga', '✍️', 'Personnage de manga', 'Manga character', 3, 30, 'personnages', [
+  S('Dessine le visage avec des joues droites et un menton arrondi.', 'Draw the face with straight cheeks and a rounded chin.', p('M160 102Q150 61 175 45Q200 29 225 45Q250 61 240 102L236 135Q223 158 200 169Q177 158 164 135Z', F('#e7b694'))),
+  S('Dessine le cou et des épaules plus larges que la tête.', 'Draw the neck and shoulders wider than the head.', p('M183 160L181 188L135 205Q112 212 103 276H297Q288 212 265 205L219 188L217 160', F('#e7b694', -2))),
+  S('Place deux yeux allongés sous des sourcils inclinés.', 'Place two long eyes below sloping eyebrows.', p('M170 106Q182 96 193 105L189 118Q178 123 170 106ZM207 105Q218 96 230 106Q222 123 211 118Z', F(Wh)), p('M170 93L191 97M209 97L230 93'), l(183, 105, 183, 115), l(217, 105, 217, 115)),
+  S('Ajoute un nez discret et une bouche courte.', 'Add a small nose and a short mouth.', p('M200 118L196 132L202 133M189 145Q200 149 211 145')),
+  S('Dessine les oreilles à la hauteur des yeux.', 'Draw the ears at eye level.', p('M162 107Q147 99 150 118Q151 131 164 133M238 107Q253 99 250 118Q249 131 236 133', F('#e7b694', -1))),
+  S('Découpe la coiffure en quelques grandes mèches.', 'Divide the hairstyle into a few large sections.', p('M158 118L147 92L152 70L141 72L157 48L153 40L183 34L204 23L218 33L241 34L244 49L258 64L247 70L252 95L240 119L231 80L216 95L219 68L198 92L196 68L173 95L172 77Z', F('#3f485d'))),
+  S('Dessine les deux pans d’un blouson ouvert.', 'Draw the two sides of an open jacket.', p('M181 188L167 219L182 276H103Q112 212 135 205Z', F('#6688a0')), p('M219 188L233 219L218 276H297Q288 212 265 205Z', F('#6688a0')), p('M181 188Q200 210 219 188L218 276H182Z', F(Cr))),
+  S('Ajoute les coutures et quelques plis.', 'Add the seams and a few folds.', p('M139 219L128 254M261 219L272 254M153 245L166 242M234 242L247 245M190 218H210')),
+], 'Choisis trois couleurs pour ton personnage de manga.', 'Choose three colors for your manga character.'));
+
+L.push(A('silhouette-debout', '🚶', 'Une silhouette debout', 'A standing figure', 3, 30, 'personnages', [
+  S('Dessine une petite tête en haut, en gardant six hauteurs de tête dessous.', 'Draw a small head near the top, leaving six head lengths below.', p('M187 41Q185 24 200 24Q215 24 213 41L210 53L200 60L190 53Z', F('#ddb28e'))),
+  S('Trace le cou et les épaules légèrement inclinées.', 'Draw the neck and slightly sloping shoulders.', p('M194 58L193 69L172 76L178 83L200 82L222 85L228 80L207 69L206 58Z', F('#ddb28e', -1))),
+  S('Dessine le chandail jusqu’à la taille.', 'Draw the shirt down to the waist.', p('M193 69Q200 78 207 69L228 80L220 100L216 143L180 140L178 98L172 76Z', F('#8caaa1'))),
+  S('Ajoute un bras détendu de chaque côté.', 'Add a relaxed arm on each side.', p('M172 76L161 112L159 151Q157 163 164 162L169 154L170 117L178 98M228 80L240 113L238 153Q240 164 233 164L229 154L230 116L220 100', F('#ddb28e', -1))),
+  S('Dessine le bassin avec une hanche un peu plus haute.', 'Draw the pelvis with one hip slightly higher.', p('M180 140L216 143L221 167L200 174L177 164Z', F('#586b85'))),
+  S('Prolonge une jambe droite sous la hanche gauche.', 'Extend a straight leg below the left hip.', p('M177 161L196 169L194 215L190 264H178L177 214Z', F('#586b85'))),
+  S('Dessine l’autre jambe légèrement fléchie.', 'Draw the other leg slightly bent.', p('M201 171L221 163L230 211L218 263H205L213 212L198 189', F('#586b85', -1))),
+  S('Pose les deux chaussures sur le sol.', 'Place both shoes on the ground.', p('M178 262H190L194 276H164Q162 268 178 262Z', F('#d7dbe1')), p('M205 261H218L234 274Q235 278 227 278H205Z', F('#d7dbe1')), p('M148 282H251')),
+  S('Ajoute les cheveux et quelques plis aux articulations.', 'Add the hair and a few folds at the joints.', p('M187 40Q181 24 195 20Q215 17 216 39L207 32L197 36L193 31Z', F('#57433c')), p('M184 133L202 136M182 211L190 214M216 210L224 213')),
+], 'Colorie les vêtements et la silhouette.', 'Color the clothes and the figure.'));
+
+L.push(A('personnage-course', '🏃', 'Un personnage qui court', 'A running character', 3, 35, 'personnages', [
+  S('Dessine une petite tête penchée vers l’avant.', 'Draw a small head tilted forward.', p('M213 54Q211 35 226 33Q242 32 244 48L241 62L229 70L218 64Z', F('#bd8967'))),
+  S('Dessine le torse incliné vers la tête.', 'Draw the torso leaning toward the head.', p('M217 66L214 78L192 81L162 136L195 152L226 103L231 77L230 69', F('#739da6'))),
+  S('Plie le bras de devant vers le visage.', 'Bend the front arm toward the face.', p('M220 87L246 111L264 82Q267 75 273 78Q280 82 274 89L252 130Q248 135 241 129L211 105Z', F('#bd8967'))),
+  S('Plie l’autre bras derrière le corps.', 'Bend the other arm behind the body.', p('M192 85L165 101L147 80Q143 74 137 79Q133 83 140 90L161 116Q165 120 172 116L197 102Z', F('#bd8967', -1))),
+  S('Dessine le short autour du bassin.', 'Draw the shorts around the hips.', p('M162 136L195 152L194 176L177 184L162 168L149 169L146 155Z', F('#465975'))),
+  S('Lève un genou devant le corps.', 'Raise one knee in front of the body.', p('M181 178L220 158Q230 154 235 165L254 215L241 221L220 178L193 197Z', F('#bd8967', -1))),
+  S('Étire l’autre jambe vers l’arrière.', 'Stretch the other leg behind the body.', p('M150 166L167 174L139 217L94 238L88 225L127 203Z', F('#bd8967', -2))),
+  S('Ajoute les chaussures au bout des jambes.', 'Add shoes at the ends of the legs.', p('M240 215L254 211L266 226L278 231Q283 238 274 241L251 239Z', F('#dedfe4')), p('M86 222L97 236L84 247L79 262Q71 266 67 258L69 239Z', F('#dedfe4'))),
+  S('Ajoute les cheveux et les plis qui suivent le mouvement.', 'Add hair and folds that follow the movement.', p('M214 53Q204 37 217 29Q233 21 245 36L246 48L233 40L222 45Z', F('#403c42')), p('M178 124L193 135M158 151L170 158M239 222L250 228M77 240L84 246')),
+], 'Colorie ton personnage en mouvement.', 'Color your character in motion.'));
+
+L.push(A('main-ouverte', '🖐️', 'Une main ouverte', 'An open hand', 3, 30, 'personnages', [
+  S('Trace les deux côtés de la paume en laissant le haut ouvert.', 'Draw the two sides of the palm, leaving the top open.', p('M145 163Q140 195 160 224L168 240M239 151Q247 199 223 226L220 240')),
+  S('Dessine l’index avec un bout arrondi.', 'Draw the index finger with a rounded tip.', p('M145 163L139 83Q138 69 149 67Q160 67 162 81L170 145')),
+  S('Ajoute le majeur, un peu plus long.', 'Add the middle finger, slightly longer.', p('M170 145L169 55Q169 42 181 42Q193 42 193 55L195 143')),
+  S('Ajoute l’annulaire à côté du majeur.', 'Add the ring finger next to the middle finger.', p('M195 143L199 67Q200 54 211 56Q222 58 221 71L219 147')),
+  S('Dessine le petit doigt, plus court.', 'Draw the little finger, shorter than the others.', p('M219 147L228 100Q231 88 241 92Q251 95 248 108L239 151')),
+  S('Dessine le pouce qui s’écarte de la paume.', 'Draw the thumb opening away from the palm.', p('M145 163L121 138Q112 130 105 138Q99 145 107 155L125 178Q130 206 160 224')),
+  S('Prolonge les côtés vers le poignet.', 'Extend the sides toward the wrist.', p('M168 240L164 277H225L220 240')),
+  S('Marque les plis de la paume et les articulations.', 'Mark the palm creases and finger joints.', p('M149 174Q169 193 162 212M170 163Q192 156 217 164M175 188Q194 178 216 183M145 108L158 107M175 91H188M203 102L215 104M231 122L242 125M174 243L213 245')),
+], 'Colorie la main avec la teinte de peau de ton choix.', 'Color the hand with the skin tone you choose.', [p('M145 163L139 83Q138 69 149 67Q160 67 162 81L170 145L169 55Q169 42 181 42Q193 42 193 55L195 143L199 67Q200 54 211 56Q222 58 221 71L219 147L228 100Q231 88 241 92Q251 95 248 108L239 151Q247 199 223 226L220 240L225 277H164L168 240L160 224Q130 206 125 178L107 155Q99 145 105 138Q112 130 121 138Z', F('#dca986', -1))]));
 
 export const projects = L;
