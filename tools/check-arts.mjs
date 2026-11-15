@@ -1,7 +1,8 @@
 // `node tools/check-arts.mjs [cat...]` — validates the Arts plastiques library (docs/ARTS.md).
 import fs from 'node:fs';
 import { genSteps } from '../js/arts-gen.js';
-const CATS = process.argv.slice(2).length ? process.argv.slice(2) : ['dessin', 'dessin2', 'dessin3', 'pliage', 'recup', 'fetes', 'openmoji', 'quickdraw'];
+import { ART_FILES, BIG_FILES } from '../js/content/arts/index.js';
+const CATS = process.argv.slice(2).length ? process.argv.slice(2) : [...ART_FILES, ...BIG_FILES];
 const GEN = { openmoji: 'om', quickdraw: 'qd' };   // big generated libraries: id prefix, steps built by js/arts-gen.js
 const ids = new Set();
 let errors = 0, total = 0, steps = 0;

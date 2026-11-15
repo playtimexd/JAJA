@@ -8,6 +8,7 @@ import { tr, lang } from './i18n.js';
 import { speak, sfx, setContentLang, unlockAudio } from './audio.js';
 import { screen, backBtn, wallet, sheet } from './ui.js';
 import { ensureSteps, thumbSvg, CREDIT } from './arts-gen.js';
+import { ART_FILES, BIG_FILES } from './content/arts/index.js';
 import { COIN, addCoins, progress, bump, checkBadges, showBadges, confetti, touchStreak, dressedOwl } from './game.js';
 
 const CATS = [
@@ -39,7 +40,7 @@ let all = null;
 async function load() {
   if (all) return all;
   all = [];
-  for (const c of ['dessin', 'dessin2', 'dessin3', 'pliage', 'recup', 'fetes']) {
+  for (const c of ART_FILES) {
     try { all.push(...(await import(`./content/arts/${c}.js`)).projects); } catch (e) { console.warn('arts missing', c, e.message); }
   }
   return all;
@@ -48,7 +49,7 @@ let big = null;
 async function loadBig() {
   if (big) return big;
   big = [];
-  for (const c of ['openmoji', 'quickdraw']) {
+  for (const c of BIG_FILES) {
     try { big.push(...(await import(`./content/arts/${c}.js`)).projects); } catch (e) { console.warn('arts library missing', c, e.message); }
   }
   return big;
