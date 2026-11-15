@@ -9,7 +9,7 @@ const svgOk = (w, v) => {
   if (!/viewBox="0 0 400 300"/.test(v)) fail(w, 'viewBox');
   if (/<script|\son\w+=|href="(?!#)|<image|<foreignObject/i.test(v)) fail(w, 'forbidden svg content');
   if (/<text[^>]*>[^<]*[A-Za-zÀ-ÿ]{2,}/.test(v)) fail(w, 'words in svg');
-  if (v.length > 12000) fail(w, `svg too big ${v.length}`);
+  if (v.length > 40000) fail(w, `svg too big ${v.length}`);
 };
 for (const id of ids) {
   let b;

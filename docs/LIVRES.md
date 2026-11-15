@@ -29,6 +29,6 @@ Text
 Pictures
 - `viewBox="0 0 400 300"`, flat picture-book style with full colour backgrounds (sky, ground, rooms), `#3a3f55` outlines (stroke 3–4), soft palette.
 - Characters must look THE SAME on every page: write one helper per character (e.g. `cochon(x, y, s, hat)`) and reuse it. Show what the page text says.
-- No words in pictures (signs may use simple symbols). No `<script>`, events, external refs, `<image>`. ≤ 12 000 characters per SVG.
+- No words in pictures (signs may use simple symbols). No `<script>`, events, external refs, `<image>`. ≤ 40 000 characters per SVG (each picture is shown as an isolated image, so `<style>`, `<defs>`, gradients and ids are safe).
 
 Check: `node tools/check-livres.mjs [id…]`. Preview: `http://localhost:5180/tools/livre-preview.html?id=trois-petits-cochons` (silent screenshots with tools/shot.mjs).
