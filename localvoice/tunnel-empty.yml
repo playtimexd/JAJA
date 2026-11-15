@@ -1,0 +1,1 @@
+# empty on purpose: the quick tunnel must not use ~/.cloudflared/config.yml ingress rules

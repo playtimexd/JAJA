@@ -1,4 +1,4 @@
-# Petit Hibou — local voice (free, on this PC). Leave this window open while the child plays.
+﻿# Petit Hibou — local voice (free, on this PC). Leave this window open while the child plays.
 # 1. starts the voice server (Whisper + Ollama qwen3 + Kokoro) on port 5190
 # 2. opens a free Cloudflare HTTPS tunnel (the iPad microphone needs https)
 # 3. tells the voice worker the tunnel address, so the game finds this PC by itself
@@ -18,14 +18,14 @@ $server = Start-Process -PassThru -NoNewWindow -FilePath (Join-Path $here '.venv
 $log = Join-Path $env:TEMP 'hibou-tunnel.log'
 if (Test-Path $log) { Remove-Item $log }
 $tunnel = Start-Process -PassThru -WindowStyle Hidden -FilePath 'cloudflared' `
-  -ArgumentList 'tunnel', '--no-autoupdate', '--url', 'http://127.0.0.1:5190' -RedirectStandardError $log
+  -ArgumentList '--config', (Join-Path $here 'tunnel-empty.yml'), 'tunnel', '--no-autoupdate', '--url', 'http://127.0.0.1:5190' -RedirectStandardError $log
 
 $url = $null
 for ($i = 0; $i -lt 60 -and -not $url; $i++) {
   Start-Sleep -Seconds 1
   if (Test-Path $log) { $m = Select-String -Path $log -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' | Select-Object -First 1; if ($m) { $url = $m.Matches[0].Value } }
 }
-if (-not $url) { Write-Host 'Tunnel: pas d’adresse (voir ' $log ')' -ForegroundColor Red }
+if (-not $url) { Write-Host "Tunnel: pas d'adresse (voir $log)" -ForegroundColor Red }
 else {
   Write-Host "Tunnel: $url" -ForegroundColor Green
   if ($workerUrl -and (Test-Path $secretFile)) {
