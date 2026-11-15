@@ -741,10 +741,10 @@ function parentGate() {
   const a = 6 + Math.floor(Math.random() * 4), b = 6 + Math.floor(Math.random() * 4);
   const input = el('input', { type: 'number', inputmode: 'numeric', class: 'gate-in' });
   const msg = el('p', { class: 'gate-msg' });
-  const go = () => { if (Number(input.value) === a * b) parents(); else { msg.textContent = `✗ ${input.value} — ${t('gate')} ${a} × ${b} ?`; input.value = ''; input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake'); input.focus(); } };
+  const go = () => { if (Number(input.value) === a * b) parents(); else { msg.textContent = `✗ ${input.value} — ${t('gate')} ${a} × ${b}?`; input.value = ''; input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake'); input.focus(); } };
   screen('gate',
     el('header', { class: 'bar' }, backBtn(home), el('h1', {}, '⚙️ ', t('parents'))),
-    el('div', { class: 'gate-box' }, el('p', {}, `${t('gate')} ${a} × ${b} ?`), input, el('button', { class: 'btn primary', onclick: go }, 'OK'), msg),
+    el('div', { class: 'gate-box' }, el('p', {}, `${t('gate')} ${a} × ${b}?`), input, el('button', { class: 'btn primary', onclick: go }, 'OK'), msg),
   );
   input.addEventListener('keydown', (e) => e.key === 'Enter' && go());
   input.focus();

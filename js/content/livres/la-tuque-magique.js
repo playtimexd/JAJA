@@ -138,7 +138,7 @@ export const book = {
       svg: svg(snowSky() + flakes(16, 36) + pine(375, 160, 1, '#3f8f63', true) + path('M-5 80 Q150 100 250 195 Q310 250 405 254 L405 305 L-5 305Z', '#f4f8fd') + path('M-5 140 Q120 150 215 228 Q290 288 405 284 L405 305 L-5 305Z', 'url(#gSnow)', 3) + G(205, 224, 1.45, sled(0, 0, 1, 0) + personne(-8, -6, 1, 'zoe', 'laugh', 'up', { sit: true }), false, 26) + personne(340, 296, 1.3, 'rose', 'happy', 'wave') + path('M110 170 l-26 -8 M96 200 l-30 -4 M118 232 l-26 2', 'none', 3, 'stroke="#fff"') + heart(100, 110, 1) + heart(300, 140, .7, '#ff9ab0') + sparks(200, 110, 80, 5) + ell(150, 238, 22, 9, '#fff', 0, 'opacity=".8"')) },
   ],
   words: [
-    {"word":"une tuque","emoji":"🧶","def":"Un bonnet de laine chaud qu’on porte l’hiver, au Québec."},
+    {"word":"une tuque","emoji":"🧶","def":"Un chapeau de laine chaud qu’on porte l’hiver, au Québec."},
     {"word":"tricoter","emoji":"🧵","def":"Faire un vêtement avec de la laine et des aiguilles."},
     {"word":"une maille","emoji":"🪢","def":"Une petite boucle de fil qu’on fait en tricotant."},
     {"word":"mystérieux","emoji":"🔮","def":"Qui est étrange et qu’on ne comprend pas tout à fait."},

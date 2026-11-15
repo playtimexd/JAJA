@@ -745,7 +745,7 @@ export const units = [
       const RL = [
         { f: (n) => `Un joueur de hockey porte 2 patins. Combien de patins pour ${n} joueurs?`, en: (n) => `A hockey player wears 2 skates. How many skates for ${n} players?`, per: 2, e: '⛸️' },
         { f: (n) => `Une main a 5 doigts. Combien de doigts sur ${n} mains?`, en: (n) => `One hand has 5 fingers. How many fingers on ${n} hands?`, per: 5, e: '✋' },
-        { f: (n) => `Une voiture a 4 roues. Combien de roues pour ${n} voitures?`, en: (n) => `A car has 4 wheels. How many wheels for ${n} cars?`, per: 4, e: '🚗' },
+        { f: (n) => `Une auto a 4 roues. Combien de roues pour ${n} autos?`, en: (n) => `A car has 4 wheels. How many wheels for ${n} cars?`, per: 4, e: '🚗' },
         { f: (n) => `Un chat a 4 pattes. Combien de pattes ont ${n} chats?`, en: (n) => `A cat has 4 paws. How many paws do ${n} cats have?`, per: 4, e: '🐱' },
         { f: (n) => `Un bonhomme de neige a 3 boules. Combien de boules pour ${n} bonshommes de neige?`, en: (n) => `A snowman has 3 balls. How many balls for ${n} snowmen?`, per: 3, e: '⛄' },
         { f: (n) => `Une paire de mitaines, c’est 2 mitaines. Combien de mitaines dans ${n} paires?`, en: (n) => `A pair of mittens is 2 mittens. How many mittens in ${n} pairs?`, per: 2, e: '🧤' },

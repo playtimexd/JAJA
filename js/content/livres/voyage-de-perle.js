@@ -135,7 +135,7 @@ ${[[34, 246], [56, 252], [76, 244]].map(([x, y]) => `<circle cx="${x}" cy="${y}"
 <path d="M10 70q70 -16 110 2M0 105q56 -14 90 4M20 138q46 -10 70 2" class="ln" stroke="#fff" stroke-width="5" opacity=".95"/><path d="M26 82q20 -4 30 6" class="ln" stroke="#fff" stroke-width="4"/>
 <path d="M310 28q10 -6 20 0q10 -6 20 0M345 52q8 -5 16 0q8 -5 16 0" class="ln" stroke="#3a3f55" stroke-width="3"/>
 ${perle(170, 108, 2.4, 'nuage', 'laugh')}`),
-      text: "Le vent se met à souffler, et il pousse le nuage vers les montagnes. En dessous, Perle voit défiler des forêts, des villages et des routes minuscules, comme dans un jeu miniature. Les voitures ressemblent à des fourmis, et les rivières à des rubans argentés. Perle n’en croit pas ses yeux, car elle n’a jamais vu autant de choses d’un seul coup. « Quel voyage extraordinaire! » s’exclame-t-elle." },
+      text: "Le vent se met à souffler, et il pousse le nuage vers les montagnes. En dessous, Perle voit défiler des forêts, des villages et des routes minuscules, comme dans un jeu miniature. Les autos ressemblent à des fourmis, et les rivières à des rubans argentés. Perle n’en croit pas ses yeux, car elle n’a jamais vu autant de choses d’un seul coup. « Quel voyage extraordinaire! » s’exclame-t-elle." },
     // 6 — flocon
     { svg: svg(`${sky('skyStorm')}${mont(205, 140, 10, 400, 300, '#b3c0dc', '#8091b8', true)}<path d="M-20 300L60 222L120 250L200 214L300 246L420 206V300Z" fill="url(#snow)" ${O2}/>${sapin(60, 288, 1.1, true)}${sapin(340, 292, 1.2, true)}${sapin(300, 276, .8, true)}${sapin(100, 276, .7, true)}
 ${nuageG(95, 36, 1.5, '#aab3c9', '#8d97b2')}${nuageG(310, 40, 1.4, '#aab3c9', '#8d97b2')}

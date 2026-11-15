@@ -411,7 +411,7 @@ const e27Gens = {
   ],
   2: [
     (R) => { const x = R.pick(PA); const m = R.pick(PASTM); return mc('pf2:' + x[0] + m, P.fill, x[1], badPast(x[0], x[1]).slice(0, 3), { stimulus: { text: `We ___ ${x[2]} ${m}.` }, cols: 2 }); },
-    (R) => { const x = R.pick(PAR); return mc('pr2:' + x[0], { fr: 'Quelle orthographe est correcte?', en: 'Which spelling is correct?' }, x[1], [...new Set([x[0] + 'ed', x[0] + 'd', x[0].replace(/y$/, 'yed'), x[0] + x[0][x[0].length - 1] + 'ed', x[0].slice(0, -1) + 'ed'])].filter((w) => w !== x[1]).slice(0, 3), { say: say(x[1]), stimulus: { text: `${x[0]} → ?` }, cols: 2 }); },
+    (R) => { const x = R.pick(PAR); return mc('pr2:' + x[0], { fr: 'Quelle orthographe est correcte?', en: 'Which spelling is correct?' }, x[1], [...new Set([x[0] + 'ed', x[0] + 'd', x[0].replace(/y$/, 'yed'), x[0] + x[0][x[0].length - 1] + 'ed', x[0].slice(0, -1) + 'ed'])].filter((w) => w !== x[1]).slice(0, 3), { say: say(x[1]), stimulus: { text: `${x[0]} →?` }, cols: 2 }); },
     (R) => { const x = R.pick(PA); const m = R.pick(PASTM), n = R.pick(PRESM);
       return mc('pw2:' + x[0] + m + n, { fr: 'Quelle phrase parle du passé?', en: 'Which sentence is about the past?' }, `We ${x[1]} ${x[2]} ${m}.`, [`We ${x[0]} ${x[2]} ${n}.`], { cols: 1 }); },
     (R) => { const was = R.chance(0.5); const s = R.pick(was ? SUBWAS : SUBWERE); const t = R.pick(WW);
@@ -633,7 +633,7 @@ const QW = ['Who', 'What', 'Where', 'When', 'Why', 'How', 'Which', 'Do', 'Can', 
 const e31Gens = {
   1: [
     (R) => { const [s, m] = R.pick(ALLS); return mc('m1:' + s, { fr: 'Quel signe termine la phrase?', en: 'Which end mark finishes the sentence?' }, m, rest(['.', '?', '!'], m), { stimulus: { text: s + ' ___' }, say: say(s), cols: 3 }); },
-    (R) => { const [s, m] = R.pick(ALLS); return mc('mk1:' + s, { fr: 'Cette phrase est… ?', en: 'This sentence is…?' }, m === '.' ? 'telling' : m === '?' ? 'asking' : 'exclaiming', rest(['telling', 'asking', 'exclaiming'], m === '.' ? 'telling' : m === '?' ? 'asking' : 'exclaiming'), { stimulus: { text: s + m }, say: say(s + m), cols: 3 }); },
+    (R) => { const [s, m] = R.pick(ALLS); return mc('mk1:' + s, { fr: 'Cette phrase est…?', en: 'This sentence is…?' }, m === '.' ? 'telling' : m === '?' ? 'asking' : 'exclaiming', rest(['telling', 'asking', 'exclaiming'], m === '.' ? 'telling' : m === '?' ? 'asking' : 'exclaiming'), { stimulus: { text: s + m }, say: say(s + m), cols: 3 }); },
     (R) => { const t = R.pick(TELL), a = R.pick(ASKS); return mc('q1:' + a, { fr: 'Quelle phrase POSE UNE QUESTION?', en: 'Which sentence ASKS a question?' }, a + '?', [t + '.', R.pick(EXCL) + '!'], { cols: 1 }); },
   ],
   2: [
@@ -648,7 +648,7 @@ const e31Gens = {
     (R) => { const a = R.pick(ASKS); const w = a.split(' ')[0]; return mc('qw3:' + a, { fr: 'Quel mot commence cette question?', en: 'Which word starts this question?' }, w, R.sample(rest(QW, w), 3), { stimulus: { text: a + '?' }, cols: 4 }); },
     (R) => { const g = [R.sample(TELL, 2), R.sample(ASKS, 2), R.sample(EXCL, 2)];
       return { type: 'sort', key: 'k3:' + g.flat().sort().join('|'), prompt: { fr: 'Place chaque phrase dans la bonne boîte.', en: 'Put each sentence in the right box.' },
-        bins: [{ text: 'Telling .', emoji: '💬' }, { text: 'Asking ?', emoji: '❓' }, { text: 'Exclaiming !', emoji: '❗' }],
+        bins: [{ text: 'Telling .', emoji: '💬' }, { text: 'Asking?', emoji: '❓' }, { text: 'Exclaiming!', emoji: '❗' }],
         items: g.flatMap((a, i) => a.map((s) => ({ text: s + ['.', '?', '!'][i], bin: i }))) }; },
     (R) => { const e = R.pick(EXCL); return mc('x3:' + e, { fr: 'Quelle phrase EXCLAME (forte émotion)?', en: 'Which sentence EXCLAIMS (a strong feeling)?' }, e + '!', [R.pick(TELL) + '.', R.pick(ASKS) + '?'], { cols: 1 }); },
     (R) => { const [s, m] = R.pick(ALLS); const g = R.sample(FRAG, 2);
@@ -957,7 +957,7 @@ export const units = [
   mkUnit('e28', '🎨', { fr: 'Les adjectifs : big, bigger, biggest', en: 'Adjectives' }, 'adjectifs (couleur, taille, sentiment) et comparatifs / superlatifs (-er, -est)', e28Gens),
   mkUnit('e29', '👤', { fr: 'Les pronoms : I, he, she, they, me, him…', en: 'Pronouns' }, 'pronoms sujets et compléments (he/him), possessifs, « Max and I »', e29Gens),
   mkUnit('e30', '🧱', { fr: 'Je construis une phrase', en: 'Build a sentence' }, 'construction de phrases : ordre des mots, majuscule et ponctuation finale', e30Gens),
-  mkUnit('e31', '❓', { fr: 'Dire, demander, s\'écrier . ? !', en: 'Telling, asking & exclaiming' }, 'types de phrases (. ? !) et phrase complète ou fragment', e31Gens),
+  mkUnit('e31', '❓', { fr: 'Dire, demander, s\'écrier .? !', en: 'Telling, asking & exclaiming' }, 'types de phrases (.? !) et phrase complète ou fragment', e31Gens),
   mkUnit('e32', '✂️', { fr: 'Contractions et mots composés', en: 'Contractions & compound words' }, 'contractions (can\'t, it\'s, don\'t) et mots composés (sun + flower)', e32Gens),
   mkUnit('e33', '🔁', { fr: 'Synonymes, contraires et homophones', en: 'Synonyms, antonyms & homophones' }, 'vocabulaire : mots de même sens, contraires et homophones (to/two, see/sea)', e33Gens),
   mkUnit('e34', '📖', { fr: 'Je lis et je réponds', en: 'Read & answer' }, 'compréhension de lecture : qui, quoi, où, pourquoi, ordre des événements, idée principale', e34Gens),

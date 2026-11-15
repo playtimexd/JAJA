@@ -16,7 +16,7 @@ export const TALK_LANGS = {
     praise: 'Great!' },
   fr: { flag: '⚜️', name: 'Français', t: { fr: 'Français', en: 'French' }, code: 'fr',
     who: 'practise speaking French. The child lives in Québec and is in 2e année at a French-speaking school; help them speak in full, correct sentences and learn new words.',
-    speak: 'Speak ONLY in French, slowly and clearly, with a warm Québec French accent and Québec vocabulary (ex. « dîner » for lunch, « tuque », « dépanneur »).',
+    speak: 'Speak ONLY in French, slowly and clearly, with a warm Québec French accent and Québec vocabulary (ex. « déjeuner » for breakfast, « dîner » for lunch, « souper » for dinner, « auto », « chandail », « bas », « tuque », « mitaines », « fin de semaine », « dépanneur »); never use France-only words (« voiture », « pull », « chaussettes », « week-end », « petit-déjeuner »).',
     help: 'If the child answers in English or Chinese or gets stuck, give the French words and invite them to repeat. Gently model correct gender, verb forms and liaisons.',
     praise: 'Bravo!' },
   zh: { flag: '🐼', name: '中文', t: { fr: 'Chinois', en: 'Chinese' }, code: 'zh',

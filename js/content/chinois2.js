@@ -289,7 +289,7 @@ const CH_TXT = {
 门 mén 3 porte|door
 手 shǒu 4 main|hand
 牛 niú 4 vache|cow
-车 chē 4 voiture|car
+车 chē 4 auto|car
 书 shū 4 livre|book
 他 tā 5 il (garçon, homme)|he
 们 men 5 pluriel (ex. nous : 我们)|plural (e.g. we: 我们)
@@ -398,7 +398,7 @@ function c15Name(R, level) {
   const list = LV_STROKES[level];
   const s = R.pick(list);
   const w = R.sample(list.filter((x) => x !== s), level === 1 ? 2 : 3);
-  return mc(`c15-a-${s.n}-${level}`, T('Quel est le nom de ce trait ?', 'What is the name of this stroke?'), strokeName(s), w.map(strokeName), {
+  return mc(`c15-a-${s.n}-${level}`, T('Quel est le nom de ce trait?', 'What is the name of this stroke?'), strokeName(s), w.map(strokeName), {
     stimulus: { svg: strokeSvg(s) },
     say: say(s.n),
     cols: level === 1 ? 3 : 2,
@@ -409,7 +409,7 @@ function c15Pic(R, level) {
   const s = R.pick(list);
   const w = R.sample(list.filter((x) => x !== s), level === 1 ? 2 : 3);
   const so = (x) => ({ svg: strokeSvg(x) });
-  return mc(`c15-b-${s.n}-${level}`, T('Quel dessin est ce trait ?', 'Which drawing is this stroke?'), so(s), w.map(so), {
+  return mc(`c15-b-${s.n}-${level}`, T('Quel dessin est ce trait?', 'Which drawing is this stroke?'), so(s), w.map(so), {
     stimulus: { hz: s.n, py: s.py },
     say: say(s.n),
     cols: 2,
@@ -418,7 +418,7 @@ function c15Pic(R, level) {
 function c15Count(R, level) {
   const c = R.pick(c15Chars[level]);
   const base = { stimulus: { hz: c.hz, py: c.py }, say: chSay(c) };
-  const prompt = T('Combien de traits a ce caractère ?', 'How many strokes does this character have?');
+  const prompt = T('Combien de traits a ce caractère?', 'How many strokes does this character have?');
   if (level === 1) {
     const w = R.sample([c.n - 2, c.n - 1, c.n + 1, c.n + 2].filter((x) => x >= 1), 2);
     return { type: 'choice', key: `c15-c-${c.hz}`, prompt, ...base, options: [c.n, ...w].map((x) => ({ text: String(x) })), answer: 0, cols: 3 };
@@ -433,7 +433,7 @@ function c15More(R, level) {
   const big = a.n > b.n ? a : b;
   const small = big === a ? b : a;
   const key = `c15-m-${[a.hz, b.hz].sort().join('')}`;
-  return mc(key, T('Quel caractère a le plus de traits ?', 'Which character has more strokes?'), o(big.hz, big.py), [o(small.hz, small.py)], { cols: 2 });
+  return mc(key, T('Quel caractère a le plus de traits?', 'Which character has more strokes?'), o(big.hz, big.py), [o(small.hz, small.py)], { cols: 2 });
 }
 const c15 = {
   id: 'c15',
@@ -553,10 +553,10 @@ function c18Nth(R, level) {
   const wrong = R.sample(ALL_STROKE_NAMES.filter((n) => n !== c.seq[i]).map(strokeInfo), level === 1 ? 2 : 3);
   const last = i === c.seq.length - 1 && c.seq.length > 1;
   const prompt = last
-    ? T('Quel est le dernier trait de ce caractère ?', 'What is the last stroke of this character?')
+    ? T('Quel est le dernier trait de ce caractère?', 'What is the last stroke of this character?')
     : i === 0
-      ? T('Quel est le premier trait de ce caractère ?', 'What is the first stroke of this character?')
-      : { fr: `Quel est le ${ord(i).fr} trait de ce caractère ?`, en: `What is the ${ord(i).en} stroke of this character?` };
+      ? T('Quel est le premier trait de ce caractère?', 'What is the first stroke of this character?')
+      : { fr: `Quel est le ${ord(i).fr} trait de ce caractère?`, en: `What is the ${ord(i).en} stroke of this character?` };
   return mc(`c18-n-${c.hz}-${i}`, prompt, strokeName(ans), wrong.map(strokeName), {
     stimulus: { hz: c.hz, py: c.py },
     say: say(SAYWORD[c.hz] || c.hz),
@@ -580,7 +580,7 @@ function c18Rule(R) {
   const right = RULES[it.ri];
   const wrong = R.sample(RULES.filter((r) => r !== right), 3);
   const ro = (r) => o(r.hz, r.py);
-  return mc(`c18-r-${it.hz}`, T("Quelle règle d'ordre des traits s'applique ?", 'Which stroke-order rule applies?'), ro(right), wrong.map(ro), {
+  return mc(`c18-r-${it.hz}`, T("Quelle règle d'ordre des traits s'applique?", 'Which stroke-order rule applies?'), ro(right), wrong.map(ro), {
     stimulus: { hz: it.hz, py: it.py },
     say: say(it.hz),
     cols: 2,
@@ -638,7 +638,7 @@ function nextLineQ(R, prefix, text, i, nOpts, level, mixOther) {
     wrong = [...w1, ...R.sample(others, nOpts - 1 - w1.length)];
   } else wrong = R.sample(others, nOpts - 1);
   const lo = (l) => o(l.hz, l.py);
-  return mc(`${prefix}-n-${text.id}-${i}`, T('Quelle est la ligne suivante ?', 'Which line comes next?'), lo(nxt), wrong.map(lo), {
+  return mc(`${prefix}-n-${text.id}-${i}`, T('Quelle est la ligne suivante?', 'Which line comes next?'), lo(nxt), wrong.map(lo), {
     stimulus: { hz: cur.hz, py: cur.py },
     say: say(cur.hz),
     cols: 1,
@@ -650,7 +650,7 @@ function blankQ(R, prefix, text, i, nOpts) {
   const avoid = text.lines.map((x) => x.hz).join('');
   const wrong = wrongWords(R, m.kind, m.word, avoid, nOpts - 1, false);
   const shown = text.lines.map((x, j) => (j === i ? { hz: m.hz, py: m.py } : x));
-  return mc(`${prefix}-b-${text.id}-${i}`, T('Quel mot manque ?', 'Which word is missing?'), o(m.word, m.wordPy), wrong.map((p) => o(p.hz, p.py)), {
+  return mc(`${prefix}-b-${text.id}-${i}`, T('Quel mot manque?', 'Which word is missing?'), o(m.word, m.wordPy), wrong.map((p) => o(p.hz, p.py)), {
     stimulus: { hz: joinHz(shown), py: joinPy(shown) },
     say: sayAll(text.lines),
     cols: nOpts === 4 ? 2 : 3,
@@ -678,7 +678,7 @@ function picQ(R, prefix, text, i, all, prompt) {
 function heardQ(R, prefix, text, i) {
   const l = text.lines[i];
   const w = R.sample(text.lines.filter((x) => x !== l), 2);
-  return mc(`${prefix}-h-${text.id}-${i}`, T('Écoute. Quelle ligne as-tu entendue ?', 'Listen. Which line did you hear?'), o(l.hz, l.py), w.map((x) => o(x.hz, x.py)), {
+  return mc(`${prefix}-h-${text.id}-${i}`, T('Écoute. Quelle ligne as-tu entendue?', 'Listen. Which line did you hear?'), o(l.hz, l.py), w.map((x) => o(x.hz, x.py)), {
     say: say(l.hz),
     cols: 1,
   });
@@ -707,7 +707,7 @@ const RH = [
   { id: 'r17', e: '🎂', L: ['今天我生日 | jīn tiān wǒ shēng rì | 今天:t', '大家来唱歌 | dà jiā lái chàng gē | 唱歌:v', '我吹蜡烛真高兴 | wǒ chuī là zhú zhēn gāo xìng | 蜡烛:o', '吃块大蛋糕 | chī kuài dà dàn gāo | 蛋糕:o'] },
 ].map((r) => ({ id: r.id, e: r.e, lines: parseLines(r.L, r.id) }));
 const blankIdx = (t) => t.lines.map((l, i) => (l.b ? i : -1)).filter((i) => i >= 0);
-const RH_PIC = T('Quelle image va avec cette comptine ?', 'Which picture goes with this rhyme?');
+const RH_PIC = T('Quelle image va avec cette comptine?', 'Which picture goes with this rhyme?');
 const c19 = {
   id: 'c19',
   icon: '🎵',
@@ -768,7 +768,7 @@ const POEMS_RAW = [
     m: [2, T("De loin, on sait que ce n'est pas de la neige.", 'From far away, you know it is not snow.'), [T("De loin, on sait que c'est de la pluie.", 'From far away, you know it is rain.'), T("De loin, on sait que c'est un oiseau.", 'From far away, you know it is a bird.')]] },
 ];
 const PO = POEMS_RAW.map((p) => { chk(p.t, p.tp, 'poem title ' + p.id); return { id: p.id, e: p.e, t: p.t, tp: p.tp, a: p.a, m: p.m, lines: parseLines(p.L, p.id) }; });
-const PO_PIC = T('Quel dessin va avec ce poème ?', 'Which drawing goes with this poem?');
+const PO_PIC = T('Quel dessin va avec ce poème?', 'Which drawing goes with this poem?');
 function poemTitleQ(R, p) {
   const w = R.sample(PO.filter((x) => x !== p), 2);
   return mc(`c20-t-${p.id}`, PO_PIC, { emoji: p.e }, w.map((x) => ({ emoji: x.e })), { stimulus: { hz: p.t, py: p.tp }, say: say(p.t), cols: 3 });
@@ -776,12 +776,12 @@ function poemTitleQ(R, p) {
 function authorQ(R, p) {
   const names = Object.keys(AU);
   const w = R.sample(names.filter((n) => n !== p.a), 3);
-  return mc(`c20-a-${p.id}`, T('Qui a écrit ce poème ?', 'Who wrote this poem?'), o(p.a, AU[p.a]), w.map((n) => o(n, AU[n])), { stimulus: { hz: p.t, py: p.tp }, say: say(p.t), cols: 2 });
+  return mc(`c20-a-${p.id}`, T('Qui a écrit ce poème?', 'Who wrote this poem?'), o(p.a, AU[p.a]), w.map((n) => o(n, AU[n])), { stimulus: { hz: p.t, py: p.tp }, say: say(p.t), cols: 2 });
 }
 function meaningQ(p) {
   const [i, ok, wr] = p.m;
   const l = p.lines[i];
-  return mc(`c20-m-${p.id}`, T('Que veut dire cette ligne ?', 'What does this line mean?'), { text: ok }, wr.map((x) => ({ text: x })), {
+  return mc(`c20-m-${p.id}`, T('Que veut dire cette ligne?', 'What does this line mean?'), { text: ok }, wr.map((x) => ({ text: x })), {
     stimulus: { hz: l.hz, py: l.py },
     say: say(l.hz),
     cols: 1,
@@ -822,73 +822,73 @@ const c20 = {
 const ST_RAW = [
   // ---- level 1 (3 short sentences, picture options) ----
   ['s1', 1, ['今天下雪了。 | jīn tiān xià xuě le', '小明在雪地里堆雪人。 | xiǎo míng zài xuě dì lǐ duī xuě rén', '小明很高兴。 | xiǎo míng hěn gāo xìng'],
-    [['who', '小明', 'Qui joue dans la neige ?', 'Who plays in the snow?'], ['p', '雪地', 'Où joue Xiaoming ?', 'Where does Xiaoming play?'], ['v', '堆雪人', 'Que fait Xiaoming ?', 'What does Xiaoming do?'], ['f', '高兴', 'Comment se sent Xiaoming ?', 'How does Xiaoming feel?']]],
+    [['who', '小明', 'Qui joue dans la neige?', 'Who plays in the snow?'], ['p', '雪地', 'Où joue Xiaoming?', 'Where does Xiaoming play?'], ['v', '堆雪人', 'Que fait Xiaoming?', 'What does Xiaoming do?'], ['f', '高兴', 'Comment se sent Xiaoming?', 'How does Xiaoming feel?']]],
   ['s2', 1, ['妈妈在厨房。 | mā ma zài chú fáng', '她在包饺子。 | tā zài bāo jiǎo zi', '小美想吃饺子。 | xiǎo měi xiǎng chī jiǎo zi'],
-    [['who', '妈妈', 'Qui est dans la cuisine ?', 'Who is in the kitchen?'], ['p', '厨房', 'Où est maman ?', 'Where is Mum?'], ['v', '包饺子', 'Que fait maman ?', 'What is Mum doing?'], ['o', '饺子', 'Que veut manger Xiaomei ?', 'What does Xiaomei want to eat?']]],
+    [['who', '妈妈', 'Qui est dans la cuisine?', 'Who is in the kitchen?'], ['p', '厨房', 'Où est maman?', 'Where is Mum?'], ['v', '包饺子', 'Que fait maman?', 'What is Mum doing?'], ['o', '饺子', 'Que veut manger Xiaomei?', 'What does Xiaomei want to eat?']]],
   ['s3', 1, ['小狗在公园里。 | xiǎo gǒu zài gōng yuán lǐ', '它爱跑步。 | tā ài pǎo bù', '它跑累了。 | tā pǎo lèi le'],
-    [['who', '小狗', 'Qui est dans le parc ?', 'Who is in the park?'], ['p', '公园', 'Où est le chien ?', 'Where is the dog?'], ['v', '跑步', 'Qu\'est-ce que le chien aime faire ?', 'What does the dog like to do?'], ['f', '累', 'Comment se sent le chien à la fin ?', 'How does the dog feel at the end?']]],
+    [['who', '小狗', 'Qui est dans le parc?', 'Who is in the park?'], ['p', '公园', 'Où est le chien?', 'Where is the dog?'], ['v', '跑步', 'Qu\'est-ce que le chien aime faire?', 'What does the dog like to do?'], ['f', '累', 'Comment se sent le chien à la fin?', 'How does the dog feel at the end?']]],
   ['s4', 1, ['爸爸有一个蛋糕。 | bà ba yǒu yí gè dàn gāo', '今天是小美的生日。 | jīn tiān shì xiǎo měi de shēng rì', '小美很高兴。 | xiǎo měi hěn gāo xìng'],
-    [['who', '爸爸', 'Qui a un gâteau ?', 'Who has a cake?'], ['o', '蛋糕', 'Qu\'a papa ?', 'What does Dad have?'], ['t', '今天', "Quand est l'anniversaire de Xiaomei ?", "When is Xiaomei's birthday?"], ['f', '高兴', 'Comment se sent Xiaomei ?', 'How does Xiaomei feel?']]],
+    [['who', '爸爸', 'Qui a un gâteau?', 'Who has a cake?'], ['o', '蛋糕', 'Qu\'a papa?', 'What does Dad have?'], ['t', '今天', "Quand est l'anniversaire de Xiaomei?", "When is Xiaomei's birthday?"], ['f', '高兴', 'Comment se sent Xiaomei?', 'How does Xiaomei feel?']]],
   ['s5', 1, ['小鸟在树上。 | xiǎo niǎo zài shù shàng', '它唱着歌。 | tā chàng zhe gē', '小猫看着它。 | xiǎo māo kàn zhe tā'],
-    [['who', '小鸟', "Qui est dans l'arbre ?", 'Who is in the tree?'], ['p', '树上', "Où est l'oiseau ?", 'Where is the bird?'], ['v', '唱歌', "Que fait l'oiseau ?", 'What does the bird do?'], ['who', '小猫', "Qui regarde l'oiseau ?", 'Who looks at the bird?']]],
+    [['who', '小鸟', "Qui est dans l'arbre?", 'Who is in the tree?'], ['p', '树上', "Où est l'oiseau?", 'Where is the bird?'], ['v', '唱歌', "Que fait l'oiseau?", 'What does the bird do?'], ['who', '小猫', "Qui regarde l'oiseau?", 'Who looks at the bird?']]],
   ['s6', 1, ['奶奶给我一个红包。 | nǎi nai gěi wǒ yí gè hóng bāo', '今天是春节。 | jīn tiān shì chūn jié', '我说新年快乐。 | wǒ shuō xīn nián kuài lè'],
-    [['who', '奶奶', 'Qui donne une enveloppe rouge ?', 'Who gives a red envelope?'], ['o', '红包', 'Que donne grand-maman ?', 'What does Grandma give?'], ['t', '春节', 'Quelle fête est-ce ?', 'Which holiday is it?']]],
+    [['who', '奶奶', 'Qui donne une enveloppe rouge?', 'Who gives a red envelope?'], ['o', '红包', 'Que donne grand-maman?', 'What does Grandma give?'], ['t', '春节', 'Quelle fête est-ce?', 'Which holiday is it?']]],
   ['s7', 1, ['小熊在冬天睡觉。 | xiǎo xióng zài dōng tiān shuì jiào', '外面在下雪。 | wài miàn zài xià xuě', '小熊在家里。 | xiǎo xióng zài jiā lǐ'],
-    [['who', '小熊', 'Qui dort ?', 'Who is sleeping?'], ['t', '冬天', 'Quand dort-il ?', 'When does it sleep?'], ['v', '睡觉', 'Que fait le petit ours ?', 'What does the little bear do?'], ['p', '家里', 'Où est le petit ours ?', 'Where is the little bear?']]],
+    [['who', '小熊', 'Qui dort?', 'Who is sleeping?'], ['t', '冬天', 'Quand dort-il?', 'When does it sleep?'], ['v', '睡觉', 'Que fait le petit ours?', 'What does the little bear do?'], ['p', '家里', 'Où est le petit ours?', 'Where is the little bear?']]],
   ['s8', 1, ['小美有一把雨伞。 | xiǎo měi yǒu yì bǎ yǔ sǎn', '外面下大雨。 | wài miàn xià dà yǔ', '她去学校。 | tā qù xué xiào'],
-    [['who', '小美', 'Qui a un parapluie ?', 'Who has an umbrella?'], ['o', '雨伞', 'Qu\'a Xiaomei ?', 'What does Xiaomei have?'], ['p', '学校', 'Où va Xiaomei ?', 'Where does Xiaomei go?']]],
+    [['who', '小美', 'Qui a un parapluie?', 'Who has an umbrella?'], ['o', '雨伞', 'Qu\'a Xiaomei?', 'What does Xiaomei have?'], ['p', '学校', 'Où va Xiaomei?', 'Where does Xiaomei go?']]],
   ['s9', 1, ['爷爷在家里看书。 | yé ye zài jiā lǐ kàn shū', '小猫在床上睡觉。 | xiǎo māo zài chuáng shàng shuì jiào', '我在写字。 | wǒ zài xiě zì'],
-    [['who', '爷爷', 'Qui lit ?', 'Who is reading?'], ['v', '看书', 'Que fait grand-papa ?', 'What does Grandpa do?'], ['who', '小猫', 'Qui dort ?', 'Who is sleeping?'], ['p', '床上', 'Où dort le chat ?', 'Where is the cat sleeping?']]],
+    [['who', '爷爷', 'Qui lit?', 'Who is reading?'], ['v', '看书', 'Que fait grand-papa?', 'What does Grandpa do?'], ['who', '小猫', 'Qui dort?', 'Who is sleeping?'], ['p', '床上', 'Où dort le chat?', 'Where is the cat sleeping?']]],
   ['s10', 1, ['小鱼在河里游。 | xiǎo yú zài hé lǐ yóu', '小鸭也在河里。 | xiǎo yā yě zài hé lǐ', '它们很高兴。 | tā men hěn gāo xìng'],
-    [['who', '小鱼', 'Qui nage ?', 'Who is swimming?'], ['who', '小鸭', 'Qui est aussi dans la rivière ?', 'Who is also in the river?'], ['p', '河里', 'Où sont-ils ?', 'Where are they?'], ['f', '高兴', 'Comment se sentent-ils ?', 'How do they feel?']]],
+    [['who', '小鱼', 'Qui nage?', 'Who is swimming?'], ['who', '小鸭', 'Qui est aussi dans la rivière?', 'Who is also in the river?'], ['p', '河里', 'Où sont-ils?', 'Where are they?'], ['f', '高兴', 'Comment se sentent-ils?', 'How do they feel?']]],
   ['s11', 1, ['早上，弟弟喝牛奶。 | zǎo shang dì di hē niú nǎi', '他还吃面包。 | tā hái chī miàn bāo', '他吃饱了。 | tā chī bǎo le'],
-    [['who', '弟弟', 'Qui boit du lait ?', 'Who drinks milk?'], ['t', '早上', 'Quand ?', 'When?'], ['o', '牛奶', 'Que boit-il ?', 'What does he drink?'], ['o', '面包', 'Que mange-t-il ?', 'What does he eat?']]],
+    [['who', '弟弟', 'Qui boit du lait?', 'Who drinks milk?'], ['t', '早上', 'Quand?', 'When?'], ['o', '牛奶', 'Que boit-il?', 'What does he drink?'], ['o', '面包', 'Que mange-t-il?', 'What does he eat?']]],
   ['s12', 1, ['小兔在花园里。 | xiǎo tù zài huā yuán lǐ', '它吃苹果。 | tā chī píng guǒ', '太阳很大，它很热。 | tài yáng hěn dà tā hěn rè'],
-    [['who', '小兔', 'Qui est dans le jardin ?', 'Who is in the garden?'], ['p', '花园', 'Où est le lapin ?', 'Where is the rabbit?'], ['o', '苹果', 'Que mange le lapin ?', 'What does the rabbit eat?'], ['f', '热', 'Comment se sent le lapin ?', 'How does the rabbit feel?']]],
+    [['who', '小兔', 'Qui est dans le jardin?', 'Who is in the garden?'], ['p', '花园', 'Où est le lapin?', 'Where is the rabbit?'], ['o', '苹果', 'Que mange le lapin?', 'What does the rabbit eat?'], ['f', '热', 'Comment se sent le lapin?', 'How does the rabbit feel?']]],
   // ---- level 2 (4 sentences) ----
   ['s13', 2, ['周末，爸爸带我去冰场。 | zhōu mò bà ba dài wǒ qù bīng chǎng', '我穿上冰鞋。 | wǒ chuān shàng bīng xié', '爸爸和我打冰球。 | bà ba hé wǒ dǎ bīng qiú', '我们玩得很开心。 | wǒ men wán de hěn kāi xīn'],
-    [['who', '爸爸', 'Qui m\'emmène à la patinoire ?', 'Who takes me to the rink?'], ['p', '冰场', 'Où allons-nous ?', 'Where do we go?'], ['o', '冰鞋', 'Que je mets ?', 'What do I put on?'], ['o', '冰球', 'À quoi jouons-nous ?', 'What do we play?']]],
+    [['who', '爸爸', 'Qui m\'emmène à la patinoire?', 'Who takes me to the rink?'], ['p', '冰场', 'Où allons-nous?', 'Where do we go?'], ['o', '冰鞋', 'Que je mets?', 'What do I put on?'], ['o', '冰球', 'À quoi jouons-nous?', 'What do we play?']]],
   ['s14', 2, ['秋天到了。 | qiū tiān dào le', '公园里的枫叶红了。 | gōng yuán lǐ de fēng yè hóng le', '小美捡了很多枫叶。 | xiǎo měi jiǎn le hěn duō fēng yè', '她把枫叶送给妈妈。 | tā bǎ fēng yè sòng gěi mā ma'],
-    [['t', '秋天', 'Quelle saison est-ce ?', 'Which season is it?'], ['p', '公园', 'Où sont les feuilles d\'érable ?', 'Where are the maple leaves?'], ['o', '枫叶', 'Que ramasse Xiaomei ?', 'What does Xiaomei pick up?'], ['who', '妈妈', 'À qui donne-t-elle les feuilles ?', 'Who does she give the leaves to?']]],
+    [['t', '秋天', 'Quelle saison est-ce?', 'Which season is it?'], ['p', '公园', 'Où sont les feuilles d\'érable?', 'Where are the maple leaves?'], ['o', '枫叶', 'Que ramasse Xiaomei?', 'What does Xiaomei pick up?'], ['who', '妈妈', 'À qui donne-t-elle les feuilles?', 'Who does she give the leaves to?']]],
   ['s15', 2, ['春节快到了。 | chūn jié kuài dào le', '奶奶和妈妈在包饺子。 | nǎi nai hé mā ma zài bāo jiǎo zi', '我也来帮忙。 | wǒ yě lái bāng máng', '饺子真好吃。 | jiǎo zi zhēn hǎo chī'],
-    [['t', '春节', 'Quelle fête arrive ?', 'Which holiday is coming?'], ['v', '包饺子', 'Que font grand-maman et maman ?', 'What are Grandma and Mum doing?'], ['who', '奶奶', 'Qui fait des raviolis avec maman ?', 'Who makes dumplings with Mum?']]],
+    [['t', '春节', 'Quelle fête arrive?', 'Which holiday is coming?'], ['v', '包饺子', 'Que font grand-maman et maman?', 'What are Grandma and Mum doing?'], ['who', '奶奶', 'Qui fait des raviolis avec maman?', 'Who makes dumplings with Mum?']]],
   ['s16', 2, ['下雪了，雪很大。 | xià xuě le xuě hěn dà', '爷爷拿来雪橇。 | yé ye ná lái xuě qiāo', '小明和弟弟坐在雪橇上。 | xiǎo míng hé dì di zuò zài xuě qiāo shàng', '他们从山上滑下来。 | tā men cóng shān shàng huá xià lái'],
-    [['o', '雪橇', 'Qu\'apporte grand-papa ?', 'What does Grandpa bring?'], ['who', '爷爷', 'Qui apporte la luge ?', 'Who brings the sled?'], ['who', '弟弟', 'Avec qui Xiaoming est-il sur la luge ?', 'Who is on the sled with Xiaoming?'], ['p', '山上', "D'où glissent-ils ?", 'Where do they slide from?']]],
+    [['o', '雪橇', 'Qu\'apporte grand-papa?', 'What does Grandpa bring?'], ['who', '爷爷', 'Qui apporte la luge?', 'Who brings the sled?'], ['who', '弟弟', 'Avec qui Xiaoming est-il sur la luge?', 'Who is on the sled with Xiaoming?'], ['p', '山上', "D'où glissent-ils?", 'Where do they slide from?']]],
   ['s17', 2, ['今天是小美的生日。 | jīn tiān shì xiǎo měi de shēng rì', '妈妈做了一个大蛋糕。 | mā ma zuò le yí gè dà dàn gāo', '朋友们来到她家。 | péng you men lái dào tā jiā', '大家一起唱生日歌。 | dà jiā yì qǐ chàng shēng rì gē'],
-    [['t', '今天', "Quand est l'anniversaire de Xiaomei ?", "When is Xiaomei's birthday?"], ['who', '妈妈', 'Qui fait le gâteau ?', 'Who makes the cake?'], ['o', '蛋糕', 'Que fait maman ?', 'What does Mum make?'], ['v', '唱歌', 'Que font-ils tous ensemble ?', 'What do they all do together?']]],
+    [['t', '今天', "Quand est l'anniversaire de Xiaomei?", "When is Xiaomei's birthday?"], ['who', '妈妈', 'Qui fait le gâteau?', 'Who makes the cake?'], ['o', '蛋糕', 'Que fait maman?', 'What does Mum make?'], ['v', '唱歌', 'Que font-ils tous ensemble?', 'What do they all do together?']]],
   ['s18', 2, ['小猫饿了。 | xiǎo māo è le', '它去河边找小鱼。 | tā qù hé biān zhǎo xiǎo yú', '小鱼在水里游。 | xiǎo yú zài shuǐ lǐ yóu', '小猫吃不到，很难过。 | xiǎo māo chī bú dào hěn nán guò'],
-    [['f', '饿', 'Comment se sent le chat au début ?', 'How does the cat feel at the start?'], ['p', '河边', 'Où va le chat ?', 'Where does the cat go?'], ['who', '小鱼', 'Qui nage dans l\'eau ?', 'Who swims in the water?'], ['f', '难过', 'Comment se sent le chat à la fin ?', 'How does the cat feel at the end?']]],
+    [['f', '饿', 'Comment se sent le chat au début?', 'How does the cat feel at the start?'], ['p', '河边', 'Où va le chat?', 'Where does the cat go?'], ['who', '小鱼', 'Qui nage dans l\'eau?', 'Who swims in the water?'], ['f', '难过', 'Comment se sent le chat à la fin?', 'How does the cat feel at the end?']]],
   ['s19', 2, ['小海狸住在河边。 | xiǎo hǎi lí zhù zài hé biān', '它每天搬木头。 | tā měi tiān bān mù tou', '它用木头盖房子。 | tā yòng mù tou gài fáng zi', '房子盖好了，它很高兴。 | fáng zi gài hǎo le tā hěn gāo xìng'],
-    [['who', '海狸', 'Qui construit ?', 'Who builds?'], ['p', '河边', 'Où habite le castor ?', 'Where does the beaver live?'], ['o', '房子', 'Que construit le castor ?', 'What does the beaver build?'], ['f', '高兴', 'Comment se sent le castor à la fin ?', 'How does the beaver feel at the end?']]],
+    [['who', '海狸', 'Qui construit?', 'Who builds?'], ['p', '河边', 'Où habite le castor?', 'Where does the beaver live?'], ['o', '房子', 'Que construit le castor?', 'What does the beaver build?'], ['f', '高兴', 'Comment se sent le castor à la fin?', 'How does the beaver feel at the end?']]],
   ['s20', 2, ['早上，我去学校。 | zǎo shang wǒ qù xué xiào', '老师在黑板上写字。 | lǎo shī zài hēi bǎn shàng xiě zì', '我们一起读书。 | wǒ men yì qǐ dú shū', '我喜欢上学。 | wǒ xǐ huan shàng xué'],
-    [['t', '早上', 'Quand vais-je à l\'école ?', 'When do I go to school?'], ['p', '学校', 'Où vais-je ?', 'Where do I go?'], ['who', '老师', 'Qui écrit au tableau ?', 'Who writes on the board?']]],
+    [['t', '早上', 'Quand vais-je à l\'école?', 'When do I go to school?'], ['p', '学校', 'Où vais-je?', 'Where do I go?'], ['who', '老师', 'Qui écrit au tableau?', 'Who writes on the board?']]],
   ['s21', 2, ['星期六，我和姐姐去公园。 | xīng qī liù wǒ hé jiě jie qù gōng yuán', '姐姐放风筝。 | jiě jie fàng fēng zheng', '风很大，风筝飞得很高。 | fēng hěn dà fēng zheng fēi de hěn gāo', '我看着风筝笑。 | wǒ kàn zhe fēng zheng xiào'],
-    [['who', '姐姐', 'Qui fait voler un cerf-volant ?', 'Who flies a kite?'], ['v', '放风筝', 'Que fait grande sœur ?', 'What does my older sister do?'], ['p', '公园', 'Où allons-nous ?', 'Where do we go?'], ['o', '风筝', 'Qu\'est-ce qui vole très haut ?', 'What flies very high?']]],
+    [['who', '姐姐', 'Qui fait voler un cerf-volant?', 'Who flies a kite?'], ['v', '放风筝', 'Que fait grande sœur?', 'What does my older sister do?'], ['p', '公园', 'Où allons-nous?', 'Where do we go?'], ['o', '风筝', 'Qu\'est-ce qui vole très haut?', 'What flies very high?']]],
   ['s22', 2, ['晚上，妈妈给我讲故事。 | wǎn shang mā ma gěi wǒ jiǎng gù shi', '故事里有一只小兔。 | gù shi lǐ yǒu yì zhī xiǎo tù', '小兔不睡觉，小兔玩球。 | xiǎo tù bú shuì jiào xiǎo tù wán qiú', '我很快睡着了。 | wǒ hěn kuài shuì zháo le'],
-    [['t', '晚上', 'Quand maman raconte-t-elle l\'histoire ?', 'When does Mum tell the story?'], ['who', '妈妈', 'Qui raconte l\'histoire ?', 'Who tells the story?'], ['who', '小兔', 'Qui est dans l\'histoire ?', 'Who is in the story?'], ['o', '球', 'Avec quoi joue le lapin ?', 'What does the rabbit play with?']]],
+    [['t', '晚上', 'Quand maman raconte-t-elle l\'histoire?', 'When does Mum tell the story?'], ['who', '妈妈', 'Qui raconte l\'histoire?', 'Who tells the story?'], ['who', '小兔', 'Qui est dans l\'histoire?', 'Who is in the story?'], ['o', '球', 'Avec quoi joue le lapin?', 'What does the rabbit play with?']]],
   ['s23', 2, ['爸爸去商店。 | bà ba qù shāng diàn', '他买了牛奶和面包。 | tā mǎi le niú nǎi hé miàn bāo', '小明想吃糖。 | xiǎo míng xiǎng chī táng', '爸爸笑了，也买了糖。 | bà ba xiào le yě mǎi le táng'],
-    [['p', '商店', 'Où va papa ?', 'Where does Dad go?'], ['o', '牛奶', 'Papa a acheté du…', 'Dad bought some…'], ['who', '小明', 'Qui veut des bonbons ?', 'Who wants candy?'], ['o', '糖', 'Que veut Xiaoming ?', 'What does Xiaoming want?']]],
+    [['p', '商店', 'Où va papa?', 'Where does Dad go?'], ['o', '牛奶', 'Papa a acheté du…', 'Dad bought some…'], ['who', '小明', 'Qui veut des bonbons?', 'Who wants candy?'], ['o', '糖', 'Que veut Xiaoming?', 'What does Xiaoming want?']]],
   // ---- level 3 (5–6 sentences) ----
   ['s24', 3, ['星期天早上，小明起床了。 | xīng qī tiān zǎo shang xiǎo míng qǐ chuáng le', '他先刷牙，再洗脸。 | tā xiān shuā yá zài xǐ liǎn', '妈妈做了面包和牛奶。 | mā ma zuò le miàn bāo hé niú nǎi', '吃完早饭，他去公园。 | chī wán zǎo fàn tā qù gōng yuán', '在公园里，他遇到了小美。 | zài gōng yuán lǐ tā yù dào le xiǎo měi', '他们一起打球，玩得真开心。 | tā men yì qǐ dǎ qiú wán de zhēn kāi xīn'],
-    [['t', '早上', 'Quand Xiaoming se lève-t-il ?', 'When does Xiaoming get up?'], ['v', '刷牙', "Que fait-il d'abord ?", 'What does he do first?'], ['p', '公园', 'Où va-t-il après le repas ?', 'Where does he go after eating?'], ['who', '小美', 'Qui rencontre-t-il ?', 'Who does he meet?']]],
+    [['t', '早上', 'Quand Xiaoming se lève-t-il?', 'When does Xiaoming get up?'], ['v', '刷牙', "Que fait-il d'abord?", 'What does he do first?'], ['p', '公园', 'Où va-t-il après le repas?', 'Where does he go after eating?'], ['who', '小美', 'Qui rencontre-t-il?', 'Who does he meet?']]],
   ['s25', 3, ['冬天，河里结冰了。 | dōng tiān hé lǐ jié bīng le', '爸爸说我们去滑冰吧。 | bà ba shuō wǒ men qù huá bīng ba', '我穿上厚厚的手套和帽子。 | wǒ chuān shàng hòu hòu de shǒu tào hé mào zi', '冰上有很多人。 | bīng shàng yǒu hěn duō rén', '我不会滑，摔倒了。 | wǒ bú huì huá shuāi dǎo le', '爸爸笑着拉我起来。 | bà ba xiào zhe lā wǒ qǐ lái'],
-    [['t', '冬天', 'Quelle saison est-ce ?', 'Which season is it?'], ['v', '滑冰', 'Que font-ils ?', 'What do they do?'], ['o', '手套', 'Que je mets aux mains ?', 'What do I put on my hands?'], ['who', '爸爸', 'Qui m\'aide à me relever ?', 'Who helps me get up?']]],
+    [['t', '冬天', 'Quelle saison est-ce?', 'Which season is it?'], ['v', '滑冰', 'Que font-ils?', 'What do they do?'], ['o', '手套', 'Que je mets aux mains?', 'What do I put on my hands?'], ['who', '爸爸', 'Qui m\'aide à me relever?', 'Who helps me get up?']]],
   ['s26', 3, ['秋天，松鼠很忙。 | qiū tiān sōng shǔ hěn máng', '它在树林里跑来跑去。 | tā zài shù lín lǐ pǎo lái pǎo qù', '它找到了很多吃的。 | tā zhǎo dào le hěn duō chī de', '它把吃的搬回家。 | tā bǎ chī de bān huí jiā', '冬天来了，它不怕冷。 | dōng tiān lái le tā bú pà lěng'],
-    [['t', '秋天', "Quand l'écureuil est-il très occupé ?", 'When is the squirrel very busy?'], ['who', '松鼠', 'Qui est très occupé ?', 'Who is very busy?'], ['p', '树林', 'Où court-il ?', 'Where does it run around?'], ['f', '冷', "De quoi n'a-t-il pas peur ?", 'What is it not afraid of?']]],
+    [['t', '秋天', "Quand l'écureuil est-il très occupé?", 'When is the squirrel very busy?'], ['who', '松鼠', 'Qui est très occupé?', 'Who is very busy?'], ['p', '树林', 'Où court-il?', 'Where does it run around?'], ['f', '冷', "De quoi n'a-t-il pas peur?", 'What is it not afraid of?']]],
   ['s27', 3, ['春节那天，我们去奶奶家。 | chūn jié nà tiān wǒ men qù nǎi nai jiā', '家里挂着红红的灯笼。 | jiā lǐ guà zhe hóng hóng de dēng long', '爷爷奶奶给我红包。 | yé ye nǎi nai gěi wǒ hóng bāo', '大家一起吃饺子。 | dà jiā yì qǐ chī jiǎo zi', '饭后，我和弟弟唱歌跳舞。 | fàn hòu wǒ hé dì di chàng gē tiào wǔ'],
-    [['t', '春节', 'Quel jour allons-nous chez grand-maman ?', 'On which day do we go to Grandma\'s?'], ['o', '灯笼', 'Qu\'est-ce qui est accroché à la maison ?', 'What hangs in the house?'], ['o', '饺子', 'Que mange-t-on ensemble ?', 'What do we eat together?'], ['who', '弟弟', 'Qui chante et danse avec moi ?', 'Who sings and dances with me?']]],
+    [['t', '春节', 'Quel jour allons-nous chez grand-maman?', 'On which day do we go to Grandma\'s?'], ['o', '灯笼', 'Qu\'est-ce qui est accroché à la maison?', 'What hangs in the house?'], ['o', '饺子', 'Que mange-t-on ensemble?', 'What do we eat together?'], ['who', '弟弟', 'Qui chante et danse avec moi?', 'Who sings and dances with me?']]],
   ['s28', 3, ['今天下雨了。 | jīn tiān xià yǔ le', '小美没有带雨伞。 | xiǎo měi méi yǒu dài yǔ sǎn', '她很难过。 | tā hěn nán guò', '这时，小明走过来。 | zhè shí xiǎo míng zǒu guò lái', '他说我们一起走吧。 | tā shuō wǒ men yì qǐ zǒu ba', '他和小美用一把雨伞回家。 | tā hé xiǎo měi yòng yì bǎ yǔ sǎn huí jiā'],
-    [['who', '小美', "Qui n'a pas de parapluie ?", 'Who has no umbrella?'], ['f', '难过', 'Comment se sent Xiaomei ?', 'How does Xiaomei feel?'], ['who', '小明', 'Qui vient aider ?', 'Who comes to help?'], ['o', '雨伞', 'Que partagent-ils ?', 'What do they share?']]],
+    [['who', '小美', "Qui n'a pas de parapluie?", 'Who has no umbrella?'], ['f', '难过', 'Comment se sent Xiaomei?', 'How does Xiaomei feel?'], ['who', '小明', 'Qui vient aider?', 'Who comes to help?'], ['o', '雨伞', 'Que partagent-ils?', 'What do they share?']]],
   ['s29', 3, ['星期六，爸爸带我去动物园。 | xīng qī liù bà ba dài wǒ qù dòng wù yuán', '我看见了大象。 | wǒ kàn jiàn le dà xiàng', '大象的鼻子很长。 | dà xiàng de bí zi hěn cháng', '我还看见了老虎和猴子。 | wǒ hái kàn jiàn le lǎo hǔ hé hóu zi', '小猴子很可爱。 | xiǎo hóu zi hěn kě ài', '我有点怕老虎。 | wǒ yǒu diǎn pà lǎo hǔ'],
-    [['p', '动物园', 'Où va-t-on le samedi ?', 'Where do we go on Saturday?'], ['who', '大象', 'Qui a un très long nez ?', 'Who has a very long nose?'], ['who', '猴子', 'Qui est très mignon ?', 'Who is very cute?'], ['who', '老虎', "De qui ai-je un peu peur ?", 'Who am I a little afraid of?']]],
+    [['p', '动物园', 'Où va-t-on le samedi?', 'Where do we go on Saturday?'], ['who', '大象', 'Qui a un très long nez?', 'Who has a very long nose?'], ['who', '猴子', 'Qui est très mignon?', 'Who is very cute?'], ['who', '老虎', "De qui ai-je un peu peur?", 'Who am I a little afraid of?']]],
   ['s30', 3, ['小鸭不会游泳。 | xiǎo yā bú huì yóu yǒng', '鸭妈妈说别怕。 | yā mā ma shuō bié pà', '小鸭跳进河里。 | xiǎo yā tiào jìn hé lǐ', '它游起来了。 | tā yóu qǐ lái le', '小鸭真高兴。 | xiǎo yā zhēn gāo xìng'],
-    [['v', '游泳', 'Que ne sait pas faire le caneton ?', "What can't the duckling do?"], ['p', '河里', 'Où saute-t-il ?', 'Where does it jump?'], ['f', '高兴', 'Comment se sent-il à la fin ?', 'How does it feel at the end?']]],
+    [['v', '游泳', 'Que ne sait pas faire le caneton?', "What can't the duckling do?"], ['p', '河里', 'Où saute-t-il?', 'Where does it jump?'], ['f', '高兴', 'Comment se sent-il à la fin?', 'How does it feel at the end?']]],
   ['s31', 3, ['周末，爸爸在厨房做饭。 | zhōu mò bà ba zài chú fáng zuò fàn', '我帮爸爸洗苹果。 | wǒ bāng bà ba xǐ píng guǒ', '妈妈在看书。 | mā ma zài kàn shū', '奶奶在睡觉。 | nǎi nai zài shuì jiào', '饭做好了，大家一起吃饭。 | fàn zuò hǎo le dà jiā yì qǐ chī fàn'],
-    [['p', '厨房', 'Où cuisine papa ?', 'Where does Dad cook?'], ['o', '苹果', 'Que lave-je ?', 'What do I wash?'], ['v', '看书', 'Que fait maman ?', 'What does Mum do?'], ['who', '奶奶', 'Qui dort ?', 'Who is sleeping?']]],
+    [['p', '厨房', 'Où cuisine papa?', 'Where does Dad cook?'], ['o', '苹果', 'Que lave-je?', 'What do I wash?'], ['v', '看书', 'Que fait maman?', 'What does Mum do?'], ['who', '奶奶', 'Qui dort?', 'Who is sleeping?']]],
   ['s32', 3, ['夏天，我们去海边。 | xià tiān wǒ men qù hǎi biān', '太阳很大，天很热。 | tài yáng hěn dà tiān hěn rè', '弟弟在海边玩球。 | dì di zài hǎi biān wán qiú', '我和姐姐游泳。 | wǒ hé jiě jie yóu yǒng', '妈妈给我们西瓜吃。 | mā ma gěi wǒ men xī guā chī', '吃了西瓜，不热了。 | chī le xī guā bú rè le'],
-    [['t', '夏天', 'Quelle saison est-ce ?', 'Which season is it?'], ['p', '海边', 'Où allons-nous ?', 'Where do we go?'], ['v', '游泳', 'Que font ma sœur et moi ?', 'What do my sister and I do?'], ['o', '西瓜', 'Que nous donne maman ?', 'What does Mum give us?']]],
+    [['t', '夏天', 'Quelle saison est-ce?', 'Which season is it?'], ['p', '海边', 'Où allons-nous?', 'Where do we go?'], ['v', '游泳', 'Que font ma sœur et moi?', 'What do my sister and I do?'], ['o', '西瓜', 'Que nous donne maman?', 'What does Mum give us?']]],
   ['s33', 3, ['春天，风很大。 | chūn tiān fēng hěn dà', '小明和爷爷去公园放风筝。 | xiǎo míng hé yé ye qù gōng yuán fàng fēng zheng', '风筝飞得很高，像一只小鸟。 | fēng zheng fēi de hěn gāo xiàng yì zhī xiǎo niǎo', '忽然，线断了。 | hū rán xiàn duàn le', '风筝飞走了，小明很难过。 | fēng zheng fēi zǒu le xiǎo míng hěn nán guò', '爷爷笑着说明年再做一个。 | yé ye xiào zhe shuō míng nián zài zuò yí gè'],
-    [['t', '春天', 'Quelle saison est-ce ?', 'Which season is it?'], ['who', '爷爷', 'Avec qui Xiaoming fait-il voler le cerf-volant ?', 'Who flies the kite with Xiaoming?'], ['o', '风筝', "Qu'est-ce qui s'envole ?", 'What flies away?'], ['f', '难过', 'Comment se sent Xiaoming à la fin ?', 'How does Xiaoming feel at the end?']]],
+    [['t', '春天', 'Quelle saison est-ce?', 'Which season is it?'], ['who', '爷爷', 'Avec qui Xiaoming fait-il voler le cerf-volant?', 'Who flies the kite with Xiaoming?'], ['o', '风筝', "Qu'est-ce qui s'envole?", 'What flies away?'], ['f', '难过', 'Comment se sent Xiaoming à la fin?', 'How does Xiaoming feel at the end?']]],
 ];
 const STORIES = ST_RAW.map(([id, lv, ss, facts]) => {
   const sents = ss.map((s, i) => { const [hz, py] = s.split(' | '); chk(hz, py, `${id}#${i}`); return { hz, py }; });
@@ -897,7 +897,7 @@ const STORIES = ST_RAW.map(([id, lv, ss, facts]) => {
   return { id, lv, hz: text, py: sents.map((s) => s.py).join(' '), facts };
 });
 // the 'o' question in s23 is clearer with a plain prompt: fix text
-STORIES.find((s) => s.id === 's23').facts[1] = ['o', '牛奶', 'Que boit-on ? Papa a acheté…', 'Dad bought some…'];
+STORIES.find((s) => s.id === 's23').facts[1] = ['o', '牛奶', 'Que boit-on? Papa a acheté…', 'Dad bought some…'];
 const ST_LV = { 1: STORIES.filter((s) => s.lv === 1), 2: STORIES.filter((s) => s.lv <= 2), 3: STORIES.filter((s) => s.lv >= 2) };
 const c21 = {
   id: 'c21',

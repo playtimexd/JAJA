@@ -471,7 +471,7 @@ L.push(A('dinosaure', '🦖', 'Un dinosaure', 'A dinosaur', 3, 20, 'animaux', [
 
 L.push(A('princesse', '👸', 'Une princesse', 'A princess', 3, 20, 'personnages', [
   S('Dessine un rond pour la tête.', 'Draw a circle for the head.', c(200, 70, 34, F(SK))),
-  S('Ajoute les cheveux : un bonnet et deux longues mèches.', 'Add the hair: a cap and two long locks.', p('M172 62 Q168 30 200 30 Q232 30 228 62 Q215 44 200 44 Q185 44 172 62 Z', F('#e0a030')), p('M174 52 Q145 100 160 160'), p('M226 52 Q255 100 240 160')),
+  S('Ajoute les cheveux : une coupe au bol et deux longues mèches.', 'Add the hair: a cap and two long locks.', p('M172 62 Q168 30 200 30 Q232 30 228 62 Q215 44 200 44 Q185 44 172 62 Z', F('#e0a030')), p('M174 52 Q145 100 160 160'), p('M226 52 Q255 100 240 160')),
   S('Dessine une couronne avec des pointes.', 'Draw a crown with points.', p('M178 40 L182 20 L192 32 L200 14 L208 32 L218 20 L222 40 Z', F(Y))),
   S('Dessine deux yeux et un sourire.', 'Draw two eyes and a smile.', eyes(188, 212, 68, 4), p('M188 82 Q200 92 212 82')),
   S('Dessine le haut de la robe.', 'Draw the top of the dress.', p('M178 104 L222 104 L226 150 L174 150 Z', F(Pk))),
@@ -529,7 +529,7 @@ L.push(A('dragon', '🐉', 'Un dragon gentil', 'A friendly dragon', 3, 22, 'fant
 
 L.push(A('sirene', '🧜‍♀️', 'Une sirène', 'A mermaid', 3, 20, 'fantastique', [
   S('Dessine un rond pour la tête.', 'Draw a circle for the head.', c(200, 60, 28, F(SK))),
-  S('Ajoute les cheveux : un bonnet et deux longues mèches.', 'Add the hair: a cap and two long locks.', p('M172 62 Q168 30 200 30 Q232 30 228 62 Q215 44 200 44 Q185 44 172 62 Z', F('#d9742e')), p('M174 52 Q145 100 160 160'), p('M226 52 Q255 100 240 160')),
+  S('Ajoute les cheveux : une coupe au bol et deux longues mèches.', 'Add the hair: a cap and two long locks.', p('M172 62 Q168 30 200 30 Q232 30 228 62 Q215 44 200 44 Q185 44 172 62 Z', F('#d9742e')), p('M174 52 Q145 100 160 160'), p('M226 52 Q255 100 240 160')),
   S('Dessine deux yeux et un sourire.', 'Draw two eyes and a smile.', eyes(190, 210, 58, 4), p('M190 70 Q200 78 210 70')),
   S('Dessine le corps avec deux coquillages.', 'Draw the body with two shells.', p('M180 88 L220 88 L224 160 L176 160 Z', F(SK)), c(189, 112, 12, F(Pk)), c(211, 112, 12, F(Pk))),
   S('Ajoute deux bras avec des mains rondes.', 'Add two arms with round hands.', pg('180,94 176,108 140,128 130,114', F(SK)), pg('220,94 224,108 260,128 270,114', F(SK)), c(134, 122, 9, F(SK)), c(266, 122, 9, F(SK))),

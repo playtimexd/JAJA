@@ -254,7 +254,7 @@ const pages = [
     + noe(280, 302, 1.85, { mood: 'laugh', al: [-34, -62], ar: [26, -46], holdL: G(thick('M0 0L-8 -36', '#a8672f', 3) + C(-8, -42, 8, taffy, 'stroke-width="2.4"'), '', 2.2),
       extra: P('M-3 -52Q-6 -40 -2 -30', 'none', `stroke="${taffy}" stroke-width="4.5"`) + C(-2, -29, 3.4, taffy, 'stroke-width="1.6"') + C(-5, -62, 3.4, taffy, 'stroke-width="1.4"'),
       front: C(10, -30, 4, taffy, 'stroke-width="1.6"') + C(-9, -22, 3.2, taffy, 'stroke-width="1.4"') + P('M8 -34Q12 -26 10 -22', 'none', `stroke="${taffy}" stroke-width="2.4"`) })
-    + dropS(0, 0, 0) + sparkles(10, 6, 215)), text: "Miam! La tire est molle, chaude et collante, et elle fond sur la langue. Léa en veut déjà une deuxième. À côté d’elle, Noé a tellement de tire sur le menton qu’on dirait qu’il a une barbe dorée. Et il en a même sur son manteau et sur sa tuque! « Je suis tout collant! » dit-il en riant. Les enfants éclatent de rire, et la maîtresse leur donne des mouchoirs pour s’essuyer." },
+    + dropS(0, 0, 0) + sparkles(10, 6, 215)), text: "Miam! La tire est molle, chaude et collante, et elle fond sur la langue. Léa en veut déjà une deuxième. À côté d’elle, Noé a tellement de tire sur le menton qu’on dirait qu’il a une barbe dorée. Et il en a même sur son manteau et sur sa tuque! « Je suis tout collant! » dit-il en riant. Les enfants éclatent de rire, et l’enseignante leur donne des mouchoirs pour s’essuyer." },
   // 7 — sleigh ride
   { svg: svg(winter({ seed: 7 }) + pine(30, 178, 0.8) + pine(86, 172, 0.58) + pine(372, 166, 0.7)
     + P('M-2 262Q160 252 402 258', 'none', 'stroke="#bcd3e4" stroke-width="5" opacity=".8"') + P('M-2 274Q160 264 402 270', 'none', 'stroke="#bcd3e4" stroke-width="4" opacity=".7"')
@@ -266,7 +266,7 @@ const pages = [
     + `<g transform="translate(86 270) scale(1.55)">` + sleighBody() + lea(44, -34, 1.12, { bust: true, shadow: false, al: [38, -92], ar: 'd', mitt: null, mittR: '#e23b3b', mood: 'surprised' }) + noe(100, -34, 1.1, { bust: true, shadow: false, mood: 'happy' }) + kidB(150, -34, 1.1, { bust: true, shadow: false, ar: 'w' })
     + blanket() + sleighFront() + '</g>'
     + mitten(48, 276, 1.6, -50) + E(46, 281, 20, 5, '#fff', `${NS} opacity=".9"`) + P('M62 240l-8 18M72 248l-8 16M40 238l-4 16', 'none', 'stroke="#fff" stroke-width="2.6" opacity=".8"') + star4(22, 268, 3, '#fff') + star4(78, 282, 2.4, '#fff')
-    + P('M60 206q-4 -10 6 -14', 'none', 'stroke="#e8a317" stroke-width="3"')), text: "Pendant la promenade, Léa salue les grands arbres en levant la main, comme s’ils étaient de vieux amis. Oups! Sa mitaine, qui n’était pas bien enfoncée, glisse de sa main et tombe dans la neige, sans bruit. Personne ne la voit tomber : ni Noé, ni la maîtresse, ni le conducteur. La traîne continue lentement son chemin, et la petite mitaine rouge reste toute seule au bord du sentier." },
+    + P('M60 206q-4 -10 6 -14', 'none', 'stroke="#e8a317" stroke-width="3"')), text: "Pendant la promenade, Léa salue les grands arbres en levant la main, comme s’ils étaient de vieux amis. Oups! Sa mitaine, qui n’était pas bien enfoncée, glisse de sa main et tombe dans la neige, sans bruit. Personne ne la voit tomber : ni Noé, ni l’enseignante, ni le conducteur. La traîne continue lentement son chemin, et la petite mitaine rouge reste toute seule au bord du sentier." },
   // 9 — sad Léa
   { svg: svg(winter({ sun: false, seed: 9 }) + shack(330, 192, 0.8) + pine(30, 186, 0.7)
     + lea(180, 296, 1.9, { mood: 'sad', ar: [14, -44], al: [-10, -56], mittR: null, mitt: '#e23b3b', holdR: C(0, 0, 0.1, 'none') })
@@ -281,7 +281,7 @@ const pages = [
     + rose(26, 280, 0.95, { mood: 'laugh', al: [-30, -78] }) + noe(74, 292, 1.1, { mood: 'laugh', al: 'w' })
     + lea(112, 298, 1.9, { mood: 'laugh', tilt: 9, ar: [44, -34], al: [-50, -40], mitt: '#e23b3b', mittR: '#e23b3b' })
     + dog(272, 298, 1.9, { flip: true, mood: 'happy' }) + G(thick('M140 232Q190 252 240 244', '#8a5cc7', 8.5) + hand(246, 242, -8, '#e23b3b', '#f1c6a0'), '')
-    + mitten(78, 290, 1.4, 70, '#e23b3b', true) + dropS(88, 268, 0.9) + dropS(70, 280, 0.7) + sparkles(8, 11, 230)), text: "C’est la mitaine de Léa! Elle est toute mouillée et pleine de bave de chien, mais Léa s’en fiche complètement. Elle la serre contre son cœur, puis elle prend Biscuit dans ses bras, pour le remercier. Biscuit lui lèche la joue, et tout le monde se met à rire. « Tu es mon héros, Biscuit! » dit Léa. La maîtresse sort un biscuit de sa poche, et le chien en profite pour le croquer." },
+    + mitten(78, 290, 1.4, 70, '#e23b3b', true) + dropS(88, 268, 0.9) + dropS(70, 280, 0.7) + sparkles(8, 11, 230)), text: "C’est la mitaine de Léa! Elle est toute mouillée et pleine de bave de chien, mais Léa s’en fiche complètement. Elle la serre contre son cœur, puis elle prend Biscuit dans ses bras, pour le remercier. Biscuit lui lèche la joue, et tout le monde se met à rire. « Tu es mon héros, Biscuit! » dit Léa. L’enseignante sort un biscuit de sa poche, et le chien en profite pour le croquer." },
   // 12 — sleepy bus ride home
   { svg: svg(R(0, 0, 400, 300, '#e9d3a0') + R(0, 0, 400, 300, 'url(#shv)', 0, NS)
     + G(R(30, 24, 340, 168, 'url(#skyI)', 12) + C(290, 126, 60, 'url(#sun)', NS) + C(290, 126, 18, '#fff1c8', NS) + P('M30 130Q110 108 200 126T370 118V192H30Z', '#c9a6b8', NS) + farTrees(150, 2, '#5a4a6a') + P('M30 150Q120 134 210 148T370 142V192H30Z', '#f3e6ee', NS) + pine(80, 186, 0.8) + pine(150, 190, 1.0) + pine(328, 188, 0.85) + flakes(14, 1.6) + P('M200 24V192', 'none', 'stroke-width="5"') + R(30, 20, 340, 8, '#6b6b78', 3, NS), '', 4)
@@ -316,7 +316,7 @@ export const book = {
     {"word":"la cabane à sucre","emoji":"🛖","def":"Le petit bâtiment où l’on fait bouillir l’eau d’érable."},
     {"word":"la vapeur","emoji":"♨️","def":"Un nuage blanc qui sort d’un liquide très chaud."},
     {"word":"la tire sur la neige","emoji":"🍬","def":"Du sirop d’érable chaud, versé sur la neige, qui devient une friandise molle."},
-    {"word":"la traîne","emoji":"🛷","def":"Une grande voiture sans roues qu’un cheval tire sur la neige."},
+    {"word":"la traîne","emoji":"🛷","def":"Un grand traîneau sans roues qu’un cheval tire sur la neige."},
     {"word":"une mitaine","emoji":"🧤","def":"Un gant sans doigts séparés qui garde la main bien au chaud."},
     {"word":"écarquiller","emoji":"👀","def":"Ouvrir très grand les yeux, par surprise."},
     {"word":"collant","emoji":"🍯","def":"Qui reste collé aux doigts, comme le sirop."},

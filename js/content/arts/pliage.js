@@ -451,14 +451,14 @@ const sq4 = (cx, cy, k, fill) => PG([[cx - k, cy - k], [cx + k, cy - k], [cx + k
 const dg = (cx, cy, k, a, col, dashed = true, w = 4) => LN([cx + a[0] * k, cy + a[1] * k], [cx + a[2] * k, cy + a[3] * k], col, w, dashed);
 out.push(manual({
   id: 'pliage-moulin-a-vent', emoji: '🎡', title: ['Moulin à vent', 'Pinwheel'], level: 3, minutes: 12, theme: 'jouets', adult: true,
-  materials: [['carré de papier de 15 cm', '6-inch square of paper'], M_SC, ['épingle à tête, crayon avec gomme', 'pin, pencil with an eraser'], ['un adulte', 'a grown-up']],
+  materials: [['carré de papier de 15 cm', '6-inch square of paper'], M_SC, ['épingle à tête, crayon avec gomme à effacer', 'pin, pencil with an eraser'], ['un adulte', 'a grown-up']],
   steps: [
     { t: ['Plie le carré en deux sur chaque diagonale, puis ouvre-le.', 'Fold the square in half along each diagonal, then open it.'], svg: sq4(200, 150, 100, '#ffd166') + dg(200, 150, 100, [-1, -1, 1, 1], INK) + dg(200, 150, 100, [1, -1, -1, 1], INK) + AR([110, 90], [160, 135], 0.3) },
     { t: sc(['Coupe sur chaque pli, du coin jusqu’au tiers du milieu. Ne coupe pas le centre!', 'Cut along each crease from the corner to one third from the middle. Do not cut the center!']), svg: sq4(200, 150, 100, '#ffd166') + [0, 1, 2, 3].map((r) => { const a = rot2([1, -1], r), b = rot2([0.35, -0.35], r); return LN([200 + a[0] * 100, 150 + a[1] * 100], [200 + b[0] * 100, 150 + b[1] * 100], PINK, 5, true); }).join('') + CI(200, 150, 6, '#fff', 3) },
     { t: ['Plie un coin sur deux jusqu’au centre. Fais-le avec les quatre coins.', 'Fold one corner out of two to the center. Do it with all four corners.'], svg: sq4(200, 150, 100, '#ffd166') + [0, 1, 2, 3].map((r) => { const a = rot2([0.5, -0.5], r), b = rot2([1, 0], r); return LN([200 + a[0] * 100, 150 + a[1] * 100], [200 + b[0] * 100, 150 + b[1] * 100], INK, 4, true) + LN([200 + rot2([1, -1], r)[0] * 100, 150 + rot2([1, -1], r)[1] * 100], [200 + rot2([0.35, -0.35], r)[0] * 100, 150 + rot2([0.35, -0.35], r)[1] * 100], '#fff', 5); }).join('') + AR([285, 75], [235, 140], 0.35) },
     { t: ['Tiens les pointes au centre. Avec l’adulte, pique l’épingle à travers le centre.', 'Hold the points in the middle. With the grown-up, push the pin through the center.'], svg: PWc(200, 150, 100, '#ffd166', '#ff8fb0') + CI(200, 150, 8, '#e63946', 3) },
   ],
-  final: { t: ['Plante l’épingle dans la gomme d’un crayon. Souffle: ton moulin tourne!', 'Stick the pin into a pencil eraser. Blow: your pinwheel spins!'], svg: PG([[193, 150], [207, 150], [207, 290], [193, 290]], '#c58b4e', 3) + PWc(200, 115, 85, '#ffd166', '#ff8fb0') + CI(200, 115, 7, '#e63946', 3) + AR([275, 60], [330, 110], 0.4) },
+  final: { t: ['Plante l’épingle dans la gomme à effacer d’un crayon. Souffle: ton moulin tourne!', 'Stick the pin into a pencil eraser. Blow: your pinwheel spins!'], svg: PG([[193, 150], [207, 150], [207, 290], [193, 290]], '#c58b4e', 3) + PWc(200, 115, 85, '#ffd166', '#ff8fb0') + CI(200, 115, 7, '#e63946', 3) + AR([275, 60], [330, 110], 0.4) },
 }));
 out.push(manual({
   id: 'pliage-mini-carnet', emoji: '📓', title: ['Petit carnet d’une seule feuille', 'One-sheet mini book'], level: 3, minutes: 12, theme: 'objets', materials: [M_LT, M_SC, M_PEN],

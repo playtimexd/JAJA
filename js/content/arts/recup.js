@@ -96,13 +96,13 @@ export const projects = [
       `Colle une bouche rouge sous le pli.|Glue a red mouth under the fold.`, `Colle des fils de laine sur le dessus pour les cheveux.|Glue yarn on top for hair.`,
       `Habille le corps avec du papier bleu, un nœud et des boutons.|Dress the body with blue paper, a bow and buttons.`]),
 
-  pr('recup-marionnette-chaussette', '🧦', `Une marionnette chaussette|A sock puppet`, 1, 20, 'jouets',
-    [`Chaussette orpheline|A lonely sock`, `Gros boutons|Big buttons`, `Feutre rouge|Red felt`, `Laine|Yarn`, `Colle à tissu|Fabric glue`],
+  pr('recup-marionnette-chaussette', '🧦', `Une marionnette en bas|A sock puppet`, 1, 20, 'jouets',
+    [`Un bas orphelin|A lonely sock`, `Gros boutons|Big buttons`, `Feutre rouge|Red felt`, `Laine|Yarn`, `Colle à tissu|Fabric glue`],
     P_(col(0, 4, (c, s) => P('M140 40L260 40L260 230Q260 270 220 270L180 270Q140 270 140 230Z', c, s) + E(200, 40, 60, 11, '#2b3050', s), '#6ec1ff', '#6ec1ff'),
       [1, (s) => C(170, 120, 14, '#fff', s) + C(230, 120, 14, '#fff', s) + dots([[170, 120], [230, 120]], 5, D)],
       [2, (s) => E(200, 185, 36, 20, '#ff7a7a', s)], [3, (s) => [165, 185, 205, 225, 235].map((x) => L(`M${x} 34q${x < 200 ? -14 : 14} -30 0 -34`, s)).join('') + T('190,150 210,150 200,162', '#ffa94d', s)],
       [4, (s) => R(142, 228, 116, 14, '#ffd95e', s, 4) + R(143, 246, 114, 12, '#fff', s, 4)]),
-    [`Prends une chaussette propre qui n'a plus de partenaire.|Take a clean sock that lost its partner.`, `Colle deux gros boutons pour les yeux.|Glue two big buttons for the eyes.`,
+    [`Prends un bas propre qui n'a plus de partenaire.|Take a clean sock that lost its partner.`, `Colle deux gros boutons pour les yeux.|Glue two big buttons for the eyes.`,
       `Colle une bouche en feutre rouge.|Glue a red felt mouth.`, `Ajoute un nez et des cheveux en laine.|Add a nose and yarn hair.`, `Colle des rayures de tissu au bas.|Glue fabric stripes at the bottom.`]),
 
   pr('recup-lion-assiette', '🦁', `Un lion en assiette de carton|A paper plate lion`, 1, 25, 'animaux',
@@ -144,7 +144,7 @@ export const projects = [
       [2, (s) => R(150, 150, 100, 14, '#ffd95e', s, 4) + R(150, 185, 100, 14, '#fff', s, 4)], [3, (s) => R(130, 236, 140, 18, CB, s, 4)]),
     [`Prends un gros rouleau de carton.|Take a big cardboard tube.`, `Peins le rouleau en vert et laisse sécher.|Paint the tube green and let it dry.`,
       `Colle des bandes de papier pour décorer.|Glue paper strips to decorate.`, `Colle le rouleau sur un carré de carton pour faire le fond.|Glue the tube on a cardboard square for the base.`,
-      `Mets tes crayons dedans !|Put your pencils inside!`]),
+      `Mets tes crayons dedans!|Put your pencils inside!`]),
 
   pr('recup-monstre-pince', '👾', `Un monstre pince à linge|A clothespin monster`, 1, 15, 'jouets',
     [`Pince à linge en bois|Wooden clothespin`, `Gouache verte|Green paint`, `Gros yeux mobiles|Googly eyes`, `Cure-pipes|Pipe cleaners`, `Colle blanche|White glue`],
@@ -269,7 +269,7 @@ export const projects = [
       [4, (s) => T('318,110 385,150 318,190', '#7bd88f', s) + R(120, 190, 28, 26, '#7bd88f', s, 6) + R(210, 190, 28, 26, '#7bd88f', s, 6)],
       [2, (s) => eye(120, 96, 14, s) + eye(168, 96, 14, s)],
       [3, (s) => [90, 130, 170, 210, 250].map((x) => T(`${x},139 ${x + 14},139 ${x + 7},153`, '#fff', s) + T(`${x + 15},155 ${x + 29},155 ${x + 22},141`, '#fff', s)).join('')]),
-    [`Prends une pince à linge. Quand tu la serres, la gueule s'ouvre !|Take a clothespin. When you squeeze it, the mouth opens!`, `Peins-la en vert.|Paint it green.`,
+    [`Prends une pince à linge. Quand tu la serres, la gueule s'ouvre!|Take a clothespin. When you squeeze it, the mouth opens!`, `Peins-la en vert.|Paint it green.`,
       `Colle deux gros yeux sur le dessus.|Glue two big eyes on top.`, `Colle des dents pointues blanches.|Glue pointy white teeth.`,
       `Ajoute une queue et deux pattes en papier vert.|Add a tail and two legs from green paper.`]),
 
@@ -283,7 +283,7 @@ export const projects = [
       [4, (s) => [30, 90, 150, 210, 270, 330].map((a) => `<circle cx="${(200 + 62 * Math.cos(a * Math.PI / 180)).toFixed(0)}" cy="${(150 + 62 * Math.sin(a * Math.PI / 180)).toFixed(0)}" r="9" fill="#fff" stroke="${D}" stroke-width="3"/>`).join('')]),
     [`Trace un grand rond sur du carton avec un bol et découpe-le.|Trace a big circle on cardboard with a bowl and cut it out.`, `Partage le rond en six parts avec ta règle.|Divide the circle into six parts with your ruler.`,
       `Colorie chaque part d'une couleur différente.|Colour each part a different colour.`, `Un adulte perce un trou au centre. Passe le crayon dedans.|A grown-up pokes a hole in the middle. Push the pencil through.`,
-      `Ajoute un rond blanc dans chaque part. Fais tourner !|Add a white dot in each part. Give it a spin!`], { adult: true }),
+      `Ajoute un rond blanc dans chaque part. Fais tourner!|Add a white dot in each part. Give it a spin!`], { adult: true }),
 
   pr('recup-bilboquet', '🎯', `Un bilboquet|A cup and ball game`, 2, 30, 'jeux',
     [`Pot de yogourt en plastique|Plastic yogurt cup`, `Ficelle|String`, `Papier d'aluminium|Aluminum foil`, `Gouache|Paint`],
@@ -293,7 +293,7 @@ export const projects = [
       [5, (s) => R(152, 96, 96, 12, '#ffd95e', s, 3) + star(200, 138, 14, '#ffd95e', s)]),
     [`Prends un pot de yogourt propre.|Take a clean yogurt cup.`, `Peins le pot en bleu.|Paint the cup blue.`,
       `Un adulte perce un petit trou dans le fond.|A grown-up pokes a small hole in the bottom.`, `Passe une ficelle dans le trou et fais un nœud.|Thread string through the hole and tie a knot.`,
-      `Attache une boule d'aluminium au bout de la ficelle.|Tie an aluminum foil ball to the end of the string.`, `Décore le pot. Lance la boule et attrape-la dans le pot !|Decorate the cup. Swing the ball and catch it in the cup!`], { adult: true }),
+      `Attache une boule d'aluminium au bout de la ficelle.|Tie an aluminum foil ball to the end of the string.`, `Décore le pot. Lance la boule et attrape-la dans le pot!|Decorate the cup. Swing the ball and catch it in the cup!`], { adult: true }),
 
   pr('recup-mobile-formes', '🌙', `Un mobile de formes|A shape mobile`, 2, 35, 'decorations',
     [`Carton de boîte de céréales|Cereal box cardboard`, `Bâton de bois ou cintre|Wooden stick or hanger`, `Ficelle|String`, `Gouache|Paint`, `Ciseaux|Scissors`],
@@ -325,7 +325,7 @@ export const projects = [
       [4, (s) => T('196,62 196,40 168,51', '#ffd95e', s)]),
     [`Pose cinq bouchons de liège côte à côte.|Lay five corks side by side.`, `Attache-les ensemble avec deux élastiques.|Tie them together with two rubber bands.`,
       `Un adulte pique un bâtonnet dans le bouchon du milieu : c'est le mât.|A grown-up pokes a stick into the middle cork: it is the mast.`, `Colle une voile de papier triangulaire sur le mât.|Glue a triangular paper sail on the mast.`,
-      `Ajoute un petit drapeau et pose ton bateau sur l'eau !|Add a little flag and set your boat on the water!`], { adult: true }),
+      `Ajoute un petit drapeau et pose ton bateau sur l'eau!|Add a little flag and set your boat on the water!`], { adult: true }),
 
   pr('recup-serpent-bouchons', '🐍', `Un serpent en bouchons|A bottle cap snake`, 2, 35, 'animaux',
     [`9 bouchons de bouteille|9 bottle caps`, `Ficelle ou cure-pipe|String or pipe cleaner`, `Gouache verte et jaune|Green and yellow paint`, `Papier rouge|Red paper`],
@@ -389,7 +389,7 @@ export const projects = [
       [5, (s) => dots([[366, 150], [366, 166], [366, 182], [378, 150], [378, 166], [378, 182]], 4, '#ffd95e') + star(60, 130, 9, '#ffd95e', s) + star(60, 205, 9, '#ffd95e', s)]),
     [`Prends une boîte : ce sera le corps de la guitare.|Take a box: it will be the guitar body.`, `Un adulte découpe un grand rond dans le dessus.|A grown-up cuts a big round hole in the top.`,
       `Colle une longue bande de carton rigide pour le manche.|Glue a long strip of stiff cardboard for the neck.`, `Peins ta guitare en orange.|Paint your guitar orange.`,
-      `Étire quatre élastiques sur la boîte et le manche. Pince-les !|Stretch four rubber bands over the box and the neck. Pluck them!`, `Ajoute des boutons et des étoiles.|Add little knobs and stars.`], { adult: true }),
+      `Étire quatre élastiques sur la boîte et le manche. Pince-les!|Stretch four rubber bands over the box and the neck. Pluck them!`, `Ajoute des boutons et des étoiles.|Add little knobs and stars.`], { adult: true }),
 
   pr('recup-baton-pluie', '🌧️', `Un bâton de pluie|A rain stick`, 3, 45, 'musique',
     [`Long tube de carton|A long cardboard tube`, `Cure-dents ou petits clous|Toothpicks`, `Riz ou petites lentilles|Rice or lentils`, `Carton et ruban adhésif|Cardboard and tape`, `Gouache|Paint`],
@@ -401,7 +401,7 @@ export const projects = [
       [5, (s) => [0, 1, 2, 3, 4, 5].map((i) => R(64 + i * 52, 112, 12, 66, i % 2 ? '#ffd95e' : '#fff', s, 3)).join('') + star(120, 145, 10, '#ff7a7a', s) + star(250, 145, 10, '#6ec1ff', s)]),
     [`Prends un long tube de carton.|Take a long cardboard tube.`, `Un adulte pique des cure-dents en spirale à travers le tube.|A grown-up pushes toothpicks through the tube in a spiral.`,
       `Ferme un bout avec un cercle de carton et du ruban adhésif.|Close one end with a cardboard circle and tape.`, `Verse une tasse de riz par l'autre bout.|Pour a cup of rice in the other end.`,
-      `Ferme l'autre bout avec du carton.|Close the other end with cardboard.`, `Peins et décore ton bâton. Retourne-le pour entendre la pluie !|Paint and decorate your stick. Turn it over to hear the rain!`], { adult: true }),
+      `Ferme l'autre bout avec du carton.|Close the other end with cardboard.`, `Peins et décore ton bâton. Retourne-le pour entendre la pluie!|Paint and decorate your stick. Turn it over to hear the rain!`], { adult: true }),
 
   pr('recup-labyrinthe-billes', '🕹️', `Un labyrinthe à bille|A marble maze`, 3, 50, 'jeux',
     [`Couvercle de boîte à chaussures|A shoebox lid`, `Bâtons de popsicle|Popsicle sticks`, `Une bille|A marble`, `Gouache|Paint`, `Colle blanche|White glue`],
@@ -449,7 +449,7 @@ export const projects = [
       [5, (s) => star(200, 46, 13, '#ffd95e', s)]),
     [`Prends une grande boîte de carton et mets-la debout.|Take a large cardboard box and stand it up.`, `Dessine un grand rectangle sur le devant pour la scène.|Draw a big rectangle on the front for the stage.`,
       `Un adulte découpe le rectangle avec un couteau.|A grown-up cuts out the rectangle with a knife.`, `Peins ou colle un décor derrière la scène : ciel, colline et soleil.|Paint or glue a backdrop behind the stage: sky, hill and sun.`,
-      `Colle des rideaux rouges de chaque côté.|Glue red curtains on each side.`, `Fais une marionnette avec un bâton de popsicle et glisse-la sur la scène. Ajoute une étoile !|Make a popsicle stick puppet and slide it onto the stage. Add a star!`], { adult: true }),
+      `Colle des rideaux rouges de chaque côté.|Glue red curtains on each side.`, `Fais une marionnette avec un bâton de popsicle et glisse-la sur la scène. Ajoute une étoile!|Make a popsicle stick puppet and slide it onto the stage. Add a star!`], { adult: true }),
 
   pr('recup-fusee-bouteille', '🛸', `Une grande fusée en bouteille|A big bottle rocket`, 3, 50, 'vehicules',
     [`Bouteille de plastique|A plastic bottle`, `Carton pour les ailerons|Cardboard for fins`, `Peinture acrylique|Acrylic paint`, `Papier de soie rouge et jaune|Red and yellow tissue paper`, `Colle blanche|White glue`],

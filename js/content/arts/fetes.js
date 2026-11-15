@@ -81,9 +81,9 @@ const add = (id, emoji, title, level, minutes, theme, season, mats, mode, steps,
       [leaf(110, 150, 2, '#e8a33c'), "Ramasse une belle feuille d'érable.|Pick up a pretty maple leaf."],
       [leaf(110, 150, 2, '#e8505b') + brush, "Peins le dessous de la feuille avec de la gouache rouge.|Paint the underside of the leaf with red paint."],
       [R(215, 40, 165, 220, '#fffaf0', 8), "Retourne la feuille sur le papier et appuie fort.|Flip the leaf onto the paper and press hard.", arc(165, 80, 205, 40, 235, 70)],
-      [mapleF(297, 150, 1.9, '#e8505b') + P('M297 218V140M297 180L262 140M297 180L332 140', 'none', 3).replace(K, '#c0392b'), "Soulève la feuille doucement : voilà ton empreinte !|Lift the leaf slowly: there is your print!"],
+      [mapleF(297, 150, 1.9, '#e8505b') + P('M297 218V140M297 180L262 140M297 180L332 140', 'none', 3).replace(K, '#c0392b'), "Soulève la feuille doucement : voilà ton empreinte!|Lift the leaf slowly: there is your print!"],
       [mapleF(262, 78, 1.1, '#ff9a3c') + mapleF(340, 220, 1.1, '#ffd23f'), "Fais d'autres empreintes : orange et jaune.|Make more prints: orange and yellow."],
-      [mapleF(340, 80, 0.8, '#c0392b') + mapleF(255, 225, 0.8, '#ff9a3c'), "Laisse sécher. Quelle belle page d'automne !|Let it dry. What a lovely autumn page!"],
+      [mapleF(340, 80, 0.8, '#c0392b') + mapleF(255, 225, 0.8, '#ff9a3c'), "Laisse sécher. Quelle belle page d'automne!|Let it dry. What a lovely autumn page!"],
     ]);
 }
 {
@@ -332,7 +332,7 @@ add('carte-noel', '✉️', 'Une carte de Noël|A Christmas card', 1, 15, 'carte
     [R(100, 60, 100, 180, '#ffb3c7', 6), "Plie une feuille de papier rouge en deux.|Fold a sheet of red paper in half.", arc(60, 70, 40, 160, 90, 230)],
     [P(half, 'none', 5, DASH), "Dessine une moitié de cœur le long du pli.|Draw half a heart along the fold."],
     ['', "Coupe sur la ligne avec des ciseaux.|Cut along the line with scissors.", cut(half)],
-    ['@' + R(60, 25, 280, 250, '#fff8e8', 10) + heart(200, 145, 2.6, '#e8505b'), "Ouvre : un cœur parfait ! Colle-le sur une carte.|Open it: a perfect heart! Glue it on a card."],
+    ['@' + R(60, 25, 280, 250, '#fff8e8', 10) + heart(200, 145, 2.6, '#e8505b'), "Ouvre : un cœur parfait! Colle-le sur une carte.|Open it: a perfect heart! Glue it on a card."],
     [Sc('M120 254Q140 242 160 254T200 254T240 254T280 254', K, 4), "Écris un mot doux sous le cœur.|Write a sweet message under the heart."],
   ]);
 }
@@ -366,7 +366,7 @@ add('seau-erable', '🪣', "Un seau d'eau d'érable|A maple sap bucket", 2, 20, 
   [poly([[170, 175], [262, 175], [252, 262], [180, 262]], '#c9ced9') + E(216, 175, 46, 9, '#e1e5ee', 0, 4), "Dessine un seau en dessous.|Draw a bucket below it."],
   [P('M172 176Q216 110 260 176', 'none', 5), "Ajoute l'anse du seau.|Add the bucket handle."],
   [drop(204, 158, 0.7) + E(216, 235, 30, 6, '#9fd8ff', 0, 3), "Dessine une goutte d'eau d'érable qui tombe.|Draw a drop of maple sap falling."],
-  [PF('M20 262H400V300H20Z', '#eaf3ff'), "Colorie le tronc en brun et le seau en gris. De la neige !|Colour the trunk brown and the bucket grey. Add snow!"],
+  [PF('M20 262H400V300H20Z', '#eaf3ff'), "Colorie le tronc en brun et le seau en gris. De la neige!|Colour the trunk brown and the bucket grey. Add snow!"],
 ]);
 {
   add('cabane-sucre', '🏡', 'Une cabane à sucre|A sugar shack', 3, 30, 'nature', 'cabane-a-sucre', "Feuille blanche|White paper;Crayon de plomb|Pencil;Crayons de couleur|Colouring pencils", 'draw', [
@@ -454,7 +454,7 @@ add('seau-erable', '🪣', "Un seau d'eau d'érable|A maple sap bucket", 2, 20, 
     [R(50, 40, 300, 220, '#fffaf0', 6), "Plie une feuille en deux, puis ouvre-la : le pli est au milieu.|Fold a sheet in half, then open it: the fold is in the middle.", fold('M200 40V260')],
     [bl, "Mets des taches de gouache sur un seul côté du pli.|Put blobs of paint on one side of the fold only.", fold('M200 40V260')],
     ['', "Referme la feuille et frotte bien avec ta main.|Close the sheet and rub well with your hand.", arc(350, 150, 285, 50, 205, 110)],
-    [mir(bl), "Ouvre : un papillon pareil des deux côtés !|Open it: a butterfly the same on both sides!"],
+    [mir(bl), "Ouvre : un papillon pareil des deux côtés!|Open it: a butterfly the same on both sides!"],
     [E(200, 150, 10, 62, K, 0, 4) + P('M196 90Q185 62 168 54M204 90Q215 62 232 54', 'none', 4) + dot(168, 54, 6) + dot(232, 54, 6), "Dessine le corps et les antennes avec un feutre noir.|Draw the body and antennae with a black marker."],
   ]);
 }
@@ -487,7 +487,7 @@ add('planete-terre', '🌍', 'Notre planète Terre|Our planet Earth', 1, 15, 'na
   [C(200, 150, 110, '#6fb7e9'), "Peins le rond en bleu : ce sont les océans.|Paint the circle blue: these are the oceans."],
   [PF('M140 90C170 70 215 85 205 115C195 140 160 130 150 150C135 160 120 120 140 90Z', '#5fbf6a') + PF('M240 165C270 150 292 170 282 195C270 220 245 215 240 165Z', '#5fbf6a') + PF('M150 200C175 190 190 215 175 240C160 255 140 230 150 200Z', '#5fbf6a'), "Peins des continents verts.|Paint green continents."],
   [EF(160, 112, 24, 9, '#fff') + EF(182, 106, 18, 8, '#fff') + EF(250, 120, 24, 9, '#fff') + EF(230, 232, 26, 9, '#fff') + EF(120, 160, 18, 8, '#fff'), "Ajoute des nuages blancs avec ton pinceau.|Add white clouds with your brush."],
-  [heart(218, 150, 0.9, '#e8505b'), "Dessine un cœur : prends soin de la Terre !|Draw a heart: take care of the Earth!"],
+  [heart(218, 150, 0.9, '#e8505b'), "Dessine un cœur : prends soin de la Terre!|Draw a heart: take care of the Earth!"],
 ]);
 {
   add('mangeoire', '🐦', 'Une mangeoire à oiseaux|A bird feeder', 3, 40, 'objets', 'jour-de-la-terre', "Un carton de lait vide, propre et sec|An empty, clean, dry milk carton;Gouache|Paint;Un bâton ou un crayon|A stick or pencil;Graines pour oiseaux|Bird seed;Ficelle|String", 'craft', [
@@ -507,7 +507,7 @@ add('planete-terre', '🌍', 'Notre planète Terre|Our planet Earth', 1, 15, 'na
     [P('M128 150Q200 108 272 150Z', '#7a5230'), "Remplis le pot de terre.|Fill the pot with soil."],
     [EF(180, 132, 7, 4, '#e0b24a') + EF(200, 126, 7, 4, '#e0b24a') + EF(220, 132, 7, 4, '#e0b24a'), "Mets trois graines et enfonce-les avec ton doigt.|Put in three seeds and push them in with your finger.", arrow(200, 70, 200, 112)],
     [drop(160, 70, 0.9) + drop(200, 40, 0.9) + drop(240, 70, 0.9) + drop(200, 95, 0.9), "Arrose avec un petit peu d'eau.|Water it with a little water."],
-    [Sc('M200 132V82', '#5fbf6a', 7) + E(178, 84, 24, 12, '#5fbf6a', -30) + E(224, 84, 24, 12, '#5fbf6a', 30) + CF(345, 55, 24, '#ffd23f') + Sd('M345 18V8M345 102V92M308 55H298M392 55H382M319 29L312 22M371 81L378 88M319 81L312 88M371 29L378 22', '#ffd23f', 5), "Mets le pot au soleil : bientôt une petite pousse sort !|Put the pot in the sun: soon a little sprout comes out!"],
+    [Sc('M200 132V82', '#5fbf6a', 7) + E(178, 84, 24, 12, '#5fbf6a', -30) + E(224, 84, 24, 12, '#5fbf6a', 30) + CF(345, 55, 24, '#ffd23f') + Sd('M345 18V8M345 102V92M308 55H298M392 55H382M319 29L312 22M371 81L378 88M319 81L312 88M371 29L378 22', '#ffd23f', 5), "Mets le pot au soleil : bientôt une petite pousse sort!|Put the pot in the sun: soon a little sprout comes out!"],
   ]);
 }
 
