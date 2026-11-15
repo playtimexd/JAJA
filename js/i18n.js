@@ -92,7 +92,7 @@ const STR = {
   readVoice: { fr: 'Voix naturelle pour la lecture', en: 'Natural voice for reading' },
   chinois: { fr: 'Chinois', en: 'Chinese' },
   pinyin: { fr: 'Pinyin au-dessus des caractères', en: 'Pinyin above characters' },
-  why: { fr: 'Pourquoi? 为什么', en: 'Why? 为什么' },
+  why: { fr: 'Pourquoi?', en: 'Why?' },
   talkShort: { fr: 'Parler', en: 'Talk' },
   grade: { fr: '2e année · Programme du Québec', en: 'Grade 2 · Québec program' },
 };

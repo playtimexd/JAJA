@@ -8,6 +8,7 @@ import { runQuestion, hanzi } from './widgets.js';
 import { screen, backBtn, wallet, sheet } from './ui.js';
 import { COIN, addCoins, bump, progress, checkBadges, showBadges, confetti, touchStreak, dressedOwl } from './game.js';
 import { makeRng } from './util.js';
+import { GROUPS } from './content/why/groups.js';
 
 const CATS = [
   { id: 'animaux', icon: '🦊', t: { zh: '动物和植物', fr: 'Animaux et plantes' } },
@@ -27,7 +28,7 @@ const L = {
   again: { zh: '再看一遍', fr: 'Revoir' },
   learned: { zh: '已学会', fr: 'appris' },
 };
-const wl = () => (store.settings.whyLang === 'fr' ? 'fr' : 'zh');
+const wl = () => (store.settings.whyLang === 'zh' ? 'zh' : 'fr');   // French by default, Chinese on request
 const T = (x) => x[wl()] ?? x.fr;
 const sayLang = () => (wl() === 'zh' ? 'zh-CN' : 'fr-CA');
 // text node for a {zh,py,fr} item in the current language
@@ -51,9 +52,20 @@ export async function whyHome(home, playFn) {
     el('button', { class: wl() === k ? 'on' : '', onclick: () => { sfx('tap'); store.settings.whyLang = k; save(); whyHome(home, playFn); } }, label)));
   const tabs = el('div', { class: 'art-tabs' }, CATS.map((c) => el('button', { class: `art-tab ${view.cat === c.id ? 'on' : ''}`, onclick: () => { sfx('tap'); view.cat = c.id; whyHome(home, playFn); } },
     el('span', { class: 'ti' }, c.icon), T(c.t), el('small', {}, String(list.filter((t) => t.cat === c.id).length)))));
-  const items = list.filter((t) => t.cat === view.cat).sort((a, b) => a.level - b.level);
-  const grid = el('div', { class: 'why-grid' }, items.map((t) => el('button', { class: `why-card lv${t.level} ${store.why?.[t.id] ? 'done' : ''}`, onclick: () => { sfx('tap'); topic(t, 0, home, playFn); } },
-    el('span', { class: 'why-emoji' }, t.emoji), el('span', { class: 'why-q' }, txt(t.q)), store.why?.[t.id] ? el('span', { class: 'art-done' }, '✔') : null)));
+  const items = list.filter((t) => t.cat === view.cat);
+  const byId = Object.fromEntries(items.map((t) => [t.id.slice(view.cat.length + 1), t]));
+  const groups = (GROUPS[view.cat] || []).map((g) => ({ ...g, topics: g.ids.map((id) => byId[id]).filter(Boolean) }));
+  const placed = new Set(groups.flatMap((g) => g.topics.map((t) => t.id)));
+  const rest = items.filter((t) => !placed.has(t.id));
+  if (rest.length) groups.push({ icon: '✨', zh: '其他', fr: 'Autres', topics: rest });
+  const card = (t) => el('button', { class: `why-card lv${t.level} ${store.why?.[t.id] ? 'done' : ''}`, onclick: () => { sfx('tap'); topic(t, 0, home, playFn); } },
+    el('span', { class: 'why-emoji' }, t.emoji), el('span', { class: 'why-q' }, txt(t.q)), store.why?.[t.id] ? el('span', { class: 'why-ok' }, '✔') : null);
+  const grid = el('div', { class: 'why-groups' }, groups.filter((g) => g.topics.length).map((g) => {
+    const got = g.topics.filter((t) => store.why?.[t.id]).length;
+    return el('section', { class: 'why-group' },
+      el('h2', {}, el('span', { class: 'wg-i' }, g.icon), T(g), el('small', {}, `${got} / ${g.topics.length}`)),
+      el('div', { class: 'why-grid' }, g.topics.sort((a, b) => a.level - b.level).map(card)));
+  }));
   const learned = Object.keys(store.why || {}).length;
   screen('why-screen blue',
     el('header', { class: 'bar' }, backBtn(home), el('h1', {}, '🔭 ', T(L.title)), langSeg, wallet()),

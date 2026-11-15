@@ -40,7 +40,9 @@ const L = {
   noServer: { fr: 'La voix de Hibou n’est pas encore installée. Demande à un parent.', en: 'Owl’s voice is not set up yet. Ask a parent.' },
   noMic: { fr: 'Le micro est bloqué. Autorise le micro pour ce site dans Réglages.', en: 'The microphone is blocked. Allow the microphone for this site in Settings.' },
   needHttps: { fr: 'Le micro marche seulement sur la version en ligne (https).', en: 'The microphone only works on the online (https) version.' },
-  badCode: { fr: 'Le code familial manque ou n’est pas bon. Demande à un parent (⚙️ Parents).', en: 'The family code is missing or wrong. Ask a parent (⚙️ Parents).' },
+  badCode: { fr: 'Le code familial n’est pas bon. Un parent peut l’entrer ici :', en: 'The family code is wrong. A parent can enter it here:' },
+  needCode: { fr: 'Avant la première conversation, un parent entre le code familial :', en: 'Before the first talk, a parent enters the family code:' },
+  codeLabel: { fr: 'Code familial', en: 'Family code' },
   limit: { fr: 'C’est assez pour aujourd’hui! Reviens demain.', en: 'That’s enough for today! Come back tomorrow.' },
   error: { fr: 'Oups, Hibou n’a pas pu venir. Réessaie plus tard.', en: 'Oops, Owl could not come. Try again later.' },
   left: { fr: 'min restantes aujourd’hui', en: 'min left today' },
@@ -81,6 +83,19 @@ export const SCENARIOS = [
 ];
 
 let live = null;   // current session
+// Family code box shown right where it is needed (also on ⚙️ Parents → Serveur de voix).
+function codeBox(onSaved) {
+  const i = el('input', { class: 'name-in code-in', type: 'password', inputmode: 'numeric', placeholder: '••••••', autocomplete: 'off', value: store.settings.voiceCode || '' });
+  const ok = () => { store.settings.voiceCode = i.value.trim(); save(); sfx('tap'); onSaved?.(); };
+  i.addEventListener('keydown', (e) => e.key === 'Enter' && ok());
+  return el('div', { class: 'code-box' }, el('span', {}, '🔑 ', tr(L.codeLabel)), i, el('button', { class: 'btn primary', onclick: ok }, 'OK'));
+}
+function badCode() {
+  if (!live) return;
+  const back = live.ui.back, tl = live.tl;
+  live.ui.status.textContent = tr(L.badCode);
+  live.ui.status.after(codeBox(() => { end(true); talkHome(back, tl); }));
+}
 const voiceUrl = () => (store.settings.voiceUrl || VOICE_URL).replace(/\/$/, '');
 
 export function talkHome(back, langArg) {
@@ -101,6 +116,7 @@ export function talkHome(back, langArg) {
     el('div', { class: 'talk-langs' }, Object.entries(TALK_LANGS).map(([k, T]) => el('button', { class: `talk-lang ${k === tl ? 'on' : ''}`, onclick: () => { sfx('tap'); store.pick.talkLang = k; save(); talkHome(back, k); } }, el('span', {}, T.flag), T.name))),
     el('p', { class: 'hub-intro' }, tr(L.pick), ' · ', `⏱️ ${Math.ceil(left / 60)} ${tr(L.left)}`),
     !ok ? el('div', { class: 'talk-warn' }, '⚙️ ', tr(L.noServer)) : null,
+    ok && !store.settings.voiceCode ? el('div', { class: 'talk-warn' }, tr(L.needCode), codeBox(() => talkHome(back, tl))) : null,
     seg,
     el('div', { class: 'talk-grid' }, SCENARIOS.map((s) => el('button', { class: 'talk-card', onclick: () => { sfx('tap'); start(s, level, back, tl); } },
       el('span', { class: 'tc-i' }, s.icon), el('span', { class: 'tc-t' }, tr(s.t))))),
@@ -140,7 +156,7 @@ async function start(s, level, back, tl = 'en') {
       method: 'POST', headers: { 'content-type': 'application/json', ...(store.settings.voiceCode ? { 'x-family-code': store.settings.voiceCode } : {}) },
       body: JSON.stringify({ scenario: s.id, lang: T.code, instructions: `${BASE(level, T)}\n\nActivity: ${s.task}` }),
     });
-    if (r.status === 401) { ui.status.textContent = tr(L.badCode); cleanup(); return; }
+    if (r.status === 401) { cleanup(); badCode(); return; }
     if (!r.ok) throw new Error(`server ${r.status}`);
     const { value } = await r.json();
     const pc = new RTCPeerConnection();
@@ -207,7 +223,7 @@ async function localSession(base, instructions, code, kind) {
     await say(first.audio, first.mime);
   } catch (e) {
     if (!live) return true;
-    if (e.code === 401) { ui.status.textContent = tr(L.badCode); return true; }
+    if (e.code === 401) { badCode(); return true; }
     console.warn('voice', kind, e);
     clearInterval(live.tick); live.t0 = 0;
     return false;
@@ -242,7 +258,7 @@ async function localSession(base, instructions, code, kind) {
       if (res.heard) { addLine('me', res.heard); history.push({ role: 'user', content: res.heard }); live.turns++; sfx('tap'); }
       addLine('owl', res.reply); history.push({ role: 'assistant', content: res.reply });
       await say(res.audio, res.mime);
-    } catch (e) { if (live) ui.status.textContent = tr(e.code === 401 ? L.badCode : L.error); }
+    } catch (e) { if (e.code === 401) badCode(); else if (live) ui.status.textContent = tr(L.error); }
     if (live) { btn.disabled = false; btn.textContent = `🎤 ${tr(L.tapTalk)}`; }
   };
   return true;

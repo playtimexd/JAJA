@@ -55,10 +55,10 @@ const SECTIONS = {
     { id: 'talk', icon: '💬', t: { fr: 'Parler', en: 'Speaking' }, ids: ['e1', 'e12'], boss: '🦈', talk: true },
   ],
   chinois: [
-    { id: 'py', icon: '🔤', t: { fr: 'Pinyin et tons · 拼音', en: 'Pinyin & tones · 拼音' }, ids: range('c', 1, 5), boss: '🐉' },
-    { id: 'sz', icon: '🀄', t: { fr: 'Caractères · 识字', en: 'Characters · 识字' }, ids: range('c', 6, 14), boss: '🦁' },
-    { id: 'xz', icon: '🖌️', t: { fr: 'Écrire · 写字', en: 'Writing · 写字' }, ids: range('c', 15, 18), boss: '🐯' },
-    { id: 'yd', icon: '📜', t: { fr: 'Lire · 儿歌和古诗', en: 'Reading · 儿歌和古诗' }, ids: range('c', 19, 21), boss: '🐲' },
+    { id: 'py', icon: '🔤', t: { fr: 'Pinyin et tons', en: 'Pinyin & tones' }, ids: range('c', 1, 5), boss: '🐉' },
+    { id: 'sz', icon: '🀄', t: { fr: 'Caractères', en: 'Characters' }, ids: range('c', 6, 14), boss: '🦁' },
+    { id: 'xz', icon: '🖌️', t: { fr: 'Écrire', en: 'Writing' }, ids: range('c', 15, 18), boss: '🐯' },
+    { id: 'yd', icon: '📜', t: { fr: 'Comptines et poèmes', en: 'Rhymes & poems' }, ids: range('c', 19, 21), boss: '🐲' },
   ],
 };
 function sectionsOf(s) {
@@ -669,10 +669,11 @@ function album() {
 function parentGate() {
   const a = 6 + Math.floor(Math.random() * 4), b = 6 + Math.floor(Math.random() * 4);
   const input = el('input', { type: 'number', inputmode: 'numeric', class: 'gate-in' });
-  const go = () => { if (Number(input.value) === a * b) parents(); else { input.value = ''; input.classList.add('shake'); } };
+  const msg = el('p', { class: 'gate-msg' });
+  const go = () => { if (Number(input.value) === a * b) parents(); else { msg.textContent = `✗ ${input.value} — ${t('gate')} ${a} × ${b} ?`; input.value = ''; input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake'); input.focus(); } };
   screen('gate',
     el('header', { class: 'bar' }, backBtn(home), el('h1', {}, '⚙️ ', t('parents'))),
-    el('div', { class: 'gate-box' }, el('p', {}, `${t('gate')} ${a} × ${b} ?`), input, el('button', { class: 'btn primary', onclick: go }, 'OK')),
+    el('div', { class: 'gate-box' }, el('p', {}, `${t('gate')} ${a} × ${b} ?`), input, el('button', { class: 'btn primary', onclick: go }, 'OK'), msg),
   );
   input.addEventListener('keydown', (e) => e.key === 'Enter' && go());
   input.focus();
