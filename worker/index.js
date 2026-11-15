@@ -23,7 +23,7 @@ export default {
       if (!env.LOCAL_SECRET || req.headers.get('x-local-secret') !== env.LOCAL_SECRET) return json({ error: 'secret' }, 401, {});
       if (!env.ELEVENLABS_API_KEY) return json({ error: 'no ELEVENLABS_API_KEY secret' }, 503, {});
       const target = 'https://api.elevenlabs.io/v1/' + url.pathname.slice('/eleven/'.length) + url.search;
-      if (!/^https:\/\/api\.elevenlabs\.io\/v1\/(user\/subscription|voices|text-to-speech\/[A-Za-z0-9]+)(\?|$)/.test(target)) return json({ error: 'path' }, 400, {});
+      if (!/^https:\/\/api\.elevenlabs\.io\/v1\/(user\/subscription|voices|shared-voices|text-to-speech\/[A-Za-z0-9]+)(\?|$)/.test(target)) return json({ error: 'path' }, 400, {});
       const r = await fetch(target, { method: req.method, headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'content-type': 'application/json', accept: req.headers.get('accept') || '*/*' }, body: req.method === 'POST' ? await req.text() : undefined });
       return new Response(r.body, { status: r.status, headers: { 'content-type': r.headers.get('content-type') || 'application/octet-stream' } });
     }

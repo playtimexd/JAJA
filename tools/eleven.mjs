@@ -28,12 +28,13 @@ fs.mkdirSync(out, { recursive: true });
 
 const sub = await (await fetch(`${API}/user/subscription`, { headers: H })).json();
 if (sub.error) { console.log('Worker:', sub.error); process.exit(1); }
-if (sub.detail) { console.log('ElevenLabs refused the key:', sub.detail.status || sub.detail.message || sub.detail); process.exit(1); }
-const left = sub.character_limit - sub.character_count;
-console.log(`ElevenLabs plan: ${sub.tier} · used ${sub.character_count} / ${sub.character_limit} characters · left ${left}`);
+let left = Infinity;
+if (sub.detail) console.log('Balance not readable with this key (', sub.detail.status || sub.detail, ') — recording until ElevenLabs says the quota is used up.');
+else { left = sub.character_limit - sub.character_count; console.log(`ElevenLabs plan: ${sub.tier} · used ${sub.character_count} / ${sub.character_limit} characters · left ${left}`); }
 
 const sets = arg('sets', 'books,why,prompts').split(',');
-const items = [...(await collect({ sets })).entries()].filter(([k]) => !fs.existsSync(path.join(out, `${k}.mp3`)));
+const order = { books: 0, why: 1, prompts: 2 };
+const items = [...(await collect({ sets })).entries()].sort((a, b) => order[a[1].set] - order[b[1].set]).filter(([k]) => !fs.existsSync(path.join(out, `${k}.mp3`)));
 const chars = items.reduce((a, [, v]) => a + v.text.length, 0);
 console.log(`to record: ${items.length} clips, ${chars} characters (${sets.join(', ')})`);
 
@@ -65,7 +66,7 @@ async function worker() {
           body: JSON.stringify({ text: v.text, model_id: MODEL, language_code: lang.slice(0, 2), voice_settings: { stability: 0.55, similarity_boost: 0.75, style: 0.25, speed: lang === 'zh-CN' ? 0.9 : 0.95 } }),
         });
         if (r.status === 429) { await new Promise((s) => setTimeout(s, 4000)); continue; }
-        if (!r.ok) throw new Error(`${r.status} ${(await r.text()).slice(0, 120)}`);
+        if (!r.ok) { const t = await r.text(); if (/quota|credits|limit/i.test(t)) { console.log('Quota reached — stopping.'); queue.length = 0; return; } throw new Error(`${r.status} ${t.slice(0, 120)}`); }
         fs.writeFileSync(path.join(out, `${k}.mp3`), Buffer.from(await r.arrayBuffer()));
         manifest[k] = 1; done++;
         if (done % 50 === 0) { fs.writeFileSync(manifestFile, JSON.stringify(manifest)); console.log(`${done}/${limit}`); }
