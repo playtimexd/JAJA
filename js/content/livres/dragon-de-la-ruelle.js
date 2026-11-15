@@ -11,7 +11,7 @@ const DEFS = '<defs>'
   + '<radialGradient id="sun"><stop offset="0" stop-color="#fff6c2" stop-opacity=".95"/><stop offset="1" stop-color="#fff6c2" stop-opacity="0"/></radialGradient>'
   + '<radialGradient id="glow"><stop offset="0" stop-color="#ffd27a" stop-opacity=".9"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>'
   + '<radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#2a2038" stop-opacity="0"/><stop offset="1" stop-color="#2a2038" stop-opacity=".22"/></radialGradient>'
-  + '<linearGradient id="skyS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a9bb2"/><stop offset=".6" stop-color="#c3cfdc"/><stop offset="1" stop-color="#e6edf4"/></linearGradient><linearGradient id="skyN" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f1636"/><stop offset=".7" stop-color="#2b3a74"/><stop offset="1" stop-color="#4a5c9a"/></linearGradient><linearGradient id="nightSnow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9d6f0"/><stop offset="1" stop-color="#8fa2cc"/></linearGradient><radialGradient id="beam"><stop offset="0" stop-color="#fff3b0" stop-opacity=".85"/><stop offset="1" stop-color="#fff3b0" stop-opacity="0"/></radialGradient><radialGradient id="orange"><stop offset="0" stop-color="#ffb04a" stop-opacity=".95"/><stop offset="1" stop-color="#ff8a1a" stop-opacity="0"/></radialGradient><linearGradient id="skyDay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fc0f0"/><stop offset="1" stop-color="#fbe8c0"/></linearGradient><linearGradient id="skyDusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d2f6e"/><stop offset=".55" stop-color="#c85a7a"/><stop offset="1" stop-color="#ffb070"/></linearGradient><linearGradient id="skyNight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1030"/><stop offset=".6" stop-color="#1e2a66"/><stop offset="1" stop-color="#4a4a8a"/></linearGradient><linearGradient id="skyDark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1a4a"/><stop offset=".55" stop-color="#6a3a6a"/><stop offset="1" stop-color="#f09068"/></linearGradient><pattern id="gingham" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#fff"/><rect width="8" height="16" fill="#e8556a" opacity=".5"/><rect width="16" height="8" fill="#e8556a" opacity=".5"/></pattern><radialGradient id="glowG"><stop offset="0" stop-color="#9affc0" stop-opacity=".9"/><stop offset="1" stop-color="#9affc0" stop-opacity="0"/></radialGradient><radialGradient id="orange"><stop offset="0" stop-color="#ffb04a" stop-opacity=".95"/><stop offset="1" stop-color="#ff8a1a" stop-opacity="0"/></radialGradient></defs>';
+  + '<linearGradient id="skyS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a9bb2"/><stop offset=".6" stop-color="#c3cfdc"/><stop offset="1" stop-color="#e6edf4"/></linearGradient><linearGradient id="skyN" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f1636"/><stop offset=".7" stop-color="#2b3a74"/><stop offset="1" stop-color="#4a5c9a"/></linearGradient><linearGradient id="nightSnow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9d6f0"/><stop offset="1" stop-color="#8fa2cc"/></linearGradient><radialGradient id="beam"><stop offset="0" stop-color="#fff3b0" stop-opacity=".85"/><stop offset="1" stop-color="#fff3b0" stop-opacity="0"/></radialGradient><radialGradient id="orange"><stop offset="0" stop-color="#ffb04a" stop-opacity=".95"/><stop offset="1" stop-color="#ff8a1a" stop-opacity="0"/></radialGradient><linearGradient id="skyDay" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fc0f0"/><stop offset="1" stop-color="#fbe8c0"/></linearGradient><linearGradient id="skyDusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d2f6e"/><stop offset=".55" stop-color="#c85a7a"/><stop offset="1" stop-color="#ffb070"/></linearGradient><linearGradient id="skyNight" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1030"/><stop offset=".6" stop-color="#1e2a66"/><stop offset="1" stop-color="#4a4a8a"/></linearGradient><linearGradient id="skyDark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1a4a"/><stop offset=".55" stop-color="#6a3a6a"/><stop offset="1" stop-color="#f09068"/></linearGradient><pattern id="gingham" width="16" height="16" patternUnits="userSpaceOnUse"><rect width="16" height="16" fill="#fff"/><rect width="8" height="16" fill="#e8556a" opacity=".5"/><rect width="16" height="8" fill="#e8556a" opacity=".5"/></pattern><radialGradient id="glowG"><stop offset="0" stop-color="#9affc0" stop-opacity=".9"/><stop offset="1" stop-color="#9affc0" stop-opacity="0"/></radialGradient><radialGradient id="orange"><stop offset="0" stop-color="#ffb04a" stop-opacity=".95"/><stop offset="1" stop-color="#ff8a1a" stop-opacity="0"/></radialGradient><g id="Ln0" stroke="#3a3f55" stroke-width="1.8"><circle cy="6" r="36" fill="url(#glow)" stroke="none" opacity=".9"/><path d="M0 -16V-10" fill="none" stroke-width="1.6"/><rect x="-5" y="-12" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><ellipse cy="4" rx="12.5" ry="14" fill="#ff5a3c"/><ellipse cy="4" rx="8" ry="10" fill="#fff2b0" opacity=".55" stroke="none"/><path d="M0 -10V18M-7 -8Q-12 4 -7 16M7 -8Q12 4 7 16" fill="none" stroke="#a8321a" stroke-width="1.2" opacity=".6"/><rect x="-5" y="16" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><path d="M0 20V27" fill="none" stroke-width="1.4"/><circle cy="28" r="2.2" fill="#f4c430" stroke-width="1.2"/></g><g id="Ln1" stroke="#3a3f55" stroke-width="1.8"><circle cy="6" r="36" fill="url(#glow)" stroke="none" opacity=".9"/><path d="M0 -16V-10" fill="none" stroke-width="1.6"/><rect x="-5" y="-12" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><ellipse cy="4" rx="12.5" ry="14" fill="#ff9a2a"/><ellipse cy="4" rx="8" ry="10" fill="#fff2b0" opacity=".55" stroke="none"/><path d="M0 -10V18M-7 -8Q-12 4 -7 16M7 -8Q12 4 7 16" fill="none" stroke="#a8321a" stroke-width="1.2" opacity=".6"/><rect x="-5" y="16" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><path d="M0 20V27" fill="none" stroke-width="1.4"/><circle cy="28" r="2.2" fill="#f4c430" stroke-width="1.2"/></g><g id="Ln2" stroke="#3a3f55" stroke-width="1.8"><circle cy="6" r="36" fill="url(#glow)" stroke="none" opacity=".9"/><path d="M0 -16V-10" fill="none" stroke-width="1.6"/><rect x="-5" y="-12" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><ellipse cy="4" rx="12.5" ry="14" fill="#ffd24a"/><ellipse cy="4" rx="8" ry="10" fill="#fff2b0" opacity=".55" stroke="none"/><path d="M0 -10V18M-7 -8Q-12 4 -7 16M7 -8Q12 4 7 16" fill="none" stroke="#a8321a" stroke-width="1.2" opacity=".6"/><rect x="-5" y="16" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><path d="M0 20V27" fill="none" stroke-width="1.4"/><circle cy="28" r="2.2" fill="#f4c430" stroke-width="1.2"/></g><g id="Lf0" stroke="#3a3f55" stroke-width="1.8"><path d="M0 -16V-10" fill="none" stroke-width="1.6"/><rect x="-5" y="-12" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><ellipse cy="4" rx="12.5" ry="14" fill="#7a3a3a"/><path d="M0 -10V18M-7 -8Q-12 4 -7 16M7 -8Q12 4 7 16" fill="none" stroke="#2a1a1a" stroke-width="1.2" opacity=".6"/><rect x="-5" y="16" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><path d="M0 20V27" fill="none" stroke-width="1.4"/><circle cy="28" r="2.2" fill="#f4c430" stroke-width="1.2"/></g><g id="Lf1" stroke="#3a3f55" stroke-width="1.8"><path d="M0 -16V-10" fill="none" stroke-width="1.6"/><rect x="-5" y="-12" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><ellipse cy="4" rx="12.5" ry="14" fill="#7a5a3a"/><path d="M0 -10V18M-7 -8Q-12 4 -7 16M7 -8Q12 4 7 16" fill="none" stroke="#2a1a1a" stroke-width="1.2" opacity=".6"/><rect x="-5" y="16" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><path d="M0 20V27" fill="none" stroke-width="1.4"/><circle cy="28" r="2.2" fill="#f4c430" stroke-width="1.2"/></g><g id="Lf2" stroke="#3a3f55" stroke-width="1.8"><path d="M0 -16V-10" fill="none" stroke-width="1.6"/><rect x="-5" y="-12" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><ellipse cy="4" rx="12.5" ry="14" fill="#7a6a3a"/><path d="M0 -10V18M-7 -8Q-12 4 -7 16M7 -8Q12 4 7 16" fill="none" stroke="#2a1a1a" stroke-width="1.2" opacity=".6"/><rect x="-5" y="16" width="10" height="4" rx="1.5" fill="#6b4a34" stroke-width="1.6"/><path d="M0 20V27" fill="none" stroke-width="1.4"/><circle cy="28" r="2.2" fill="#f4c430" stroke-width="1.2"/></g><g id="W0" stroke="#3a3f55" stroke-width="1.4"><path d="M-7 0h14l2 18h-18z" fill="currentColor"/><path d="M-7 0l-6 8M7 0l6 8" fill="none" stroke="currentColor" stroke-width="4"/></g><g id="W1" stroke="#3a3f55" stroke-width="1.4"><rect x="-8" width="16" height="22" rx="1" fill="currentColor"/></g><g id="W2" stroke="#3a3f55" stroke-width="1.4"><path d="M-5 0h10v14q0 6 -5 6q-5 0 -5 -6z" fill="currentColor"/></g><g id="Bn"><circle cy="5" r="11" fill="url(#glow)" opacity=".8"/><circle cy="5" r="3.4" fill="#fff2a0" stroke="#3a3f55" stroke-width="1"/></g><pattern id="brickP" width="22" height="24" patternUnits="userSpaceOnUse"><path d="M11 0V12M0 12V24M22 12V24" stroke="#000" stroke-opacity=".12" stroke-width="1" fill="none"/></pattern></defs>';
 const svg = (b) => `<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" stroke-linejoin="round" stroke-linecap="round">${DEFS}${b}</svg>`.replace(/\d+\.\d{2,}/g, (m) => String(Math.round(m * 10) / 10)).replace(/ rx="0"| rotate\(0\)/g, '').replace(/ +\/>/g, '/>').replace(/ {2,}/g, ' ');
 const R = (x, y, w, h, f, r = 0, ex = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${f}" ${ex}/>`;
 const C = (x, y, r, f, ex = '') => `<circle cx="${x}" cy="${y}" r="${r}" fill="${f}" ${ex}/>`;
@@ -64,7 +64,20 @@ const hand = (px, py, ang, m, skin) => {
     : [-4.8, -1.6, 1.6, 4.8].map((yy, i) => R(4, yy - 1.7, 9 + (i === 1 || i === 2 ? 1.8 : 0), 3.4, skin, 1.7, 'stroke-width="1.6"')).join('') + R(-3, -6.2, 10, 12.4, skin, 5) + E(1, -7.4, 4.8, 2.9, skin, 'transform="rotate(-40 1 -7.4)" stroke-width="1.8"') + P('M5 -2.5V2.5', 'none', 'stroke="#d08a6a" stroke-width="1" opacity=".6"');
   return `<g transform="translate(${px} ${py}) rotate(${ang})" stroke-width="2.2">${body}</g>`;
 };
+const lk = (x, y, s, o = {}) => {
+  const { skin = '#f1c6a0', hair = '#3a2a20', coat = '#4a8fe0', pants = '#4a4a5a', boots = '#3a3a44', mood = 'happy', al = 'd', ar = 'd', flip = false, tilt = 0, extra = '', back = '', style = 'short', holdL = '', holdR = '', shadow = false, front = '' } = o;
+  const hl = hp(al), hr = hp(ar);
+  const arm = (sx, h) => P(`M${sx * 15} -50L${sx * h[0]} ${h[1]}`, 'none', `stroke="${O}" stroke-width="11"`) + P(`M${sx * 15} -50L${sx * h[0]} ${h[1]}`, 'none', `stroke="${coat}" stroke-width="7"`) + C(sx * h[0], h[1], 5.4, skin, 'stroke-width="2"');
+  return `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s}) rotate(${tilt})" stroke="${O}" stroke-width="2.4">`
+    + (shadow ? E(0, 1, 24, 5, '#10183a', `${NS} opacity=".22"`) : '') + (style === 'long' ? P('M-21 -72Q-23 -44 -16 -42L16 -42Q23 -44 21 -72Z', hair) : '') + back
+    + P('M-13 -18h11v18h-11zM2 -18h11v18h-11z', pants) + P('M-15 -7h14v7h-14zM1 -7h14v7h-14z', boots)
+    + P('M-19 -13Q-23 -48 -12 -59L12 -59Q23 -48 19 -13Z', coat) + P('M-19 -13Q-23 -48 -12 -59L12 -59Q23 -48 19 -13Z', 'url(#sh)', NS)
+    + arm(-1, hl) + arm(1, hr)
+    + C(0, -72, 20, skin) + C(0, -72, 20, 'url(#sh)', NS) + P('M-19.5 -72Q-22 -95 0 -94Q22 -95 19.5 -72Q12 -83 0 -82Q-12 -83 -19.5 -72Z', hair)
+    + liteFace(mood) + extra + front + (holdL ? `<g transform="translate(${-hl[0]} ${hl[1]})">${holdL}</g>` : '') + (holdR ? `<g transform="translate(${hr[0]} ${hr[1]})">${holdR}</g>` : '') + '</g>';
+};
 const kid = (x, y, s, o = {}) => {
+  if (o.lite) return lk(x, y, s, o);
   const { skin = '#f1c6a0', skinD = '#d99d78', hair = '#5a3a28', style = 'short', coat = '#d9473f', pants = '#3a4a7a', hat = null, band = '#fff', mitt = null, mittR, mood = 'happy', al = 'd', ar = 'd', scarf = null, flip = false, back = '', extra = '', holdL = '', holdR = '', hold = '', boots = '#4a3a4a', tilt = 0, nc = false, iris = '#5a3a22', beard = false, brow, bust = false, front = '', plaid = false, shadow = true, lite = false } = o;
   const mr = mittR === undefined ? mitt : mittR;
   const bc = brow || hair;
@@ -97,9 +110,9 @@ const mitten = (x, y, s = 1, rot = 0, col = '#e23b3b', wet = false) => G(P('M-9.
 // ---------- characters of this book ----------
 const GLASSES = C(-7.5, -70.5, 6.9, 'rgba(255,255,255,.22)', 'stroke-width="1.9"') + C(7.5, -70.5, 6.9, 'rgba(255,255,255,.22)', 'stroke-width="1.9"') + P('M-0.7 -71h1.4M-14.4 -71L-20 -73M14.4 -71L20 -73', 'none', 'stroke-width="1.8"') + P('M-11 -74q3 -2 6 -1', 'none', 'stroke="#fff" stroke-width="1.4" opacity=".7"');
 const camille = (x, y, s, o = {}) => kid(x, y, s, { skin: '#9a6040', skinD: '#7a4a30', hair: '#1e1612', style: 'short', coat: '#f4c430', pants: '#3b7fd1', boots: '#e8556a', iris: '#2a1a12', back: C(-17, -88, 11, '#1e1612', 'stroke-width="2.4"') + C(17, -88, 11, '#1e1612', 'stroke-width="2.4"') + C(-17, -88, 4, '#e8556a', 'stroke-width="1.6"') + C(17, -88, 4, '#e8556a', 'stroke-width="1.6"'), ...o });
-const lacasse = (x, y, s, o = {}) => kid(x, y, s * 1.12, { skin: '#f1c6a0', skinD: '#d99d78', hair: '#c0392b', coat: '#e8785a', pants: '#7a5a6a', boots: '#6b4a3a', iris: '#3a6a4a', back: C(0, -98, 10, '#c0392b', 'stroke-width="2.4"') + P('M-5 -100q5 -4 10 0', 'none', 'stroke="#e8705a" stroke-width="1.5"'), ...o, extra: GLASSES + (o.extra || '') });
+const lacasse = (x, y, s, o = {}) => kid(x, y, s * 1.12, { skin: '#f1c6a0', skinD: '#d99d78', hair: '#c0392b', coat: '#e8785a', pants: '#7a5a6a', boots: '#6b4a3a', iris: '#3a6a4a', lite: !o.full, back: C(0, -98, 10, '#c0392b', 'stroke-width="2.4"'), ...o, extra: GLASSES + (o.extra || '') });
 const MOUSTACHE = P('M-11 -62Q-6 -68 0 -63Q6 -68 11 -62Q6 -59 0 -60Q-6 -59 -11 -62Z', '#8a8a92', 'stroke-width="1.5"');
-const dimitri = (x, y, s, o = {}) => kid(x, y, s * 1.2, { skin: '#e0b08a', skinD: '#c08a62', hair: '#9a9aa2', style: 'short', coat: '#4a7ac0', pants: '#6b4a3a', boots: '#3a3a44', iris: '#4a3a2a', brow: '#8a8a92', plaid: false, ...o, front: P('M-8 -57v40M8 -57v40', 'none', 'stroke="#c8372d" stroke-width="3"') + (o.front || ''), extra: MOUSTACHE + (o.extra || '') });
+const dimitri = (x, y, s, o = {}) => kid(x, y, s * 1.2, { skin: '#e0b08a', skinD: '#c08a62', hair: '#9a9aa2', style: 'short', coat: '#4a7ac0', pants: '#6b4a3a', boots: '#3a3a44', iris: '#4a3a2a', brow: '#8a8a92', lite: !o.full, front: P('M-8 -57v40M8 -57v40', 'none', 'stroke="#c8372d" stroke-width="3"') + (o.front || ''), ...o, extra: MOUSTACHE + (o.extra || '') });
 const NEIGH = [
   { skin: '#f1c6a0', hair: '#3a2a20', coat: '#4a8fe0', pants: '#4a4a5a', boots: '#4a3a4a' }, { skin: '#c68a5e', hair: '#1e1612', coat: '#e8556a', pants: '#3a3f55', boots: '#3a3a44' },
   { skin: '#e8b890', hair: '#c9772b', coat: '#3fa34d', pants: '#5a4a3a', boots: '#4a3a2a' }, { skin: '#8a5a3a', hair: '#1a1410', coat: '#8a5cc7', pants: '#3a4a7a', boots: '#2a2a3a' },
@@ -116,19 +129,19 @@ const sparks = (x, y, s = 1) => spk(x, y, 13 * s) + spk(x + 24 * s, y - 14 * s, 
 
 const dEye = (ex, o = {}) => { const { r = 7.4, py = 0, px = 0 } = o; return C(ex, -78, r, '#fff', 'stroke-width="2"') + C(ex + px, -77 + py, r * 0.64, '#2a6a62', NS) + C(ex + px, -77 + py, r * 0.36, '#0d2a2a', NS) + C(ex + px + 1.9, -79 + py, r * 0.22, '#fff', NS) + C(ex + px - 1.6, -74.6 + py, r * 0.1, '#fff', NS); };
 const dragon = (x, y, s = 1, o = {}) => {
-  const { mood = 'happy', pose = 'stand', flip = false, body = '#4fc27b', dark = '#35a064', light = '#8ee3a8', belly = '#f6d083', wing = '#b6efc8', arms = 'd', headTilt = 0, shadow = true, tilt = 0, horn = '#f6e6b8' } = o;
+  const { mood = 'happy', pose = 'stand', flip = false, body = '#4fc27b', dark = '#35a064', light = '#8ee3a8', belly = '#f6d083', wing = '#b6efc8', arms = 'd', headTilt = 0, shadow = true, tilt = 0, horn = '#f6e6b8', lite = false } = o;
   const fly = pose === 'fly', curl = pose === 'curl';
   const wingR = fly
-    ? P('M14 -56Q50 -128 118 -98Q106 -88 112 -72Q94 -76 90 -58Q76 -62 68 -44Q40 -44 18 -34Z', wing) + P('M14 -56Q60 -94 118 -98M14 -56Q70 -74 112 -72M14 -56Q66 -58 90 -58M14 -56Q50 -48 68 -44', 'none', `stroke="${dark}" stroke-width="2.2"`) + P('M14 -56Q50 -128 118 -98Q106 -88 112 -72Q94 -76 90 -58Q76 -62 68 -44Q40 -44 18 -34Z', 'url(#sh)', NS)
+    ? P('M14 -56Q50 -128 118 -98Q106 -88 112 -72Q94 -76 90 -58Q76 -62 68 -44Q40 -44 18 -34Z', wing) + (lite ? '' : P('M14 -56Q60 -94 118 -98M14 -56Q70 -74 112 -72M14 -56Q66 -58 90 -58M14 -56Q50 -48 68 -44', 'none', `stroke="${dark}" stroke-width="2.2"`)) + P('M14 -56Q50 -128 118 -98Q106 -88 112 -72Q94 -76 90 -58Q76 -62 68 -44Q40 -44 18 -34Z', 'url(#sh)', NS)
     : P('M14 -58Q44 -90 56 -54Q44 -58 40 -46Q32 -50 20 -38Z', wing) + P('M14 -58Q40 -70 56 -54M14 -58Q34 -58 40 -46', 'none', `stroke="${dark}" stroke-width="2"`) + P('M14 -58Q44 -90 56 -54Q44 -58 40 -46Q32 -50 20 -38Z', 'url(#sh)', NS);
   const tail = thick(curl ? 'M16 -10Q58 -8 52 -36Q48 -52 34 -46' : 'M16 -12Q60 -4 56 -38Q54 -54 40 -48', body, 10) + P(curl ? 'M34 -47L26 -60L42 -58Z' : 'M40 -49L33 -62L49 -59Z', belly, 'stroke-width="2.2"')
     + P(curl ? 'M30 -12l2 -7 4 6M44 -16l4 -6 2 7M52 -30l6 -4 -1 7' : 'M32 -10l2 -7 4 6M48 -12l5 -6 1 8M56 -28l7 -3 -2 8', dark, 'stroke-width="1.6"');
   const head = `<g transform="rotate(${headTilt} 0 -58) translate(0 ${curl ? 7 : 0})">`
-    + [-1, 1].map((q) => P(`M${q * 21} -82Q${q * 42} -96 ${q * 42} -70Q${q * 36} -72 ${q * 27} -62Z`, wing) + P(`M${q * 24} -80Q${q * 36} -82 ${q * 38} -72`, 'none', `stroke="${dark}" stroke-width="1.6"`)).join('')
-    + [-1, 1].map((q) => P(`M${q * 11} -95L${q * 20} -113L${q * 19} -92Z`, horn, 'stroke-width="2.2"') + P(`M${q * 13} -97L${q * 18} -108`, 'none', 'stroke="#fff" stroke-width="1.6" opacity=".6"')).join('')
-    + CS(0, -74, 24.5, body) + P('M-5 -97L0 -108L5 -97Z', dark, 'stroke-width="1.8"') + P('M-3 -91h6', 'none', `stroke="${light}" stroke-width="2.4" opacity=".7"`)
+    + [-1, 1].map((q) => P(`M${q * 21} -82Q${q * 42} -96 ${q * 42} -70Q${q * 36} -72 ${q * 27} -62Z`, wing) + (lite ? '' : P(`M${q * 24} -80Q${q * 36} -82 ${q * 38} -72`, 'none', `stroke="${dark}" stroke-width="1.6"`))).join('')
+    + [-1, 1].map((q) => P(`M${q * 11} -95L${q * 20} -113L${q * 19} -92Z`, horn, 'stroke-width="2.2"') + (lite ? '' : P(`M${q * 13} -97L${q * 18} -108`, 'none', 'stroke="#fff" stroke-width="1.6" opacity=".6"'))).join('')
+    + CS(0, -74, 24.5, body) + P('M-5 -97L0 -108L5 -97Z', dark, 'stroke-width="1.8"') 
     + ES(0, -65, 16, 11.5, light, 'stroke-width="2"') + C(-5, -67, 1.7, dark, NS) + C(5, -67, 1.7, dark, NS)
-    + E(-16, -64, 5, 3.4, '#ee7f82', `${NS} opacity=".5"`) + E(16, -64, 5, 3.4, '#ee7f82', `${NS} opacity=".5"`)
+    + (lite ? '' : E(-16, -64, 5, 3.4, '#ee7f82', `${NS} opacity=".5"`) + E(16, -64, 5, 3.4, '#ee7f82', `${NS} opacity=".5"`))
     + ({
       happy: dEye(-10) + dEye(10) + P('M-14 -87Q-10 -90 -6 -88M6 -88Q10 -90 14 -87', 'none', `stroke="${dark}" stroke-width="2.4"`) + P('M-6 -60Q0 -54 6 -60', 'none', 'stroke-width="2.2"'),
       sad: dEye(-10, { py: 2 }) + dEye(10, { py: 2 }) + P('M-16 -85L-5 -90M16 -85L5 -90', 'none', `stroke="${dark}" stroke-width="2.6"`) + P('M-5 -57Q0 -62 5 -57', 'none', 'stroke-width="2.2"') + P('M17 -70q-4 7 0 11q4 -4 0 -11', '#9ad8f8', 'stroke="#5aa8d8" stroke-width="1.2"') + P('M-17 -70q-4 7 0 11q4 -4 0 -11', '#9ad8f8', 'stroke="#5aa8d8" stroke-width="1.2"'),
@@ -140,14 +153,14 @@ const dragon = (x, y, s = 1, o = {}) => {
       sneeze: P('M-17 -80L-6 -76L-17 -72M17 -80L6 -76L17 -72', 'none', 'stroke-width="3"') + E(0, -56, 7.4, 8.4, '#a8323a', 'stroke-width="2.4"') + E(0, -52, 4.6, 3.4, '#ef8a8a', NS) + P('M-9 -92q9 -5 18 0', 'none', `stroke="${dark}" stroke-width="2.4"`),
       shy: dEye(-10, { py: 2.4, px: -1.4 }) + dEye(10, { py: 2.4, px: -1.4 }) + P('M-15 -86L-5 -88M15 -86L5 -88', 'none', `stroke="${dark}" stroke-width="2.4"`) + P('M-4 -59Q0 -61.5 4 -59', 'none', 'stroke-width="2.2"'),
     })[mood] + '</g>';
-  const armSvg = (q) => { const T = { d: [28, -22], u: [36, -64], h: [18, -34], o: [42, -42], c: [14, -40] }[arms]; return P(`M${q * 20} -44L${q * T[0]} ${T[1]}`, 'none', `stroke="${O}" stroke-width="11"`) + P(`M${q * 20} -44L${q * T[0]} ${T[1]}`, 'none', `stroke="${body}" stroke-width="7"`) + CS(q * T[0], T[1], 5.6, body, 'stroke-width="2.2"') + [-1, 0, 1].map((k) => C(q * T[0] + k * 3.4, T[1] - 5.4, 1.5, horn, 'stroke="none"')).join(''); };
+  const armSvg = (q) => { const T = { d: [28, -22], u: [36, -64], h: [18, -34], o: [42, -42], c: [14, -40] }[arms]; return P(`M${q * 20} -44L${q * T[0]} ${T[1]}`, 'none', `stroke="${O}" stroke-width="11"`) + P(`M${q * 20} -44L${q * T[0]} ${T[1]}`, 'none', `stroke="${body}" stroke-width="7"`) + CS(q * T[0], T[1], 5.6, body, 'stroke-width="2.2"') + (lite ? '' : [-1, 0, 1].map((k) => C(q * T[0] + k * 3.4, T[1] - 5.4, 1.5, horn, 'stroke="none"')).join('')); };
   const foldedWings = curl
     ? [-1, 1].map((q) => P(`M${q * 24} -56Q${q * 44} -22 ${q * 8} -4Q${q * -4} -14 ${q * 0} -40Z`, wing) + P(`M${q * 24} -56Q${q * 44} -22 ${q * 8} -4Q${q * -4} -14 ${q * 0} -40Z`, 'url(#sh)', NS) + P(`M${q * 22} -52Q${q * 28} -30 ${q * 8} -10M${q * 18} -50Q${q * 14} -30 ${q * 4} -18`, 'none', `stroke="${dark}" stroke-width="1.8"`)).join('') : '';
   return `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s}) rotate(${tilt})" stroke="${O}" stroke-width="2.6">`
     + (shadow && !fly ? E(0, 1, 34, 6.5, '#10183a', `${NS} opacity=".25"`) : '')
     + tail + `<g transform="scale(-1 1)">${wingR}</g>` + wingR
-    + (fly ? '' : ES(-12, -4, 11.5, 6, dark) + ES(12, -4, 11.5, 6, dark) + P('M-18 -3v3M-12 -2v3M-6 -3v3M6 -3v3M12 -2v3M18 -3v3', 'none', `stroke="${horn}" stroke-width="2.4"`))
-    + ES(0, -32, curl ? 28 : 25, curl ? 26 : 30, body) + E(0, -29, curl ? 18 : 16, curl ? 18 : 23, belly, 'stroke="none"') + P(curl ? 'M-14 -34h28M-15 -26h30M-13 -18h26' : 'M-12 -38h24M-13 -30h26M-12 -22h24M-10 -14h20', 'none', 'stroke="#c8963a" stroke-width="1.8" opacity=".7"')
+    + (fly ? '' : ES(-12, -4, 11.5, 6, dark) + ES(12, -4, 11.5, 6, dark) + (lite ? '' : P('M-18 -3v3M-12 -2v3M-6 -3v3M6 -3v3M12 -2v3M18 -3v3', 'none', `stroke="${horn}" stroke-width="2.4"`)))
+    + ES(0, -32, curl ? 28 : 25, curl ? 26 : 30, body) + E(0, -29, curl ? 18 : 16, curl ? 18 : 23, belly, 'stroke="none"') + (lite ? '' : P(curl ? 'M-14 -34h28M-15 -26h30M-13 -18h26' : 'M-12 -38h24M-13 -30h26M-12 -22h24M-10 -14h20', 'none', 'stroke="#c8963a" stroke-width="1.8" opacity=".7"'))
     + (curl ? '' : armSvg(-1) + armSvg(1)) + foldedWings + head + '</g>';
 };
 const dragonMama = (x, y, s, o = {}) => dragon(x, y, s, { body: '#3ea88f', dark: '#2a8070', light: '#86d8c4', belly: '#f2d28c', wing: '#a8e6d6', ...o });
@@ -155,12 +168,7 @@ const dragonPapa = (x, y, s, o = {}) => dragon(x, y, s, { body: '#3c9a66', dark:
 const dragonOld = (x, y, s, o = {}) => dragon(x, y, s, { body: '#5aa6d0', dark: '#3a82aa', light: '#9ad0ee', belly: '#f4dca0', wing: '#b8e2f6', ...o });
 
 // ---------- props ----------
-const lantern = (x, y, s = 1, i = 0, on = true) => {
-  const C0 = [['#ff5a3c', '#b8362a'], ['#ff9a2a', '#b8701a'], ['#ffd24a', '#b8962a']][i % 3];
-  return `<g transform="translate(${x} ${y}) scale(${s})">` + (on ? C(0, 6, 36, 'url(#glow)', `${NS} opacity=".9"`) : '')
-    + G(P('M0 -16V-10', 'none', 'stroke-width="1.6"') + R(-5, -12, 10, 4, '#6b4a34', 1.5, 'stroke-width="1.6"') + E(0, 4, 12.5, 14, on ? C0[0] : C0[1] + '99', 'stroke-width="1.8"') + (on ? E(0, 4, 8, 10, '#fff2b0', `${NS} opacity=".55"`) : '') + P('M0 -10V18M-7 -8Q-12 4 -7 16M7 -8Q12 4 7 16', 'none', `stroke="${on ? '#a8321a' : '#2a1a1a'}" stroke-width="1.2" opacity=".6"`) + R(-5, 16, 10, 4, '#6b4a34', 1.5, 'stroke-width="1.6"') + P('M0 20V27', 'none', 'stroke-width="1.4"') + C(0, 28, 2.2, '#f4c430', 'stroke-width="1.2"'), '', 1.8)
-    + '</g>';
-};
+const lantern = (x, y, s = 1, i = 0, on = true) => `<use href="#L${on ? 'n' : 'f'}${i % 3}" transform="translate(${x} ${y}) scale(${s})"/>`;
 const qpt = (p0, c, p2, t) => [(1 - t) * (1 - t) * p0[0] + 2 * (1 - t) * t * c[0] + t * t * p2[0], (1 - t) * (1 - t) * p0[1] + 2 * (1 - t) * t * c[1] + t * t * p2[1]];
 const line = (p0, p2, sag, col = '#3a3f55') => P(`M${p0[0]} ${p0[1]}Q${(p0[0] + p2[0]) / 2} ${(p0[1] + p2[1]) / 2 + sag * 2} ${p2[0]} ${p2[1]}`, 'none', `stroke="${col}" stroke-width="1.8"`);
 const lanternLine = (p0, p2, sag, n, lit, sc = 1, off = 0) => {
@@ -170,15 +178,12 @@ const lanternLine = (p0, p2, sag, n, lit, sc = 1, off = 0) => {
 };
 const laundryLine = (p0, p2, sag, seed = 0) => {
   const c = [(p0[0] + p2[0]) / 2, (p0[1] + p2[1]) / 2 + sag * 2]; let out = line(p0, p2, sag);
-  const cols = ['#e8556a', '#4a8fe0', '#f4c430', '#8a5cc7', '#fff', '#3fa34d'];
-  for (let k = 0; k < 7; k++) { const t = (k + 0.6) / 7.4, [px, py] = qpt(p0, c, p2, t), col = cols[(k + seed) % 6], kind = (k + seed) % 3;
-    out += kind === 0 ? G(P(`M${px - 7} ${py}h14l2 18h-18z`, col, 'stroke-width="1.4"') + P(`M${px - 7} ${py}l-6 8M${px + 7} ${py}l6 8`, 'none', `stroke="${col}" stroke-width="4"`), '', 1.4)
-      : kind === 1 ? G(R(px - 8, py, 16, 22, col, 1, 'stroke-width="1.4"') + P(`M${px - 8} ${py + 6}h16`, 'none', 'stroke="#000" stroke-width="1" opacity=".15"'), '', 1.4)
-        : G(P(`M${px - 5} ${py}h10v14q0 6 -5 6q-5 0 -5 -6z`, col, 'stroke-width="1.4"'), '', 1.4); }
+  const cols = ['#e8556a', '#4a8fe0', '#f4c430', '#8a5cc7', '#f4f4f8', '#3fa34d'];
+  for (let k = 0; k < 6; k++) { const [px, py] = qpt(p0, c, p2, (k + 0.6) / 6.6); out += `<use href="#W${(k + seed) % 3}" color="${cols[(k + seed) % 6]}" transform="translate(${px.toFixed(1)} ${py.toFixed(1)})"/>`; }
   return out;
 };
 const bunting = (p0, p2, sag, n = 12) => { const c = [(p0[0] + p2[0]) / 2, (p0[1] + p2[1]) / 2 + sag * 2]; let out = line(p0, p2, sag); const cols = ['#e8556a', '#f4c430', '#3fa34d', '#4a8fe0', '#8a5cc7']; for (let k = 0; k < n; k++) { const [px, py] = qpt(p0, c, p2, (k + 0.5) / n); out += P(`M${px - 6} ${py}L${px + 6} ${py}L${px} ${py + 13}Z`, cols[k % 5], 'stroke="#3a3f55" stroke-width="1.2"'); } return out; };
-const bulbs = (p0, p2, sag, n, on) => { const c = [(p0[0] + p2[0]) / 2, (p0[1] + p2[1]) / 2 + sag * 2]; let out = line(p0, p2, sag, '#2a2a38'); for (let k = 0; k < n; k++) { const [px, py] = qpt(p0, c, p2, (k + 0.5) / n); out += (on ? C(px, py + 5, 11, 'url(#glow)', `${NS} opacity=".8"`) : '') + C(px, py + 5, 3.4, on ? '#fff2a0' : '#7a7a8a', 'stroke="#3a3f55" stroke-width="1"'); } return out; };
+const bulbs = (p0, p2, sag, n, on) => { const c = [(p0[0] + p2[0]) / 2, (p0[1] + p2[1]) / 2 + sag * 2]; let out = line(p0, p2, sag, '#2a2a38'); for (let k = 0; k < n; k++) { const [px, py] = qpt(p0, c, p2, (k + 0.5) / n); out += on ? `<use href="#Bn" transform="translate(${px.toFixed(1)} ${py.toFixed(1)})"/>` : C(px.toFixed(1), (py + 5).toFixed(1), 3.2, '#7a7a8a', 'stroke="#3a3f55" stroke-width="1"'); } return out; };
 const bacBleu = (x, y, s = 1, o = {}) => {
   const { open = false } = o;
   return G(E(2, 2, 36, 6, '#10183a', `${NS} opacity=".25"`) + C(-20, -6, 8, '#2a2d3e') + C(-20, -6, 3, '#9aa6b0', NS) + C(20, -6, 8, '#2a2d3e') + C(20, -6, 3, '#9aa6b0', NS)
@@ -192,7 +197,7 @@ const tarte = (x, y, s = 1) => G(ES(0, -4, 28, 9, '#f4f0e8', 'stroke-width="2"')
 const tarteSlice = (x, y, s = 1) => G(ES(0, 2, 24, 6, '#f4f0e8', 'stroke-width="2"') + PS('M-18 0L16 -6L16 -18L-18 -10Z', '#e8b866') + P('M-18 -10L16 -18L16 -14L-18 -5Z', '#b8742e', 'stroke-width="1.6"') + P('M-6 -12q4 -3 8 0', 'none', 'stroke="#d9a050" stroke-width="1.4"'), `translate(${x} ${y}) scale(${s})`, 2.2);
 const feather = (x, y, s = 1, rot = 0) => G(P('M0 0Q-16 -30 -6 -74Q8 -64 14 -30Q12 -10 0 0Z', '#e8e8f0') + P('M0 0Q-16 -30 -6 -74Q8 -64 14 -30Q12 -10 0 0Z', 'url(#sh)', NS) + P('M0 4Q2 -30 -4 -72', 'none', 'stroke="#8a8aa0" stroke-width="2.2"') + P('M0 -10l-9 -8M2 -24l-11 -10M0 -38l-9 -10M-2 -52l-7 -8M2 -14l9 -8M3 -28l10 -8M1 -42l9 -8', 'none', 'stroke="#b0b0c4" stroke-width="1.2"') + P('M-6 -60Q-12 -40 -4 -20', 'none', 'stroke="#9aa0c4" stroke-width="2" opacity=".5"'), `translate(${x} ${y}) rotate(${rot}) scale(${s})`, 1.8);
 const scale_ = (x, y, s = 1, rot = 0) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})">` + C(0, 0, 34, 'url(#glowG)', `${NS} opacity=".8"`) + G(PS('M0 -16Q16 -16 18 0Q16 14 0 18Q-16 14 -18 0Q-16 -16 0 -16Z', '#5fcf88') + P('M-9 -4Q0 -10 9 -4M-11 4Q0 -2 11 4M-8 11Q0 5 8 11', 'none', 'stroke="#2a9060" stroke-width="1.6"') + P('M-8 -9q8 -5 14 -1', 'none', 'stroke="#fff" stroke-width="2.4" opacity=".6"'), '', 2) + '</g>';
-const handkerchief = (x, y, s = 1, rot = 0) => G(P('M-14 -8Q0 -14 14 -8L16 8Q0 14 -16 8Z', '#fff') + P('M-12 -5Q0 -10 12 -5M-13 5Q0 10 13 5', 'none', 'stroke="#8fc0e8" stroke-width="1.6"') + P('M-4 -2h8M0 -5v6', 'none', 'stroke="#e8556a" stroke-width="1.6"'), `translate(${x} ${y}) rotate(${rot}) scale(${s})`, 2);
+const handkerchief = (x, y, s = 1, rot = 0) => G(P('M-14 -8Q0 -14 14 -8L16 8Q0 14 -16 8Z', '#fff') + P('M-12 -5Q0 -10 12 -5M-13 5Q0 10 13 5', 'none', 'stroke="#8fc0e8" stroke-width="1.6"') + C(0, 0, 2.6, '#8fc0e8', NS) + C(-7, 0, 1.6, '#e8556a', NS) + C(7, 0, 1.6, '#e8556a', NS), `translate(${x} ${y}) rotate(${rot}) scale(${s})`, 2);
 const biscuit = (x, y, s = 1) => G(CS(0, 0, 10, '#e8b866') + C(-3, -2, 1.4, '#8a5428', NS) + C(3, 2, 1.4, '#8a5428', NS) + C(2, -4, 1.2, '#8a5428', NS) + P('M7 -7a4 4 0 0 0 4 6', 'none', 'stroke="none"'), `translate(${x} ${y}) scale(${s})`, 2);
 const ladleD = (x, y, s = 1, rot = 0) => G(thick('M0 0L34 -34', '#8a8a96', 3.4) + E(40, -40, 11, 9, '#9aa6b0', 'transform="rotate(-45 40 -40)"') + E(40, -40, 8, 5, '#6b3f26', 'transform="rotate(-45 40 -40)" stroke="none"'), `translate(${x} ${y}) rotate(${rot}) scale(${s})`, 2.2);
 const basket = (x, y, s = 1, o = {}) => {
@@ -221,30 +226,27 @@ const alley = (o = {}) => {
   const { time = 'dusk', seed = 0, glowEnd = false, stars = false } = o;
   const T = TIMES[time];
   let out = R(0, 0, 400, 300, T.sky);
-  if (stars || time === 'night' || time === 'dark') out += [[30, 22], [90, 38], [160, 14], [250, 20], [320, 40], [372, 16], [200, 40], [140, 30], [60, 12]].map(([a, b], i) => star4(a, b, 1 + (i % 3) * 0.5, '#fff')).join('');
+  if (stars || time === 'night' || time === 'dark') out += [[30, 22], [90, 38], [160, 14], [250, 20], [320, 40], [372, 16], [200, 40]].map(([a, b], i) => star4(a, b, 1 + (i % 3) * 0.5, '#fff')).join('');
   if (time === 'dusk' || glowEnd) out += C(200, 120, 90, 'url(#orange)', `${NS} opacity=".6"`);
   out += R(128, 52, 144, 144, T.far, 0, NS) + R(128, 52, 144, 144, 'url(#shv)', 0, NS);
-  if (glowEnd) out += R(172, 96, 56, 100, 'url(#skyDark)', 0, NS) + R(172, 150, 56, 46, '#ffb070', 0, `${NS} opacity=".7"`) + C(200, 170, 50, 'url(#glow)', `${NS} opacity=".9"`);
-  out += [[134, 70, 18, 126], [226, 60, 20, 136], [150, 90, 16, 106]].map(([a, b, w, h], i) => R(a + (i === 1 ? 24 : 0), b, w, h, T.far, 0, `${NS} opacity=".6"`)).join('');
-  const wallCol = (side) => (side === 'L' ? T.wallL : T.wallR);
+  if (glowEnd) out += R(176, 100, 48, 96, 'url(#skyDark)', 0, NS) + R(176, 152, 48, 44, '#ffb070', 0, `${NS} opacity=".7"`) + C(200, 172, 50, 'url(#glow)', `${NS} opacity=".9"`);
+  out += R(136, 70, 16, 126, T.far, 0, `${NS} opacity=".6"`) + R(250, 62, 18, 134, T.far, 0, `${NS} opacity=".6"`);
   for (const side of ['L', 'R']) {
-    out += wq(side, 0, 1, 0, 1, wallCol(side)) + wq(side, 0, 1, 0, 1, 'url(#sh)', NS);
-    for (let k = 0; k <= 16; k++) { const t = k / 16; out += wl(side, 0, t, 1, t, 'stroke="#000" stroke-width="1" opacity=".16"'); }
-    for (let k = 0; k < 16; k++) for (let j = 0; j < 6; j++) { const u = (j + (k % 2 ? 0.5 : 0)) / 6 + 0.04; if (u > 0.98) continue; out += wl(side, u, k / 16, u, (k + 1) / 16, 'stroke="#000" stroke-width="1" opacity=".1"'); }
-    const rows = [[0.08, 0.3], [0.4, 0.62]]; let wi = 0;
-    for (const [t0, t1] of rows) for (const [u0, u1] of [[0.07, 0.25], [0.37, 0.55], [0.68, 0.86]]) {
-      wi++; const lit = ((wi * 37 + seed * 13 + (side === 'L' ? 5 : 11)) % 100) / 100 < T.litPct;
-      out += wq(side, u0 - 0.012, u1 + 0.012, t0 - 0.015, t1 + 0.015, '#e8dcc8', 'stroke="#3a3f55" stroke-width="1.6"') + wq(side, u0, u1, t0, t1, lit ? T.winOn : T.winOff, 'stroke="#3a3f55" stroke-width="1.4"')
-        + wl(side, (u0 + u1) / 2, t0, (u0 + u1) / 2, t1, 'stroke="#e8dcc8" stroke-width="1.6"') + wl(side, u0, (t0 + t1) / 2, u1, (t0 + t1) / 2, 'stroke="#e8dcc8" stroke-width="1.6"');
-      if (lit) { const [gx, gy] = wp(side, (u0 + u1) / 2, (t0 + t1) / 2); out += C(gx, gy, 26 - (u0 * 14), 'url(#glow)', `${NS} opacity=".5"`); }
-      if (t0 > 0.3) out += wq(side, u0 - 0.03, u1 + 0.03, t1 + 0.015, t1 + 0.04, '#2a2d3e', NS) + wl(side, u0 - 0.03, t1 - 0.05, u1 + 0.03, t1 - 0.05, 'stroke="#2a2d3e" stroke-width="1.8"') + [0, 0.25, 0.5, 0.75, 1].map((q) => wl(side, lerp(u0 - 0.03, u1 + 0.03, q), t1 - 0.05, lerp(u0 - 0.03, u1 + 0.03, q), t1 + 0.03, 'stroke="#2a2d3e" stroke-width="1.5"')).join('');
+    out += wq(side, 0, 1, 0, 1, side === 'L' ? T.wallL : T.wallR) + wq(side, 0, 1, 0, 1, 'url(#sh)', NS) + wq(side, 0, 1, 0, 1, 'url(#brickP)', NS)
+      + P(Array.from({ length: 15 }, (_, k) => 'M' + wp(side, 0, (k + 1) / 16).join(' ') + 'L' + wp(side, 1, (k + 1) / 16).join(' ')).join(''), 'none', 'stroke="#000" stroke-width="1" opacity=".16"');
+    let wi = 0;
+    for (const [t0, t1] of [[0.1, 0.32], [0.44, 0.66]]) for (const [u0, u1] of [[0.1, 0.3], [0.55, 0.75]]) {
+      wi++; const lit = ((wi * 37 + seed * 13 + (side === 'L' ? 5 : 11)) % 100) / 100 < T.litPct, um = (u0 + u1) / 2, tm = (t0 + t1) / 2;
+      out += wq(side, u0, u1, t0, t1, lit ? T.winOn : T.winOff, 'stroke="#e8dcc8" stroke-width="2.6"') + P(`M${wp(side, um, t0).join(' ')}L${wp(side, um, t1).join(' ')}M${wp(side, u0, tm).join(' ')}L${wp(side, u1, tm).join(' ')}`, 'none', 'stroke="#e8dcc8" stroke-width="1.4"')
+        + (lit ? C(wp(side, um, tm)[0].toFixed(1), wp(side, um, tm)[1].toFixed(1), 30 - u0 * 30, 'url(#glow)', `${NS} opacity=".45"`) : '');
+      if (t0 > 0.3) out += wq(side, u0 - 0.02, u1 + 0.02, t1 + 0.012, t1 + 0.04, '#2a2d3e', NS) + P(`M${wp(side, u0 - 0.02, t1 - 0.04).join(' ')}L${wp(side, u1 + 0.02, t1 - 0.04).join(' ')}M${wp(side, u0 - 0.02, t1 - 0.04).join(' ')}L${wp(side, u0 - 0.02, t1 + 0.03).join(' ')}M${wp(side, u1 + 0.02, t1 - 0.04).join(' ')}L${wp(side, u1 + 0.02, t1 + 0.03).join(' ')}`, 'none', 'stroke="#2a2d3e" stroke-width="1.8"');
     }
-    out += wq(side, 0.4, 0.55, 0.64, 1, '#6b3f26', 'stroke="#3a3f55" stroke-width="1.6"') + wq(side, 0.43, 0.52, 0.68, 0.8, T.winOff, NS);
+    out += wq(side, 0.38, 0.5, 0.64, 1, '#6b3f26', 'stroke="#3a3f55" stroke-width="1.6"');
   }
   out += P('M0 300V262L128 196H272L400 262V300Z', T.floor) + P('M0 300V262L128 196H272L400 262V300Z', 'url(#shv)', NS)
-    + P('M200 196L90 300M200 196L170 300M200 196L240 300M200 196L310 300M200 196L-10 300M200 196L410 300', 'none', 'stroke="#000" stroke-width="1.4" opacity=".14"') + P('M140 206H260M110 224H290M70 250H330M20 282H380', 'none', 'stroke="#000" stroke-width="1.2" opacity=".12"')
+    + P('M200 196L90 300M200 196L240 300M200 196L310 300M200 196L-10 300M200 196L410 300M140 206H260M110 224H290M70 250H330M20 282H380', 'none', 'stroke="#000" stroke-width="1.2" opacity=".13"')
     + E(200, 246, 70, 10, 'url(#glow)', `${NS} opacity="${time === 'day' ? 0.15 : 0.25}"`);
-  for (const side of ['L', 'R']) for (let k = 0; k < 9; k++) { const [gx, gy] = wp(side, (k + 0.4) / 9, 1); out += P(`M${gx - 3} ${gy}l1 -7M${gx} ${gy}l0 -9M${gx + 3} ${gy}l-1 -7`, 'none', `stroke="${time === 'day' || time === 'dusk' ? '#5aa860' : '#2f6a58'}" stroke-width="1.8"`); }
+  out += P(['L', 'R'].map((side) => Array.from({ length: 8 }, (_, k) => { const [gx, gy] = wp(side, (k + 0.4) / 8, 1); return `M${gx.toFixed(1)} ${gy.toFixed(1)}l-2 -7M${gx.toFixed(1)} ${gy.toFixed(1)}l0 -9M${gx.toFixed(1)} ${gy.toFixed(1)}l3 -7`; }).join('')).join(''), 'none', `stroke="${time === 'day' || time === 'dusk' ? '#5aa860' : '#2f6a58'}" stroke-width="1.8"`);
   if (T.tint) out += R(0, 0, 400, 300, T.tint, 0, NS);
   return out;
 };
@@ -265,7 +267,7 @@ const pages = [
     + camille(118, 294, 1.5, { mood: 'happy', ar: [34, -60], al: 'd' }) + P('M60 82l6 -6M300 96l6 -6', 'none', 'stroke="#fff3b0" stroke-width="2"')), text: "Derrière la maison de Camille, la ruelle sent le pain grillé et l'herbe chaude. Des escaliers en colimaçon grimpent jusqu'aux balcons, et des cordes à linge relient les fenêtres comme de longues toiles d'araignée. Demain, c'est la fête des voisins." },
   // 2 — recycling bin, a spark
   { svg: svg(alley({ time: 'dusk', seed: 2 }) + laundryLine([0, 66], [400, 86], 20, 1)
-    + poubelle(56, 266, 1.25) + poubelle(104, 258, 1.1, '#7a8490') + sparkGlow(78, 226, 16) + C(78, 232, 44, 'url(#orange)', `${NS} opacity=".4"`)
+    + poubelle(56, 266, 1.25) + poubelle(104, 258, 1.1, '#7a8490') + C(80, 232, 60, 'url(#orange)', `${NS} opacity=".7"`) + sparkGlow(80, 230, 22)
     + camille(236, 296, 1.55, { mood: 'surprised', al: 'd', ar: [14, -58] })
     + bacBleu(326, 296, 1.5) + C(196, 240, 4, '#ffe066', NS) + spk(116, 244, 6, '#ffe066') + P('M150 226q-8 -6 -2 -14', 'none', 'stroke="#fff3b0" stroke-width="2" opacity=".6"')), text: "Ce soir-là, Camille sort le bac de recyclage. Soudain, elle entend un petit « Atchoum! » derrière les poubelles. Une étincelle orange jaillit dans la pénombre." },
   // 3 — tiny curled dragon behind the blue bin
@@ -282,7 +284,7 @@ const pages = [
   { svg: svg(alley({ time: 'night', seed: 5 }) + spiral(110, 262, 1.5, 150) + R(60, 200, 110, 4, '#2a2d3e', 0, NS)
     + C(150, 232, 90, 'url(#glow)', `${NS} opacity=".55"`) + G(R(150, 136, 6, 40, '#2a2d3e', 2, NS) + E(153, 182, 14, 10, '#ffe9a8', 'stroke-width="2"') + P('M138 182h30', 'none', 'stroke-width="2"'), '')
     + cardboard(160, 296, 1.6)
-    + dragon(160, 290, 0.8, { pose: 'curl', mood: 'sleepy', shadow: false }) + blanketD(160, 290, 1.5) + biscuit(194, 252, 0.9)
+    + dragon(160, 284, 0.95, { pose: 'curl', mood: 'sleepy', shadow: false }) + blanketD(160, 300, 1.45) + biscuit(206, 240, 1.0)
     + crouched(316, 298, 1.6, { flip: true, mood: 'happy', al: [-34, -40], ar: [20, -44] }) + P('M232 226q4 -8 10 -2', 'none', 'stroke="none"')), text: "Camille lui apporte un biscuit et une vieille couverture. Pouf grignote en frissonnant, puis il s'endort dans une boîte de carton, sous l'escalier. Camille promet de garder son secret." },
   // 6 — party preparations, Pouf hides in the basket
   { svg: svg(alley({ time: 'day', seed: 6 }) + bunting([0, 30], [400, 44], 14, 14) + lanternLine([10, 62], [390, 80], 22, 6, false, 1.05, 0) + lanternLine([4, 118], [396, 110], 16, 4, true, 0.9, 1)
@@ -294,12 +296,12 @@ const pages = [
   { svg: svg(alley({ time: 'day', seed: 7 }) + lanternLine([10, 62], [390, 80], 22, 6, false, 1.05, 0) + longTable(210, 248, 1.1) + burnt(150, 206, 1.4)
     + dimitri(330, 262, 1.0, { mood: 'surprised', ar: [30, -70], al: [-30, -70] })
     + lacasse(86, 292, 1.5, { mood: 'shout', ar: [34, -86], al: [-34, -86] }) + ladleD(150, 168, 1.3, 40)
-    + dragon(262, 262, 0.95, { mood: 'sneeze', arms: 'u', headTilt: -8 }) + sparks(262, 190, 1.4)
+    + dragon(262, 264, 0.95, { mood: 'sneeze', arms: 'u', headTilt: -8 }) + sparks(300, 150, 1.2) + spk(236, 168, 8, '#ffe066') + spk(214, 188, 6)
     + basket(262, 296, 1.5, { shake: true })
     + camille(366, 298, 1.3, { flip: true, mood: 'surprised', ar: [30, -40], al: 'd' })), text: "Tout à coup, le panier se met à trembler : « Atchoum! » Des étincelles volent partout et brûlent un coin de nappe. — Un dragon! hurle Madame Lacasse en lâchant sa louche." },
   // 8 — Camille protects Pouf
   { svg: svg(alley({ time: 'day', seed: 8 }) + lanternLine([10, 62], [390, 80], 22, 6, false, 1.05, 0) + longTable(300, 252, 0.9)
-    + dimitri(70, 322, 1.35, { mood: 'surprised', bust: true, shadow: false }) + chair(70, 302, 1.5)
+    + dimitri(70, 300, 1.35, { mood: 'surprised', bust: true, shadow: false }) + chair(70, 304, 1.5)
     + neighbor(150, 270, 1.15, 0, { mood: 'surprised', ar: 'u', al: 'u' }) + neighbor(350, 268, 1.1, 2, { mood: 'surprised', al: 'u', ar: [-10, -60] }) + neighbor(318, 280, 1.2, 4, { mood: 'shy', al: 'u', ar: 'u' })
     + dragon(262, 296, 0.8, { mood: 'shy', arms: 'c' })
     + camille(212, 300, 1.85, { mood: 'shout', al: [-46, -52], ar: [46, -52] })), text: "Monsieur Dimitri se cache derrière une chaise et les voisins reculent. — Attendez! s'écrie Camille en ouvrant les bras. Il n'est pas méchant, il est perdu et il a le rhume!" },
@@ -307,7 +309,7 @@ const pages = [
   { svg: svg(alley({ time: 'day', seed: 9 }) + lanternLine([10, 62], [390, 80], 22, 6, false, 1.05, 0)
     + neighbor(330, 262, 1.2, 1, { mood: 'shy', al: 'd', ar: 'd' }) + dimitri(372, 276, 1.05, { mood: 'shy', flip: true, ar: 'c', al: 'c' }) + neighbor(36, 262, 1.15, 3, { mood: 'shy' })
     + dragon(236, 296, 1.25, { mood: 'cry', headTilt: 8, arms: 'd' })
-    + lacasse(104, 296, 1.5, { mood: 'happy', ar: [48, -50], holdR: handkerchief(2, -2, 1.1, -10) })
+    + lacasse(96, 296, 1.5, { mood: 'happy', ar: [44, -48], holdR: handkerchief(2, -2, 1.0, -10) })
     + camille(336, 298, 1.55, { mood: 'happy', al: [-34, -42] })), text: "Pouf baisse la tête, et une grosse larme roule sur son museau. Les voisins se regardent, un peu honteux. Madame Lacasse s'approche et lui tend un mouchoir." },
   // 10 — power cut, dark alley
   { svg: svg(alley({ time: 'dark', seed: 10, glowEnd: true }) + bulbs([0, 40], [400, 60], 16, 14, false) + lanternLine([10, 84], [390, 100], 20, 6, false, 1.05, 0) + longTable(262, 256, 0.85) + C(262, 218, 40, 'url(#glow)', `${NS} opacity=".6"`) + R(256, 208, 5, 10, '#fff3c8', 1.5, NS)
@@ -319,33 +321,33 @@ const pages = [
   { svg: svg(alley({ time: 'dark', seed: 11, glowEnd: true }) + bulbs([0, 40], [400, 60], 16, 14, false) + lanternLine([10, 84], [390, 100], 20, 6, false, 1.05, 0)
     + neighbor(60, 266, 1.15, 1, { mood: 'shy' }) + neighbor(110, 262, 1.1, 4, { mood: 'happy' }) + lacasse(40, 290, 1.2, { mood: 'happy' }) + dimitri(380, 280, 1.2, { mood: 'happy', flip: true })
     + dragon(150, 296, 1.45, { mood: 'squint', arms: 'c', headTilt: 4 }) + spk(118, 190, 7, '#ffb020') + spk(132, 178, 5, '#ffe066') + C(150, 186, 22, 'url(#orange)', `${NS} opacity=".6"`)
-    + camille(290, 298, 1.7, { flip: true, mood: 'happy', tilt: -4, ar: [52, -62], al: [-24, -40], holdR: feather(0, 4, 1.2, 62) })), text: "Pouf renifle, puis il se redresse. — Je pourrais allumer vos lanternes, propose-t-il, mais je ne sais pas éternuer sur commande. Camille ramasse une plume de pigeon et lui chatouille le nez." },
+    + camille(318, 298, 1.7, { flip: true, mood: 'happy', tilt: -2, ar: [50, -52], al: [-24, -40], holdR: feather(0, 2, 0.66, 100) })), text: "Pouf renifle, puis il se redresse. — Je pourrais allumer vos lanternes, propose-t-il, mais je ne sais pas éternuer sur commande. Camille ramasse une plume de pigeon et lui chatouille le nez." },
   // 12 — sneezes light the lanterns
   { svg: svg(alley({ time: 'night', seed: 12, glowEnd: true }) + bulbs([0, 38], [400, 58], 16, 14, true)
     + lanternLine([6, 76], [394, 98], 24, 8, (k) => k < 7, 1.1, 0) + lanternLine([4, 128], [396, 120], 18, 6, (k) => k < 5, 1.0, 1)
     + P('M170 184Q190 130 214 100M214 100Q250 80 290 98', 'none', 'stroke="#ffe066" stroke-width="3" opacity=".8" stroke-dasharray="2 8"') + spk(214, 100, 9, '#ffe066') + spk(290, 98, 8) + spk(252, 84, 5, '#ffe066') + spk(160, 150, 7)
-    + neighbor(34, 270, 1.2, 0, { mood: 'laugh', ar: 'u', al: 'u' }) + neighbor(82, 276, 1.1, 2, { mood: 'happy', al: 'u' }) + neighbor(356, 272, 1.2, 4, { mood: 'laugh', ar: 'u', al: 'u' }) + neighbor(318, 280, 1.1, 5, { mood: 'happy', ar: 'u' })
-    + lacasse(122, 296, 1.35, { mood: 'laugh', ar: 'u', al: 'u' }) + dimitri(290, 298, 1.35, { mood: 'laugh', ar: 'u', al: 'u' })
-    + dragon(206, 296, 1.2, { mood: 'sneeze', arms: 'u', headTilt: -12 }) + sparks(206, 178, 1.3)
-    + camille(240, 300, 1.2, { mood: 'laugh', ar: 'u' }) + sparkles(14, 12, 140)), text: "Atchoum! Atchoum! Atchoum! À chaque éternuement, une étincelle file le long des cordes à linge. Les lanternes s'allument une à une, rouges, orange et dorées. La ruelle entière brille comme un ciel d'étoiles." },
+    + neighbor(362, 270, 1.2, 4, { mood: 'laugh', ar: 'u', al: 'u' }) + neighbor(262, 262, 1.0, 5, { mood: 'happy', ar: 'u' })
+    + lacasse(138, 292, 1.3, { mood: 'laugh', ar: 'u', al: 'u' }) + dimitri(312, 298, 1.35, { mood: 'laugh', ar: 'u', al: 'u' })
+    + dragon(214, 298, 1.35, { mood: 'sneeze', arms: 'u', headTilt: -10 }) + sparks(246, 150, 1.2)
+    + camille(58, 300, 1.45, { mood: 'laugh', ar: 'u', al: 'u' }) + sparkles(10, 12, 150)), text: "Atchoum! Atchoum! Atchoum! À chaque éternuement, une étincelle file le long des cordes à linge. Les lanternes s'allument une à une, rouges, orange et dorées. La ruelle entière brille comme un ciel d'étoiles." },
   // 13 — applause, pie, apology
   { svg: svg(alley({ time: 'night', seed: 13, glowEnd: true }) + bulbs([0, 38], [400, 58], 16, 14, true) + lanternLine([6, 76], [394, 98], 24, 8, true, 1.1, 0) + lanternLine([4, 128], [396, 120], 18, 6, true, 1.0, 1)
     + P('M20 90q-8 4 0 8M16 100q-10 6 0 12M380 92q8 4 0 8M384 102q10 6 0 12', 'none', 'stroke="#fff" stroke-width="2.4" opacity=".5"')
-    + neighbor(40, 262, 1.15, 1, { mood: 'laugh', al: 'c', ar: 'c' }) + neighbor(92, 258, 1.05, 3, { mood: 'laugh', al: 'c', ar: 'c' }) + neighbor(318, 258, 1.05, 4, { mood: 'laugh', al: 'c', ar: 'c' }) + neighbor(366, 262, 1.15, 5, { mood: 'laugh', al: 'c', ar: 'c' })
-    + dragon(220, 296, 1.05, { mood: 'laugh', arms: 'c' }) + sparks(262, 214, 0.7)
-    + lacasse(116, 298, 1.5, { mood: 'happy', ar: [48, -30], holdR: tarteSlice(0, 4, 1.5) }) + tarte(150, 262, 1.3)
-    + dimitri(330, 300, 1.45, { mood: 'shy', al: 'c', ar: 'c', tilt: 6 }) + camille(190, 300, 1.0, { mood: 'laugh', ar: 'u' })), text: "Les voisins applaudissent! Madame Lacasse offre une part de tarte au sucre à Pouf, et monsieur Dimitri lui demande pardon pour sa frayeur. Soudain, un grondement lointain fait vibrer les vitres." },
+    + neighbor(30, 262, 1.1, 1, { mood: 'laugh', al: 'c', ar: 'c' }) + neighbor(380, 262, 1.1, 5, { mood: 'laugh', al: 'c', ar: 'c' }) + neighbor(262, 250, 1.0, 4, { mood: 'laugh', al: 'c', ar: 'c' })
+    + dragon(214, 298, 1.2, { mood: 'laugh', arms: 'c' }) + sparks(250, 180, 0.6)
+    + lacasse(98, 298, 1.45, { mood: 'happy', ar: [52, -32], al: [-30, -34], holdR: tarteSlice(2, 4, 1.1), holdL: tarte(0, 8, 0.8) })
+    + dimitri(352, 300, 1.35, { mood: 'shy', al: 'c', ar: 'c', tilt: 6 }) + camille(292, 300, 1.0, { mood: 'laugh', ar: 'u' })), text: "Les voisins applaudissent! Madame Lacasse offre une part de tarte au sucre à Pouf, et monsieur Dimitri lui demande pardon pour sa frayeur. Soudain, un grondement lointain fait vibrer les vitres." },
   // 14 — the dragon family
-  { svg: svg(alley({ time: 'night', seed: 14, glowEnd: true }) + bulbs([0, 40], [400, 60], 16, 14, true) + lanternLine([6, 104], [394, 124], 24, 8, true, 1.1, 0) + lanternLine([4, 150], [396, 142], 18, 6, true, 1.0, 1)
-    + dragonMama(82, 150, 0.74, { pose: 'fly', mood: 'happy' }) + dragonPapa(318, 144, 0.74, { pose: 'fly', mood: 'happy' }) + dragonOld(200, 100, 0.72, { pose: 'fly', mood: 'surprised' })
-    + neighbor(34, 272, 1.25, 0, { mood: 'surprised', ar: 'u', al: 'u' }) + neighbor(366, 272, 1.25, 3, { mood: 'surprised', ar: 'u', al: 'u' }) + lacasse(86, 300, 1.3, { mood: 'surprised', al: 'c', ar: 'c' }) + dimitri(318, 300, 1.3, { mood: 'surprised', al: 'c', ar: 'c' })
-    + camille(200, 300, 1.7, { mood: 'happy', al: [-36, -66], ar: [36, -66] }) + dragon(200, 230, 0.78, { pose: 'fly', mood: 'laugh', arms: 'h', shadow: false })
-    + sparkles(16, 14, 40)), text: "Trois grands dragons descendent entre les balcons, attirés par la lumière des lanternes. — Maman! Papa! s'écrie Pouf en battant des ailes. Il serre Camille dans ses bras avant de s'envoler." },
+  { svg: svg(alley({ time: 'night', seed: 14, glowEnd: true }) + lanternLine([6, 104], [394, 124], 24, 8, true, 1.1, 0) + lanternLine([4, 150], [396, 142], 18, 4, true, 1.0, 1)
+    + dragonMama(82, 150, 0.74, { pose: 'fly', mood: 'happy', lite: true }) + dragonPapa(318, 144, 0.74, { pose: 'fly', mood: 'happy', lite: true }) + dragonOld(200, 100, 0.72, { pose: 'fly', mood: 'surprised', lite: true })
+    + lacasse(70, 300, 1.3, { mood: 'surprised', al: 'c', ar: 'c' }) + dimitri(330, 300, 1.3, { mood: 'surprised', al: 'c', ar: 'c' })
+    + camille(200, 300, 1.7, { mood: 'happy', al: [-30, -44], ar: [30, -44] }) + dragon(200, 296, 0.8, { pose: 'fly', mood: 'laugh', arms: 'h', shadow: false })
+    ), text: "Trois grands dragons descendent entre les balcons, attirés par la lumière des lanternes. — Maman! Papa! s'écrie Pouf en battant des ailes. Il serre Camille dans ses bras avant de s'envoler." },
   // 15 — farewell
   { svg: svg(alley({ time: 'night', seed: 15, stars: true }) + lanternLine([6, 76], [394, 98], 24, 8, true, 1.1, 0) + lanternLine([4, 130], [396, 122], 18, 6, true, 1.0, 1)
-    + [[300, 34, 0.16], [336, 52, 0.13], [366, 30, 0.11]].map(([a, b, sc]) => C(a, b, 16, 'url(#glowG)', `${NS} opacity=".9"`) + dragon(a, b + 8, sc, { pose: 'fly', mood: 'happy', shadow: false })).join('')
+    + [[300, 34, 0.16], [336, 52, 0.13], [366, 30, 0.11]].map(([a, b, sc]) => C(a, b, 16, 'url(#glowG)', `${NS} opacity=".9"`) + dragon(a, b + 8, sc, { pose: 'fly', mood: 'happy', shadow: false, lite: true })).join('')
     + P('M24 100q40 -14 70 0t70 0M250 150q30 -10 60 0t60 0', 'none', 'stroke="#fff" stroke-width="2.4" opacity=".35"')
-    + camille(150, 300, 1.75, { mood: 'happy', ar: [34, -92], al: [44, -56], holdL: scale_(2, -8, 1.1, -10) }) + sparkles(10, 15, 150)), text: "Camille le salue longtemps, jusqu'à ce que les dragons ressemblent à de petites étoiles. Dans sa main, une écaille verte est encore tiède. Depuis ce soir-là, quand le vent chante dans les cordes à linge, elle sourit : peut-être que Pouf pense à elle." },
+    + camille(150, 300, 1.75, { mood: 'happy', ar: [34, -92], al: [44, -56], holdL: scale_(4, -10, 0.85, -10) }) + sparkles(10, 15, 150)), text: "Camille le salue longtemps, jusqu'à ce que les dragons ressemblent à de petites étoiles. Dans sa main, une écaille verte est encore tiède. Depuis ce soir-là, quand le vent chante dans les cordes à linge, elle sourit : peut-être que Pouf pense à elle." },
 ];
 
 export const book = {
