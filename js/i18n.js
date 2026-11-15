@@ -90,6 +90,7 @@ const STR = {
   familyCode: { fr: 'Code familial', en: 'Family code' },
   talkLimit: { fr: 'Conversation max / jour', en: 'Talk time max / day' },
   readVoice: { fr: 'Voix naturelle pour la lecture', en: 'Natural voice for reading' },
+  talkShort: { fr: 'Parler', en: 'Talk' },
   grade: { fr: '2e année · Programme du Québec', en: 'Grade 2 · Québec program' },
 };
 

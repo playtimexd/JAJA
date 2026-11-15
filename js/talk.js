@@ -1,4 +1,4 @@
-// "Parle avec Hibou": real spoken English conversation with an AI owl (OpenAI Realtime over WebRTC).
+// "Parle avec Hibou": real spoken conversation (English, French or Mandarin) with an AI owl (OpenAI Realtime over WebRTC).
 // The iPad never sees the OpenAI key: the parents' voice server (worker/index.js) hands out a 2-minute key.
 import { el } from './util.js';
 import { VOICE_URL } from './config.js';
@@ -8,13 +8,30 @@ import { sfx, stopSpeech } from './audio.js';
 import { screen, backBtn, wallet, sheet } from './ui.js';
 import { COIN, addCoins, bump, progress, checkBadges, showBadges, confetti, touchStreak, dressedOwl } from './game.js';
 
+export const TALK_LANGS = {
+  en: { flag: '🍁', name: 'English', t: { fr: 'Anglais', en: 'English' }, code: 'en',
+    who: 'practise speaking English. The child lives in Québec, goes to a French-speaking school, and is in grade 2 (English as a second language).',
+    speak: 'Speak slowly and clearly in Canadian English.',
+    help: 'If the child answers in French or gets stuck, give the English words and invite them to repeat. You may say one short French word to help, but keep the conversation in English.',
+    praise: 'Great!' },
+  fr: { flag: '⚜️', name: 'Français', t: { fr: 'Français', en: 'French' }, code: 'fr',
+    who: 'practise speaking French. The child lives in Québec and is in 2e année at a French-speaking school; help them speak in full, correct sentences and learn new words.',
+    speak: 'Speak ONLY in French, slowly and clearly, with a warm Québec French accent and Québec vocabulary (ex. « dîner » for lunch, « tuque », « dépanneur »).',
+    help: 'If the child answers in English or Chinese or gets stuck, give the French words and invite them to repeat. Gently model correct gender, verb forms and liaisons.',
+    praise: 'Bravo!' },
+  zh: { flag: '🐼', name: '中文', t: { fr: 'Chinois', en: 'Chinese' }, code: 'zh',
+    who: 'practise speaking Mandarin Chinese. The child is 7, lives in Québec (French school, learns English), and speaks some Chinese at home; help them speak more and learn new words.',
+    speak: 'Speak ONLY in Mandarin Chinese (Putonghua), slowly and clearly, standard pronunciation, simple everyday words a 7-year-old knows.',
+    help: 'If the child answers in French or English or gets stuck, say the Chinese words and invite them to repeat. Help gently with tones of difficult words. You may give one French or English word in parentheses if really needed.',
+    praise: '真棒!' },
+};
 const MAX_SESSION = 6 * 60;                  // seconds per conversation
 export const dailyLimit = () => store.settings.talkLimit ?? 15;   // minutes per day (parents)
 const usedToday = () => (store.talk?.date === today() ? store.talk.sec : 0);
 
 const L = {
   title: { fr: 'Parle avec Hibou', en: 'Talk with Owl' },
-  pick: { fr: 'Choisis une conversation. Hibou parle anglais avec toi!', en: 'Pick a conversation. Owl talks English with you!' },
+  pick: { fr: 'Choisis une langue et une conversation. Hibou parle avec toi!', en: 'Pick a language and a conversation. Owl talks with you!' },
   start: { fr: 'Touche pour commencer', en: 'Tap to start' },
   connecting: { fr: 'Hibou arrive…', en: 'Owl is coming…' },
   listening: { fr: 'Hibou t’écoute… parle!', en: 'Owl is listening… talk!' },
@@ -31,16 +48,16 @@ const L = {
   you: { fr: 'Toi', en: 'You' },
 };
 
-const BASE = (level) => `You are "Hoo", a warm, playful owl who helps a 7-year-old child practise speaking English.
-The child lives in Québec, goes to a French-speaking school, and is in grade 2 (English as a second language).
+const BASE = (level, T) => `You are "Hoo" (in Chinese: 小猫头鹰 Hoo, in French: Hibou), a warm, playful owl who helps a 7-year-old child ${T.who}
 Rules:
-- Speak slowly and clearly in Canadian English. ${['', 'Use very simple words and 3–6 word sentences.', 'Use simple words and short sentences.', 'Use simple but natural sentences; you may use a few new words and explain them.'][level]}
+- ${T.speak} ${['', 'Use very simple words and 3–6 word sentences.', 'Use simple words and short sentences.', 'Use simple but natural sentences; you may use a few new words and explain them.'][level]}
 - Say at most 2 short sentences, then ask ONE easy question and wait. Never give long speeches.
-- If the child answers in French or gets stuck, give the English words and invite them to repeat. You may say one short French word to help, but keep the conversation in English.
+- ${T.help}
 - When the child makes a mistake, repeat the sentence correctly in a natural way ("Oh, you have a dog! Me too!") instead of saying "wrong".
 - Praise effort often and be enthusiastic. Laugh softly when something is funny.
 - Keep everything child-safe and kind. If the child talks about something unsafe or sad, be gentle and suggest talking to a parent.
 - Never ask for or repeat personal details (last name, address, school name, phone, passwords). If the child shares them, don't repeat them.
+- Adapt the activity below to this language and culture (prices in dollars are fine).
 - Stay on the activity below; if the child drifts, follow briefly then bring it back playfully.
 - Start right away by greeting the child and beginning the activity.`;
 
@@ -62,7 +79,10 @@ export const SCENARIOS = [
 let live = null;   // current session
 const voiceUrl = () => (store.settings.voiceUrl || VOICE_URL).replace(/\/$/, '');
 
-export function talkHome(back) {
+export function talkHome(back, langArg) {
+  let tl = langArg || store.pick.talkLang || 'en';
+  if (!TALK_LANGS[tl]) tl = 'en';
+  store.pick.talkLang = tl;
   const left = Math.max(0, dailyLimit() * 60 - usedToday());
   const ok = !!voiceUrl();
   let level = store.pick.talk || 1;
@@ -74,10 +94,11 @@ export function talkHome(back) {
   drawSeg();
   screen('talk-screen green',
     el('header', { class: 'bar' }, backBtn(back), el('h1', {}, '🎙️ ', tr(L.title)), wallet()),
+    el('div', { class: 'talk-langs' }, Object.entries(TALK_LANGS).map(([k, T]) => el('button', { class: `talk-lang ${k === tl ? 'on' : ''}`, onclick: () => { sfx('tap'); store.pick.talkLang = k; save(); talkHome(back, k); } }, el('span', {}, T.flag), T.name))),
     el('p', { class: 'hub-intro' }, tr(L.pick), ' · ', `⏱️ ${Math.ceil(left / 60)} ${tr(L.left)}`),
     !ok ? el('div', { class: 'talk-warn' }, '⚙️ ', tr(L.noServer)) : null,
     seg,
-    el('div', { class: 'talk-grid' }, SCENARIOS.map((s) => el('button', { class: 'talk-card', onclick: () => { sfx('tap'); start(s, level, back); } },
+    el('div', { class: 'talk-grid' }, SCENARIOS.map((s) => el('button', { class: 'talk-card', onclick: () => { sfx('tap'); start(s, level, back, tl); } },
       el('span', { class: 'tc-i' }, s.icon), el('span', { class: 'tc-t' }, tr(s.t))))),
   );
 }
@@ -95,13 +116,14 @@ function stage(s, back) {
   return { status, log, timer, owlBox, back };
 }
 
-async function start(s, level, back) {
+async function start(s, level, back, tl = 'en') {
+  const T = TALK_LANGS[tl];
   if (!voiceUrl()) { sheet(el('p', { class: 'talk-warn' }, tr(L.noServer))); return; }
   if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) { sheet(el('p', { class: 'talk-warn' }, tr(L.needHttps))); return; }
   if (usedToday() >= dailyLimit() * 60) { sheet(el('p', { class: 'talk-warn' }, tr(L.limit))); return; }
   stopSpeech();
   const ui = stage(s, back);
-  live = { ui, s, level, t0: 0, turns: 0, pc: null, mic: null, tick: null, ended: false };
+  live = { ui, s, level, tl, t0: 0, turns: 0, pc: null, mic: null, tick: null, ended: false };
   try {
     const mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
     live.mic = mic;
@@ -179,22 +201,22 @@ function end(quit) {
   cleanup();
   const sec = live.t0 ? Math.round((Date.now() - live.t0) / 1000) : 0;
   store.talk = { date: today(), sec: usedToday() + sec };
-  const back = live.ui.back, turns = live.turns, s = live.s;
+  const back = live.ui.back, turns = live.turns, s = live.s, tl = live.tl;
   live = null;
   if (turns >= 2) {
     const coins = Math.min(30, turns * 2);
-    addCoins(coins); touchStreak(); bump('talks'); bump('games'); progress('anglais'); progress('correct', turns);
+    addCoins(coins); touchStreak(); bump('talks'); bump('games'); progress(tl === 'fr' ? 'francais' : tl === 'en' ? 'anglais' : 'chinois'); progress('correct', turns);
     store.log.push({ d: today(), unit: 'talk', level: 0, mode: 'talk', score: turns, total: turns, ms: sec * 1000 });
     const fresh = checkBadges(); save();
     if (!quit) {
       confetti(50); sfx('win');
       const sh = sheet(el('div', { class: 'memory-done' }, dressedOwl('big hop-loop'), el('h2', {}, tr(L.bravo)),
         el('div', { class: 'res-score' }, `${s.icon} 🗣️ × ${turns}`), el('div', { class: 'res-coins' }, `+${coins} ${COIN}`),
-        el('div', { class: 'res-btns' }, el('button', { class: 'btn primary', onclick: () => { sh.close(); talkHome(back); } }, '➜'))));
+        el('div', { class: 'res-btns' }, el('button', { class: 'btn primary', onclick: () => { sh.close(); talkHome(back, tl); } }, '➜'))));
       showBadges(fresh);
       return;
     }
   }
   save();
-  talkHome(back);
+  talkHome(back, tl);
 }

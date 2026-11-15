@@ -108,6 +108,7 @@ function home() {
         el('button', { class: `wide daily ${dailyDone ? 'done' : ''}`, onclick: () => { sfx('tap'); play({ mode: 'daily' }); } },
           el('span', { class: 'big-emoji' }, dailyDone ? '✅' : '🌞'), dailyDone ? t('dailyDone') : t('daily')),
         el('div', { class: 'mini-row' },
+          el('button', { class: 'wide small', onclick: async () => { sfx('tap'); (await import('./talk.js')).talkHome(home); } }, el('span', { class: 'big-emoji' }, '🎙️'), t('talkShort')),
           el('button', { class: 'wide small', onclick: () => { sfx('tap'); shop(); } }, el('span', { class: 'big-emoji' }, '🛍️'), t('shop')),
           el('button', { class: 'wide small', onclick: () => { sfx('tap'); badges(); } }, el('span', { class: 'big-emoji' }, '🏅'), `${store.badges.length}/${BADGES.length}`),
           el('button', { class: 'wide small', onclick: () => { sfx('tap'); album(); } }, el('span', { class: 'big-emoji' }, '📒'), `${new Set(store.stickers).size}/${STICKERS.length}`)),
@@ -274,7 +275,7 @@ function gamesHub(s) {
 
 async function talkInfo() {
   const s = SUBJECTS.find((x) => x.id === 'anglais');
-  (await import('./talk.js')).talkHome(() => section(s, 'talk'));
+  (await import('./talk.js')).talkHome(() => section(s, 'talk'), 'en');
 }
 
 // ---------------- Play: practice · daily · eclair · ballons · marathon · boss ----------------

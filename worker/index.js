@@ -34,7 +34,7 @@ export default {
             model: env.REALTIME_MODEL || 'gpt-realtime-2.1-mini',
             instructions,
             audio: {
-              input: { transcription: { model: 'gpt-4o-mini-transcribe', language: body.lang === 'fr' ? 'fr' : 'en' }, turn_detection: { type: 'semantic_vad', eagerness: 'low' } },
+              input: { transcription: { model: 'gpt-4o-mini-transcribe', language: ['fr', 'zh', 'en'].includes(body.lang) ? body.lang : 'en' }, turn_detection: { type: 'semantic_vad', eagerness: 'low' } },
               output: { voice: env.REALTIME_VOICE || 'marin' },
             },
           },
