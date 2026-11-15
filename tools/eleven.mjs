@@ -1,7 +1,7 @@
 // One-time ElevenLabs recording of the fixed sentences (see tools/voice-texts.mjs) into audio/vo/<key>.mp3.
 // The game then plays these files first (free, offline). Never prints the key.
 //
-//   node tools/eleven.mjs --key-file <path> [--sets books,why,prompts] [--dry] [--limit N]
+//   node tools/eleven.mjs [--key-file <path>] [--sets books,why,prompts] [--dry] [--limit N]   (default: via the Cloudflare worker)
 //   voices (optional): --fr <voiceId> --en <voiceId> --zh <voiceId>   (default: auto-pick from your ElevenLabs voices)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -9,19 +9,25 @@ import { collect } from './voice-texts.mjs';
 
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > 0 ? process.argv[i + 1] : d; };
 const has = (k) => process.argv.includes(`--${k}`);
-const keyFile = arg('key-file', path.resolve('.secrets/elevenlabs.txt'));
-const raw = fs.readFileSync(keyFile, 'utf8').trim();
-let KEY = raw;
-try { const j = JSON.parse(raw); KEY = j.key || j.apiKey || j.api_key || j.ELEVENLABS_API_KEY || raw; } catch {}
-const m = raw.match(/(?:ELEVEN(?:LABS)?_API_KEY\s*=\s*)?["']?(sk_[A-Za-z0-9]+|[a-f0-9]{32})["']?/);
-if (m) KEY = m[1];
-const API = 'https://api.elevenlabs.io/v1';
-const H = { 'xi-api-key': KEY };
+// Two ways to reach ElevenLabs: --via-worker (key stored as Cloudflare secret ELEVENLABS_API_KEY; default) or --key-file <path>.
+let API, H;
+if (has('key-file')) {
+  const raw = fs.readFileSync(arg('key-file'), 'utf8').trim();
+  let KEY = raw;
+  try { const j = JSON.parse(raw); KEY = j.key || j.apiKey || j.api_key || j.ELEVENLABS_API_KEY || raw; } catch {}
+  const m = raw.match(/(?:ELEVEN(?:LABS)?_API_KEY\s*=\s*)?["']?(sk_[A-Za-z0-9]+|[a-f0-9]{32})["']?/);
+  if (m) KEY = m[1];
+  API = 'https://api.elevenlabs.io/v1'; H = { 'xi-api-key': KEY };
+} else {
+  const cfg = fs.readFileSync(path.resolve('js/config.js'), 'utf8').match(/VOICE_URL = '([^']+)'/)[1];
+  API = `${cfg}/eleven`; H = { 'x-local-secret': fs.readFileSync(path.resolve('.secrets/local-secret.txt'), 'utf8').trim() };
+}
 const MODEL = arg('model', 'eleven_multilingual_v2');
 const out = path.resolve('audio/vo');
 fs.mkdirSync(out, { recursive: true });
 
 const sub = await (await fetch(`${API}/user/subscription`, { headers: H })).json();
+if (sub.error) { console.log('Worker:', sub.error); process.exit(1); }
 if (sub.detail) { console.log('ElevenLabs refused the key:', sub.detail.status || sub.detail.message || sub.detail); process.exit(1); }
 const left = sub.character_limit - sub.character_count;
 console.log(`ElevenLabs plan: ${sub.tier} · used ${sub.character_count} / ${sub.character_limit} characters · left ${left}`);
