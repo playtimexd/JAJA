@@ -11,10 +11,10 @@ import {
 import { wordPairs, mathPairs } from './content/pairs.js';
 
 const SUBJECTS = [
-  { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js', './content/francais2.js'], speech: 'fr-CA', praise: 'fr' },
+  { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js', './content/francais2.js', './content/francais3.js'], speech: 'fr-CA', praise: 'fr' },
   { id: 'math', icon: '🧮', color: 'blue', mods: ['./content/math.js'], speech: null, praise: null },
-  { id: 'anglais', icon: '🍁', color: 'green', mods: ['./content/anglais.js', './content/anglais2.js'], speech: 'en-CA', praise: 'en' },
-  { id: 'chinois', icon: '🐼', color: 'red', mods: ['./content/chinois.js', './content/chinois2.js'], speech: 'zh-CN', praise: 'zh' },
+  { id: 'anglais', icon: '🍁', color: 'green', mods: ['./content/anglais.js', './content/anglais2.js', './content/anglais3.js'], speech: 'en-CA', praise: 'en' },
+  { id: 'chinois', icon: '🐼', color: 'red', mods: ['./content/chinois.js', './content/chinois2.js', './content/chinois3.js'], speech: 'zh-CN', praise: 'zh' },
 ];
 const perSession = () => store.settings.perSession || 8;
 const STICKERS = '🦊🐻🐼🐨🐯🦁🐸🐵🐧🐦🦉🦄🐝🦋🐢🐙🦀🐬🐳🦭🦫🦌🐿️🦔🐞🍁🌻🌈⭐🌙☀️❄️⛄🍓🍉🍩🧁🍭🎈🎨🚀🚲🛷🏒🎸🎁🏆👑💎🦕🦖🐲'.match(/\p{Extended_Pictographic}(️)?/gu);
@@ -46,18 +46,20 @@ const SECTIONS = {
     { id: 'mots', icon: '📝', t: { fr: 'Mots et orthographe', en: 'Words & spelling' }, ids: ['f3', 'f9', 'f10', 'f12', 'f13'], boss: '🦈' },
     { id: 'gram', icon: '✏️', t: { fr: 'Grammaire', en: 'Grammar' }, ids: ['f4', 'f5', 'f6'], boss: '🦖' },
     { id: 'phr', icon: '💬', t: { fr: 'Phrases et ponctuation', en: 'Sentences & punctuation' }, ids: ['f7', 'f11'], boss: '🐙' },
+    { id: 'ecrire', icon: '✍️', t: { fr: 'J’écris', en: 'Writing' }, ids: ['f15', 'f16', 'f17', 'f18'], boss: '🦉' },
     { id: 'livres', icon: '📚', t: { fr: 'Mes livres', en: 'My books' }, ids: [], books: true },
   ],
   anglais: [
     { id: 'read', icon: '📖', t: { fr: 'Lire et répéter', en: 'Read & repeat' }, ids: ['e20', 'e19', 'e34'], boss: '🐉' },
     { id: 'words', icon: '🔤', t: { fr: 'Les mots', en: 'Words' }, ids: ['e2', 'e3', 'e4', 'e5', 'e6', 'e7', 'e8', 'e9', 'e10', 'e11', 'e13', 'e14', 'e15', 'e16', 'e17', 'e18'], boss: '🦖' },
     { id: 'gram', icon: '✍️', t: { fr: 'Phrases et grammaire', en: 'Sentences & grammar' }, ids: [...range('e', 21, 33)], boss: '🐙' },
+    { id: 'write', icon: '✍️', t: { fr: 'Écrire en anglais', en: 'Writing' }, ids: ['e35', 'e36', 'e37', 'e38'], boss: '🦉' },
     { id: 'talk', icon: '💬', t: { fr: 'Parler', en: 'Speaking' }, ids: ['e1', 'e12'], boss: '🦈', talk: true },
   ],
   chinois: [
     { id: 'py', icon: '🔤', t: { fr: 'Pinyin et tons', en: 'Pinyin & tones' }, ids: range('c', 1, 5), boss: '🐉' },
     { id: 'sz', icon: '🀄', t: { fr: 'Caractères', en: 'Characters' }, ids: range('c', 6, 14), boss: '🦁' },
-    { id: 'xz', icon: '🖌️', t: { fr: 'Écrire', en: 'Writing' }, ids: range('c', 15, 18), boss: '🐯' },
+    { id: 'xz', icon: '🖌️', t: { fr: 'Écrire', en: 'Writing' }, ids: [...range('c', 15, 18), 'c22', 'c23', 'c24'], boss: '🐯' },
     { id: 'yd', icon: '📜', t: { fr: 'Comptines et poèmes', en: 'Rhymes & poems' }, ids: range('c', 19, 21), boss: '🐲' },
   ],
 };

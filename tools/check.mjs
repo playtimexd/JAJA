@@ -57,6 +57,22 @@ for (const s of subjects) {
           case 'write':
             if (typeof q.char !== 'string' || [...q.char].length !== 1 || !/\p{Script=Han}/u.test(q.char) || !q.py) fail(where, 'write needs one Han char + py', q);
             break;
+          case 'hand':
+            if (!['fr', 'en', 'zh'].includes(q.lang)) fail(where, 'hand lang', q);
+            if (!['dictation', 'answer', 'sentence', 'composition'].includes(q.mode)) fail(where, 'hand mode', q);
+            if (q.mode === 'dictation' && (!q.expected || !q.say?.text)) fail(where, 'dictation needs expected + say', q);
+            if (q.say && (!q.say.text || !q.say.lang)) fail(where, 'say shape', q);
+            if (q.stimulus?.hz && q.stimulus.py && !pyOk(q.stimulus.hz, q.stimulus.py)) fail(where, 'stimulus pinyin ≠ characters', q.stimulus);
+            break;
+          case 'hand': {
+            if (!['fr', 'en'].includes(q.lang)) fail(where, 'hand lang', q);
+            if (!['dictation', 'answer', 'sentence', 'composition'].includes(q.mode)) { fail(where, 'hand mode', q); break; }
+            if (q.mode === 'dictation' && !(q.expected && q.say?.text && q.say?.lang)) fail(where, 'dictation needs expected + say', q);
+            if (q.mode === 'answer' && !(q.answerKey && q.stimulus?.text)) fail(where, 'answer needs answerKey + stimulus.text', q);
+            if ((q.mode === 'sentence' || q.mode === 'composition') && !(q.minWords > 0)) fail(where, 'needs minWords', q);
+            if (q.lines != null && !(q.lines >= 1 && q.lines <= 8)) fail(where, 'lines 1–8', q);
+            break;
+          }
           default: fail(where, 'unknown type ' + q.type, q);
         }
       }

@@ -2204,3 +2204,935 @@ const _m19 = {
   generate(level, R) { return m19Q(R, level); },
 };
 units.push(_m17, _m18, _m19);
+
+// =====================================================================================
+// Raised difficulty (PFEQ): Facile (L1) = solid end of 2e année (the former level 3),
+// Moyen (L2) = 3e année, Difficile (L3) = strong 3e / early 4e année.
+// L1 re-uses each unit's original level-3 generator; L2 and L3 are written below (NEW[id]).
+// =====================================================================================
+const NEW = {};
+const NB2 = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); // 12 345 (fr-CA thousands)
+const NBe = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const NT = (n) => T(NB2(n), NBe(n));
+const sumArr = (a) => a.reduce((x, y) => x + y, 0);
+// numeric multiple-choice: answer first; distractors from `cands`, padded with neighbours that pass `valid`
+function numQ(R, key, prompt, stim, ans, cands, o = {}) {
+  const { say, cols = 4, fmt = NT, valid = () => true } = o;
+  let d = [...new Set(cands)].filter((v) => v !== ans && v >= 0 && valid(v));
+  d = R.sample(d, Math.min(3, d.length));
+  for (let k = 1; d.length < 3 && k < 40; k++) for (const v of [ans + 10 * k, ans - 10 * k, ans + k, ans - k, ans + 100 * k]) if (d.length < 3 && v >= 0 && v !== ans && !d.includes(v) && valid(v)) d.push(v);
+  const q = { type: 'choice', key, prompt, ...(stim ? { stimulus: stim } : {}), options: [ans, ...d].map((v) => ({ text: fmt(v) })), answer: 0, cols };
+  if (say) q.say = say;
+  return q;
+}
+const kp = (key, prompt, stim, ans, say) => ({ type: 'keypad', key, prompt, ...(stim ? { stimulus: stim } : {}), answer: ans, ...(say ? { say } : {}) });
+const tx = (s) => ({ text: s });
+const swaps = (n) => { const s = String(n), out = []; for (let i = 0; i < s.length - 1; i++) { const a = s.split(''); [a[i], a[i + 1]] = [a[i + 1], a[i]]; out.push(Number(a.join(''))); } return out; };
+const r3 = (R) => { const m = R.int(0, 2); return m === 0 ? R.int(101, 999) : m === 1 ? R.int(1, 9) * 100 + R.int(1, 9) : R.int(1, 9) * 100 + R.int(1, 9) * 10; };
+const r4 = (R) => { const m = R.int(0, 3), th = R.int(1, 9); return m === 0 ? R.int(1001, 9999) : m === 1 ? th * 1000 + R.int(1, 9) * 100 : m === 2 ? th * 1000 + R.int(1, 99) : th * 1000 + R.int(1, 9) * 100 + R.int(1, 9); };
+function frW(n) { if (n < 1000) return frWords(n); const th = Math.floor(n / 1000), r = n % 1000; const head = th === 1 ? 'mille' : `${frWords(th)} mille`; return r ? `${head} ${frWords(r)}` : head; }
+function enW(n) { if (n < 1000) return enWords(n); const th = Math.floor(n / 1000), r = n % 1000; return `${enWords(th)} thousand` + (r ? ` ${enWords(r)}` : ''); }
+const WORDS = (n) => T(frW(n), enW(n));
+const cnt = (k, f, fp, e, ep) => T(`${k} ${k > 1 ? fp : f}`, `${k} ${k === 1 ? e : ep}`);
+const joinT = (parts, sepFr, sepEn) => T(parts.map((p) => p.fr).join(sepFr), parts.map((p) => p.en).join(sepEn));
+
+// ---------- m1 ----------
+NEW.m1 = (L, R) => {
+  if (L === 2) {
+    const k = R.int(0, 5);
+    if (k === 0) { const n = R.chance(0.35) ? r4(R) : r3(R); return kp(`w${n}`, T('Écris ce nombre en chiffres.', 'Write this number in digits.'), { text: WORDS(n) }, n, SAY(frW(n), enW(n))); }
+    if (k === 1) { const n = R.chance(0.35) ? r4(R) : r3(R), big = n > 999; return numQ(R, `wc${n}`, T('Comment s’écrit ce nombre en lettres?', 'How do you write this number in words?'), tx(NB2(n)), n, [...swaps(n), n + 10, n - 10, n + 100, n - 1], { fmt: WORDS, cols: 2, valid: (v) => (big ? v > 999 && v < 10000 : v > 0 && v < 1000) }); }
+    if (k === 2) { const n = R.chance(0.5) ? R.int(1, 9) * 100 + R.int(1, 9) : R.int(1, 9) * 100 + R.int(1, 9) * 10; return { type: 'base10', key: `b${n}`, prompt: T(`Construis le nombre ${n}.`, `Build the number ${n}.`), answer: n }; }
+    if (k === 3) {
+      const b = R.int(2, 10) * 100, m = R.int(0, 2);
+      if (m === 0) return kp(`aft${b}`, T(`Quel nombre vient juste après ${b - 1}?`, `Which number comes right after ${b - 1}?`), null, b);
+      if (m === 1) return kp(`bef${b}`, T(`Quel nombre vient juste avant ${b}?`, `Which number comes right before ${b}?`), null, b - 1);
+      const x = b + 10 * R.int(1, 9); return kp(`bef${x}`, T(`Quel nombre vient juste avant ${x}?`, `Which number comes right before ${x}?`), null, x - 1);
+    }
+    if (k === 4) { const n = R.int(1, 19) * 50; return { type: 'numberline', key: `nl50_${n}`, prompt: T(`Touche le nombre ${n}.`, `Tap the number ${n}.`), min: 0, max: 1000, step: 50, answer: n }; }
+    const n = R.pick([R.int(101, 999), R.int(1, 9) * 100 + R.int(1, 9), R.int(1, 9) * 100 + R.int(1, 9) * 10]);
+    const cands = [...swaps(n), n + 10, n - 10, n + 100, n - 1].filter((v) => v > 0 && v < 1000);
+    return numQ(R, `pic${n}`, T('Quel nombre est représenté?', 'Which number is shown?'), { svg: S.base10(n) }, n, cands, { valid: (v) => v > 0 && v < 1000, fmt: String });
+  }
+  const k = R.int(0, 5);
+  if (k <= 1) { const n = r4(R); return kp(`w${n}`, T('Écris ce nombre en chiffres.', 'Write this number in digits.'), { text: WORDS(n) }, n, SAY(frW(n), enW(n))); }
+  if (k <= 3) { const n = r4(R); return numQ(R, `wc${n}`, T('Comment s’écrit ce nombre en lettres?', 'How do you write this number in words?'), tx(NB2(n)), n, [...swaps(n), n + 100, n - 100, n + 1000, n - 10], { fmt: WORDS, cols: 2, valid: (v) => v > 999 && v < 10000 }); }
+  if (k === 4) {
+    const x = R.pick([R.int(2, 9) * 1000, R.int(11, 99) * 100, R.int(101, 999) * 10]), after = R.chance(0.5);
+    return after ? kp(`aft${x}`, T(`Quel nombre vient juste après ${NB2(x - 1)}?`, `Which number comes right after ${NBe(x - 1)}?`), null, x) : kp(`bef${x}`, T(`Quel nombre vient juste avant ${NB2(x)}?`, `Which number comes right before ${NBe(x)}?`), null, x - 1);
+  }
+  const big = R.chance(0.5), n = big ? R.int(1, 9) * 1000 : R.int(1, 19) * 500;
+  const nn = Math.min(n, big ? 9000 : 9500);
+  return { type: 'numberline', key: `nl10k_${nn}`, prompt: T(`Touche le nombre ${NB2(nn)}.`, `Tap the number ${NBe(nn)}.`), min: 0, max: 10000, step: big ? 1000 : 500, answer: nn };
+};
+
+// ---------- m2 ----------
+const PLACES = [
+  { n: T('unités', 'ones'), v: 1 }, { n: T('dizaines', 'tens'), v: 10 }, { n: T('centaines', 'hundreds'), v: 100 }, { n: T('milliers', 'thousands'), v: 1000 },
+];
+const composeT = (n) => {
+  const th = Math.floor(n / 1000), h = Math.floor(n / 100) % 10, t = Math.floor(n / 10) % 10, u = n % 10;
+  const parts = [];
+  if (th) parts.push(cnt(th, 'millier', 'milliers', 'thousand', 'thousands'));
+  parts.push(cnt(h, 'centaine', 'centaines', 'hundred', 'hundreds'), cnt(t, 'dizaine', 'dizaines', 'ten', 'tens'), cnt(u, 'unité', 'unités', 'one', 'ones'));
+  return joinT(parts, ', ', ', ');
+};
+const expandStr = (n) => [1000, 100, 10, 1].map((v) => Math.floor(n / v) % 10 * v).filter(Boolean).join(' + ');
+NEW.m2 = (L, R) => {
+  const n = L === 2 ? (R.chance(0.3) ? R.int(101, 999) : R.int(1001, 9999)) : R.int(1001, 9999);
+  const four = n > 999;
+  const digs = String(n).split('').map(Number).reverse(); // ones first
+  const k = R.int(0, L === 2 ? 3 : 5);
+  if (k === 0) {
+    if (L === 3) { // value of a digit (distinct digits)
+      const ds = R.shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 4);
+      if (ds[0] === 0) [ds[0], ds[1]] = [ds[1], ds[0]];
+      const m = Number(ds.join('')), pos = R.pick([0, 1, 2, 3].filter((p) => ds[3 - p] !== 0)), d = ds[3 - pos];
+      return kp(`val${m}${d}`, T(`Dans ${NB2(m)}, quelle est la valeur du chiffre ${d}?`, `In ${NBe(m)}, what is the value of the digit ${d}?`), null, d * 10 ** pos);
+    }
+    const pos = R.int(0, four ? 3 : 2), ans = digs[pos];
+    const pool = [...new Set([...digs, ...[ans + 1, ans - 1, 0, 5].filter((v) => v >= 0 && v <= 9)])].filter((v) => v !== ans);
+    const pr = T(`Dans ${NB2(n)}, quel est le chiffre des ${PLACES[pos].n.fr}?`, `In ${NBe(n)}, which digit is in the ${PLACES[pos].n.en} place?`);
+    return { type: 'choice', key: `pv${n}${pos}`, prompt: pr, say: SAY(pr.fr, pr.en), stimulus: tx(NB2(n)), options: [ans, ...R.sample(pool, 3)].map((v) => ({ text: String(v) })), answer: 0, cols: 4 };
+  }
+  if (k === 1) {
+    const c = composeT(n);
+    return kp(`cmp${n}`, T('Quel nombre est-ce?', 'Which number is it?'), { text: c }, n, SAY(c.fr, c.en));
+  }
+  if (k === 2) {
+    const parts = R.shuffle([1000, 100, 10, 1].map((v) => Math.floor(n / v) % 10 * v).filter(Boolean));
+    return kp(`exp${parts.join('+')}`, T('Calcule.', 'Work it out.'), tx(parts.join(' + ') + ' = ?'), n);
+  }
+  if (k === 3 && L === 2) {
+    const cands = [...swaps(n), n + 100, n - 100, n + 10, n - 10].filter((v) => v > 0 && v < 10000 && v !== n);
+    const d = R.sample([...new Set(cands)], 3);
+    return { type: 'choice', key: `ex${n}`, prompt: T(`Quelle décomposition est égale à ${NB2(n)}?`, `Which expansion equals ${NBe(n)}?`), options: [n, ...d].map((v) => ({ text: expandStr(v) })), answer: 0, cols: 2 };
+  }
+  if (k === 3) { // how many tens / hundreds
+    const t = R.chance(0.5);
+    const m = t ? R.int(11, 999) * 10 : R.int(11, 99) * 100;
+    return kp(`how${m}${t}`, t ? T(`Combien de dizaines y a-t-il dans ${NB2(m)}?`, `How many tens are there in ${NBe(m)}?`) : T(`Combien de centaines y a-t-il dans ${NB2(m)}?`, `How many hundreds are there in ${NBe(m)}?`), null, t ? m / 10 : m / 100);
+  }
+  if (k === 4) { // regrouping
+    const m = R.int(0, 2);
+    if (m === 0) { const a = R.int(11, 59), u = R.int(1, 9); return kp(`rg${a}d${u}`, T('Quel nombre est-ce?', 'Which number is it?'), { text: T(`${a} dizaines et ${u} unités`, `${a} tens and ${u} ones`) }, a * 10 + u); }
+    if (m === 1) { const a = R.int(11, 59), u = R.int(1, 9); return kp(`rg${a}c${u}`, T('Quel nombre est-ce?', 'Which number is it?'), { text: T(`${a} centaines et ${u} unités`, `${a} hundreds and ${u} ones`) }, a * 100 + u); }
+    const a = R.int(10, 59), b = R.int(1, 9); return kp(`rg${a}c${b}t`, T('Quel nombre est-ce?', 'Which number is it?'), { text: T(`${a} centaines et ${b} dizaines`, `${a} hundreds and ${b} tens`) }, a * 100 + b * 10);
+  }
+  const cands = [...swaps(n), n + 1000, n - 1000, n + 100, n - 100].filter((v) => v > 999 && v < 10000 && v !== n);
+  const d = R.sample([...new Set(cands)], 3);
+  return { type: 'choice', key: `ex${n}`, prompt: T(`Quelle décomposition est égale à ${NB2(n)}?`, `Which expansion equals ${NBe(n)}?`), options: [n, ...d].map((v) => ({ text: expandStr(v) })), answer: 0, cols: 2 };
+};
+
+// ---------- m3 ----------
+NEW.m3 = (L, R) => {
+  const lo = L === 2 ? 100 : 1000, hi = L === 2 ? 4999 : 9999, span = L === 2 ? 90 : 400;
+  const k = R.int(0, L === 2 ? 3 : 4);
+  const near3 = () => { const a = R.int(lo, hi); const b = R.chance(0.1) ? a : R.chance(0.6) ? Math.max(lo, Math.min(hi, a + R.int(-span, span))) : R.int(lo, hi); return [a, b]; };
+  if (k === 0) {
+    const [a, b] = near3(), sym = a < b ? 0 : a > b ? 1 : 2;
+    return { type: 'choice', key: `cmp${a}_${b}`, prompt: T('Quel signe va dans la case?', 'Which sign goes in the box?'), stimulus: tx(`${NB2(a)}  ☐  ${NB2(b)}`), options: [{ text: '<' }, { text: '>' }, { text: '=' }], answer: sym, fixedOrder: true, cols: 3 };
+  }
+  if (k === 1) {
+    const count = L === 2 ? 4 : 5, set = new Set(), base = R.int(lo, hi - span);
+    while (set.size < count) set.add(R.chance(0.7) ? base + R.int(0, span) : R.int(lo, hi));
+    const asc = [...set].sort((x, y) => x - y), up = R.chance(0.5);
+    const arr = up ? asc : asc.slice().reverse();
+    return { type: 'order', key: `ord${arr.join(',')}`, joiner: '  ', prompt: up ? T('Place les nombres du plus petit au plus grand.', 'Put the numbers from smallest to biggest.') : T('Place les nombres du plus grand au plus petit.', 'Put the numbers from biggest to smallest.'), tiles: arr.map(NB2) };
+  }
+  if (k === 2) {
+    const a = R.int(lo, hi - 90), b = a + R.int(30, 90), ans = R.int(a + 1, b - 1);
+    return numQ(R, `btw${a}_${b}_${ans}`, T(`Quel nombre est entre ${NB2(a)} et ${NB2(b)}?`, `Which number is between ${NBe(a)} and ${NBe(b)}?`), null, ans, [a - R.int(1, 20), b + R.int(1, 20), a - 5, b + 5, a, b], { cols: 4, valid: (v) => v < a || v > b });
+  }
+  if (k === 3 && L === 2) {
+    const set = new Set(), base = R.int(lo, hi - 120);
+    while (set.size < 3) set.add(base + R.int(0, 120));
+    const arr = [...set], big = R.chance(0.5), t = big ? Math.max(...arr) : Math.min(...arr);
+    return { type: 'choice', key: `top${arr.slice().sort().join(',')}${big}`, prompt: big ? T('Quel est le plus grand nombre?', 'Which is the biggest number?') : T('Quel est le plus petit nombre?', 'Which is the smallest number?'), options: arr.map((v) => ({ text: NT(v) })), answer: arr.indexOf(t), fixedOrder: true, cols: 3 };
+  }
+  if (k === 3) {
+    const set = new Set(), base = R.int(1000, 9400);
+    while (set.size < 4) set.add(base + R.int(0, 500));
+    const arr = [...set], big = R.chance(0.5), t = big ? Math.max(...arr) : Math.min(...arr);
+    return { type: 'choice', key: `top${arr.slice().sort().join(',')}${big}`, prompt: big ? T('Quel est le plus grand nombre?', 'Which is the biggest number?') : T('Quel est le plus petit nombre?', 'Which is the smallest number?'), options: arr.map((v) => ({ text: NT(v) })), answer: arr.indexOf(t), fixedOrder: true, cols: 2 };
+  }
+  // k === 4 (L3): smallest digit that makes the sentence true
+  const th = R.int(1, 9), h = R.int(0, 8), rest = R.int(10, 99);
+  return kp(`dgt${th}${h}${rest}`, T(`Quel est le plus petit chiffre qui peut aller dans la case pour que ${th}☐${rest} > ${NB2(th * 1000 + h * 100 + rest)}?`, `What is the smallest digit that can go in the box so that ${th},☐${rest} > ${NBe(th * 1000 + h * 100 + rest)}?`), null, h + 1);
+};
+
+// ---------- m4 ----------
+NEW.m4 = (L, R) => {
+  const lo = L === 2 ? 100 : 1000, hi = L === 2 ? 2999 : 9999;
+  const k = R.int(0, L === 2 ? 2 : 4);
+  if (k === 0) {
+    const set = new Set();
+    while (set.size < 6) set.add(R.int(lo, hi));
+    const arr = [...set];
+    if (arr.every((v) => v % 2 === arr[0] % 2)) arr[0] += 1;
+    return { type: 'sort', key: `pi${arr.join(',')}`, prompt: T('Classe les nombres.', 'Sort the numbers.'), bins: [{ text: T('pair', 'even'), emoji: '👫' }, { text: T('impair', 'odd'), emoji: '🧍' }], items: arr.map((v) => ({ text: NB2(v), bin: v % 2 })) };
+  }
+  if (k === 1) {
+    const wantEven = R.chance(0.5), a = []; while (a.length < 3) { const v = R.int(lo, hi), want = a.length === 0 ? (wantEven ? 0 : 1) : (wantEven ? 1 : 0), w = v % 2 === want ? v : v + 1; if (!a.includes(w)) a.push(w); }
+    return { type: 'choice', key: `wh${a.join()}${wantEven}`, prompt: wantEven ? T('Lequel de ces nombres est pair?', 'Which of these numbers is even?') : T('Lequel de ces nombres est impair?', 'Which of these numbers is odd?'), options: a.map((v) => ({ text: NT(v) })), answer: 0, cols: 3 };
+  }
+  if (k === 2 && L === 2) {
+    const par = R.int(0, 1), x = R.int(1, 15) * 2 + par, y = x + R.int(5, 9) * 2;
+    let c = 0; for (let v = x; v <= y; v++) if (v % 2 === par) c++;
+    return kp(`cnt${x}_${y}`, T(`Combien de nombres ${par ? 'impairs' : 'pairs'} y a-t-il de ${x} à ${y}? (${x} et ${y} sont inclus)`, `How many ${par ? 'odd' : 'even'} numbers are there from ${x} to ${y}? (${x} and ${y} are included)`), null, c);
+  }
+  if (k === 2) {
+    const ds = R.shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    const ev = ds.filter((d) => d % 2 === 0), od = ds.filter((d) => d % 2 === 1), wantEven = R.chance(0.5);
+    const good = wantEven ? ev[0] : od[0], bad = (wantEven ? od : ev).slice(0, 2), pre = R.int(100, 999);
+    return { type: 'choice', key: `dg${pre}${good}${bad.join('')}${wantEven}`, prompt: T(`Quel chiffre peut aller dans la case pour que ${pre}☐ soit ${wantEven ? 'pair' : 'impair'}?`, `Which digit can go in the box so that ${pre}☐ is ${wantEven ? 'even' : 'odd'}?`), options: [good, ...bad].map((v) => ({ text: String(v) })), answer: 0, cols: 3 };
+  }
+  if (k === 3) { // parity of a sum
+    const wantEven = R.chance(0.5);
+    for (let g = 0; g < 200; g++) {
+      const s = [0, 1, 2].map(() => [R.int(11, 99), R.int(11, 99)]);
+      const ev = s.map((p) => (p[0] + p[1]) % 2 === 0);
+      if (ev.filter((x) => x === wantEven).length === 1) {
+        const idx = ev.findIndex((x) => x === wantEven), order = [s[idx], ...s.filter((_, i) => i !== idx)];
+        return { type: 'choice', key: `sm${order.map((p) => p.join('+')).join('|')}${wantEven}`, prompt: wantEven ? T('Quelle somme est un nombre pair?', 'Which sum is an even number?') : T('Quelle somme est un nombre impair?', 'Which sum is an odd number?'), options: order.map((p) => ({ text: `${p[0]} + ${p[1]}` })), answer: 0, cols: 3 };
+      }
+    }
+  }
+  const RULES = [
+    ['pair + pair', 'even + even', 0], ['impair + impair', 'odd + odd', 0], ['pair + impair', 'even + odd', 1],
+    ['impair + impair + impair', 'odd + odd + odd', 1], ['pair × impair', 'even × odd', 0], ['impair × impair', 'odd × odd', 1], ['n’importe quel nombre × 2', 'any number × 2', 0],
+  ];
+  const [fr, en, ans] = R.pick(RULES);
+  return { type: 'choice', key: `rule${fr}`, prompt: T(`Le résultat de « ${fr} » est toujours…`, `The result of “${en}” is always…`), options: [{ text: T('pair', 'even') }, { text: T('impair', 'odd') }], answer: ans, fixedOrder: true, cols: 2 };
+};
+
+// ---------- m5 ----------
+const hasCarry = (a, b) => { let x = a, y = b, c = 0; while (x > 0 || y > 0) { const s = (x % 10) + (y % 10) + c; if (s > 9) return true; c = 0; x = Math.floor(x / 10); y = Math.floor(y / 10); } return false; };
+const hasBorrow = (a, b) => { let x = a, y = b; while (y > 0) { if (x % 10 < y % 10) return true; x = Math.floor(x / 10); y = Math.floor(y / 10); } return false; };
+NEW.m5 = (L, R) => {
+  const k = R.int(0, 4);
+  let a, b;
+  if (L === 2) {
+    if (k === 0 || k === 3) { do { a = R.int(101, 899); b = R.int(101, 998); } while (!hasCarry(a, b) || a + b > 1500); }
+    else if (k === 1) { do { a = R.int(201, 899); b = R.int(15, 98); } while (!hasCarry(a, b)); }
+    else { do { a = R.int(101, 899); b = R.int(101, 899); } while (!hasCarry(a, b) || a + b > 1400); const s = a + b; return kp(`m${a}+?=${s}`, T('Quel nombre manque?', 'Which number is missing?'), tx(`${a} + ? = ${s}`), b); }
+    const s = a + b;
+    if (k === 3) return numQ(R, `ac${a}+${b}`, T('Calcule.', 'Work it out.'), tx(`${a} + ${b} = ?`), s, [s - 10, s - 100, s + 10, s + 100, s - 1], { fmt: String });
+    return kp(`a${a}+${b}`, T('Calcule.', 'Work it out.'), tx(`${a} + ${b} = ?`), s);
+  }
+  if (k === 0) { do { a = R.int(1001, 8000); b = R.int(101, 999); } while (!hasCarry(a, b)); return kp(`a${a}+${b}`, T('Calcule.', 'Work it out.'), tx(`${NB2(a)} + ${b} = ?`), a + b); }
+  if (k === 1) { do { a = R.int(1001, 6500); b = R.int(1001, 9999 - a); } while (!hasCarry(a, b)); return kp(`a${a}+${b}`, T('Calcule.', 'Work it out.'), tx(`${NB2(a)} + ${NB2(b)} = ?`), a + b); }
+  if (k === 2) { const x = R.int(101, 999), y = R.int(101, 999), z = R.int(101, 999); return kp(`t${x}+${y}+${z}`, T('Calcule.', 'Work it out.'), tx(`${x} + ${y} + ${z} = ?`), x + y + z); }
+  if (k === 3) { do { a = R.int(1001, 7000); b = R.int(1001, 9999 - a); } while (!hasCarry(a, b)); const s = a + b; return kp(`m${a}+?=${s}`, T('Quel nombre manque?', 'Which number is missing?'), tx(`${NB2(a)} + ? = ${NB2(s)}`), b); }
+  do { a = R.int(1001, 8000); b = R.int(101, 1999); } while (!hasCarry(a, b));
+  const s = a + b;
+  return numQ(R, `ac${a}+${b}`, T('Calcule.', 'Work it out.'), tx(`${NB2(a)} + ${NB2(b)} = ?`), s, [s - 10, s - 100, s - 1000, s + 10, s + 100], { valid: (v) => v < 10000 });
+};
+
+// ---------- m6 ----------
+const bugSub = (a, b) => { let r = 0, m = 1, x = a, y = b; while (x > 0 || y > 0) { r += Math.abs((x % 10) - (y % 10)) * m; m *= 10; x = Math.floor(x / 10); y = Math.floor(y / 10); } return r; };
+NEW.m6 = (L, R) => {
+  const k = R.int(0, 4);
+  let a, b;
+  if (L === 2) {
+    if (k === 1) { do { a = R.int(2, 9) * 100 + R.int(0, 9); b = R.int(101, a - 1); } while (!(b % 100 > a % 100)); }
+    else { do { a = R.int(300, 999); b = R.int(101, a - 1); } while (!hasBorrow(a, b)); }
+    const c = a - b;
+    if (k === 2) return R.chance(0.5) ? kp(`m${a}-?=${c}`, T('Quel nombre manque?', 'Which number is missing?'), tx(`${a} − ? = ${c}`), b) : kp(`mf?-${b}=${c}`, T('Quel nombre manque?', 'Which number is missing?'), tx(`? − ${b} = ${c}`), a);
+    if (k === 3) return numQ(R, `sc${a}-${b}`, T('Calcule.', 'Work it out.'), tx(`${a} − ${b} = ?`), c, [bugSub(a, b), c + 10, c - 10, c + 100, c - 100], { fmt: String });
+    return kp(`s${a}-${b}`, T('Calcule.', 'Work it out.'), tx(`${a} − ${b} = ?`), c);
+  }
+  if (k === 0) { do { a = R.int(1001, 9999); b = R.int(101, 999); } while (!hasBorrow(a, b)); return kp(`s${a}-${b}`, T('Calcule.', 'Work it out.'), tx(`${NB2(a)} − ${b} = ?`), a - b); }
+  if (k === 1) { do { a = R.int(2001, 9999); b = R.int(1001, a - 100); } while (!hasBorrow(a, b)); return kp(`s${a}-${b}`, T('Calcule.', 'Work it out.'), tx(`${NB2(a)} − ${NB2(b)} = ?`), a - b); }
+  if (k === 2) { a = R.int(2, 9) * 1000 + (R.chance(0.5) ? 0 : R.int(0, 9)); b = R.int(101, a - 100); return kp(`s${a}-${b}`, T('Calcule.', 'Work it out.'), tx(`${NB2(a)} − ${NB2(b)} = ?`), a - b); }
+  if (k === 3) { do { a = R.int(2001, 9999); b = R.int(101, a - 1000); } while (!hasBorrow(a, b)); const c = a - b; return R.chance(0.5) ? kp(`m${a}-?=${c}`, T('Quel nombre manque?', 'Which number is missing?'), tx(`${NB2(a)} − ? = ${NB2(c)}`), b) : kp(`mf?-${b}=${c}`, T('Quel nombre manque?', 'Which number is missing?'), tx(`? − ${b} = ${NB2(c)}`), a); }
+  do { a = R.int(2001, 9999); b = R.int(101, 1999); } while (!hasBorrow(a, b));
+  const c = a - b;
+  return numQ(R, `sc${a}-${b}`, T('Calcule.', 'Work it out.'), tx(`${NB2(a)} − ${NB2(b)} = ?`), c, [bugSub(a, b), c + 10, c - 10, c + 100, c - 1000], { valid: (v) => v < 10000 });
+};
+
+// ---------- story helpers for the harder levels ----------
+// A "scene" gives the setting + noun; build sentences with {a}, {b}… and mkQ.
+const SB = (R, L) => ctx(R, L);
+const gainS = (nb) => [`{Il} en ${nb.gv[0]} {b} de plus.`, `{He} ${nb.gv[1]} {b} more.`];
+const lossS = (nb, key = 'b') => [`{Il} en ${nb.lv[0]} {${key}}.`, `{He} ${nb.lv[1]} {${key}} of them.`];
+const DISTX = (R, s, v, used, lo = 12, hi = 480) => addDist(R, s, v, used, lo, hi);
+const mk3 = (id, c, s, q, ans, o = {}) => mkQ({ id, v: c.v, sents: s, q, ans, ...o });
+
+// ---------- m7 ----------
+const M7 = {
+  add3(c) {
+    const { R, nb, v } = c; const a = R.int(120, 650), b = R.int(110, 340); Object.assign(v, { a, b });
+    const s = [[...HAVE[0]], gainS(nb)]; DISTX(R, s, v, [a, b]);
+    return mk3('a3', c, s, ['Combien {dnf} a-t-{il} maintenant?', 'How many {ne} does {he} have now?'], a + b);
+  },
+  sub3(c) {
+    const { R, nb, v } = c; const a = R.int(300, 900), b = R.int(110, a - 60); Object.assign(v, { a, b });
+    const s = [[...HAVE[0]], lossS(nb)]; DISTX(R, s, v, [a, b]);
+    return mk3('s3', c, s, ['Combien {dnf} lui reste-t-il?', 'How many {ne} does {he} have left?'], a - b);
+  },
+  cmp3(c) {
+    const { R, v } = c; const hi = R.int(250, 950), lo = R.int(120, hi - 60); Object.assign(v, { a: hi, b: lo });
+    const s = [['{set} {p} a {a} {nf}.', '{sete} {p} has {a} {ne}.'], ['{q} en a {b}.', '{q} has {b}.']]; DISTX(R, s, v, [hi, lo]);
+    return mk3('c3', c, s, ['Combien {dnf} {p} a-t-{il} de plus {qq}?', 'How many more {ne} does {p} have than {q}?'], hi - lo);
+  },
+  two3(c) {
+    const { R, nb, v } = c; const a = R.int(200, 600), b = R.int(100, 300), cc = R.int(60, a + b - 150); Object.assign(v, { a, b, c: cc });
+    const s = [[...HAVE[0]], gainS(nb), [`Puis, {il} en ${nb.lv[0]} {c}.`, `Then {he} ${nb.lv[1]} {c} of them.`]]; DISTX(R, s, v, [a, b, cc]);
+    return mk3('t3', c, s, ['Combien {dnf} a-t-{il} à la fin?', 'How many {ne} does {he} have at the end?'], a + b - cc);
+  },
+  grp(c) {
+    const { R, v } = c; const g = R.int(3, 6), n = R.pick([2, 3, 4, 5, 10]), e = R.int(2, 9); Object.assign(v, { g, n, e });
+    const s = [['{set} {p} range ses {nf} dans {g} sacs. Chaque sac en contient {n}.', '{sete} {p} puts {ne} in {g} bags. Each bag holds {n}.'], ['{Il} en a aussi {e} dans sa poche.', '{He} also has {e} in {his} pocket.']];
+    return mk3('g3', c, s, ['Combien {dnf} {p} a-t-{il} en tout?', 'How many {ne} does {p} have in all?'], g * n + e);
+  },
+  miss3(c) {
+    const { R, v } = c; const a = R.int(500, 950), b = R.int(100, 300), cc = R.int(40, a - b - 60); Object.assign(v, { a, b, c: cc });
+    const s = [['{set} {p} veut avoir {a} {nf}.', '{sete} {p} wants to have {a} {ne}.'], ['{Il} en a {b}.', '{He} has {b}.'], ['{q} lui en donne {c}.', '{q} gives {him} {c} more.']]; DISTX(R, s, v, [a, b, cc]);
+    return mk3('m3', c, s, ['Combien {dnf} lui manque-t-il encore?', 'How many more {ne} does {he} still need?'], a - b - cc);
+  },
+  // ---- Difficile ----
+  two4(c) {
+    const { R, nb, v } = c; const a = R.int(1200, 5000), b = R.int(300, 2500), cc = R.int(200, 1500); Object.assign(v, { a: NB2(a), b: NB2(b), c: NB2(cc) });
+    const s = [[...HAVE[0]], gainS(nb), [`Puis, {il} en ${nb.lv[0]} {c}.`, `Then {he} ${nb.lv[1]} {c} of them.`]]; DISTX(R, s, v, [a, b, cc], 20, 900);
+    return mk3('t4', c, s, ['Combien {dnf} a-t-{il} à la fin?', 'How many {ne} does {he} have at the end?'], a + b - cc);
+  },
+  after(c) {
+    const { R, v } = c; const cc = R.int(10, 40), a = R.int(150, 400), b = R.int(20, a - 2 * cc - 20); Object.assign(v, { a, b, c: cc });
+    const s = [['{set} {p} a {a} {nf} et {q} en a {b}.', '{sete} {p} has {a} {ne} and {q} has {b}.'], ['{p} en donne {c} à {q}.', '{p} gives {c} to {q}.']];
+    return mk3('af', c, s, ['Combien {dnf} {p} a-t-{il} de plus {qq} maintenant?', 'How many more {ne} does {p} have than {q} now?'], (a - cc) - (b + cc));
+  },
+  start(c) {
+    const { R, nb, v } = c; const b = R.int(40, 480), cc = R.int(15, 350); Object.assign(v, { b, c: cc });
+    const s = [[`{set} {p} ${nb.lv[0]} {c} {nf}. Maintenant, {il} en a {b}.`, `{sete} {p} ${nb.lv[1]} {c} {ne}. Now {he} has {b}.`]];
+    return mk3('st', c, s, ['Combien {dnf} {p} avait-{il} au début?', 'How many {ne} did {p} have at the start?'], b + cc);
+  },
+  times(c) {
+    const { R, v } = c; const a = R.int(4, 18), f = R.int(3, 6); Object.assign(v, { a, f });
+    const s = [['{set} {p} a {a} {nf}. {q} en a {f} fois plus que {p}.', '{sete} {p} has {a} {ne}. {q} has {f} times as many as {p}.']];
+    return R.chance(0.5) ? mk3('x1', c, s, ['Combien {dnf} {q} a-t-{iq}?', 'How many {ne} does {q} have?'], a * f)
+      : mk3('x2', c, s, ['Combien {dnf} ont-{ils} en tout?', 'How many {ne} do they have altogether?'], a + a * f);
+  },
+  rem(c) {
+    const { R, v } = c; const k = R.pick([4, 5, 6, 7, 8]), n = R.int(3, 11) * k + R.int(1, k - 1); Object.assign(v, { n, k });
+    const s = [['{set} {p} a {n} {nf}. {Il} veut les mettre dans des sacs de {k}.', '{sete} {p} has {n} {ne}. {He} wants to put them in bags of {k}.']];
+    const full = Math.floor(n / k);
+    return R.int(0, 2) === 0 ? mk3('r1', c, s, ['Combien de sacs complets peut-{il} faire?', 'How many full bags can {he} make?'], full)
+      : R.chance(0.5) ? mk3('r2', c, s, ['Combien {dnf} restent-ils hors des sacs?', 'How many {ne} are left outside the bags?'], n % k)
+        : mk3('r3', c, s, ['Combien de sacs faut-il pour tout ranger?', 'How many bags are needed to hold them all?'], full + 1);
+  },
+  budget(c) {
+    const { R, v } = c; const n = R.int(2, 5), x = R.int(2, 6), y = R.int(2, 5), B = R.pick([20, 25, 30, 40, 50].filter((b) => b > n * x + y + 3));
+    Object.assign(v, { n, x, y, B });
+    const s = [['À la boutique, {p} a {B} $. {Il} achète {n} cahiers à {x} $ chacun et un crayon à {y} $.', 'At the shop, {p} has ${B}. {He} buys {n} notebooks at ${x} each and a pencil for ${y}.']];
+    return mk3('bu', c, s, ['Combien d’argent lui reste-t-il?', 'How much money does {he} have left?'], B - n * x - y);
+  },
+  share(c) {
+    const { R, v } = c; const k = R.pick([2, 4, 5]); let a, b; do { a = R.int(20, 90); b = R.int(20, 90); } while ((a + b) % k); Object.assign(v, { a, b, k });
+    const s = [['{p} a {a} {nf} et {q} en a {b}. Ils mettent tout ensemble et partagent également entre {k} amis.', '{p} has {a} {ne} and {q} has {b}. They put them together and share equally among {k} friends.']];
+    return mk3('sh', c, s, ['Combien {dnf} chaque ami reçoit-il?', 'How many {ne} does each friend get?'], (a + b) / k);
+  },
+};
+NEW.m7 = (L, R) => {
+  const c = SB(R, L);
+  const kinds = L === 2 ? ['add3', 'sub3', 'cmp3', 'two3', 'grp', 'miss3', 'two3', 'cmp3'] : ['two4', 'after', 'start', 'times', 'rem', 'budget', 'share', 'two4', 'after'];
+  return M7[R.pick(kinds)](c);
+};
+
+// ---------- m8 ----------
+const SEQSTEPS2 = [4, 6, 8, 25, 50, 100, -25, -50, -100], SEQSTEPS3 = [75, 125, 150, 250, 500, 1000, -125, -250, -500, -1000, 35, 60];
+const stepT = (s) => (s > 0 ? T(`ajouter ${s}`, `add ${s}`) : T(`soustraire ${-s}`, `subtract ${-s}`));
+NEW.m8 = (L, R) => {
+  const k = R.int(0, L === 2 ? 3 : 5);
+  if (k === 0 || (L === 2 && k === 3)) {
+    const step = R.pick(L === 2 ? SEQSTEPS2 : SEQSTEPS3), a = Math.abs(step);
+    const hi = L === 2 ? 1000 : 9999;
+    const start = step < 0 ? R.int(a * 6, Math.min(hi, a * 6 + (L === 2 ? 400 : 1500))) : R.int(0, Math.max(10, Math.min(hi - a * 6, L === 2 ? 500 : 3000)));
+    const seq = Array.from({ length: 6 }, (_, i) => start + i * step), hole = R.int(1, 5);
+    return kp(`seq${seq.join(',')}h${hole}`, T('Quel nombre manque dans la suite?', 'Which number is missing?'), tx(seq.map((v, i) => (i === hole ? '?' : NB2(v))).join(' ,  ')), seq[hole]);
+  }
+  if (k === 1) {
+    const pool = L === 2 ? [2, 3, 4, 5, 6, 8, 10, 15, 20, 25, 30, 40, 50, 100] : [15, 25, 50, 75, 100, 125, 150, 200, 250, 500, 1000];
+    const s0 = R.pick(pool), neg = R.chance(0.3), step = neg ? -s0 : s0;
+    const start = neg ? s0 * 6 + R.int(0, 200) : R.int(0, 400), seq = Array.from({ length: 5 }, (_, i) => start + i * step);
+    const ds = R.sample(pool.filter((x) => x !== s0), 3);
+    return { type: 'choice', key: `rl${seq.join(',')}`, prompt: T('Quelle est la règle de cette suite?', 'What is the rule of this pattern?'), stimulus: tx(seq.map(NB2).join(' ,  ')), options: [step, ...ds.map((d) => (neg ? -d : d))].map((s) => ({ text: stepT(s) })), answer: 0, cols: 2 };
+  }
+  if (k === 2 && L === 2) {
+    const step = R.pick([2, 4, 6, 10, 20, 3, 5, 7, 9, 15]), start = R.int(1, 30), seq = [0, 1, 2, 3, 4].map((i) => start + i * step);
+    const even = step % 2 === 0, ans = even ? (start % 2 === 0 ? 0 : 1) : 2;
+    return { type: 'choice', key: `par${seq.join(',')}`, prompt: T('Que remarques-tu sur ces nombres?', 'What do you notice about these numbers?'), stimulus: tx(seq.join(' ,  ') + ' …'), options: [{ text: T('tous pairs', 'all even') }, { text: T('tous impairs', 'all odd') }, { text: T('pair, impair, pair, impair…', 'even, odd, even, odd…') }], answer: ans, fixedOrder: true, cols: 1 };
+  }
+  if (k === 2) {
+    const s0 = R.int(2, 12), n = R.int(0, 2) + 3, seq = Array.from({ length: 6 }, (_, i) => s0 * 2 ** i), hole = R.int(3, 5);
+    return kp(`dbl${seq.join(',')}h${hole}`, T('Chaque nombre est le double du précédent. Quel nombre manque?', 'Each number is double the one before. Which number is missing?'), tx(seq.map((v, i) => (i === hole ? '?' : NB2(v))).join(' ,  ')), seq[hole]);
+  }
+  if (k === 3) {
+    const a = R.int(1, 30), x = R.int(2, 12); let y = R.int(2, 12); if (y === x) y++;
+    const seq = [a]; for (let i = 0; i < 6; i++) seq.push(seq[i] + (i % 2 === 0 ? x : y));
+    return kp(`alt${seq.join(',')}`, T('La suite change de deux façons, à tour de rôle. Quel nombre suit?', 'The pattern alternates between two steps. Which number comes next?'), tx(seq.slice(0, 6).join(' ,  ') + ' ,  ?'), seq[6]);
+  }
+  if (k === 4) {
+    const s0 = R.int(3, 9), a = R.int(2, 12), r = R.int(7, 12);
+    return kp(`rk${a}_${s0}_${r}`, T(`Une suite commence par ${a} et on ajoute ${s0} chaque fois : ${a}, ${a + s0}, ${a + 2 * s0}… Quel est le ${r}e nombre?`, `A pattern starts at ${a} and adds ${s0} each time: ${a}, ${a + s0}, ${a + 2 * s0}… What is the ${r}th number?`), null, a + (r - 1) * s0);
+  }
+  const s0 = R.pick([25, 50, 100, 250, 500]), n = R.int(4, 16), a = R.int(0, 8) * s0 * (s0 >= 250 ? 1 : 2);
+  return kp(`bd${s0}_${a}_${n}`, T(`On compte de ${s0} en ${s0}, de ${NB2(a)} à ${NB2(a + n * s0)}. Combien de bonds fait-on?`, `We count by ${s0}s from ${NBe(a)} to ${NBe(a + n * s0)}. How many jumps do we make?`), null, n);
+};
+
+// ---------- m9 ----------
+const frT = (a, b) => `${a}/${b}`;
+const eqFr = (a, b, c, d) => a * d === b * c;
+const DENF = { 2: ['demis', 'halves'], 3: ['tiers', 'thirds'], 4: ['quarts', 'quarters'], 5: ['cinquièmes', 'fifths'], 6: ['sixièmes', 'sixths'], 8: ['huitièmes', 'eighths'], 10: ['dixièmes', 'tenths'] };
+NEW.m9 = (L, R) => {
+  const kind = R.pick(['rect', 'circle']);
+  if (L === 2) {
+    const k = R.int(0, 5);
+    if (k === 0) {
+      const d = R.pick([2, 3, 4, 5, 10]), each = R.int(2, d === 10 ? 8 : 9), n = d * each, nm = { 2: 'la moitié', 3: 'le tiers', 4: 'le quart', 5: 'le cinquième', 10: 'le dixième' }[d], ne = { 2: 'half', 3: 'a third', 4: 'a quarter', 5: 'a fifth', 10: 'a tenth' }[d];
+      return kp(`of${d}_${n}`, T(`Quel est ${nm} de ${n}?`, `What is ${ne} of ${n}?`), n <= 20 ? { emojis: R.pick(OBJ), count: n } : tx(String(n)), each);
+    }
+    if (k === 1) {
+      const ds = R.sample([2, 3, 4, 5, 6, 8, 10], 3), big = R.chance(0.5), t = big ? Math.min(...ds) : Math.max(...ds);
+      return { type: 'choice', key: `uf${ds.slice().sort().join('')}${big}`, prompt: big ? T('Quelle fraction est la plus grande?', 'Which fraction is the biggest?') : T('Quelle fraction est la plus petite?', 'Which fraction is the smallest?'), options: ds.map((d) => ({ text: frT(1, d) })), answer: ds.indexOf(t), fixedOrder: true, cols: 3 };
+    }
+    if (k === 2) {
+      const B = R.pick([[1, 2, [[2, 4], [3, 6], [4, 8]]], [1, 3, [[2, 6], [3, 9]]], [1, 4, [[2, 8], [3, 12]]]]), [a, b, eqs] = B, [c, d] = R.pick(eqs);
+      const pool = [[1, 2], [1, 3], [1, 4], [2, 3], [3, 4], [2, 5], [1, 5], [3, 5], [1, 6], [3, 8], [5, 6], [2, 4], [3, 6]].filter(([x, y]) => !eqFr(x, y, a, b) && !(x === c && y === d));
+      const w = R.sample(pool, 2);
+      return { type: 'choice', key: `eq${a}/${b}_${c}/${d}${w.map((p) => p.join('/')).join('')}`, prompt: T(`Quelle fraction est équivalente à ${frT(a, b)}?`, `Which fraction is equivalent to ${frT(a, b)}?`), stimulus: { svg: S.fraction(b, a, kind, true) }, options: [[c, d], ...w].map(([x, y]) => ({ text: frT(x, y) })), answer: 0, cols: 3 };
+    }
+    if (k === 3) {
+      const d = R.pick([3, 4, 5]), each = R.int(2, 8), n = d * each, p = R.pick(PEOPLE), th = R.pick(THINGS), eat = R.chance(0.5);
+      const w = { 3: ['le tiers', 'a third'], 4: ['le quart', 'a quarter'], 5: ['le cinquième', 'a fifth'] }[d];
+      const fr = `${p.n} a ${n} ${th.fr[1]}. ${Il(p)} en ${eat ? 'mange' : 'donne'} ${w[0]}. Combien ${eat ? 'en reste-t-il' : 'lui en reste-t-il'}?`, en = `${p.n} has ${n} ${th.en[1]}. ${He(p)} ${eat ? 'eats' : 'gives away'} ${w[1]}. How many are left?`;
+      return kp(`fq${d}_${n}${p.n}${eat}`, T(fr, en), { emoji: th.e }, n - each, SAY(fr, en));
+    }
+    if (k === 4) {
+      const n = R.pick([3, 4, 5, 6, 8]), sh = R.int(1, n - 1);
+      const cands = [[sh + 1, n], [sh - 1, n], [sh, n + 1], [n - sh, n], [sh, n - 1]].filter(([a, b]) => a >= 1 && a < b && !eqFr(a, b, sh, n));
+      const uniq = []; for (const c of cands) if (!uniq.some((u) => eqFr(u[0], u[1], c[0], c[1]))) uniq.push(c);
+      const wrong = R.sample(uniq, 2);
+      return { type: 'choice', key: `frk${sh}/${n}${kind}`, prompt: T('Quelle fraction est coloriée?', 'Which fraction is coloured?'), stimulus: { svg: S.fraction(n, sh, kind, true) }, options: [[sh, n], ...wrong].map(([a, b]) => ({ text: frT(a, b) })), answer: 0, cols: 3 };
+    }
+    const n = R.pick([3, 4, 5, 6, 8]), sh = R.int(1, n - 1);
+    const cands = [[sh, n], [n - sh + 1, n], [sh, n - 1], [sh + 1, n]].filter(([a, b]) => a >= 1 && a < b && !eqFr(a, b, n - sh, n));
+    const uniq = []; for (const c of cands) if (!uniq.some((u) => eqFr(u[0], u[1], c[0], c[1]))) uniq.push(c);
+    return { type: 'choice', key: `frn${sh}/${n}${kind}`, prompt: T('Quelle fraction n’est PAS coloriée?', 'Which fraction is NOT coloured?'), stimulus: { svg: S.fraction(n, sh, kind, true) }, options: [[n - sh, n], ...R.sample(uniq, 2)].map(([a, b]) => ({ text: frT(a, b) })), answer: 0, cols: 3 };
+  }
+  const k = R.int(0, 6);
+  if (k === 0) {
+    const d = R.pick([3, 4, 5]), a = R.int(2, d - 1), each = R.int(2, 12), n = d * each;
+    const nm = { 3: ['tiers', 'thirds'], 4: ['quarts', 'quarters'], 5: ['cinquièmes', 'fifths'] }[d];
+    return kp(`fa${a}/${d}_${n}`, T(`Quelle est la valeur de ${a}/${d} de ${n}?`, `What is ${a}/${d} of ${n}?`), n <= 20 ? { emojis: R.pick(OBJ), count: n } : null, a * each);
+  }
+  if (k === 1) {
+    const d = R.pick([2, 3, 4, 5]), a = R.int(1, d - 1), N = R.pick({ 2: [10, 20], 3: [12, 15], 4: [12, 16, 20], 5: [10, 15, 20] }[d]);
+    const ans = (a * N) / d;
+    return { type: 'numberline', key: `fnl${a}/${d}_${N}`, prompt: T(`Touche ${a}/${d} de ${N}.`, `Tap ${a}/${d} of ${N}.`), min: 0, max: N, step: N / d, answer: ans };
+  }
+  if (k === 2) {
+    const d = R.pick([4, 5, 6, 8, 10]), add = R.chance(0.6);
+    let a, b;
+    if (add) { a = R.int(1, d - 2); b = R.int(1, d - 1 - a); } else { a = R.int(3, d - 1); b = R.int(1, a - 1); }
+    return kp(`fs${a}${add ? '+' : '-'}${b}/${d}`, T('Quel nombre manque?', 'Which number is missing?'), tx(`${a}/${d} ${add ? '+' : '−'} ${b}/${d} = ?/${d}`), add ? a + b : a - b);
+  }
+  if (k === 3) {
+    const same = R.chance(0.5), big = R.chance(0.5);
+    let opts;
+    if (same) { const d = R.int(5, 12), ns = R.sample([...Array(d - 1).keys()].map((x) => x + 1), 3); opts = ns.map((n) => [n, d]); const t = big ? Math.max(...ns) : Math.min(...ns); return { type: 'choice', key: `cs${d}_${ns.slice().sort().join('')}${big}`, prompt: big ? T('Quelle fraction est la plus grande?', 'Which fraction is the biggest?') : T('Quelle fraction est la plus petite?', 'Which fraction is the smallest?'), options: opts.map(([a, b]) => ({ text: frT(a, b) })), answer: ns.indexOf(t), fixedOrder: true, cols: 3 }; }
+    const n0 = R.int(1, 3), ds = R.sample([4, 5, 6, 8, 10, 12].filter((d) => d > n0), 3), t = big ? Math.min(...ds) : Math.max(...ds);
+    return { type: 'choice', key: `cn${n0}_${ds.slice().sort().join('')}${big}`, prompt: big ? T('Quelle fraction est la plus grande?', 'Which fraction is the biggest?') : T('Quelle fraction est la plus petite?', 'Which fraction is the smallest?'), options: ds.map((d) => ({ text: frT(n0, d) })), answer: ds.indexOf(t), fixedOrder: true, cols: 3 };
+  }
+  if (k === 4) {
+    const d = R.pick([2, 3, 4, 5, 6, 8, 10]);
+    return kp(`whole${d}`, T(`Combien de ${DENF[d][0]} faut-il pour faire un entier?`, `How many ${DENF[d][1]} make one whole?`), null, d);
+  }
+  if (k === 5) {
+    const [a, b] = R.pick([[1, 2], [1, 3], [2, 3], [1, 4], [3, 4], [2, 5]]), m = R.int(2, 4);
+    return kp(`mx${a}/${b}x${m}`, T('Quel nombre manque?', 'Which number is missing?'), tx(`${a}/${b} = ?/${b * m}`), a * m);
+  }
+  const d = R.pick([3, 4, 5]), a = R.int(1, d - 1), each = R.int(3, 10), n = d * each, p = R.pick(PEOPLE);
+  const fr = `Dans la classe ${dn(p.n)}, il y a ${n} élèves. ${a}/${d} des élèves font du patin. Combien d’élèves ne font pas de patin?`, en = `In ${p.n}’s class there are ${n} students. ${a}/${d} of the students skate. How many students do not skate?`;
+  return kp(`fst${a}/${d}_${n}`, T(fr, en), { emoji: '⛸️' }, n - a * each, SAY(fr, en));
+};
+
+// ---------- m10 ----------
+const gridRows = (w, h, cut) => { const rows = []; for (let j = 0; j < h; j++) { let r = ''; for (let i = 0; i < w; i++) r += cut && i >= w - cut[0] && j >= h - cut[1] ? '.' : '#'; rows.push(r); } return rows; };
+const countRows = (rows) => rows.join('').split('#').length - 1;
+NEW.m10 = (L, R) => {
+  const COLS = [S.COLORS.blue, S.COLORS.green, S.COLORS.orange, S.COLORS.pink, S.COLORS.purple];
+  const k = R.int(0, L === 2 ? 6 : 8);
+  if (L === 2) {
+    if (k === 0) { const w = R.int(3, 12), h = R.int(2, w - 1 > 2 ? Math.min(w - 1, 9) : 2); return kp(`pr${w}x${h}`, T('Quel est le périmètre de ce rectangle? (en cm)', 'What is the perimeter of this rectangle? (in cm)'), { svg: S.rectSides(w, h) }, 2 * (w + h)); }
+    if (k === 1) {
+      const sides = R.pick([3, 4, 5]), v = Array.from({ length: sides }, () => R.int(2, 12)), nm = { 3: ['triangle', 'triangle'], 4: ['quadrilatère', 'quadrilateral'], 5: ['pentagone', 'pentagon'] }[sides];
+      return kp(`pl${v.join(',')}`, T(`Un ${nm[0]} a des côtés de ${v.join(' cm, ')} cm. Quel est son périmètre (en cm)?`, `A ${nm[1]} has sides of ${v.join(' cm, ')} cm. What is its perimeter (in cm)?`), null, sumArr(v));
+    }
+    if (k === 2) { const w = R.int(2, 7), h = R.int(2, 5), rows = gridRows(w, h); return kp(`ar${w}x${h}`, T('Combien de carrés y a-t-il dans cette figure? (aire en carrés-unités)', 'How many squares are in this shape? (area in square units)'), { svg: S.areaGrid(rows, R.pick(COLS)) }, w * h); }
+    if (k === 3) {
+      const w = R.int(3, 7), h = R.int(3, 5), cw = R.int(1, 2), ch = R.int(1, 2), rows = gridRows(w, h, [cw, ch]);
+      return kp(`arL${w}x${h}-${cw}x${ch}`, T('Combien de carrés y a-t-il dans cette figure?', 'How many squares are in this shape?'), { svg: S.areaGrid(rows, R.pick(COLS)) }, countRows(rows));
+    }
+    if (k === 4) {
+      const F = [
+        ['cube', 'Combien de faces a un cube?', 'How many faces does a cube have?', 6], ['cube', 'Combien d’arêtes a un cube?', 'How many edges does a cube have?', 12], ['cube', 'Combien de sommets a un cube?', 'How many vertices does a cube have?', 8],
+        ['pyramide', 'Combien de faces a cette pyramide à base carrée?', 'How many faces does this square-based pyramid have?', 5], ['pyramide', 'Combien d’arêtes a cette pyramide à base carrée?', 'How many edges does this square-based pyramid have?', 8],
+        ['prisme', 'Combien de faces a ce prisme à base rectangulaire?', 'How many faces does this rectangular prism have?', 6], ['prisme', 'Combien d’arêtes a ce prisme à base rectangulaire?', 'How many edges does this rectangular prism have?', 12],
+      ];
+      const [s, fr, en, ans] = R.pick(F);
+      return kp(`fc${fr}`, T(fr, en), { svg: S.solid(s) }, ans, SAY(fr, en));
+    }
+    if (k === 5) {
+      const Q = [
+        ['Quelle figure a 4 côtés égaux et 4 angles droits?', 'Which shape has 4 equal sides and 4 right angles?', 'carre'],
+        ['Quelle figure a 4 côtés, dont 2 longs et 2 courts, et 4 angles droits?', 'Which shape has 4 sides (2 long, 2 short) and 4 right angles?', 'rectangle'],
+        ['Quelle figure a 3 côtés?', 'Which shape has 3 sides?', 'triangle'], ['Quelle figure a 6 côtés?', 'Which shape has 6 sides?', 'hexagone'], ['Quelle figure a 5 côtés?', 'Which shape has 5 sides?', 'pentagone'],
+        ['Quelle figure a 4 côtés égaux, mais pas d’angle droit?', 'Which shape has 4 equal sides but no right angle?', 'losange'],
+      ];
+      const NM = { carre: T('carré', 'square'), rectangle: T('rectangle', 'rectangle'), triangle: T('triangle', 'triangle'), hexagone: T('hexagone', 'hexagon'), pentagone: T('pentagone', 'pentagon'), losange: T('losange', 'rhombus'), cercle: T('cercle', 'circle') };
+      const [fr, en, ans] = R.pick(Q), d = R.sample(Object.keys(NM).filter((x) => x !== ans && !(ans === 'carre' && x === 'losange') && !(ans === 'losange' && x === 'carre') && !(ans === 'rectangle' && x === 'carre') && !(ans === 'carre' && x === 'rectangle')), 3);
+      return { type: 'choice', key: `rd${ans}${d.join('')}`, prompt: T(fr, en), say: SAY(fr, en), options: [ans, ...d].map((x) => ({ text: NM[x] })), answer: 0, cols: 2 };
+    }
+    const P = [['un rectangle', 'a rectangle', 2], ['un carré', 'a square', 2], ['un losange', 'a rhombus', 2], ['un hexagone régulier', 'a regular hexagon', 3], ['un triangle', 'a triangle', 0]];
+    const [fr, en] = R.pick([['un rectangle', 'a rectangle'], ['un carré', 'a square'], ['un losange', 'a rhombus']]);
+    return kp(`par${fr}`, T(`Combien de paires de côtés parallèles a ${fr}?`, `How many pairs of parallel sides does ${en} have?`), null, 2);
+  }
+  if (k === 0) { const w = R.int(4, 18), h = R.int(2, 12); return kp(`pr${w}x${h}`, T('Quel est le périmètre de ce rectangle? (en cm)', 'What is the perimeter of this rectangle? (in cm)'), { svg: S.rectSides(w, h) }, 2 * (w + h)); }
+  if (k === 1) { const w = R.int(3, 10), h = R.int(2, 10), P = 2 * (w + h); return kp(`pm${P}_${w}`, T(`Un rectangle a un périmètre de ${P} cm et une longueur de ${w} cm. Quelle est sa largeur (en cm)?`, `A rectangle has a perimeter of ${P} cm and a length of ${w} cm. What is its width (in cm)?`), null, h); }
+  if (k === 2) { const w = R.int(3, 12), h = R.int(2, 9); return kp(`ad${w}x${h}`, T(`Un rectangle mesure ${w} cm sur ${h} cm. Quelle est son aire (en cm²)?`, `A rectangle is ${w} cm by ${h} cm. What is its area (in cm²)?`), { svg: S.rectSides(w, h) }, w * h); }
+  if (k === 3) {
+    const w = R.int(4, 8), h = R.int(4, 6), cw = R.int(1, w - 2), ch = R.int(1, h - 2), rows = gridRows(w, h, [cw, ch]);
+    return kp(`arL${w}x${h}-${cw}x${ch}`, T('Quelle est l’aire de cette figure? (en carrés-unités)', 'What is the area of this shape? (in square units)'), { svg: S.areaGrid(rows, R.pick(COLS)) }, countRows(rows));
+  }
+  if (k === 4) { const s = R.int(3, 25); return kp(`psq${s}`, T(`Un carré a des côtés de ${s} cm. Quel est son périmètre (en cm)?`, `A square has sides of ${s} cm. What is its perimeter (in cm)?`), null, 4 * s); }
+  if (k === 5 || k === 6) {
+    const n = R.pick([3, 4, 5, 6, 8]), nm = { 3: ['triangulaire', 'triangular'], 4: ['carrée', 'square'], 5: ['pentagonale', 'pentagonal'], 6: ['hexagonale', 'hexagonal'], 8: ['octogonale', 'octagonal'] }[n];
+    if (R.chance(0.5)) {
+      const Q = [['faces', 'faces', n + 2], ['arêtes', 'edges', 3 * n], ['sommets', 'vertices', 2 * n]], [af, ae, ans] = R.pick(Q);
+      return kp(`pz${n}${af}`, T(`Combien ${af === 'arêtes' ? 'd’' : 'de '}${af} a un prisme à base ${nm[0]}?`, `How many ${ae} does a prism with a ${nm[1]} base have?`), null, ans);
+    }
+    const Q = [['faces', 'faces', n + 1], ['arêtes', 'edges', 2 * n], ['sommets', 'vertices', n + 1]], [af, ae, ans] = R.pick(Q);
+    return kp(`py${n}${af}`, T(`Combien ${af === 'arêtes' ? 'd’' : 'de '}${af} a une pyramide à base ${nm[0]}?`, `How many ${ae} does a pyramid with a ${nm[1]} base have?`), null, ans);
+  }
+  const SY = [['carré', 'square', 4], ['rectangle', 'rectangle', 2], ['triangle équilatéral', 'equilateral triangle', 3], ['losange', 'rhombus', 2], ['hexagone régulier', 'regular hexagon', 6], ['pentagone régulier', 'regular pentagon', 5]];
+  const [fr, en, ans] = R.pick(SY);
+  return kp(`axes${fr}`, T(`Combien d’axes de symétrie a un ${fr}?`, `How many lines of symmetry does a ${en} have?`), null, ans);
+};
+
+// ---------- m11 ----------
+const h24 = (h, m) => `${h} h${m ? ' ' + String(m).padStart(2, '0') : ''}`;
+const tOpt = (tot) => { const t = ((tot % 1440) + 1440) % 1440, h = Math.floor(t / 60), m = t % 60; return T(h24(h, m), `${h}:${String(m).padStart(2, '0')}`); };
+const durT = (d) => { const h = Math.floor(d / 60), m = d % 60; return T(`${h ? h + ' h' : ''}${h && m ? ' ' : ''}${m ? m + ' min' : ''}`, `${h ? h + ' h' : ''}${h && m ? ' ' : ''}${m ? m + ' min' : ''}`); };
+const timeOK = (v) => v >= 0 && v < 1440;
+const EV = [['Le film', 'The movie'], ['Le spectacle', 'The show'], ['La partie de hockey', 'The hockey game'], ['Le cours de natation', 'The swimming class'], ['La pièce de théâtre', 'The play']];
+NEW.m11 = (L, R) => {
+  const k = R.int(0, 5);
+  const lenConv = () => {
+    const m = R.int(0, 3);
+    if (m === 0) { const x = R.int(2, 9); return kp(`c${x}mcm`, T(`${x} m = ? cm`, `${x} m = ? cm`), null, x * 100); }
+    if (m === 1) { const x = R.int(2, 15); return kp(`c${x}cmmm`, T(`${x} cm = ? mm`, `${x} cm = ? mm`), null, x * 10); }
+    if (m === 2) { const x = R.int(2, 9); return kp(`c${x}00cm`, T(`${NB2(x * 100)} cm = ? m`, `${NBe(x * 100)} cm = ? m`), null, x); }
+    const x = R.int(3, 15); return kp(`c${x}0mm`, T(`${x * 10} mm = ? cm`, `${x * 10} mm = ? cm`), null, x);
+  };
+  if (L === 2) {
+    if (k === 0) {
+      const h = R.int(1, 12), m = R.int(0, 11) * 5, tot = h * 60 + m, sw = (m === 0 ? 12 : m / 5) * 60 + h * 5;
+      return numQ(R, `ck${h}:${m}`, T('Quelle heure est-il?', 'What time is it?'), { svg: S.clock(h, m) }, tot, [sw, tot + 5, tot - 5, tot + 10, tot - 10, tot + 60], { fmt: (v) => T(h24(Math.floor(v / 60), v % 60), `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`), cols: 2, valid: (v) => v >= 60 && v < 780 && v % 5 === 0 });
+    }
+    if (k === 1) {
+      const sh = R.int(8, 18), sm = R.int(0, 11) * 5, d = R.pick([20, 25, 30, 35, 40, 45, 50, 55, 60, 75, 80, 90]), ev = R.pick(EV), st = sh * 60 + sm;
+      return numQ(R, `fin${st}+${d}${ev[0]}`, T(`${ev[0]} commence à ${h24(sh, sm)} et dure ${durT(d).fr}. À quelle heure finit-il?`, `${ev[1]} starts at ${sh}:${String(sm).padStart(2, '0')} and lasts ${durT(d).en}. What time does it end?`), null, st + d, [st + d + 10, st + d - 10, st + d + 60, st + d - 5, st + d + 30, st - d], { fmt: tOpt, cols: 2, valid: timeOK });
+    }
+    if (k === 2) return lenConv();
+    if (k === 3) {
+      const vals = R.sample([30, 80, 120, 150, 200, 250, 5, 450, 700], 3), U = (v) => (v >= 100 && v % 100 === 0 ? T(`${v / 100} m`, `${v / 100} m`) : T(`${v} cm`, `${v} cm`));
+      const mixed = vals.map((v, i) => (i === 0 && v >= 100 && v % 100 === 0 ? { cm: v, t: U(v) } : i === 1 ? { cm: v, t: T(`${v * 10} mm`, `${v * 10} mm`) } : { cm: v, t: U(v) }));
+      const big = R.chance(0.5), t = mixed.reduce((a, b) => ((big ? b.cm > a.cm : b.cm < a.cm) ? b : a));
+      if (new Set(mixed.map((x) => x.cm)).size < 3) return NEW.m11(L, R);
+      return { type: 'choice', key: `lm${mixed.map((x) => x.t.fr).join('|')}${big}`, prompt: big ? T('Quelle longueur est la plus grande?', 'Which length is the longest?') : T('Quelle longueur est la plus petite?', 'Which length is the shortest?'), options: mixed.map((x) => ({ text: x.t })), answer: mixed.indexOf(t), fixedOrder: true, cols: 3 };
+    }
+    if (k === 4) {
+      const Q = [['Combien de jours y a-t-il dans 3 semaines?', 'How many days are in 3 weeks?', 21], ['Combien de jours y a-t-il dans 4 semaines?', 'How many days are in 4 weeks?', 28], ['Combien de minutes y a-t-il dans 2 heures?', 'How many minutes are in 2 hours?', 120], ['Combien de minutes y a-t-il dans 3 heures?', 'How many minutes are in 3 hours?', 180], ['Combien de secondes y a-t-il dans 2 minutes?', 'How many seconds are in 2 minutes?', 120], ['Combien de mois y a-t-il dans 2 ans?', 'How many months are in 2 years?', 24], ['Combien de jours y a-t-il en février (année normale)?', 'How many days are in February (normal year)?', 28], ['Combien de minutes y a-t-il dans une heure et demie?', 'How many minutes are in one and a half hours?', 90]];
+      const [fr, en, ans] = R.pick(Q); return kp(`tq${fr}`, T(fr, en), null, ans, SAY(fr, en));
+    }
+    const m = R.int(0, 3);
+    if (m === 0) { const x = R.int(2, 9); return kp(`kg${x}`, T(`${x} kg = ? g`, `${x} kg = ? g`), null, x * 1000); }
+    if (m === 1) { const x = R.int(2, 9); return kp(`L${x}`, T(`${x} L = ? mL`, `${x} L = ? mL`), null, x * 1000); }
+    if (m === 2) { const x = R.int(2, 9); return kp(`g${x}`, T(`${x * 1000} g = ? kg`, `${x * 1000} g = ? kg`), null, x); }
+    const x = R.int(2, 9); return kp(`mL${x}`, T(`${x * 1000} mL = ? L`, `${x * 1000} mL = ? L`), null, x);
+  }
+  if (k === 0) {
+    const sh = R.int(7, 17), sm = R.int(0, 11) * 5, eh = sh + R.int(1, 3), em = R.int(0, 11) * 5, d = (eh * 60 + em) - (sh * 60 + sm);
+    if (d < 25) return NEW.m11(L, R);
+    return kp(`du${sh}:${sm}-${eh}:${em}`, T(`De ${h24(sh, sm)} à ${h24(eh, em)}, combien de minutes y a-t-il?`, `From ${sh}:${String(sm).padStart(2, '0')} to ${eh}:${String(em).padStart(2, '0')}, how many minutes are there?`), null, d);
+  }
+  if (k === 1) {
+    const sh = R.int(8, 20), sm = R.int(0, 11) * 5, d = R.pick([65, 70, 85, 95, 105, 110, 125, 135, 150]), ev = R.pick(EV), st = sh * 60 + sm;
+    return numQ(R, `fin${st}+${d}${ev[0]}`, T(`${ev[0]} commence à ${h24(sh, sm)} et dure ${durT(d).fr}. À quelle heure finit-il?`, `${ev[1]} starts at ${sh}:${String(sm).padStart(2, '0')} and lasts ${durT(d).en}. What time does it end?`), null, st + d, [st + d + 10, st + d - 10, st + d + 60, st + d - 60, st + d + 40, st + d - 20, st + d + 5], { fmt: tOpt, cols: 2, valid: (v) => v >= 0 && v < 1440 });
+  }
+  if (k === 2) {
+    const eh = R.int(10, 21), em = R.int(0, 11) * 5, d = R.pick([75, 80, 95, 105, 115, 130, 145]), ev = R.pick(EV), en = eh * 60 + em;
+    return numQ(R, `deb${en}-${d}${ev[0]}`, T(`${ev[0]} finit à ${h24(eh, em)} et dure ${durT(d).fr}. À quelle heure commence-t-il?`, `${ev[1]} ends at ${eh}:${String(em).padStart(2, '0')} and lasts ${durT(d).en}. What time does it start?`), null, en - d, [en - d + 10, en - d - 10, en - d + 60, en - d - 60, en - d + 20, en - d - 5], { fmt: tOpt, cols: 2, valid: timeOK });
+  }
+  if (k === 3) {
+    const m = R.int(0, 4);
+    if (m === 0) { const a = R.int(1, 9), b = R.int(10, 95); return kp(`mc${a}_${b}`, T(`${a} m ${b} cm = ? cm`, `${a} m ${b} cm = ? cm`), null, a * 100 + b); }
+    if (m === 1) { const a = R.int(1, 9), b = R.int(1, 9); return kp(`km${a}_${b}`, T(`${a} km ${b}00 m = ? m`, `${a} km ${b}00 m = ? m`), null, a * 1000 + b * 100); }
+    if (m === 2) { const a = R.int(2, 9); return kp(`kk${a}`, T(`${a} km = ? m`, `${a} km = ? m`), null, a * 1000); }
+    if (m === 3) { const a = R.int(1, 9), b = R.int(1, 9); return kp(`cmm${a}_${b}`, T(`${a} cm ${b} mm = ? mm`, `${a} cm ${b} mm = ? mm`), null, a * 10 + b); }
+    const a = R.int(2, 15) * 100; return kp(`mm${a}`, T(`${NB2(a)} cm = ? m`, `${NBe(a)} cm = ? m`), null, a / 100);
+  }
+  if (k === 4) {
+    const m = R.int(0, 3);
+    if (m === 0) { const h = R.int(1, 4), mi = R.pick([15, 20, 30, 40, 45, 50]); return kp(`hm${h}_${mi}`, T(`${h} h ${mi} min = ? min`, `${h} h ${mi} min = ? min`), null, h * 60 + mi); }
+    if (m === 1) { const h = R.int(3, 9), extra = R.int(5, 55); return kp(`hf${h}_${extra}`, T(`Combien d’heures complètes y a-t-il dans ${h * 60 + extra} minutes?`, `How many full hours are there in ${h * 60 + extra} minutes?`), null, h); }
+    if (m === 2) { const mi = R.int(2, 9); return kp(`sec${mi}`, T(`${mi} minutes = ? secondes`, `${mi} minutes = ? seconds`), null, mi * 60); }
+    const d = R.int(3, 8); return kp(`dw${d}`, T(`${d} semaines et 3 jours = ? jours`, `${d} weeks and 3 days = ? days`), null, d * 7 + 3);
+  }
+  const m = R.int(0, 3);
+  if (m === 0) { const a = R.int(1, 9), b = R.int(1, 9); return kp(`kgg${a}_${b}`, T(`${a} kg ${b}00 g = ? g`, `${a} kg ${b}00 g = ? g`), null, a * 1000 + b * 100); }
+  if (m === 1) { const a = R.int(1, 9), b = R.int(1, 9); return kp(`Lm${a}_${b}`, T(`${a} L ${b}00 mL = ? mL`, `${a} L ${b}00 mL = ? mL`), null, a * 1000 + b * 100); }
+  if (m === 2) return lenConv();
+  const a = R.int(1, 9) * 1000 + R.int(0, 9) * 100; return kp(`gk${a}`, T(`Combien de kilogrammes complets y a-t-il dans ${NB2(a)} g?`, `How many full kilograms are there in ${NBe(a)} g?`), null, Math.floor(a / 1000));
+};
+
+// ---------- m12 ----------
+const SPORTS = [['Hockey', 'Hockey', '🏒'], ['Soccer', 'Soccer', '⚽'], ['Natation', 'Swimming', '🏊'], ['Vélo', 'Biking', '🚲'], ['Danse', 'Dance', '💃'], ['Judo', 'Judo', '🥋'], ['Ski', 'Skiing', '⛷️']];
+const BAGC = [['rouges', 'red', '🔴'], ['bleues', 'blue', '🔵'], ['vertes', 'green', '🟢'], ['jaunes', 'yellow', '🟡']];
+NEW.m12 = (L, R) => {
+  const k = R.int(0, L === 2 ? 4 : 6);
+  const n = L === 2 ? 4 : 5, sp = R.sample(SPORTS, n);
+  if (k <= 1) { // scaled bar graph
+    const [max, step, mult] = L === 2 ? [40, 5, 5] : R.pick([[100, 10, 5], [60, 10, 5], [100, 20, 10]]);
+    const vals = R.sample(Array.from({ length: max / mult }, (_, i) => (i + 1) * mult), n);
+    const data = sp.map((s, i) => ({ label: s[0], value: vals[i] })), chart = S.barChartScaled(data, { max, step });
+    const [a, b] = R.sample(data, 2), [hi, lo] = a.value > b.value ? [a, b] : [b, a];
+    const kind = R.pick(L === 2 ? ['one', 'diff', 'most'] : ['diff', 'tot', 'two', 'least']);
+    const base = `bs${data.map((x) => x.label + x.value).join()}${max}`;
+    if (kind === 'one') return kp(`${base}o${a.label}`, T(`Combien d’élèves choisissent ${a.label}?`, `How many students choose ${a.label}?`), { svg: chart }, a.value);
+    if (kind === 'diff') return kp(`${base}d${hi.label}${lo.label}`, T(`Combien d’élèves de plus choisissent ${hi.label} que ${lo.label}?`, `How many more students choose ${hi.label} than ${lo.label}?`), { svg: chart }, hi.value - lo.value);
+    if (kind === 'tot') return kp(`${base}t`, T('Combien d’élèves ont répondu en tout?', 'How many students answered in all?'), { svg: chart }, sumArr(vals));
+    if (kind === 'two') return kp(`${base}w${a.label}${b.label}`, T(`Combien d’élèves choisissent ${a.label} ou ${b.label}?`, `How many students choose ${a.label} or ${b.label}?`), { svg: chart }, a.value + b.value);
+    const best = data.reduce((x, y) => ((kind === 'most' ? y.value > x.value : y.value < x.value) ? y : x));
+    return { type: 'choice', key: `${base}${kind}`, prompt: kind === 'most' ? T('Quel sport est le plus populaire?', 'Which sport is the most popular?') : T('Quel sport est le moins populaire?', 'Which sport is the least popular?'), stimulus: { svg: chart }, options: [best, ...data.filter((x) => x !== best).slice(0, 3)].map((x) => ({ text: x.label })), answer: 0, cols: 2 };
+  }
+  if (k === 2) { // pictogram with a scale
+    const per = L === 2 ? R.pick([2, 5]) : R.pick([5, 10]), cnt3 = L === 2 ? 4 : 5, sps = sp.slice(0, cnt3);
+    const syms = R.sample([1, 2, 3, 4, 5, 6, 7, 8], cnt3), data = sps.map((s, i) => ({ label: s[0], value: syms[i] * per })), pic = S.pictogram(data, per, R.pick(['⭐', '👤', '🧒']));
+    const [a, b] = R.sample(data, 2), [hi, lo] = a.value > b.value ? [a, b] : [b, a], kind = R.pick(L === 2 ? ['one', 'diff', 'tot'] : ['diff', 'tot', 'one', 'two']);
+    const base = `pg${data.map((x) => x.label + x.value).join()}${per}`;
+    if (kind === 'one') return kp(`${base}o${a.label}`, T(`Combien d’élèves choisissent ${a.label}?`, `How many students choose ${a.label}?`), { svg: pic }, a.value);
+    if (kind === 'diff') return kp(`${base}d${hi.label}${lo.label}`, T(`Combien d’élèves de plus choisissent ${hi.label} que ${lo.label}?`, `How many more students choose ${hi.label} than ${lo.label}?`), { svg: pic }, hi.value - lo.value);
+    if (kind === 'two') return kp(`${base}w${a.label}${b.label}`, T(`Combien d’élèves choisissent ${a.label} ou ${b.label}?`, `How many students choose ${a.label} or ${b.label}?`), { svg: pic }, a.value + b.value);
+    return kp(`${base}t`, T('Combien d’élèves ont répondu en tout?', 'How many students answered in all?'), { svg: pic }, sumArr(data.map((x) => x.value)));
+  }
+  if (k === 3 || (k === 4 && L === 3)) { // chance with a bag of marbles
+    const cs = R.sample(BAGC, 3), cn = R.sample([1, 2, 3, 4, 5, 6, 7, 8], 3), tot = sumArr(cn);
+    const bag = cs.map((c, i) => c[2].repeat(cn[i])).join(' ');
+    if (L === 2) {
+      const most = R.chance(0.5), t = most ? Math.max(...cn) : Math.min(...cn), idx = cn.indexOf(t);
+      return { type: 'choice', key: `bag${cn.join()}${cs.map((c) => c[0]).join('')}${most}`, prompt: most ? T('Je pige une bille sans regarder. Quelle couleur ai-je le plus de chances de piger?', 'I pick a marble without looking. Which colour am I most likely to pick?') : T('Je pige une bille sans regarder. Quelle couleur ai-je le moins de chances de piger?', 'I pick a marble without looking. Which colour am I least likely to pick?'), stimulus: tx(bag), options: [idx, ...[0, 1, 2].filter((i) => i !== idx)].map((i) => ({ emoji: cs[i][2], text: T(`les ${cs[i][0]}`, cs[i][1]) })), answer: 0, cols: 3 };
+    }
+    const i = R.int(0, 2), fam = R.int(0, 1);
+    if (fam === 0) {
+      const wrongs = [`${cn[i]} sur ${tot + 1}`, `${tot - cn[i]} sur ${tot}`, `${cn[i]} sur ${tot - 1}`, `${cn[i] + 1} sur ${tot}`].filter((x) => x !== `${cn[i]} sur ${tot}`);
+      return { type: 'choice', key: `pb${cn.join()}${i}`, prompt: T(`Je pige une bille sans regarder. Quelle est la chance de piger une bille ${cs[i][0].replace(/s$/, '')}?`, `I pick a marble without looking. What is the chance of picking a ${cs[i][1]} marble?`), stimulus: tx(bag), options: [`${cn[i]} sur ${tot}`, ...R.sample([...new Set(wrongs)], 3)].map((t) => ({ text: T(t, t.replace(' sur ', ' out of ')) })), answer: 0, cols: 2 };
+    }
+    return kp(`pt${cn.join()}${i}`, T(`Combien de billes y a-t-il dans le sac en tout?`, 'How many marbles are in the bag in all?'), tx(bag), tot);
+  }
+  if (k === 4) { // L2 certain/possible/impossible with a bag
+    const c = R.sample(BAGC, 2), kind = R.int(0, 2), nn = R.int(3, 6);
+    const bag = kind === 0 ? c[0][2].repeat(nn) : c[0][2].repeat(nn) + ' ' + c[1][2].repeat(R.int(1, 4));
+    const ask = kind === 2 ? c[1] : c[0];
+    const ans = kind === 0 ? 0 : kind === 1 ? 1 : 2;
+    return { type: 'choice', key: `ci${bag}${ask[0]}`, prompt: T(`Je pige une bille sans regarder. Piger une bille ${ask[0]} est…`, `I pick a marble without looking. Picking a ${ask[1]} marble is…`), stimulus: tx(bag), options: [{ text: T('certain', 'certain') }, { text: T('possible', 'possible') }, { text: T('impossible', 'impossible') }], answer: ans, fixedOrder: true, cols: 3 };
+  }
+  if (k === 5) {
+    const a = R.int(2, 5), b = R.int(2, 4), p = R.pick(PEOPLE), x = R.pick([['chandails', 'shirts', 'pantalons', 'pants'], ['tuques', 'hats', 'foulards', 'scarves'], ['saveurs de crème glacée', 'ice-cream flavours', 'cornets', 'cones']]);
+    return kp(`cb${a}${b}${x[0]}`, T(`${p.n} a ${a} ${x[0]} et ${b} ${x[2]}. Combien de combinaisons différentes peut-${il(p)} faire en choisissant un seul de chaque?`, `${p.n} has ${a} ${x[1]} and ${b} ${x[3]}. How many different combinations can ${he(p)} make by choosing one of each?`), null, a * b);
+  }
+  const DQ = [['un nombre pair', 'an even number', 3], ['un nombre impair', 'an odd number', 3], ['un nombre plus grand que 4', 'a number greater than 4', 2], ['un nombre plus petit que 3', 'a number smaller than 3', 2], ['un 6', 'a 6', 1], ['un nombre plus grand que 1', 'a number greater than 1', 5]];
+  const [dfr, den, dn2] = R.pick(DQ), others = R.sample([1, 2, 3, 4, 5].filter((x) => x !== dn2), 3);
+  return { type: 'choice', key: `dice${dfr}`, prompt: T(`Je lance un dé à 6 faces. Quelle est la chance d’obtenir ${dfr}?`, `I roll a 6-sided die. What is the chance of getting ${den}?`), options: [dn2, ...others].map((x) => ({ text: T(`${x} sur 6`, `${x} out of 6`) })), answer: 0, cols: 2 };
+};
+
+// ---------- m13 ----------
+const BOXES = [
+  ['sac', 'sacs', 'bag', 'bags', 'bonbons', 'candies', '🍬'], ['boîte', 'boîtes', 'box', 'boxes', 'crayons', 'crayons', '🖍️'], ['panier', 'paniers', 'basket', 'baskets', 'pommes', 'apples', '🍎'],
+  ['assiette', 'assiettes', 'plate', 'plates', 'biscuits', 'cookies', '🍪'], ['étagère', 'étagères', 'shelf', 'shelves', 'livres', 'books', '📘'], ['paquet', 'paquets', 'pack', 'packs', 'jus', 'juice boxes', '🧃'],
+];
+const arrPrompt = T('Combien en tout?', 'How many altogether?');
+NEW.m13 = (L, R) => {
+  const F = L === 2 ? [2, 3, 4, 5, 10] : [2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const a = R.pick(F), b = L === 2 ? R.int(2, 10) : R.int(3, 10), e = R.pick(OBJ), bx = R.pick(BOXES);
+  const k = R.int(0, L === 2 ? 6 : 9);
+  if (k === 0) return kp(`x${a}x${b}`, T('Calcule.', 'Work it out.'), tx(`${a} × ${b} = ?`), a * b);
+  if (k === 1) return R.chance(0.5) ? kp(`mf${a}x?=${a * b}`, T('Quel nombre manque?', 'Which number is missing?'), tx(`${a} × ? = ${a * b}`), b) : kp(`mg?x${b}=${a * b}`, T('Quel nombre manque?', 'Which number is missing?'), tx(`? × ${b} = ${a * b}`), a);
+  if (k === 2) return kp(`d${a * b}/${a}`, T('Calcule.', 'Work it out.'), tx(`${a * b} ÷ ${a} = ?`), b);
+  if (k === 3) { const rows = R.int(2, L === 2 ? 5 : 6), cols = R.int(L === 2 ? 3 : 4, L === 2 ? 10 : 8); return kp(`arr${rows}x${cols}${e}`, arrPrompt, { svg: S.emojiGrid(rows, cols, e) }, rows * cols, SAY('Combien en tout?', 'How many altogether?')); }
+  if (k === 4) { const fr = `Il y a ${b} ${bx[1]}. Chaque ${bx[0]} contient ${a} ${bx[4]}. Combien de ${bx[4]} y a-t-il en tout?`, en = `There are ${b} ${bx[3]}. Each ${bx[2]} holds ${a} ${bx[5]}. How many ${bx[5]} are there in all?`; return kp(`wt${a}x${b}${bx[0]}`, T(fr, en), { emoji: bx[6] }, a * b, SAY(fr, en)); }
+  if (k === 5) { const fr = `On partage ${a * b} ${bx[4]} également entre ${a} ${bx[1]}. Combien de ${bx[4]} y a-t-il dans chaque ${bx[0]}?`, en = `We share ${a * b} ${bx[5]} equally among ${a} ${bx[3]}. How many ${bx[5]} are in each ${bx[2]}?`; return kp(`ws${a * b}/${a}${bx[0]}`, T(fr, en), { emoji: bx[6] }, b, SAY(fr, en)); }
+  if (k === 6 && L === 2) return numQ(R, `xc${a}x${b}`, T('Calcule.', 'Work it out.'), tx(`${a} × ${b} = ?`), a * b, [a + b, a * b + a, a * b - a, a * b + b, a * b - b, a * (b + 1)], { fmt: String });
+  // ---- Difficile ----
+  if (k === 6) { // division with remainder
+    const kk = R.pick([3, 4, 5, 6, 7, 8, 9]), q = R.int(3, 9), r = R.int(1, kk - 1), n = kk * q + r, ask = R.int(0, 2);
+    const fr0 = `Il y a ${n} ${bx[4]}. On les met dans des ${bx[1]} de ${kk}.`, en0 = `There are ${n} ${bx[5]}. We put them in ${bx[3]} of ${kk}.`;
+    if (ask === 0) return kp(`rm${n}/${kk}a${bx[0]}`, T(`${fr0} Combien de ${bx[1]} sont complets?`, `${en0} How many ${bx[3]} are full?`), { emoji: bx[6] }, q);
+    if (ask === 1) return kp(`rm${n}/${kk}b${bx[0]}`, T(`${fr0} Combien de ${bx[4]} restent hors des ${bx[1]}?`, `${en0} How many ${bx[5]} are left over?`), { emoji: bx[6] }, r);
+    return kp(`rm${n}/${kk}c${bx[0]}`, T(`${fr0} Combien de ${bx[1]} faut-il pour tout ranger?`, `${en0} How many ${bx[3]} are needed to hold everything?`), { emoji: bx[6] }, q + 1);
+  }
+  if (k === 7) { const extra = R.int(2, 9); const fr = `${b} ${bx[1]} contiennent chacun ${a} ${bx[4]}. On ajoute encore ${extra} ${bx[4]}. Combien de ${bx[4]} y a-t-il en tout?`, en = `${b} ${bx[3]} each hold ${a} ${bx[5]}. We add ${extra} more ${bx[5]}. How many ${bx[5]} are there in all?`; return kp(`w2${a}x${b}+${extra}${bx[0]}`, T(fr, en), { emoji: bx[6] }, a * b + extra, SAY(fr, en)); }
+  if (k === 8) {
+    const n = a * b, opts = [[a, b]];
+    const dv = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12].filter((d) => n % d === 0 && n / d <= 12 && d !== a && d !== b && d !== n / a);
+    const ex = R.sample(dv, Math.min(1, dv.length));
+    if (!ex.length) return NEW.m13(L, R);
+    const good = [ex[0], n / ex[0]];
+    let bad = []; for (let g = 0; g < 60 && bad.length < 2; g++) { const x = R.int(2, 9), y = R.int(3, 9); if (x * y !== n && !bad.some((p) => p[0] === x && p[1] === y)) bad.push([x, y]); }
+    return { type: 'choice', key: `eq${n}${good}${bad.join('|')}`, prompt: T(`Quelle multiplication est égale à ${n}?`, `Which multiplication equals ${n}?`), options: [good, ...bad].map(([x, y]) => ({ text: `${x} × ${y}` })), answer: 0, cols: 3 };
+  }
+  const per = R.int(6, 12), nb = R.pick([6, 7, 8, 9]);
+  const fr = `Un hockeyeur ramasse ${nb} rondelles par minute. Combien en ramasse-t-il en ${per > 10 ? 10 : per} minutes?`, en = `A hockey player collects ${nb} pucks per minute. How many does he collect in ${per > 10 ? 10 : per} minutes?`;
+  return kp(`wr${nb}x${per > 10 ? 10 : per}`, T(fr, en), { emoji: '🏒' }, nb * (per > 10 ? 10 : per), SAY(fr, en));
+};
+
+// ---------- m14 ----------
+NEW.m14 = (L, R) => {
+  const pr = (fr, en) => T(fr, en);
+  if (L === 2) {
+    const k = R.int(0, 9);
+    if (k === 0) { const n = R.int(21, 99); return kp(`dbl${n}`, pr(`Quel est le double de ${n}?`, `What is double ${n}?`), null, 2 * n); }
+    if (k === 1) { const n = R.int(11, 99) * 2; return kp(`half${n}`, pr(`Quelle est la moitié de ${n}?`, `What is half of ${n}?`), null, n / 2); }
+    if (k === 2) { const n = R.int(21, 69), up = R.chance(0.5); return kp(`nd${n}${up}`, pr('Calcule. Astuce : pense au double!', 'Work it out. Tip: think of the double!'), tx(`${n} + ${n + (up ? 1 : 2)} = ?`), 2 * n + (up ? 1 : 2)); }
+    if (k === 3) { const a = R.pick([9, 19, 29, 39, 49, 59, 69, 79, 99]), b = R.int(14, 76); return kp(`cp${a}+${b}`, pr('Calcule. Astuce : ajoute la dizaine, puis recule de 1.', 'Work it out. Tip: add the ten, then go back 1.'), tx(`${a} + ${b} = ?`), a + b); }
+    if (k === 4) { const n = R.int(2, 99); return kp(`x10_${n}`, pr(`Calcule ${n} × 10.`, `Work out ${n} × 10.`), null, n * 10); }
+    if (k === 5) { const n = R.int(2, 99); return kp(`d10_${n}`, pr(`Calcule ${n * 10} ÷ 10.`, `Work out ${n * 10} ÷ 10.`), null, n); }
+    if (k === 6) { const a = R.int(1, 19) * 50; return kp(`c1000_${a}`, pr('Quel nombre manque pour faire 1 000?', 'Which number makes 1000?'), tx(`${a} + ? = 1 000`), 1000 - a); }
+    if (k === 7) { const hund = R.chance(0.5), n = hund ? R.int(101, 999) : R.int(11, 99); if (n % (hund ? 100 : 10) === (hund ? 50 : 5)) return NEW.m14(L, R); const u = hund ? 100 : 10; return kp(`rd${n}${u}`, pr(`Arrondis ${n} à la ${hund ? 'centaine' : 'dizaine'} la plus proche.`, `Round ${n} to the nearest ${hund ? 'hundred' : 'ten'}.`), null, Math.round(n / u) * u); }
+    if (k === 8) { const s = R.pick([25, 50, 250]), a = R.int(0, 8) * s; return kp(`sk${s}_${a}`, pr(`Compte de ${s} en ${s}. Quel nombre manque?`, `Count by ${s}s. Which number is missing?`), tx(`${a}, ${a + s}, ${a + 2 * s}, ?`), a + 3 * s); }
+    const a = R.int(11, 49) * 10, b = R.int(11, 49) * 10;
+    return kp(`ts${a}+${b}`, pr('Calcule de tête.', 'Work it out in your head.'), tx(`${a} + ${b} = ?`), a + b);
+  }
+  const k = R.int(0, 11);
+  if (k === 0) { const a = R.pick([198, 298, 398, 498, 599, 799, 999, 797, 695]), b = R.int(120, 480), r = Math.round(a / 100) * 100; return kp(`cm${a}+${b}`, pr(`Calcule. Astuce : ${a} est proche de ${r}.`, `Work it out. Tip: ${a} is close to ${r}.`), tx(`${a} + ${b} = ?`), a + b); }
+  if (k === 1) { const a = R.int(2, 9) * 100 + R.int(1, 9) * 10 + R.int(1, 9), b = R.pick([98, 99, 198, 199, 299, 297, 49, 51]); return kp(`cs${a}-${b}`, pr('Calcule de tête. Astuce : arrondis, puis ajuste.', 'Work it out in your head. Tip: round, then adjust.'), tx(`${a} − ${b} = ?`), a - b); }
+  if (k === 2) { const n = R.int(11, 99); return kp(`x100_${n}`, pr(`Calcule ${n} × 100.`, `Work out ${n} × 100.`), null, n * 100); }
+  if (k === 3) { const n = R.int(11, 99); return kp(`d100_${n}`, pr(`Calcule ${n * 100} ÷ 100.`, `Work out ${n * 100} ÷ 100.`), null, n); }
+  if (k === 4) { const n = R.int(101, 499); return kp(`dbl${n}`, pr(`Quel est le double de ${n}?`, `What is double ${n}?`), null, 2 * n); }
+  if (k === 5) { const n = R.int(51, 499) * 2; return kp(`half${n}`, pr(`Quelle est la moitié de ${n}?`, `What is half of ${n}?`), null, n / 2); }
+  if (k === 6) { const a = R.pick([25, 50, 20, 30, 40, 60]), b = R.pick(a === 25 ? [2, 4, 6, 8] : [2, 3, 4, 5, 6, 8]); return kp(`mm${a}x${b}`, pr('Calcule de tête.', 'Work it out in your head.'), tx(`${a} × ${b} = ?`), a * b); }
+  if (k === 7) { const a = R.int(1, 99) * 10, c = 1000 - a; return kp(`c1k${a}`, pr('Quel nombre manque pour faire 1 000?', 'Which number makes 1000?'), tx(`${a} + ? = 1 000`), c); }
+  if (k === 8) { const n = R.int(1001, 9999), u = R.pick([10, 100, 1000]); if (n % u === u / 2) return NEW.m14(L, R); const r = Math.round(n / u) * u; if (r > 9999) return NEW.m14(L, R); return kp(`rd${n}${u}`, pr(`Arrondis ${NB2(n)} à ${u === 10 ? 'la dizaine' : u === 100 ? 'la centaine' : 'l’unité de mille'} la plus proche.`, `Round ${NBe(n)} to the nearest ${u === 10 ? 'ten' : u === 100 ? 'hundred' : 'thousand'}.`), null, r); }
+  if (k === 9) {
+    const a = R.int(120, 880), b = R.int(120, 880), est = Math.round(a / 100) * 100 + Math.round(b / 100) * 100;
+    if (Math.abs(a + b - est) < 40) return NEW.m14(L, R);
+    return numQ(R, `es${a}+${b}`, pr(`${a} + ${b} est environ égal à…`, `${a} + ${b} is about…`), null, est, [est + 100, est - 100, est + 200, est - 200, est + 300], { fmt: String, valid: (v) => v % 100 === 0 && v > 0 });
+  }
+  if (k === 10) { const a = R.int(11, 49), b = R.pick([20, 30, 40, 50]); return kp(`mt${a}x${b}`, pr('Calcule de tête.', 'Work it out in your head.'), tx(`${a} × ${b / 10} × 10 = ?`), a * b); }
+  const n = R.int(11, 99) * 20, d = R.pick([2, 4, 5, 10]); return kp(`dv${n}/${d}`, pr('Calcule de tête.', 'Work it out in your head.'), tx(`${n} ÷ ${d} = ?`), n / d);
+};
+
+// ---------- m15 ----------
+const CASH = [5, 10, 25, 100, 200];
+NEW.m15 = (L, R) => {
+  const k = R.int(0, 5);
+  const billAmt = (nB) => {
+    const items = []; for (let i = 0; i < nB; i++) items.push(R.pick([500, 1000]));
+    for (let i = 0, n = R.int(2, 4); i < n; i++) items.push(R.pick(CASH));
+    const srt = items.slice().sort((x, y) => y - x), tot = sumArr(items);
+    return numQ(R, `bm${srt.join('-')}`, T('Quel montant est montré?', 'Which amount is shown?'), { svg: S.money(srt) }, tot, [tot + 5, tot - 5, tot + 25, tot - 25, tot + 100, tot - 100, tot + 10, tot - 10], { fmt: (v) => moneyT(v), cols: 3 });
+  };
+  const price = () => R.int(21, 199) * 5;
+  const itemsB = [['une casquette', 'a cap', '🧢'], ['un livre', 'a book', '📘'], ['un jouet', 'a toy', '🧸'], ['un chandail de hockey', 'a hockey jersey', '🏒'], ['un sac à dos', 'a backpack', '🎒'], ['des gants', 'gloves', '🧤']];
+  if (L === 2) {
+    if (k === 0) return billAmt(R.int(1, 2));
+    if (k === 1) { const p = R.pick(PEOPLE), pay = R.pick([500, 1000, 2000]), cost = R.int(Math.floor(100 / 5), (pay - 100) / 5) * 5, it = R.pick(itemsB); const fr = `${p.n} achète ${it[0]} à ${moneyT(cost).fr}. ${Il(p)} paie avec ${moneyT(pay).fr}. Combien de monnaie reçoit-${il(p)}?`, en = `${p.n} buys ${it[1]} for ${moneyT(cost).en}. ${He(p)} pays with ${moneyT(pay).en}. How much change does ${he(p)} get?`; const ans = pay - cost; return numQ(R, `ch${cost}_${pay}${p.n}`, T(fr, en), { emoji: it[2] }, ans, [ans + 100, ans - 100, ans + 5, ans - 5, ans + 50, ans - 50, cost], { fmt: (v) => moneyT(v), cols: 3, say: SAY(fr, en), valid: (v) => v > 0 && v < pay && v % 5 === 0 }); }
+    if (k === 2) { const x = price(), y = price(), p = R.pick(PEOPLE), [i1, i2] = R.sample(itemsB, 2), ans = x + y; const fr = `${p.n} achète ${i1[0]} à ${moneyT(x).fr} et ${i2[0]} à ${moneyT(y).fr}. Combien dépense-t-${il(p)} en tout?`, en = `${p.n} buys ${i1[1]} for ${moneyT(x).en} and ${i2[1]} for ${moneyT(y).en}. How much does ${he(p)} spend in all?`; return numQ(R, `tt${x}+${y}${p.n}`, T(fr, en), { text: `${i1[2]}  ${i2[2]}` }, ans, [ans + 100, ans - 100, ans + 10, ans - 10, ans + 50, ans - 50, ans + 5], { fmt: (v) => moneyT(v), cols: 3, say: SAY(fr, en), valid: (v) => v > 0 && v % 5 === 0 }); }
+    if (k === 3) { const base = R.int(2, 9) * 100, set = new Set([base + 50, base + 5, base + 15, base + 25, base + 75, base + 45]), vals = R.sample([...set], 3), big = R.chance(0.5), t = big ? Math.max(...vals) : Math.min(...vals); return { type: 'choice', key: `cm${vals.slice().sort((a, b) => a - b).join(',')}${big}`, prompt: big ? T('Quel est le prix le plus élevé?', 'Which is the highest price?') : T('Quel est le prix le moins élevé?', 'Which is the lowest price?'), options: vals.map((v) => ({ text: moneyT(v) })), answer: vals.indexOf(t), fixedOrder: true, cols: 3 }; }
+    if (k === 4) { const n = R.int(2, 6); return kp(`q${n}`, T(`Combien de pièces de 25 ¢ faut-il pour faire ${n} $?`, `How many 25¢ coins make $${n}?`), null, n * 4); }
+    const u = R.pick([75, 125, 150, 250, 175, 50]), n = R.int(2, 4), it = R.pick([['jus', 'juice boxes', '🧃'], ['muffins', 'muffins', '🧁'], ['pommes', 'apples', '🍎'], ['crayons', 'pencils', '✏️']]), ans = u * n;
+    const fr = `Un ${it[0].replace(/s$/, '')} coûte ${moneyT(u).fr}. Combien coûtent ${n} ${it[0]}?`, en = `One ${it[1].replace(/s$/, '')} costs ${moneyT(u).en}. How much do ${n} ${it[1]} cost?`;
+    return numQ(R, `un${u}x${n}${it[0]}`, T(fr, en), { emoji: it[2] }, ans, [ans + 25, ans - 25, ans + 100, ans - 50, ans + 50, u + n * 100, ans + 5], { fmt: (v) => moneyT(v), cols: 3, say: SAY(fr, en), valid: (v) => v > 0 && v % 5 === 0 });
+  }
+  if (k === 0) { const p = R.pick(PEOPLE), pay = R.pick([2000, 5000]), n = R.int(2, 3), prices = Array.from({ length: n }, () => R.int(60, Math.floor((pay - 200) / n / 5)) * 5), tot = sumArr(prices), its = R.sample(itemsB, n); const fr = `${p.n} achète ${its.map((i, j) => `${i[0]} à ${moneyT(prices[j]).fr}`).join(', ').replace(/, ([^,]*)$/, ' et $1')}. ${Il(p)} paie avec ${moneyT(pay).fr}. Combien de monnaie reçoit-${il(p)}?`, en = `${p.n} buys ${its.map((i, j) => `${i[1]} for ${moneyT(prices[j]).en}`).join(', ').replace(/, ([^,]*)$/, ' and $1')}. ${He(p)} pays with ${moneyT(pay).en}. How much change does ${he(p)} get?`; const ans = pay - tot; if (ans <= 0) return NEW.m15(L, R); return numQ(R, `ch3${prices.join('-')}_${pay}${p.n}`, T(fr, en), { text: its.map((i) => i[2]).join('  ') }, ans, [ans + 100, ans - 100, ans + 10, ans - 10, ans + 50, ans - 50, ans + 5], { fmt: (v) => moneyT(v), cols: 3, say: SAY(fr, en), valid: (v) => v > 0 && v < pay && v % 5 === 0 }); }
+  if (k === 1) { const p = R.pick(PEOPLE), step = R.pick([250, 500, 125, 200, 150]), n = R.int(4, 12), target = step * n, it = R.pick(itemsB); const fr = `${p.n} veut acheter ${it[0]} à ${moneyT(target).fr}. ${Il(p)} économise ${moneyT(step).fr} chaque semaine. Combien de semaines doit-${il(p)} économiser?`, en = `${p.n} wants to buy ${it[1]} for ${moneyT(target).en}. ${He(p)} saves ${moneyT(step).en} each week. How many weeks must ${he(p)} save?`; if (target % step) return NEW.m15(L, R); return kp(`sv${step}x${n}${p.n}`, T(fr, en), { emoji: it[2] }, n, SAY(fr, en)); }
+  if (k === 2) { const p = R.pick(PEOPLE), it = R.pick(itemsB), orig = price() + 500, rab = R.pick([100, 150, 200, 250, 300]), ans = orig - rab; const fr = `${it[0].replace(/^./, (c) => c.toUpperCase())} coûte ${moneyT(orig).fr}. Il y a un rabais de ${moneyT(rab).fr}. Quel est le nouveau prix?`, en = `${it[1].replace(/^./, (c) => c.toUpperCase())} costs ${moneyT(orig).en}. There is a discount of ${moneyT(rab).en}. What is the new price?`; return numQ(R, `rb${orig}-${rab}`, T(fr, en), { emoji: it[2] }, ans, [ans + 2 * rab, ans + 100, ans - 100, ans + 50, ans - 50, orig + rab, ans + 5], { fmt: (v) => moneyT(v), cols: 3, say: SAY(fr, en), valid: (v) => v > 0 && v % 5 === 0 }); }
+  if (k === 3) { const n = R.pick([2, 4, 5]), u = R.int(11, 60) * 5, tot = n * u, it = R.pick([['cahiers', 'notebooks', '📓'], ['jus', 'juice boxes', '🧃'], ['balles', 'balls', '⚾'], ['sandwichs', 'sandwiches', '🥪']]); const fr = `${n} ${it[0]} coûtent ${moneyT(tot).fr} en tout. Combien coûte un seul?`, en = `${n} ${it[1]} cost ${moneyT(tot).en} in all. How much does one cost?`; return numQ(R, `pu${tot}/${n}${it[0]}`, T(fr, en), { emoji: it[2] }, u, [u + 5, u - 5, u + 25, u - 25, u + 10, u - 10, tot - u], { fmt: (v) => moneyT(v), cols: 3, say: SAY(fr, en), valid: (v) => v > 0 && v % 5 === 0 }); }
+  if (k === 4) return billAmt(2);
+  const p = R.pick(PEOPLE), prices = [price(), price(), price()], tot = sumArr(prices), its = R.sample(itemsB, 3);
+  const fr = `${p.n} achète ${its.map((i, j) => `${i[0]} à ${moneyT(prices[j]).fr}`).join(', ').replace(/, ([^,]*)$/, ' et $1')}. Combien dépense-t-${il(p)} en tout?`, en = `${p.n} buys ${its.map((i, j) => `${i[1]} for ${moneyT(prices[j]).en}`).join(', ').replace(/, ([^,]*)$/, ' and $1')}. How much does ${he(p)} spend in all?`;
+  return numQ(R, `t3${prices.join('+')}${p.n}`, T(fr, en), { text: its.map((i) => i[2]).join('  ') }, tot, [tot + 100, tot - 100, tot + 10, tot - 10, tot + 50, tot - 50, tot + 5], { fmt: (v) => moneyT(v), cols: 3, say: SAY(fr, en), valid: (v) => v > 0 && v % 5 === 0 });
+};
+
+// ---------- m16 ----------
+const crd = (x, y) => `(${x}, ${y})`;
+NEW.m16 = (L, R) => {
+  const k = R.int(0, L === 2 ? 5 : 6);
+  const pts3 = (n) => { const set = new Set(), out = []; while (out.length < 3) { const x = R.int(0, n), y = R.int(0, n); if (!set.has(`${x},${y}`) && x + y > 0) { set.add(`${x},${y}`); out.push({ x, y, label: 'ABC'[out.length] }); } } return out; };
+  if (k === 0 || (L === 3 && k === 6)) {
+    const n = L === 2 ? 5 : 7, ps = pts3(n), t = R.pick(ps);
+    const wr = [crd(t.y, t.x), crd(t.x, Math.min(n, t.y + 1)), crd(Math.max(0, t.x - 1), t.y), crd(t.x + 1, t.y)].filter((c) => c !== crd(t.x, t.y) && !(t.x === t.y));
+    const wrong = [...new Set([...wr, crd(t.x, Math.max(0, t.y - 1)), crd(Math.min(n, t.x + 1), Math.min(n, t.y + 1))])].filter((c) => c !== crd(t.x, t.y));
+    return { type: 'choice', key: `cn${n}${ps.map((p) => p.x + '.' + p.y).join('')}${t.label}`, prompt: T(`Quelles sont les coordonnées du point ${t.label}? (d’abord vers la droite, puis vers le haut)`, `What are the coordinates of point ${t.label}? (first across, then up)`), stimulus: { svg: S.coordPlane(n, ps) }, options: [crd(t.x, t.y), ...R.sample(wrong, 3)].map((c) => ({ text: c })), answer: 0, cols: 2 };
+  }
+  if (k === 1) {
+    const n = L === 2 ? 5 : 7, ps = pts3(n), t = R.pick(ps);
+    return { type: 'choice', key: `wp${n}${ps.map((p) => p.x + '.' + p.y).join('')}${t.label}`, prompt: T(`Quel point est en ${crd(t.x, t.y)}?`, `Which point is at ${crd(t.x, t.y)}?`), stimulus: { svg: S.coordPlane(n, ps) }, options: ps.map((p) => ({ text: p.label })), answer: ps.indexOf(t), fixedOrder: true, cols: 3 };
+  }
+  if (k === 2 && L === 2) {
+    const SY = [['carré', 'square', 4], ['rectangle', 'rectangle', 2], ['triangle équilatéral', 'equilateral triangle', 3], ['losange', 'rhombus', 2], ['hexagone régulier', 'regular hexagon', 6]];
+    const [fr, en, ans] = R.pick(SY); return kp(`axes${fr}`, T(`Combien d’axes de symétrie a un ${fr}?`, `How many lines of symmetry does a ${en} have?`), null, ans);
+  }
+  if (k === 3 || (k === 2 && L === 3)) {
+    const x = R.int(0, 5), y = R.int(0, 5), dx = R.int(1, 4), dy = R.int(1, 4), p = R.pick(['A', 'B', 'C']);
+    const dirs = L === 2 ? [[1, 1]] : [[1, 1], [-1, 1], [1, -1]];
+    const [sx, sy] = R.pick(dirs); let nx = x + sx * dx, ny = y + sy * dy;
+    if (nx < 0 || ny < 0) { nx = x + dx; ny = y + dy; }
+    const hd = nx >= x ? ['vers la droite', 'right'] : ['vers la gauche', 'left'], vd = ny >= y ? ['vers le haut', 'up'] : ['vers le bas', 'down'];
+    const d1 = Math.abs(nx - x), d2 = Math.abs(ny - y);
+    const wrong = [crd(nx, ny + 1), crd(ny, nx), crd(nx + 1, ny), crd(x + d2, y + d1), crd(x + d1, y)].filter((c) => c !== crd(nx, ny));
+    return { type: 'choice', key: `mv${x}${y}${nx}${ny}${p}`, prompt: T(`Le point ${p} est en ${crd(x, y)}. On le déplace de ${d1} case${d1 > 1 ? 's' : ''} ${hd[0]} et de ${d2} case${d2 > 1 ? 's' : ''} ${vd[0]}. Où arrive-t-il?`, `Point ${p} is at ${crd(x, y)}. We move it ${d1} square${d1 > 1 ? 's' : ''} ${hd[1]} and ${d2} square${d2 > 1 ? 's' : ''} ${vd[1]}. Where does it end up?`), options: [crd(nx, ny), ...R.sample([...new Set(wrong)], 3)].map((c) => ({ text: c })), answer: 0, cols: 2 };
+  }
+  if (k === 4 && L === 2) {
+    const a = R.int(2, 5), s = R.int(2, 4), n = R.int(7, 10);
+    return kp(`fg${a}_${s}_${n}`, T(`Figure 1 : ${a} carrés, figure 2 : ${a + s} carrés, figure 3 : ${a + 2 * s} carrés. La suite continue. Combien de carrés y a-t-il à la figure ${n}?`, `Figure 1: ${a} squares, figure 2: ${a + s} squares, figure 3: ${a + 2 * s} squares. The pattern continues. How many squares are in figure ${n}?`), { svg: S.areaGrid(['#'.repeat(a)], S.COLORS.green) }, a + (n - 1) * s);
+  }
+  if (k === 4) {
+    const x1 = R.int(1, 3), y1 = R.int(1, 3), w = R.int(2, 6), h = R.int(2, 5);
+    return kp(`pp${x1}${y1}${w}${h}`, T(`Un rectangle a pour sommets A${crd(x1, y1)}, B${crd(x1 + w, y1)}, C${crd(x1 + w, y1 + h)} et D${crd(x1, y1 + h)}. Quel est son périmètre?`, `A rectangle has vertices A${crd(x1, y1)}, B${crd(x1 + w, y1)}, C${crd(x1 + w, y1 + h)} and D${crd(x1, y1 + h)}. What is its perimeter?`), null, 2 * (w + h));
+  }
+  if (k === 5 && L === 2) {
+    const y = R.int(1, 5), x1 = R.int(0, 3), x2 = x1 + R.int(2, 5), ps = [{ x: x1, y, label: 'A' }, { x: x2, y, label: 'B' }];
+    return kp(`dis${x1}${x2}${y}`, T('Combien de cases sépare le point A du point B?', 'How many squares are there from point A to point B?'), { svg: S.coordPlane(Math.max(5, x2), ps) }, x2 - x1);
+  }
+  if (k === 5) { // reflection across a vertical line
+    const line = R.int(3, 6), x = R.int(1, line - 1), y = R.int(1, 7), ans = 2 * line - x;
+    return numQ(R, `rf${x}${y}${line}`, T(`Le point A est en ${crd(x, y)}. On fait un miroir par rapport à la ligne verticale x = ${line}. Quelles sont les nouvelles coordonnées?`, `Point A is at ${crd(x, y)}. We reflect it in the vertical line x = ${line}. What are its new coordinates?`), null, ans, [ans - 1, ans + 1, line, x + 1, y], { fmt: (v) => crd(v, y), cols: 2, valid: (v) => v >= 0 && v <= 12 && v !== x });
+  }
+  const x1 = R.int(0, 3), y1 = R.int(0, 3), w = R.int(2, 5), h = R.int(2, 5);
+  const A = crd(x1, y1), B = crd(x1 + w, y1), C = crd(x1 + w, y1 + h), D = crd(x1, y1 + h);
+  const wrong = [crd(x1 + w, y1 + h + 1), crd(x1 + 1, y1 + h), crd(x1 + h, y1 + w), crd(x1 + w - 1, y1 + h)].filter((c) => c !== D);
+  return { type: 'choice', key: `rc${x1}${y1}${w}${h}`, prompt: T(`ABCD est un rectangle. A est en ${A}, B est en ${B} et C est en ${C}. Quelles sont les coordonnées de D?`, `ABCD is a rectangle. A is at ${A}, B is at ${B} and C is at ${C}. What are the coordinates of D?`), options: [D, ...R.sample([...new Set(wrong)], 3)].map((c) => ({ text: c })), answer: 0, cols: 2 };
+};
+
+// ---------- m17 – cahier A (stories, teams / remainders, growing patterns) ----------
+function teamsQ(R, L) {
+  const [p, q] = R.sample(PEOPLE, 2), v = sv(p, q);
+  const k = L === 2 ? R.pick([3, 4, 5]) : R.pick([6, 7, 8, 9]), n = R.int(L === 2 ? 20 : 30, L === 2 ? 59 : 99);
+  if (n % k === 0) return teamsQ(R, L);
+  Object.assign(v, { n, k });
+  const ci = R.int(0, 2);
+  const CTX = [
+    [['À la récré, {n} enfants jouent au ballon-chasseur. Ils forment des équipes de {k}.', 'At recess, {n} children play dodgeball. They make teams of {k}.'], 'teams'],
+    [['Pour la sortie à la cabane à sucre, {n} élèves montent dans des minibus de {k} places.', 'For the sugar shack trip, {n} students get into minibuses with {k} seats each.'], 'bus'],
+    [['{p} range {n} cartes de hockey dans des pochettes de {k} cartes.', '{p} puts {n} hockey cards into sleeves of {k} cards each.'], 'cards'],
+  ][ci];
+  const nm = { teams: [['équipes complètes', 'full teams'], ['enfants sans équipe', 'children without a team'], ['équipes', 'teams']], bus: [['minibus complets', 'full minibuses'], ['élèves dans le dernier minibus plein ou non', ''], ['minibus', 'minibuses']], cards: [['pochettes pleines', 'full sleeves'], ['cartes restantes', 'cards left over'], ['pochettes', 'sleeves']] }[CTX[1]];
+  const ask = R.int(0, 2);
+  if (ask === 0) return mkQ({ id: 'tm0', v: { ...v, ci }, sents: [CTX[0]], q: [`Combien de ${nm[0][0]} y a-t-il?`, `How many ${nm[0][1]} are there?`], ans: Math.floor(n / k) });
+  if (ask === 1 && CTX[1] !== 'bus') return mkQ({ id: 'tm1', v: { ...v, ci }, sents: [CTX[0]], q: [`Combien y a-t-il de ${nm[1][0]}?`, `How many ${nm[1][1]} are there?`], ans: n % k });
+  return mkQ({ id: 'tm2', v: { ...v, ci }, sents: [CTX[0]], q: [CTX[1] === 'teams' ? 'Combien d’équipes faut-il en tout (la dernière peut être incomplète)?' : CTX[1] === 'bus' ? 'Combien de minibus faut-il en tout?' : 'Combien de pochettes faut-il en tout?', CTX[1] === 'teams' ? 'How many teams are needed in all (the last one may be incomplete)?' : CTX[1] === 'bus' ? 'How many minibuses are needed in all?' : 'How many sleeves are needed in all?'], ans: Math.ceil(n / k) });
+}
+function growQ(R, L) {
+  const [p, q] = R.sample(PEOPLE, 2), v = sv(p, q);
+  const kind = R.int(0, L === 2 ? 1 : 3);
+  if (kind <= 1) {
+    const d = L === 2 ? R.pick([5, 10, 15, 20, 25]) : R.pick([12, 15, 25, 35, 40]), s0 = R.int(2, 9) * (L === 2 ? 5 : 10), n = R.int(6, 9);
+    const act = R.pick([['pages', 'pages', 'lit', 'reads'], ['mètres', 'metres', 'patine', 'skates'], ['dessins', 'drawings', 'fait', 'makes']]);
+    Object.assign(v, { d, s0, n, a: act[0] });
+    return mkQ({ id: 'gr1', v, sents: [[`Le jour 1, {p} ${act[2]} {s0} ${act[0]}. Le jour 2, {il} en ${act[2]} {s0b}. Le jour 3, {il} en ${act[2]} {s0c}.`.replace('{s0b}', s0 + d).replace('{s0c}', s0 + 2 * d), `On day 1, {p} ${act[3]} {s0} ${act[1]}. On day 2, {he} ${act[3]} ${s0 + d}. On day 3, {he} ${act[3]} ${s0 + 2 * d}.`], ['{Il} continue ainsi.', '{He} keeps going the same way.']], q: [`Combien en ${act[2]}${act[2] === 'patine' ? '-t-' : '-'}{il} le jour {n}?`, `How many ${act[1]} does {he} ${act[3].replace(/s$/, '')} on day {n}?`], ans: s0 + (n - 1) * d });
+  }
+  if (kind === 2) {
+    const s0 = R.int(2, 5), n = R.int(5, 7), ch = R.pick([['fourmis', 'ants'], ['bactéries', 'bacteria'], ['abonnés', 'followers']]);
+    Object.assign(v, { s0, n });
+    return mkQ({ id: 'gr2', v, sents: [[`Le jour 1, il y a {s0} ${ch[0]}. Chaque jour, leur nombre double.`, `On day 1 there are {s0} ${ch[1]}. Every day the number doubles.`]], q: ['Combien y en a-t-il le jour {n}?', 'How many are there on day {n}?'], ans: s0 * 2 ** (n - 1) });
+  }
+  const s0 = R.int(90, 200), d = R.int(6, 15), n = R.int(5, 9);
+  Object.assign(v, { s0, d, n });
+  return mkQ({ id: 'gr3', v, sents: [['Un livre a {s0} pages. {p} en lit {d} chaque jour.', 'A book has {s0} pages. {p} reads {d} each day.']], q: ['Combien de pages lui reste-t-il à lire après {n} jours?', 'How many pages are left after {n} days?'], ans: s0 - d * n });
+}
+NEW.m17 = (L, R) => {
+  const r = R.int(1, 100);
+  if (r <= 52) { const kinds = L === 2 ? ['cmp3', 'miss3', 'grp', 'two3', 'sub3'] : ['after', 'start', 'times', 'two4', 'budget']; return M7[R.pick(kinds)](SB(R, L)); }
+  if (r <= 76) return teamsQ(R, L);
+  return growQ(R, L);
+};
+
+// ---------- m18 – cahier B (place value, rounding, comparing, fractions, groups, grid) ----------
+function cardsQ(R, L) {
+  const nd = L === 2 ? 3 : 4, ds = R.sample([1, 2, 3, 4, 5, 6, 7, 8, 9], nd), big = R.chance(0.5);
+  const srt = ds.slice().sort((a, b) => (big ? b - a : a - b)), n = Number(srt.join(''));
+  return kp(`cd${ds.slice().sort().join('')}${big}`, T(`Avec les cartes ${ds.join(', ')}, forme le ${big ? 'plus grand' : 'plus petit'} nombre possible.`, `With the cards ${ds.join(', ')}, make the ${big ? 'biggest' : 'smallest'} number you can.`), { text: ds.map((d) => `[${d}]`).join('  ') }, n);
+}
+function roundStoryQ(R, L) {
+  const p = R.pick(PEOPLE), hund = L === 2 || R.chance(0.5), n = L === 2 ? R.int(101, 999) : R.int(1001, 9999), u = hund ? 100 : 10;
+  if (n % u === u / 2) return roundStoryQ(R, L);
+  const r = Math.round(n / u) * u, ev = R.pick([['Un aréna a {n} places.', 'An arena has {n} seats.'], ['Le parc national a accueilli {n} visiteurs en été.', 'The national park welcomed {n} visitors in summer.'], ['{p} a ramassé {n} feuilles d’érable.', '{p} collected {n} maple leaves.']]);
+  const fr = ev[0].replace('{n}', NB2(n)).replace('{p}', p.n), en = ev[1].replace('{n}', NBe(n)).replace('{p}', p.n);
+  if (r > 9999) return roundStoryQ(R, L);
+  return kp(`rs${n}${u}${ev[0].length}`, T(`${fr} Arrondis ce nombre à la ${hund ? 'centaine' : 'dizaine'} la plus proche.`, `${en} Round this number to the nearest ${hund ? 'hundred' : 'ten'}.`), null, r);
+}
+function diffStoryQ(R, L) {
+  const a = L === 2 ? R.int(300, 999) : R.int(2000, 9900), b = L === 2 ? R.int(101, a - 80) : R.int(1001, a - 300);
+  const ev = R.pick([['Le trajet Montréal–Québec en autobus fait {a} km aller-retour pour {p} et {b} km pour {q}.', '']]);
+  const sc = R.pick([['Un parc compte {a} sapins et {b} érables.', 'A park has {a} fir trees and {b} maple trees.', 'Combien y a-t-il de sapins de plus que d’érables?', 'How many more fir trees than maple trees are there?'], ['Le premier livre a {a} pages. Le second a {b} pages.', 'The first book has {a} pages. The second has {b} pages.', 'Combien de pages le premier livre a-t-il de plus?', 'How many more pages does the first book have?'], ['En hiver, l’aréna a reçu {a} spectateurs. En été, il en a reçu {b}.', 'In winter the arena had {a} spectators. In summer it had {b}.', 'Combien de spectateurs de plus en hiver qu’en été?', 'How many more spectators in winter than in summer?']]);
+  const ap = R.chance(0.5) && L === 3;
+  const fr = sc[0].replace('{a}', NB2(a)).replace('{b}', NB2(b)), en = sc[1].replace('{a}', NBe(a)).replace('{b}', NBe(b));
+  if (ap) { const tot = a + b; if (tot > 9999) return diffStoryQ(R, L); return kp(`df${a}+${b}${sc[0].length}`, T(`${fr} Combien y en a-t-il en tout?`, `${en} How many are there in all?`), null, tot); }
+  return kp(`df${a}-${b}${sc[0].length}`, T(`${fr} ${sc[2]}`, `${en} ${sc[3]}`), null, a - b);
+}
+NEW.m18 = (L, R) => {
+  const r = R.int(1, 100);
+  if (r <= 16) return cardsQ(R, L);
+  if (r <= 30) return roundStoryQ(R, L);
+  if (r <= 44) return diffStoryQ(R, L);
+  if (r <= 60) return NEW.m9(L, R);
+  if (r <= 72) return NEW.m13(L, R);
+  if (r <= 82) return NEW.m2(L, R);
+  if (r <= 90) return NEW.m3(L, R);
+  return NEW.m16(L, R);
+};
+
+// ---------- m19 – cahier C (measurement, time, money, tables, graphs, multi-step) ----------
+function measStoryQ(R, L) {
+  const p = R.pick(PEOPLE), k = R.int(0, 3);
+  if (k === 0) { const w = R.int(L === 2 ? 4 : 8, L === 2 ? 15 : 40), h = R.int(3, L === 2 ? 9 : 25); return kp(`fe${w}x${h}`, T(`Le jardin de ${p.n} mesure ${w} m sur ${h} m. ${Il(p)} installe une clôture tout autour. Combien de mètres de clôture faut-il?`, `${p.n}’s garden is ${w} m by ${h} m. ${He(p)} puts a fence all around it. How many metres of fence are needed?`), null, 2 * (w + h)); }
+  if (k === 1) { const w = R.int(3, 12), h = R.int(2, 9); return kp(`ai${w}x${h}`, T(`La patinoire de ${p.n} est un rectangle de ${w} m sur ${h} m. Quelle est son aire (en m²)?`, `${p.n}’s rink is a rectangle ${w} m by ${h} m. What is its area (in m²)?`), null, w * h); }
+  if (k === 2) { const a = R.int(1, 9), b = R.int(15, 95); return kp(`co${a}_${b}`, T(`${p.n} coupe une corde de ${a} m et une autre de ${b} cm. Quelle est la longueur totale (en cm)?`, `${p.n} cuts a rope ${a} m long and another ${b} cm long. What is the total length (in cm)?`), null, a * 100 + b); }
+  const n = R.int(2, 6), u = R.pick([30, 40, 50, 60, 75]); return kp(`ru${n}x${u}`, T(`${p.n} place ${n} planches de ${u} cm bout à bout. Quelle est la longueur totale (en cm)?`, `${p.n} lays ${n} boards of ${u} cm end to end. What is the total length (in cm)?`), null, n * u);
+}
+function multiQ(R, L) {
+  const p = R.pick(PEOPLE), k = R.int(0, 2);
+  if (k === 0) {
+    const money = R.pick([2000, 2500, 3000]), a = R.int(3, 9) * 50 + R.pick([0, 25, 75]), b = R.int(1, 5) * 100 + R.pick([25, 50, 75]), ans = money - a - b;
+    const fr = `${p.n} a ${moneyT(money).fr}. ${Il(p)} achète un billet de cinéma à ${moneyT(a).fr} et du maïs soufflé à ${moneyT(b).fr}. Combien d’argent lui reste-t-il?`, en = `${p.n} has ${moneyT(money).en}. ${He(p)} buys a movie ticket for ${moneyT(a).en} and popcorn for ${moneyT(b).en}. How much money is left?`;
+    return numQ(R, `mq${money}-${a}-${b}`, T(fr, en), { emoji: '🎬' }, ans, [ans + 100, ans - 100, ans + 25, ans - 25, ans + 50, ans - 50, money - a], { fmt: (v) => moneyT(v), cols: 3, say: SAY(fr, en), valid: (v) => v > 0 && v % 5 === 0 });
+  }
+  if (k === 1) {
+    const sh = R.int(7, 17), sm = R.int(0, 11) * 5, d1 = R.pick([20, 25, 30, 35, 40]), d2 = R.pick([30, 45, 50, 60, 75]), st = sh * 60 + sm, end = st + d1 + d2;
+    const fr = `${p.n} sort de l’école à ${h24(sh, sm)}. ${Il(p)} marche ${d1} minutes jusqu’à l’aréna, puis s’entraîne ${d2} minutes. À quelle heure ${il(p) === 'elle' ? 'elle termine-t-elle' : 'termine-t-il'} son entraînement?`, en = `${p.n} leaves school at ${sh}:${String(sm).padStart(2, '0')}. ${He(p)} walks ${d1} minutes to the arena, then trains for ${d2} minutes. At what time does ${he(p)} finish training?`;
+    return numQ(R, `tq${st}+${d1}+${d2}${p.n}`, T(fr, en), { emoji: '⏰' }, end, [end + 10, end - 10, end + 5, end - 5, end + 20, end - 20, st + d2], { fmt: tOpt, cols: 2, say: SAY(fr, en), valid: timeOK });
+  }
+  const w = R.int(3, 9), h = R.int(2, 7), pm = R.pick([2, 3, 4, 5]);
+  const fr = `${p.n} veut clôturer un jardin de ${w} m sur ${h} m. La clôture coûte ${pm} $ le mètre. Combien coûte toute la clôture (en $)?`, en = `${p.n} wants to fence a garden ${w} m by ${h} m. The fence costs $${pm} per metre. How much does all the fence cost (in $)?`;
+  return kp(`cl${w}x${h}x${pm}${p.n}`, T(fr, en), null, 2 * (w + h) * pm, SAY(fr, en));
+}
+NEW.m19 = (L, R) => {
+  const r = R.int(1, 100);
+  if (r <= 14) return measStoryQ(R, L);
+  if (r <= 38) return NEW.m11(L, R);
+  if (r <= 62) return NEW.m15(L, R);
+  if (r <= 74) return NEW.m13(L, R);
+  if (r <= 88) return NEW.m12(L, R);
+  return multiQ(R, L);
+};
+
+// ---------- wire up: L1 = former level 3, L2/L3 = new generators ----------
+for (const u of units) {
+  const nw = NEW[u.id];
+  if (!nw) continue;
+  const base = { ...u }; // keeps the original generate() with a valid `this` for its internal retries
+  const L1FROM = { m13: 2 }; // m13 Facile = equal groups & arrays (former level 2); tables start at Moyen
+  u.generate = function generate(level, R) { return level <= 1 ? base.generate(L1FROM[u.id] || 3, R) : nw(level, R); };
+}

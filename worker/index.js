@@ -85,12 +85,12 @@ export default {
 
     // ---- Handwriting: transcribe the child's writing (image) and grade it. Free Workers AI first, OpenAI as backup. ----
     if (url.pathname === '/ai/write') {
-      const lang = body.lang === 'en' ? 'en' : 'fr';
+      const lang = ['en', 'zh'].includes(body.lang) ? body.lang : 'fr';
       const mode = ['dictation', 'answer', 'sentence', 'composition'].includes(body.mode) ? body.mode : 'sentence';
       const img = String(body.image || '').replace(/^data:image\/\w+;base64,/, '');
       const typed = String(body.typed || '').slice(0, 2000);
       if (!typed && (!img || img.length > 1_500_000)) return json({ error: 'image' }, 400, cors);
-      const L = lang === 'fr' ? 'French (Québec)' : 'English';
+      const L = lang === 'fr' ? 'French (Québec)' : lang === 'zh' ? 'Simplified Chinese (Mandarin; feedback in simple Chinese)' : 'English';
       const clip = (x, n) => String(x || '').slice(0, n);
       const task = mode === 'dictation' ? `The child was dictated: «${clip(body.expected, 300)}».`
         : mode === 'answer' ? `Text the child read: «${clip(body.text, 1500)}»\nQuestion: ${clip(body.question, 300)}\nGist of a correct answer: ${clip(body.answerKey, 300)}`
@@ -104,8 +104,8 @@ Return ONLY compact JSON: {"ok":true|false,"score":0..1,"feedback":"2 short enco
 ok = ${okRule}. corrections = at most 6 spelling/grammar fixes, child's word -> correct word. Be gentle; never mock.`;
       const readPrompt = `Transcribe exactly the handwritten ${L} text of a young child in this image. Keep their spelling mistakes; do not correct anything. Output only the text.`;
       let text = '', result = null, via = '';
-      // 1) free: Workers AI vision + Qwen
-      try {
+      // 1) free: Workers AI vision + Qwen (skipped for Chinese handwriting when OpenAI is available: much better at hanzi)
+      if (!(lang === 'zh' && !typed && env.OPENAI_API_KEY)) try {
         if (typed) text = typed;
         else {
         if (env.HIBOU_KV && !(await env.HIBOU_KV.get('llama-vision-agreed'))) {   // Meta license: one-time « agree » request

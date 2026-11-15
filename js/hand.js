@@ -19,10 +19,10 @@ const L = {
   words: { fr: 'Mots à utiliser :', en: 'Words to use:' },
 };
 const voiceUrl = () => (store.settings.voiceUrl || VOICE_URL).replace(/\/$/, '');
-const norm = (s) => String(s).toLowerCase().replace(/[’']/g, "'").replace(/[.,!?;:«»"“”]/g, ' ').replace(/\s+/g, ' ').trim();
+const norm = (s) => String(s).replace(/[，。！？、；：]/g, ' ').toLowerCase().replace(/[’']/g, "'").replace(/[.,!?;:«»"“”]/g, ' ').replace(/\s+/g, ' ').trim();
 
 export function hand(q, area, ctx) {
-  const lang = q.lang === 'en' ? 'en' : 'fr';
+  const lang = ['en', 'zh'].includes(q.lang) ? q.lang : 'fr';
   const lines = Math.max(1, Math.min(8, q.lines || (q.mode === 'composition' ? 6 : 2)));
   const LH = 92;                                    // px between writing lines (CSS px)
   const wrap = el('div', { class: 'hand-wrap' });
@@ -30,12 +30,12 @@ export function hand(q, area, ctx) {
 
   // ---- pad ----
   const canvas = el('canvas', { class: 'hand-pad' });
-  const ta = el('textarea', { class: 'hand-ta hidden', rows: String(lines + 1), lang: lang === 'fr' ? 'fr-CA' : 'en-CA', autocapitalize: 'sentences', spellcheck: 'false' });
+  const ta = el('textarea', { class: 'hand-ta hidden', rows: String(lines + 1), lang: { fr: 'fr-CA', en: 'en-CA', zh: 'zh-CN' }[lang], autocapitalize: 'sentences', spellcheck: 'false' });
   const strokes = []; let cur = null, mode = 'pen', penSeen = false, dpr = 1;
   const g = canvas.getContext('2d');
   const size = () => {
     dpr = Math.min(2.5, window.devicePixelRatio || 1);
-    const w = canvas.clientWidth || 600, h = lines * LH + 30;
+    const w = canvas.clientWidth || 600, h = lang === 'zh' ? lines * (LH + 6) + 18 : lines * LH + 30;
     canvas.style.height = `${h}px`;
     canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
     redraw();
@@ -43,6 +43,18 @@ export function hand(q, area, ctx) {
   function paper() {
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.fillStyle = '#fff'; g.fillRect(0, 0, canvas.width, canvas.height);
+    if (lang === 'zh') {                               // 田字格: one square per character
+      const W = canvas.width / dpr, n = Math.max(4, Math.floor((W - 24) / LH));
+      const x0 = (W - n * LH) / 2;
+      for (let r = 0; r < lines; r++) for (let c = 0; c < n; c++) {
+        const x = x0 + c * LH, y = 12 + r * (LH + 6);
+        g.strokeStyle = '#e5534b'; g.lineWidth = 1.5; g.setLineDash([]); g.strokeRect(x, y, LH, LH);
+        g.strokeStyle = '#f2b8b4'; g.lineWidth = 1; g.setLineDash([5, 5]);
+        g.beginPath(); g.moveTo(x + LH / 2, y); g.lineTo(x + LH / 2, y + LH); g.moveTo(x, y + LH / 2); g.lineTo(x + LH, y + LH / 2); g.stroke();
+        g.setLineDash([]);
+      }
+      return;
+    }
     for (let i = 1; i <= lines; i++) {
       const y = i * LH;
       g.strokeStyle = '#c9d6ee'; g.lineWidth = 2; g.beginPath(); g.moveTo(12, y); g.lineTo(canvas.width / dpr - 12, y); g.stroke();
@@ -65,13 +77,14 @@ export function hand(q, area, ctx) {
     if (area.classList.contains('locked')) return;
     if (e.pointerType === 'pen') penSeen = true;
     else if (penSeen && e.pointerType === 'touch') return;          // palm rejection once a Pencil is used
-    canvas.setPointerCapture(e.pointerId);
+    try { canvas.setPointerCapture(e.pointerId); } catch { /* synthetic or lost pointer */ }
     cur = { pts: [pos(e)], w: e.pointerType === 'pen' ? 4 : 5, erase: mode === 'eraser' };
     strokes.push(cur); drawStroke(cur); e.preventDefault();
   });
   canvas.addEventListener('pointermove', (e) => {
     if (!cur) return;
-    const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+    const co = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+    const evs = co.length ? co : [e];
     for (const ev of evs) cur.pts.push(pos(ev));
     redraw(); e.preventDefault();
   });
@@ -100,7 +113,7 @@ export function hand(q, area, ctx) {
     out.innerHTML = '';
     if (res.text) out.append(el('div', { class: 'hand-read' }, el('b', {}, tr(L.read), ' '), dictDiff(res.text)));
     if (res.corrections?.length) out.append(el('div', { class: 'hand-fix' }, el('b', {}, tr(L.fix), ' '), res.corrections.map((c) => el('span', { class: 'fx' }, el('s', {}, c.wrong), ' → ', el('b', {}, c.right)))));
-    if (res.feedback) { out.append(el('div', { class: 'hand-fb' }, '🦉 ', res.feedback)); speak({ text: res.feedback, lang: lang === 'fr' ? 'fr-CA' : 'en-CA' }); }
+    if (res.feedback) { out.append(el('div', { class: 'hand-fb' }, '🦉 ', res.feedback)); speak({ text: res.feedback, lang: { fr: 'fr-CA', en: 'en-CA', zh: 'zh-CN' }[lang] }); }
   };
   // dictation: mark the words that differ from the dictated sentence
   const dictDiff = (text) => {

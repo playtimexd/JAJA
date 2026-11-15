@@ -42,9 +42,18 @@ export async function collect({ sets = ['books', 'why', 'prompts'] } = {}) {
   }
   if (sets.includes('prompts')) {
     // texts that come back again and again in the generated exercises (≥ 8 % of a unit's questions)
-    const subj = { francais: 'fr-CA', math: null, anglais: 'en-CA', anglais2: 'en-CA', chinois: 'zh-CN', chinois2: 'zh-CN' };
+    const subj = { francais: 'fr-CA', francais2: 'fr-CA', francais3: 'fr-CA', math: null, anglais: 'en-CA', anglais2: 'en-CA', anglais3: 'en-CA', chinois: 'zh-CN', chinois2: 'zh-CN', chinois3: 'zh-CN' };
     for (const [file, speech] of Object.entries(subj)) {
+      if (!fs.existsSync(new URL(`js/content/${file}.js`, root))) continue;
       const { units } = await import(new URL(`js/content/${file}.js`, root).href);
+      // units with fixed sentences (dictations…) list them all
+      for (const u of units) for (const sy of (u.allSay?.() || [])) {
+        for (const ui of ['fr', 'en']) {
+          let text = sy.text, lang = sy.lang;
+          if (text && typeof text === 'object') { text = text[ui] ?? text.fr; lang = lang || (ui === 'fr' ? 'fr-CA' : 'en-CA'); }
+          if (typeof text === 'string') add(lang || speech || 'fr-CA', text, 'prompts');
+        }
+      }
       for (const u of units) for (const level of [1, 2, 3]) {
         const R = makeRng(7 + level), seen = new Map(), N = 300;
         for (let i = 0; i < N; i++) {
