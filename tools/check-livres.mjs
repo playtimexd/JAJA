@@ -10,6 +10,7 @@ const svgOk = (w, v) => {
   if (/<script|\son\w+=|href="(?!#)|<image|<foreignObject/i.test(v)) fail(w, 'forbidden svg content');
   if (/<text[^>]*>[^<]*[A-Za-zÀ-ÿ]{2,}/.test(v)) fail(w, 'words in svg');
   if (v.length > 40000) fail(w, `svg too big ${v.length}`);
+  for (const tag of v.match(/<[a-zA-Z][^>]*>/g) || []) { const names = [...tag.matchAll(/\s([a-zA-Z:-]+)=/g)].map((m) => m[1]); const dup = names.find((n, i) => names.indexOf(n) !== i); if (dup) { fail(w, `repeated attribute ${dup} in ${tag.slice(0, 60)}`); break; } }
 };
 for (const id of ids) {
   let b;

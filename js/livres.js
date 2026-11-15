@@ -14,6 +14,7 @@ export const BOOKS = [
 ];
 const L = {
   shelf: { fr: 'Mes livres', en: 'My books' },
+  cont: { fr: 'Continuer', en: 'Continue' },
   read: { fr: 'Je lis', en: 'I read' },
   listen: { fr: 'J’écoute', en: 'Listen' },
   tapWord: { fr: 'Touche un mot pour l’entendre.', en: 'Tap a word to hear it.' },
@@ -36,10 +37,17 @@ const fr = (text) => ({ text, lang: 'fr-CA' });
 // Each picture is an isolated <img>: books may use <style>/ids inside their SVG without leaking into each other.
 const pic = (svg, cls) => {
   let v = String(svg || '');
+  // Re-serialise through the lenient HTML parser: fixes small XML mistakes (e.g. a repeated attribute) that would break an <img>.
+  try {
+    const node = new DOMParser().parseFromString(`<body>${v}</body>`, 'text/html').querySelector('svg');
+    if (node) { node.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); v = new XMLSerializer().serializeToString(node); }
+  } catch { /* keep the original */ }
   if (!/xmlns=/.test(v)) v = v.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
   if (/xlink:href/.test(v) && !/xmlns:xlink/.test(v)) v = v.replace('<svg', '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
   return el('div', { class: cls }, el('img', { src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(v), alt: '', draggable: 'false' }));
 };
+
+export async function openBook(id, back, i = 0) { const b = await loadBook(id); page(b, Math.min(i, b.pages.length - 1), back, false); }
 
 export async function libraryHome(back) {
   const books = await loadAll();
@@ -62,6 +70,7 @@ function cover(b, back) {
       el('div', { class: 'cover-side' },
         el('h1', { class: 'cover-title' }, b.title),
         el('div', { class: 'art-meta' }, `${tr(L.lvl[b.level])} · ${b.pages.length} pages · ⏱️ ${b.minutes} min`),
+        (store.bookPos?.[b.id] > 0 && store.bookPos[b.id] < b.pages.length - 1) ? el('button', { class: 'btn primary big-go', onclick: () => { sfx('tap'); page(b, store.bookPos[b.id], back, false); } }, '▶ ', tr(L.cont), ` (p. ${store.bookPos[b.id] + 1})`) : null,
         el('button', { class: 'btn primary big-go', onclick: () => { sfx('tap'); page(b, 0, back, false); } }, '📖 ', tr(L.read)),
         el('button', { class: 'btn big-go', onclick: () => { sfx('tap'); page(b, 0, back, true); } }, '🎧 ', tr(L.listen)))),
   );
@@ -84,6 +93,9 @@ function tappable(text) {
 let auto = null;
 function page(b, i, back, listen) {
   clearTimeout(auto);
+  store.bookPos = { ...(store.bookPos || {}), [b.id]: i };
+  store.resume = { t: 'book', id: b.id, i, label: b.title, icon: b.emoji };
+  save();
   const p = b.pages[i], last = i === b.pages.length - 1;
   const go = (k) => { stopSpeech(); clearTimeout(auto); sfx('tap'); k < b.pages.length ? page(b, k, back, listen) : endWords(b, back); };
   const bar = el('div', { class: 'book-progress' }, el('span', { style: { width: `${((i + 1) / b.pages.length) * 100}%` } }));

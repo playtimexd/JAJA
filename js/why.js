@@ -46,6 +46,8 @@ async function load() {
 }
 const view = { cat: 'animaux' };
 
+export async function openWhy(id, home, playFn, i = 0) { const list = await load(); const t = list.find((x) => x.id === id); if (t) topic(t, Math.min(i, t.slides.length - 1), home, playFn); else whyHome(home, playFn); }
+
 export async function whyHome(home, playFn) {
   const list = await load();
   const langSeg = el('div', { class: 'why-lang' }, [['zh', '🐼 中文'], ['fr', '⚜️ Français']].map(([k, label]) =>
@@ -77,6 +79,8 @@ export async function whyHome(home, playFn) {
 
 function topic(t, i, home, playFn) {
   unlockAudio();
+  store.resume = { t: 'why', id: t.id, i, label: wl() === 'zh' ? t.q.zh : t.q.fr, icon: t.emoji };
+  save();
   setContentLang(sayLang());
   const s = t.slides[i], last = i === t.slides.length - 1;
   const dots = el('div', { class: 'step-dots' }, t.slides.map((_, k) => el('button', { class: `sd ${k < i ? 'past' : ''} ${k === i ? 'now' : ''}`, onclick: () => { sfx('tap'); topic(t, k, home, playFn); } })));

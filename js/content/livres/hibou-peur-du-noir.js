@@ -18,7 +18,7 @@ const sky = (a, b) => vg('gSky', a, b) + '<rect width="400" height="300" fill="u
 const ell = (cx, cy, rx, ry, f, sw = 3, ex = '') => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${f}"${sw_(sw)}${ex ? ' ' + ex : ''}/>`;
 const circ = (cx, cy, r, f, sw = 3) => ell(cx, cy, r, r, f, sw);
 const rect = (x, y, w, h, f, sw = 3, r = 0) => `<rect x="${x}" y="${y}" width="${w}" height="${h}"${r ? ` rx="${r}"` : ''} fill="${f}"${sw_(sw)}/>`;
-const path = (d, f = 'none', sw = 3, ex = '') => `<path d="${d}" fill="${f}"${sw_(sw)}${ex ? ' ' + ex : ''}/>`;
+const path = (d, f = 'none', sw = 3, ex = '') => `<path d="${d}"${/fill=/.test(ex) ? '' : ` fill="${f}"`}${/stroke-width=/.test(ex) ? '' : sw_(sw)}${ex ? ' ' + ex : ''}/>`;
 const line = (x1, y1, x2, y2, c = O, sw = 3) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"${c === O ? '' : ` stroke="${c}"`}${sw_(sw)}/>`;
 const G = (x, y, s, inner, flip = false, rot = 0) => `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${flip ? -s : s} ${s})">${inner}</g>`;
 const rnd = (i) => { const s = Math.sin(i * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
@@ -69,7 +69,7 @@ const hibou = (x, y, s, who = 'baby', face = 'happy', wings = 'down', flip = fal
   return G(x, y, s,
     shadow(0, 1, 32, 5) +
     path('M-10 -6 L-12 6 L0 2 L12 6 L10 -6Z', d, 2.5) +
-    behind + [-9, 9].map((px) => path(`M${px - 8} 0 Q${px} -9 ${px + 8} 0 M${px - 3} 0 L${px - 3} -5 M${px + 3} 0 L${px + 3} -5`, BEAK, 3, `stroke="#c9801f" fill="${BEAK}"`)).join('') +
+    behind + [-9, 9].map((px) => path(`M${px - 8} 0 Q${px} -9 ${px + 8} 0 M${px - 3} 0 L${px - 3} -5 M${px + 3} 0 L${px + 3} -5`, BEAK, 3, `stroke="#c9801f"`)).join('') +
     ell(0, -42, 31, 37, c) + ell(0, -36, 20, 28, b, 0) + [[-8, -50], [8, -50], [0, -42], [-14, -36], [14, -36], [-7, -30], [7, -30], [0, -22], [-10, -20], [10, -20]].map(([a, bb]) => path(`M${a - 5} ${bb} q5 6 10 0`, 'none', 1.8, `stroke="${dl}"`)).join('') +
     clothes + (wings === 'cover' ? '' : '') +
     path('M-23 -98 L-29 -122 L-8 -106Z', d) + path('M23 -98 L29 -122 L8 -106Z', d) +

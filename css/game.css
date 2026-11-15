@@ -377,3 +377,66 @@
 .why-q { font-size: 20px; line-height: 1.45; }
 .why-ok { position: absolute; right: 10px; top: 8px; color: var(--green); font-weight: 900; font-size: 20px; }
 .gate-msg { color: var(--red); font-weight: 800; min-height: 1.4em; }
+
+/* ===== phones & narrow screens (tested at 390 px) ===== */
+#app { overflow-x: hidden; }
+.choices { grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); }
+.choices.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.choices.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 600px) {
+  .screen { padding: 10px 12px 20px; gap: 12px; }
+  .home-top { gap: 10px; }
+  .home-top .owl.big { width: 76px; height: 82px; }
+  .bubble { padding: 10px 14px; font-size: 15px; }
+  .greet { font-size: 24px; }
+  .hud { gap: 6px; }
+  .pill { font-size: 16px; padding: 5px 10px; }
+  .subjects.five, .subjects.four { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .subjects.five .subject { min-height: 118px; padding: 10px 6px; border-radius: 22px; }
+  .subjects.five .sub-icon { font-size: 40px; }
+  .sub-name { font-size: 19px; }
+  .home .home-row { grid-template-columns: 1fr; }
+  .home .mini-row { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .wide.small { min-height: 74px; font-size: 13px; padding: 6px 2px; }
+  .wide.small .big-emoji { font-size: 26px; }
+  .home-foot { flex-wrap: wrap; }
+  .bar { gap: 8px; min-height: 52px; }
+  .bar h1 { font-size: 20px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .round { width: 46px; height: 46px; font-size: 26px; }
+  .dots { gap: 4px; } .dot { width: 14px; height: 14px; border-width: 2px; }
+  .q-prompt { font-size: 18px; }
+  .say-btn { width: 48px; height: 48px; font-size: 22px; }
+  .choices { gap: 10px; }
+  .choices.cols-3, .choices.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .opt { min-height: 92px !important; padding: 10px 6px; }
+  .opt .f-emoji { font-size: 46px !important; }
+  .opt .f-text { font-size: 20px !important; }
+  .stim-text.long { font-size: 17px; padding: 12px 14px; }
+  .stim-emoji { font-size: 72px; }
+  .owl-corner .owl.mini { width: 48px; height: 52px; }
+  .hud-row { font-size: 18px; gap: 8px; } .score { font-size: 22px; }
+  .talk-langs { flex-wrap: wrap; } .talk-lang { flex: 1 1 30%; font-size: 16px; padding: 10px 6px; }
+  .talk-lang span { font-size: 22px; }
+  .talk-grid, .modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mode-card { min-height: 112px; } .mode-i { font-size: 38px; } .mode-t { font-size: 18px; }
+  .diff-seg button { font-size: 16px; padding: 10px 4px; }
+  .why-screen .bar { flex-wrap: wrap; }
+  .why-lang { order: 3; width: 100%; } .why-lang button { flex: 1; }
+  .why-top { flex-direction: column; align-items: stretch; }
+  .why-grid { grid-template-columns: 1fr; }
+  .why-q { font-size: 17px; }
+  .why-text, .step-text, .book-text { font-size: 21px; }
+  .node { width: 150px; } .node-icon { width: 84px; height: 84px; font-size: 42px; } .node-title { font-size: 14px; }
+  .node.boss .node-icon { width: 100px; height: 100px; font-size: 54px; }
+  .node-owl { left: -48px; } .node.pos0 { margin-left: 16%; } .node.pos2 { margin-right: 4%; }
+  .sec-tile { min-height: 120px; padding: 14px; } .sec-icon { font-size: 46px; } .sec-name { font-size: 20px; }
+  .memory { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 8px; } .mcard { min-height: 84px; }
+  .shop-body { grid-template-columns: 1fr; } .shop-owl { position: static; padding: 40px 10px 16px; }
+  .hw-py .hz { font-size: 56px; }
+  .res-score { font-size: 40px; } .results h1 { font-size: 26px; }
+  .sheet { padding: 18px 14px calc(18px + env(safe-area-inset-bottom)); }
+  .sheet-head h2 { font-size: 21px; } .sheet-icon { font-size: 44px; }
+}
+.resume { display: flex; align-items: center; gap: 14px; background: var(--card); border: 3px solid var(--green); border-radius: 22px; padding: 10px 18px; box-shadow: 0 5px 0 #1f8a5240; text-align: left; }
+.resume:active { transform: translateY(3px); }
+.resume-i { font-size: 36px; } .resume-t { display: flex; flex-direction: column; } .resume-t b { font-size: 20px; color: #1f8a52; } .resume-t small { color: var(--ink2); font-weight: 700; font-size: 15px; }

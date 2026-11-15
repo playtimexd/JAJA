@@ -103,6 +103,7 @@ function home() {
       el('div', { class: 'bubble' }, el('div', { class: 'greet' }, greet), el('div', {}, t('pickSubject'))),
       el('div', { class: 'hud' }, wallet(), streakPill()),
     ),
+    resumeCard(),
     el('div', { class: 'subjects five' }, cards),
     el('div', { class: 'home-row' },
       el('div', { class: 'missions mcard-box' },
@@ -133,6 +134,22 @@ function home() {
     ),
   );
   speak({ text: { fr: greet, en: greet } });
+}
+
+// ▶ Continuer: picks up the last book page, craft step, « Pourquoi? » topic or exercise.
+function resumeCard() {
+  const r = store.resume;
+  if (!r) return null;
+  const go = async () => {
+    sfx('tap');
+    if (r.t === 'book') return (await import('./livres.js')).openBook(r.id, home, r.i);
+    if (r.t === 'art') return (await import('./arts.js')).openArt(r.id, home, r.i);
+    if (r.t === 'why') return (await import('./why.js')).openWhy(r.id, home, play, r.i);
+    const u = unitById(r.unit);
+    if (u) return play({ mode: r.mode, unit: u, level: r.level, back: () => subject(u.subject) });
+  };
+  return el('button', { class: 'resume', onclick: go }, el('span', { class: 'resume-i' }, r.icon || '▶'),
+    el('span', { class: 'resume-t' }, el('b', {}, '▶ ', t('continue')), el('small', {}, r.label || '')));
 }
 
 // ---------------- Subject: big section tiles ----------------
@@ -296,6 +313,7 @@ async function talkInfo() {
 async function play(opts) {
   unlockAudio();
   const { mode } = opts;
+  if (opts.unit && mode !== 'daily') { store.resume = { t: 'play', mode, unit: opts.unit.id, level: opts.level || 1, label: `${tr(opts.unit.title)} · ${t('diff' + (opts.level || 1))}`, icon: opts.unit.icon }; save(); }
   const R = makeRng();
   let level = opts.level || 1;
   const pool = opts.pool || (opts.unit ? [opts.unit] : []);

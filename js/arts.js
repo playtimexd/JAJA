@@ -40,6 +40,8 @@ async function load() {
 }
 const view = { cat: 'saison', lvl: 0 };
 
+export async function openArt(id, home, i = 0) { const list = await load(); const p = list.find((x) => x.id === id); if (p) steps(p, home, Math.min(i, p.steps.length - 1)); else artsHome(home); }
+
 export async function artsHome(home) {
   const list = await load();
   const month = new Date().getMonth() + 1;
@@ -102,6 +104,8 @@ function project(p, home) {
 
 function steps(p, home, i) {
   const s = p.steps[i], last = i === p.steps.length - 1;
+  store.resume = { t: 'art', id: p.id, i, label: tr(p.title), icon: p.emoji };
+  save();
   const dots = el('div', { class: 'step-dots' }, p.steps.map((_, k) => el('button', { class: `sd ${k < i ? 'past' : ''} ${k === i ? 'now' : ''}`, onclick: () => { sfx('tap'); steps(p, home, k); } })));
   screen('art-step purple',
     el('header', { class: 'bar' }, backBtn(() => project(p, home), '✕'), el('h1', {}, p.emoji, ' ', tr(p.title)), el('span', { class: 'bar-title' }, `${tr(L.step)} ${i + 1} / ${p.steps.length}`)),

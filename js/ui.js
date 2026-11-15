@@ -6,6 +6,7 @@ import { store } from './store.js';
 import { COIN, streakNow } from './game.js';
 
 export const app = document.getElementById('app');
+let navigating = false;
 export const screen = (cls, ...kids) => {
   stopSpeech();
   document.querySelectorAll('.sheet-wrap').forEach((n) => n.remove());
@@ -13,8 +14,17 @@ export const screen = (cls, ...kids) => {
   const n = el('div', { class: `screen ${cls}` }, ...kids);
   app.append(n);
   app.scrollTop = 0;
+  if (!navigating) history.pushState({ hibou: Date.now() }, '');
   return n;
 };
+// Back swipe / browser back = the screen's own ‹ or ✕ button (or closes an open sheet).
+window.addEventListener('popstate', () => {
+  const open = document.querySelector('.sheet-wrap:not(.out)');
+  if (open) { open.querySelector('.sheet-x')?.click(); history.pushState({ hibou: Date.now() }, ''); return; }
+  const back = document.querySelector('#app .screen .bar .back, #app .screen .back');
+  if (back) { navigating = true; try { back.click(); } finally { navigating = false; } history.pushState({ hibou: Date.now() }, ''); }
+  else history.pushState({ hibou: Date.now() }, '');   // on the home screen: stay in the app
+});
 export const backBtn = (fn, label = '‹') => el('button', { class: 'round back', 'aria-label': t('back'), onclick: () => { sfx('tap'); fn(); } }, label);
 export const starsTxt = (n) => '★'.repeat(n) + '☆'.repeat(3 - n);
 
