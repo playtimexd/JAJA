@@ -131,6 +131,16 @@ function speakDevice(text, l) {
 }
 
 // say: { text: string | {fr,en}, lang?: 'fr-CA' | 'en-CA' }
+// Pre-recorded voice (tools/eleven.mjs → audio/vo/<key>.mp3, listed in audio/vo/index.json). Played first when it exists.
+let vo = null;
+fetch('audio/vo/index.json').then((r) => (r.ok ? r.json() : {})).then((j) => { vo = j; }).catch(() => { vo = {}; });
+function voiceKey(l, text) {
+  let h = 0x811c9dc5;
+  const s = `${l}|${text}`;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h.toString(16).padStart(8, '0');
+}
+
 export async function speak(say, { interrupt = true } = {}) {
   if (!say || !store.settings.voice) return;
   let text = say.text, l = say.lang;
@@ -140,6 +150,10 @@ export async function speak(say, { interrupt = true } = {}) {
   text = String(text).replace(/☐/g, '').replace(/_{2,}/g, ' … ');
   if (interrupt) stopSpeech();
   const my = ++token;
+  const k = vo && voiceKey(l, text.trim());
+  if (k && vo[k]) {
+    try { await playSrc(`audio/vo/${k}.mp3`); return; } catch { if (my !== token) return; }
+  }
   if (neural) {
     try { await speakNeural(text, l); return; }
     catch { if (my !== token) return; if (player) player.pause(); }   // fall back to the iPad voice
