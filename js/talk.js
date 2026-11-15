@@ -23,6 +23,7 @@ const L = {
   noServer: { fr: 'La voix de Hibou n’est pas encore installée. Demande à un parent.', en: 'Owl’s voice is not set up yet. Ask a parent.' },
   noMic: { fr: 'Le micro est bloqué. Autorise le micro pour ce site dans Réglages.', en: 'The microphone is blocked. Allow the microphone for this site in Settings.' },
   needHttps: { fr: 'Le micro marche seulement sur la version en ligne (https).', en: 'The microphone only works on the online (https) version.' },
+  badCode: { fr: 'Le code familial manque ou n’est pas bon. Demande à un parent (⚙️ Parents).', en: 'The family code is missing or wrong. Ask a parent (⚙️ Parents).' },
   limit: { fr: 'C’est assez pour aujourd’hui! Reviens demain.', en: 'That’s enough for today! Come back tomorrow.' },
   error: { fr: 'Oups, Hibou n’a pas pu venir. Réessaie plus tard.', en: 'Oops, Owl could not come. Try again later.' },
   left: { fr: 'min restantes aujourd’hui', en: 'min left today' },
@@ -108,6 +109,7 @@ async function start(s, level, back) {
       method: 'POST', headers: { 'content-type': 'application/json', ...(store.settings.voiceCode ? { 'x-family-code': store.settings.voiceCode } : {}) },
       body: JSON.stringify({ scenario: s.id, lang: lang(), instructions: `${BASE(level)}\n\nActivity: ${s.task}` }),
     });
+    if (r.status === 401) { ui.status.textContent = tr(L.badCode); cleanup(); return; }
     if (!r.ok) throw new Error(`server ${r.status}`);
     const { value } = await r.json();
     const pc = new RTCPeerConnection();

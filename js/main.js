@@ -689,6 +689,7 @@ function parents() {
       el('h2', {}, '🎙️ ', t('voiceServer')),
       el('p', { class: 'hint' }, t('voiceServerHint')),
       el('label', { class: 'row' }, el('span', {}, 'URL'), (() => { const i = el('input', { class: 'name-in wide-in', value: store.settings.voiceUrl || '', placeholder: 'https://petithibou-voice.….workers.dev', autocapitalize: 'off', spellcheck: 'false' }); i.addEventListener('change', () => { store.settings.voiceUrl = i.value.trim(); save(); }); return i; })()),
+      el('label', { class: 'row' }, el('span', {}, t('familyCode')), (() => { const i = el('input', { class: 'name-in', type: 'password', value: store.settings.voiceCode || '', autocapitalize: 'off', autocomplete: 'off' }); i.addEventListener('change', () => { store.settings.voiceCode = i.value.trim(); save(); }); return i; })()),
       el('div', { class: 'row' }, el('span', {}, t('talkLimit')),
         el('div', { class: 'seg' }, [10, 15, 20, 30].map((n) => el('button', { class: (store.settings.talkLimit ?? 15) === n ? 'on' : '', onclick: () => { store.settings.talkLimit = n; save(); parents(); } }, `${n}′`)))),
       el('div', { class: 'row' }, el('span', {}, t('readVoice')), toggle('cloudVoice')),
