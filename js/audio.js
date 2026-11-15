@@ -1,4 +1,5 @@
 // Text-to-speech: neural voice served by the PC when available, else Web Speech API (offline on iPad) + small synthesized sound effects.
+import { VOICE_URL } from './config.js';
 import { store } from './store.js';
 import { lang } from './i18n.js';
 
@@ -68,14 +69,15 @@ function speakNeural(text, l) {
 
 // Same idea through the parents' voice server (worker/index.js → OpenAI TTS) when the app is hosted online.
 const cloudCache = new Map();   // text|lang|rate -> object URL (kept for the session)
-const cloudOn = () => store.settings.cloudVoice !== false && !!store.settings.voiceUrl && !!store.settings.voiceCode;
+const voiceUrl = () => (store.settings.voiceUrl || VOICE_URL).replace(/\/$/, '');
+const cloudOn = () => store.settings.cloudVoice !== false && !!voiceUrl() && location.protocol === 'https:';
 async function speakCloud(text, l, my) {
   const rate = store.settings.rate;
   const k = `${l}|${rate}|${text}`;
   let src = cloudCache.get(k);
   if (!src) {
-    const r = await fetch(`${store.settings.voiceUrl.replace(/\/$/, '')}/tts`, {
-      method: 'POST', headers: { 'content-type': 'application/json', 'x-family-code': store.settings.voiceCode },
+    const r = await fetch(`${voiceUrl()}/tts`, {
+      method: 'POST', headers: { 'content-type': 'application/json', ...(store.settings.voiceCode ? { 'x-family-code': store.settings.voiceCode } : {}) },
       body: JSON.stringify({ text, lang: l, rate }), signal: AbortSignal.timeout(8000),
     });
     if (!r.ok) throw new Error('cloud tts ' + r.status);

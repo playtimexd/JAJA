@@ -13,11 +13,11 @@ La clé OpenAI reste dans le Worker ; l’iPad reçoit seulement une clé de 2 m
    ```
    npx wrangler login
    npx wrangler secret put OPENAI_API_KEY     (coller la clé)
-   npx wrangler secret put FAMILY_CODE        (inventer un code, ex. 8 chiffres)
    npx wrangler deploy
    ```
    Wrangler affiche l’adresse, ex. `https://petithibou-voice.<compte>.workers.dev`.
-4. Dans le jeu : ⚙️ Parents → **Serveur de voix** → coller l’URL et le code familial.
+4. Donner l’URL à Claude (ou la mettre dans `js/config.js` → `VOICE_URL`) : le jeu en ligne s’y connecte tout seul.
+   (Optionnel : `npx wrangler secret put FAMILY_CODE` pour exiger un code, à entrer ensuite dans le jeu.)
 
 ## Coût (à vérifier sur openai.com/api/pricing)
 - Conversation : modèle `gpt-realtime-2.1-mini` ≈ quelques cents par minute. Limite par défaut 15 min/jour (réglable dans Parents), 6 min max par conversation.

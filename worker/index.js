@@ -1,8 +1,9 @@
 // Petit Hibou voice backend — a Cloudflare Worker (free plan is enough).
-// Keeps the OpenAI API key off the iPad. Endpoints (all need header X-Family-Code):
+// Keeps the OpenAI API key off the iPad. Only pages from ALLOWED_ORIGINS may call it.
+// FAMILY_CODE is optional: if set, requests must send it in header X-Family-Code. Endpoints:
 //   POST /realtime  { scenario, instructions }  → { value: "ek_…" }  short-lived key for a WebRTC voice chat
 //   POST /tts       { text, lang, rate }        → audio/mpeg           natural reading voice
-// Secrets (wrangler secret put …): OPENAI_API_KEY, FAMILY_CODE
+// Secrets (wrangler secret put …): OPENAI_API_KEY (required), FAMILY_CODE (optional)
 // Vars (wrangler.toml): ALLOWED_ORIGINS, REALTIME_MODEL, REALTIME_VOICE, TTS_MODEL, TTS_VOICE_EN, TTS_VOICE_FR
 
 const json = (obj, status, cors) => new Response(JSON.stringify(obj), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...cors } });
@@ -17,7 +18,7 @@ export default {
     const url = new URL(req.url);
     if (url.pathname === '/health') return json({ ok: true }, 200, cors);
     if (!okOrigin) return json({ error: 'origin' }, 403, cors);
-    if (!env.FAMILY_CODE || req.headers.get('x-family-code') !== env.FAMILY_CODE) return json({ error: 'code' }, 401, cors);
+    if (env.FAMILY_CODE && req.headers.get('x-family-code') !== env.FAMILY_CODE) return json({ error: 'code' }, 401, cors);
     if (req.method !== 'POST') return json({ error: 'method' }, 405, cors);
     const body = await req.json().catch(() => ({}));
 

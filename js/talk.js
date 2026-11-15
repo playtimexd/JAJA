@@ -1,6 +1,7 @@
 // "Parle avec Hibou": real spoken English conversation with an AI owl (OpenAI Realtime over WebRTC).
 // The iPad never sees the OpenAI key: the parents' voice server (worker/index.js) hands out a 2-minute key.
 import { el } from './util.js';
+import { VOICE_URL } from './config.js';
 import { store, save, today } from './store.js';
 import { tr, lang } from './i18n.js';
 import { sfx, stopSpeech } from './audio.js';
@@ -19,7 +20,7 @@ const L = {
   listening: { fr: 'Hibou t’écoute… parle!', en: 'Owl is listening… talk!' },
   speaking: { fr: 'Hibou parle…', en: 'Owl is talking…' },
   stop: { fr: 'Terminer', en: 'Finish' },
-  noServer: { fr: 'La voix de Hibou n’est pas encore installée. Demande à un parent (⚙️ Parents → Serveur de voix).', en: 'Owl’s voice is not set up yet. Ask a parent (⚙️ Parents → Voice server).' },
+  noServer: { fr: 'La voix de Hibou n’est pas encore installée. Demande à un parent.', en: 'Owl’s voice is not set up yet. Ask a parent.' },
   noMic: { fr: 'Le micro est bloqué. Autorise le micro pour ce site dans Réglages.', en: 'The microphone is blocked. Allow the microphone for this site in Settings.' },
   needHttps: { fr: 'Le micro marche seulement sur la version en ligne (https).', en: 'The microphone only works on the online (https) version.' },
   limit: { fr: 'C’est assez pour aujourd’hui! Reviens demain.', en: 'That’s enough for today! Come back tomorrow.' },
@@ -58,10 +59,11 @@ export const SCENARIOS = [
 ];
 
 let live = null;   // current session
+const voiceUrl = () => (store.settings.voiceUrl || VOICE_URL).replace(/\/$/, '');
 
 export function talkHome(back) {
   const left = Math.max(0, dailyLimit() * 60 - usedToday());
-  const ok = !!(store.settings.voiceUrl && store.settings.voiceCode);
+  const ok = !!voiceUrl();
   let level = store.pick.talk || 1;
   const seg = el('div', { class: 'diff-seg' });
   const drawSeg = () => {
@@ -93,7 +95,7 @@ function stage(s, back) {
 }
 
 async function start(s, level, back) {
-  if (!store.settings.voiceUrl || !store.settings.voiceCode) { sheet(el('p', { class: 'talk-warn' }, tr(L.noServer))); return; }
+  if (!voiceUrl()) { sheet(el('p', { class: 'talk-warn' }, tr(L.noServer))); return; }
   if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) { sheet(el('p', { class: 'talk-warn' }, tr(L.needHttps))); return; }
   if (usedToday() >= dailyLimit() * 60) { sheet(el('p', { class: 'talk-warn' }, tr(L.limit))); return; }
   stopSpeech();
@@ -102,8 +104,8 @@ async function start(s, level, back) {
   try {
     const mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
     live.mic = mic;
-    const r = await fetch(`${store.settings.voiceUrl.replace(/\/$/, '')}/realtime`, {
-      method: 'POST', headers: { 'content-type': 'application/json', 'x-family-code': store.settings.voiceCode },
+    const r = await fetch(`${voiceUrl()}/realtime`, {
+      method: 'POST', headers: { 'content-type': 'application/json', ...(store.settings.voiceCode ? { 'x-family-code': store.settings.voiceCode } : {}) },
       body: JSON.stringify({ scenario: s.id, lang: lang(), instructions: `${BASE(level)}\n\nActivity: ${s.task}` }),
     });
     if (!r.ok) throw new Error(`server ${r.status}`);
