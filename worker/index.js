@@ -18,6 +18,15 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { status: okOrigin ? 204 : 403, headers: cors });
     const url = new URL(req.url);
     if (url.pathname === '/health') return json({ ok: true }, 200, cors);
+    // One-time voice-over recording from the family PC (tools/eleven.mjs --via-worker): ElevenLabs key stays in Cloudflare.
+    if (url.pathname.startsWith('/eleven/')) {
+      if (!env.LOCAL_SECRET || req.headers.get('x-local-secret') !== env.LOCAL_SECRET) return json({ error: 'secret' }, 401, {});
+      if (!env.ELEVENLABS_API_KEY) return json({ error: 'no ELEVENLABS_API_KEY secret' }, 503, {});
+      const target = 'https://api.elevenlabs.io/v1/' + url.pathname.slice('/eleven/'.length) + url.search;
+      if (!/^https:\/\/api\.elevenlabs\.io\/v1\/(user\/subscription|voices|text-to-speech\/[A-Za-z0-9]+)(\?|$)/.test(target)) return json({ error: 'path' }, 400, {});
+      const r = await fetch(target, { method: req.method, headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'content-type': 'application/json', accept: req.headers.get('accept') || '*/*' }, body: req.method === 'POST' ? await req.text() : undefined });
+      return new Response(r.body, { status: r.status, headers: { 'content-type': r.headers.get('content-type') || 'application/octet-stream' } });
+    }
     // The family PC (localvoice/start.ps1) registers its HTTPS tunnel address here.
     if (url.pathname === '/local-register' && req.method === 'POST') {
       if (!env.LOCAL_SECRET || req.headers.get('x-local-secret') !== env.LOCAL_SECRET) return json({ error: 'secret' }, 401, {});
@@ -28,15 +37,6 @@ export default {
     }
     if (!okOrigin) return json({ error: 'origin' }, 403, cors);
     if (env.FAMILY_CODE && req.headers.get('x-family-code') !== env.FAMILY_CODE) return json({ error: 'code' }, 401, cors);
-    // One-time voice-over recording from the family PC (tools/eleven.mjs --via-worker): ElevenLabs key stays in Cloudflare.
-    if (url.pathname.startsWith('/eleven/')) {
-      if (!env.LOCAL_SECRET || req.headers.get('x-local-secret') !== env.LOCAL_SECRET) return json({ error: 'secret' }, 401, {});
-      if (!env.ELEVENLABS_API_KEY) return json({ error: 'no ELEVENLABS_API_KEY secret' }, 503, {});
-      const target = 'https://api.elevenlabs.io/v1/' + url.pathname.slice('/eleven/'.length) + url.search;
-      if (!/^https:\/\/api\.elevenlabs\.io\/v1\/(user\/subscription|voices|text-to-speech\/[A-Za-z0-9]+)(\?|$)/.test(target)) return json({ error: 'path' }, 400, {});
-      const r = await fetch(target, { method: req.method, headers: { 'xi-api-key': env.ELEVENLABS_API_KEY, 'content-type': 'application/json', accept: req.headers.get('accept') || '*/*' }, body: req.method === 'POST' ? await req.text() : undefined });
-      return new Response(r.body, { status: r.status, headers: { 'content-type': r.headers.get('content-type') || 'application/octet-stream' } });
-    }
     if (url.pathname === '/local') {
       const v = env.HIBOU_KV ? await env.HIBOU_KV.get('local') : null;
       return json(v ? JSON.parse(v) : {}, 200, cors);
