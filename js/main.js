@@ -1,5 +1,5 @@
 import { el, makeRng, wait } from './util.js';
-import { store, save, today, levelStats, recordSession } from './store.js';
+import { store, save, today, levelStats, recordSession, frWeek, setFrWeek } from './store.js';
 import { t, tr, lang, STRINGS } from './i18n.js';
 import { speak, stopSpeech, sfx, unlockAudio, setContentLang } from './audio.js';
 import { runQuestion, face } from './widgets.js';
@@ -10,9 +10,10 @@ import {
 } from './game.js';
 import { wordPairs, mathPairs } from './content/pairs.js';
 import { planCard, markPlan, upcoming } from './plan.js';
+import { blockForWeek } from './content/francais4.js';
 
 const SUBJECTS = [
-  { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js', './content/francais2.js', './content/francais3.js'], speech: 'fr-CA', praise: 'fr' },
+  { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js', './content/francais2.js', './content/francais3.js', './content/francais4.js'], speech: 'fr-CA', praise: 'fr' },
   { id: 'math', icon: '🧮', color: 'blue', mods: ['./content/math.js'], speech: null, praise: null },
   { id: 'anglais', icon: '🍁', color: 'green', mods: ['./content/anglais-catch.js', './content/anglais.js', './content/anglais2.js', './content/anglais3.js'], speech: 'en-CA', praise: 'en' },
   { id: 'chinois', icon: '🐼', color: 'red', mods: ['./content/chinois.js', './content/chinois2.js', './content/chinois3.js'], speech: 'zh-CN', praise: 'zh' },
@@ -46,6 +47,8 @@ const SECTIONS = {
     { id: 'probl', icon: '🕵️', t: { fr: 'Je résous des problèmes', en: 'Problem solving' }, ids: ['m7', 'm17', 'm18', 'm19'], boss: '🐉' },
   ],
   francais: [
+    // cahier « Semaines » de la classe ; le bloc de la semaine courante (frWeek) est mis en avant
+    { id: 'semaine', icon: '📅', t: { fr: 'Mes mots de la semaine', en: 'This week’s words' }, ids: range('f', 19, 30), boss: '🐺', week: true },
     { id: 'lect', icon: '🔤', t: { fr: 'Lecture et sons', en: 'Reading & sounds' }, ids: ['f1', 'f2', 'f8', 'f14'], boss: '🐉' },
     { id: 'mots', icon: '📝', t: { fr: 'Mots et orthographe', en: 'Words & spelling' }, ids: ['f3', 'f9', 'f10', 'f12', 'f13'], boss: '🦈' },
     { id: 'gram', icon: '✏️', t: { fr: 'Grammaire', en: 'Grammar' }, ids: ['f4', 'f5', 'f6'], boss: '🦖' },
@@ -160,10 +163,10 @@ async function openPlanBlock(b) {
   if (b.target === 'TALK') return (await import('./talk.js')).talkHome(home, 'en');
   if (b.target === 'WHY') { store.settings.whyLang = 'zh'; save(); return (await import('./why.js')).whyHome(home, play); }
   const u = unitById(b.target);
-  if (u) play({ mode: 'practice', unit: u, level: suggestedLevel(u), back: home });
+  if (u) play({ mode: 'practice', unit: u, level: b.level ?? Math.min(b.cap ?? 3, suggestedLevel(u)), back: home });
 }
-export function planDone(target) {
-  const r = markPlan(target);
+export function planDone(target, level) {
+  const r = markPlan(target, level);
   if (r?.all) { addCoins(20); save(); setTimeout(() => { toast('📅', t('planAll')); confetti(70); }, 900); }
   else if (r) setTimeout(() => toast('✅', `${t('planBlock')} · ${tr(r.block.label)}`), 900);
 }
@@ -197,6 +200,7 @@ function subject(s) {
         if (x.books) return tile(x.icon, tr(x.t), `${Object.keys(store.books || {}).length} ✔ · 10 📖`, 'books', async () => (await import('./livres.js')).libraryHome(() => subject(s)));
         const got = x.units.reduce((a, u) => a + unitStars(u), 0), max = x.units.length * 9;
         const troph = store.trophies[`${s.id}-${x.id}`];
+        if (x.week) { const cur = x.units.find((u) => u.id === blockForWeek(frWeek()).id); return tile(x.icon, tr(x.t), `⭐ ${tr({ fr: 'Cette semaine', en: 'This week' })} : ${cur ? tr(cur.title) : ''}`, 'weekly', () => section(s, x.id)); }
         return tile(x.icon, tr(x.t), `${x.units.length} ${t('games')} · ★ ${got}/${max}${troph ? ' · 🏆' : ''}`, '', () => section(s, x.id));
       }),
       tile('⚡', t('quiz'), t('quizSub'), 'quiz', () => quizHub(s)),
@@ -209,12 +213,14 @@ function subject(s) {
 function section(s, secId) {
   const sec = sectionsOf(s).find((x) => x.id === secId);
   const lastId = [...store.log].reverse().find((x) => sec.units.some((u) => u.id === x.unit))?.unit;
-  const here = sec.units.findIndex((u) => u.id === lastId);
+  const curId = sec.week ? blockForWeek(frWeek()).id : null;
+  const here = curId ? sec.units.findIndex((u) => u.id === curId) : sec.units.findIndex((u) => u.id === lastId);
   const nodes = [];
   const path = el('div', { class: 'path' });
   sec.units.forEach((u, i) => {
     const lv = [1, 2, 3].map((l) => levelStats(u.id, l)?.stars ?? 0);
-    const node = el('button', { class: `node pos${i % 4} ${unitStars(u) ? 'played' : ''}`, onclick: () => { sfx('tap'); openUnit(u, sec); } },
+    const node = el('button', { class: `node pos${i % 4} ${unitStars(u) ? 'played' : ''} ${u.id === curId ? 'current' : ''}`, onclick: () => { sfx('tap'); openUnit(u, sec); } },
+      u.id === curId ? el('span', { class: 'node-badge' }, '⭐ ', tr({ fr: 'Cette semaine', en: 'This week' })) : null,
       el('span', { class: 'node-icon' }, u.icon),
       el('span', { class: 'node-medals' }, lv.map((st, k) => el('i', { class: st ? DIFF_COL[k + 1] : '' }))),
       el('span', { class: 'node-title' }, tr(u.title)),
@@ -237,6 +243,7 @@ function section(s, secId) {
   path.prepend(svg);
   screen(`section-screen ${s.color}`,
     el('header', { class: 'bar' }, backBtn(() => subject(s)), el('h1', {}, sec.icon, ' ', tr(sec.t)), wallet()),
+    curId ? weekCard(blockForWeek(frWeek()), sec.units.find((u) => u.id === curId), sec) : null,
     path);
   // dotted trail between the nodes
   requestAnimationFrame(() => {
@@ -248,6 +255,22 @@ function section(s, secId) {
     for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; const my = (y0 + y1) / 2; d += ` C${x0} ${my} ${x1} ${my} ${x1} ${y1}`; }
     svg.innerHTML = `<path d="${d}" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 22"/>`;
   });
+}
+
+// « Mes mots de la semaine » : la page du cahier de la semaine courante (mots ⛓ / *, règle, verbe, sons).
+function weekCard(b, u, sec) {
+  const wk = frWeek();
+  const word = (x) => el('span', { class: `wk-word ${x.menotte ? 'men' : ''} ${b.weeks.find((w) => w.n === wk)?.words.includes(x) ? 'now' : ''}` }, x.text, x.menotte ? ' ⛓' : '', x.special ? ' *' : '');
+  return el('section', { class: 'week-card' },
+    el('div', { class: 'wc-head' }, el('b', {}, '⭐ ', tr({ fr: `Semaine ${wk} · ${tr(u.title)}`, en: `Week ${wk} · ${tr(u.title)}` })),
+      b.proposed ? el('small', { class: 'wc-prop' }, tr({ fr: 'proposé', en: 'proposed' })) : null,
+      el('button', { class: 'btn primary small', onclick: () => { sfx('tap'); openUnit(u, sec); } }, '▶ ', tr({ fr: 'Jouer', en: 'Play' }))),
+    el('div', { class: 'wc-weeks' }, b.weeks.map((w) => el('div', { class: `wc-week ${w.n === wk ? 'now' : ''}` }, el('small', {}, tr({ fr: `Semaine ${w.n}`, en: `Week ${w.n}` })), el('div', { class: 'wc-words' }, w.words.map(word))))),
+    el('p', { class: 'wc-rule' }, '💡 ', b.rule),
+    el('div', { class: 'wc-foot' },
+      el('span', {}, '🔤 ', tr({ fr: 'Sons', en: 'Sounds' }), ' : ', b.sounds.map((x) => `« ${x.label} »`).join(' · ')),
+      el('span', {}, '🏃 ', tr({ fr: 'Verbe', en: 'Verb' }), ` « ${b.verb} » : `, b.conj.join(', '))),
+  );
 }
 
 // ---------------- Mes erreurs: wrong answers come back after 1, 3, 7, 14 days ----------------
@@ -575,7 +598,7 @@ function finishGame(g) {
   progress('combo', bestCombo, { set: true });
   const subj = (g.unit || g.pool?.[0])?.subject;
   if (subj) progress(subj.id);
-  if (mode === 'practice' && g.unit) planDone(g.unit.id);
+  if (mode === 'practice' && g.unit) planDone(g.unit.id, level);
   if (mode === 'review') {
     store.log.push({ d: today(), unit: 'review', level: 0, mode, score, total, ms });
     coins = Math.floor(correct) * 2;
@@ -801,6 +824,12 @@ function parents() {
       el('div', { class: 'row' }, el('span', {}, t('sound')), toggle('sound')),
       el('div', { class: 'row' }, el('span', {}, '🐼 ', t('pinyin')), (() => { if (store.settings.pinyin === undefined) store.settings.pinyin = true; return toggle('pinyin'); })()),
       el('div', { class: 'row' }, el('span', {}, `${COIN} ${t('coinsP')}`), el('b', {}, String(store.coins))),
+      el('div', { class: 'row' }, el('span', {}, '📅 ', tr({ fr: 'Semaine de la classe (cahier « Semaines »)', en: 'Class week (“Semaines” booklet)' }), el('br'),
+        el('small', { class: 'hint' }, tr(units.francais.find((u) => u.id === blockForWeek(frWeek()).id)?.title ?? ''), ' · ', tr({ fr: '+1 chaque lundi', en: '+1 every Monday' }))),
+        el('div', { class: 'seg' },
+          el('button', { onclick: () => { setFrWeek(frWeek() - 1); parents(); } }, '−'),
+          el('button', { class: 'on' }, String(frWeek())),
+          el('button', { onclick: () => { setFrWeek(frWeek() + 1); parents(); } }, '+'))),
     ),
     el('section', { class: 'card-p' },
       el('h2', {}, '🎙️ ', t('voiceServer')),
@@ -845,4 +874,4 @@ home();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('./sw.js');
 
 // test hooks (used by tools/shot.mjs captures)
-window.__hibou = { units, play, home, subject, section, quizHub, gamesHub, memory, shop, badges, store, SUBJECTS, sectionsOf, openUnit, openBoss, refreshWallet };
+window.__hibou = { units, play, home, subject, section, parents, quizHub, gamesHub, memory, shop, badges, store, SUBJECTS, sectionsOf, openUnit, openBoss, refreshWallet };

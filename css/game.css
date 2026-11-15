@@ -503,3 +503,23 @@
 .art-door:active { transform: scale(.97); }
 .color-go { margin-top: 8px; width: 100%; }
 @media (max-width: 600px) { .art-hub { grid-template-columns: repeat(2, 1fr); gap: 8px; } .art-door { padding: 10px 6px; } .art-door .ad-i { font-size: 32px; } .art-door b { font-size: 16px; } .art-door small { display: none; } }
+
+/* « Mes mots de la semaine » (js/content/francais4.js) */
+.sec-tile.weekly { background: linear-gradient(135deg, #fff, #ffe3ef); border-color: #ff8fb8; }
+.node.current .node-icon { box-shadow: 0 8px 0 color-mix(in srgb, var(--acc) 60%, #000), 0 0 0 6px #ffd23f, 0 0 0 12px #ffd23f55; }
+.node-badge { position: absolute; top: -18px; z-index: 2; background: #ffd23f; color: #3a2d00; font-weight: 900; font-size: 15px; border-radius: 999px; padding: 3px 12px; box-shadow: 0 3px 0 #e0b31a; white-space: nowrap; }
+.week-card { background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 14px 18px; margin: 4px 0 18px; display: flex; flex-direction: column; gap: 10px; }
+.wc-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 20px; }
+.wc-head b { flex: 1; min-width: 0; }
+.wc-prop { background: #e5dcff; border-radius: 8px; padding: 2px 8px; font-weight: 800; }
+.wc-weeks { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.wc-week { background: #faf6ee; border-radius: 16px; padding: 8px 10px; }
+.wc-week.now { background: #fff3c4; outline: 3px solid #ffd23f; }
+.wc-week small { font-weight: 800; color: var(--ink2); }
+.wc-words { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.wk-word { background: #fff; border-radius: 10px; padding: 3px 9px; font-weight: 800; font-size: 18px; box-shadow: 0 1px 2px #0002; }
+.wk-word.men { background: #ffe1e1; }
+.wc-rule { margin: 0; font-weight: 700; font-size: 17px; line-height: 1.35; }
+.wc-foot { display: flex; flex-direction: column; gap: 4px; font-size: 15px; color: var(--ink2); font-weight: 700; }
+@media (max-width: 600px) { .wc-head { font-size: 17px; } .wk-word { font-size: 16px; } .wc-rule { font-size: 15px; } .node-badge { font-size: 12px; top: -14px; } }
+.wc-head .btn { padding: 8px 18px; font-size: 18px; }

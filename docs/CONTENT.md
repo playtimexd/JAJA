@@ -110,3 +110,15 @@ The child writes on a lined pad (Apple Pencil or finger); on « Vérifier » the
   lines?: 2 }                  // writing lines on the pad (1–8)
 ```
 Units that use `hand` also export `allSay()` on the unit: an array of every fixed `say` object (for pre-recording with ElevenLabs).
+
+## « Mes mots de la semaine » — `js/content/francais4.js` (unités f19 → f30)
+Le cahier « Semaines » de la classe : une unité par bloc de 3 semaines (`BLOCKS` exporté : semaines, mots avec
+`menotte` ⛓ / `special` *, règle, verbe et sa conjugaison, 3 sons à l'étude avec vrais mots, mots extraterrestres et phrases, dictées).
+Semaines 1–26 transcrites des photos; 27–35 `proposed: true` (mots de la liste du MEQ 2e année pas encore vus); sons non
+photographiés `inferred: true`. Phrases, dictées et mots extraterrestres sont originaux.
+- Facile : écouter → mot bien écrit (faux choix sosies, jamais de vrais mots), mot extraterrestre (3 choix à écouter), mot qui a le son, lire une phrase.
+- Moyen : lettres à placer, mot dicté (`hand`), règle du bloc (ge, s, te, c, s=[z], m devant p/b, lettre muette, que, eau, ç, ss; ce/cet/cette; petits mots), verbe au présent.
+- Difficile : dictée de phrases faites de mots connus (`hand` dictation, clavier possible), mot dicté, « Écris 2 autres mots avec le son… » (`hand` answer, la correction IA reçoit une liste d'exemples acceptés).
+Semaine courante : `frWeek()` (js/store.js) — semaine 13 = semaine du lundi 2026-11-16, +1 chaque lundi; corrigeable sur la page Parents
+(`settings.frWeek` + `settings.frWeekAt`). La section « Mes mots de la semaine » est la première en français et met le bloc courant en avant;
+le Plan du jour (jours de français) utilise ce bloc pour « Mes mots de la semaine » (niveau ≤ Moyen) et « Dictée de la semaine » (Difficile).

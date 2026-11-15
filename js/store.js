@@ -81,3 +81,20 @@ export function recordSession(unitId, level, score, total, ms) {
   save();
   return stars;
 }
+
+// ---- « Mes mots de la semaine » : semaine du cahier « Semaines » de la classe ----
+// Estimation : semaine 13 = semaine du lundi 2026-11-16, +1 chaque lundi (aucune semaine sautée).
+// Le parent peut corriger (page Parents) : store.settings.frWeek = semaine à la date store.settings.frWeekAt, puis +1 chaque lundi.
+export const FR_WEEK_REF = { week: 13, monday: '2026-11-16' };
+const mondayOf = (d) => { const x = new Date(`${d}T12:00`); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
+export function frWeek(d = today()) {
+  const s = store.settings;
+  const base = s.frWeek && s.frWeekAt ? { week: s.frWeek, monday: s.frWeekAt } : FR_WEEK_REF;
+  const n = base.week + Math.round((mondayOf(d) - mondayOf(base.monday)) / (7 * 864e5));
+  return Math.max(1, Math.min(35, n));
+}
+export function setFrWeek(w) {
+  store.settings.frWeek = Math.max(1, Math.min(35, w));
+  store.settings.frWeekAt = today();
+  save();
+}
