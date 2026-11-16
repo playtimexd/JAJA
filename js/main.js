@@ -11,9 +11,10 @@ import {
 import { wordPairs, mathPairs } from './content/pairs.js';
 import { planCard, markPlan, upcoming } from './plan.js';
 import { blockForWeek } from './content/francais4.js';
+import { GROUPS as F6_GROUPS } from './content/francais6.js';
 
 const SUBJECTS = [
-  { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js', './content/francais2.js', './content/francais3.js', './content/francais4.js'], speech: 'fr-CA', praise: 'fr' },
+  { id: 'francais', icon: '📖', color: 'pink', mods: ['./content/francais.js', './content/francais2.js', './content/francais3.js', './content/francais4.js', './content/francais5.js', './content/francais6.js'], speech: 'fr-CA', praise: 'fr' },
   { id: 'math', icon: '🧮', color: 'blue', mods: ['./content/math.js'], speech: null, praise: null },
   { id: 'anglais', icon: '🍁', color: 'green', mods: ['./content/anglais-catch.js', './content/anglais.js', './content/anglais2.js', './content/anglais3.js'], speech: 'en-CA', praise: 'en' },
   { id: 'chinois', icon: '🐼', color: 'red', mods: ['./content/chinois.js', './content/chinois2.js', './content/chinois3.js'], speech: 'zh-CN', praise: 'zh' },
@@ -50,6 +51,8 @@ const SECTIONS = {
     // cahier « Semaines » de la classe ; le bloc de la semaine courante (frWeek) est mis en avant
     { id: 'semaine', icon: '📅', t: { fr: 'Mes mots de la semaine', en: 'This week’s words' }, ids: range('f', 19, 30), boss: '🐺', week: true },
     { id: 'lect', icon: '🔤', t: { fr: 'Lecture et sons', en: 'Reading & sounds' }, ids: ['f1', 'f2', 'f8', 'f14'], boss: '🐉' },
+    { id: 'sons', icon: '🔊', t: { fr: 'Tous les sons', en: 'All the sounds' }, ids: range('f', 40, 77), boss: '🦜' },
+    ...F6_GROUPS.map((g, i) => ({ id: g.id, icon: g.icon, t: g.title, ids: g.ids, boss: ['🦁', '🐊', '🦅', '🐘', '🐳'][i % 5] })),
     { id: 'mots', icon: '📝', t: { fr: 'Mots et orthographe', en: 'Words & spelling' }, ids: ['f3', 'f9', 'f10', 'f12', 'f13'], boss: '🦈' },
     { id: 'gram', icon: '✏️', t: { fr: 'Grammaire', en: 'Grammar' }, ids: ['f4', 'f5', 'f6'], boss: '🦖' },
     { id: 'phr', icon: '💬', t: { fr: 'Phrases et ponctuation', en: 'Sentences & punctuation' }, ids: ['f7', 'f11'], boss: '🐙' },

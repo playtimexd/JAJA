@@ -1,7 +1,7 @@
 // Content validator: `node tools/check.mjs` — generates every unit × level many times and checks the schema.
 import { makeRng } from '../js/util.js';
 
-const subjects = process.argv[2] ? process.argv.slice(2) : ['math', 'francais', 'anglais', 'francais4'];
+const subjects = process.argv[2] ? process.argv.slice(2) : ['math', 'francais', 'anglais', 'francais4', 'francais5', 'francais6'];
 const N = 400;
 let errors = 0, total = 0;
 const txt = (x) => (x && typeof x === 'object' ? `${x.fr}|${x.en}` : String(x ?? ''));

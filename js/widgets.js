@@ -410,7 +410,7 @@ export function runQuestion(q, root, R, hooks) {
       },
       mistake() { mistakes++; sfx('bad'); hooks.retry(); },
       finish() { sfx('good'); hooks.praise(); finish(isSort ? scoreNow() : 1, 1100); },
-      revealed() { hooks.waitNext(() => finish(0, 0)); },
+      revealed() { if (q.tip) root.append(el('div', { class: 'q-tip' }, '💡 ', tr(q.tip))); hooks.waitNext(() => finish(0, 0)); },
     };
 
     window.__q = q; // test hook
