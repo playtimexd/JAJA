@@ -53,6 +53,7 @@ async function load() {
   all = [];
   for (const c of CATS) {
     try { all.push(...(await import(`./content/why/${c.id}.js`)).topics); } catch (e) { console.warn('why missing', c.id, e.message); }
+    try { all.push(...(await import(`./content/why/g3-${c.id}.js`)).topics); } catch { /* grade-3 topics of this domain: optional */ }
   }
   // topics that moved to another domain keep their progress
   for (const box of ['why', 'whyRead']) {
@@ -97,11 +98,15 @@ export async function whyHome(home, playFn) {
   const card = (t) => el('button', { class: `why-card lv${t.level} ${isRead(t.id) ? 'read' : ''} ${isDone(t.id) ? 'done' : ''}`, onclick: () => { sfx('tap'); topic(t, 0, home, playFn); } },
     el('span', { class: 'why-emoji' }, t.emoji),
     el('span', { class: 'why-q', lang: l }, label(t.q, l)),
-    el('span', { class: 'why-ok' }, isDone(t.id) ? '⭐' : isRead(t.id) ? '✔' : ''));
+    el('span', { class: 'why-ok' }, isDone(t.id) ? '⭐' : isRead(t.id) ? '✔' : ''),
+    t.grade === 3 ? el('span', { class: 'why-g3' }, '3e') : null);
   const shelves = (cat) => {
     const c = CATS.find((x) => x.id === cat);
     const items = list.filter((t) => t.cat === cat);
-    return el('div', { class: 'why-groups' }, c.shelves.map((s) => {
+    // « 3e année » shelf: first when the app is in grade 3, last (still reachable) otherwise
+    const shelfList = [...c.shelves].sort((a, b) => (b.id === 'g3') - (a.id === 'g3') || 0);
+    if (store.settings.grade !== 3) shelfList.push(shelfList.shift());
+    return el('div', { class: 'why-groups' }, shelfList.map((s) => {
       const ts = items.filter((t) => t.shelf === s.id).sort((a, b) => a.level - b.level);
       if (!ts.length) return null;
       const got = ts.filter((t) => isRead(t.id)).length;
