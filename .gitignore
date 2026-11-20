@@ -8,3 +8,4 @@ worker/node_modules/
 *.mp3
 .venv/
 __pycache__/
+!audio/vo/*.mp3
