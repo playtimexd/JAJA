@@ -524,3 +524,22 @@
 @media (max-width: 600px) { .wc-head { font-size: 17px; } .wk-word { font-size: 16px; } .wc-rule { font-size: 15px; } .node-badge { font-size: 12px; top: -14px; } }
 .wc-head .btn { padding: 8px 18px; font-size: 18px; }
 .q-tip { margin: 14px auto 0; max-width: 760px; background: #fff7d6; border: 3px solid #ffd36e; border-radius: 18px; padding: 12px 16px; font-weight: 700; font-size: 19px; line-height: 1.35; }
+
+/* Chinese books */
+.book-text.zh .w { vertical-align: bottom; display: inline-block; }
+.book-text.zh { line-height: 1.75; letter-spacing: 0; }
+.book-text.zh .hz { vertical-align: bottom; }
+.book-text.zh.l { font-size: clamp(21px, 2.4vw, 29px); }
+@media (min-width: 601px) { .book-body:has(.book-text.zh.l) { grid-template-columns: .95fr 1.2fr; } }
+@media (max-width: 600px) { .book-text.zh, .book-text.zh.l { font-size: 19px; } }
+
+/* 2e / 3e année switch on the home screen */
+.grade-switch { display: flex; gap: 4px; background: var(--card); border-radius: 999px; padding: 4px; box-shadow: var(--shadow); align-self: center; }
+.grade-switch button { border-radius: 999px; padding: 8px 14px; font-weight: 800; font-size: 16px; color: var(--ink2); background: transparent; white-space: nowrap; }
+.grade-switch button.on { background: var(--purple, #8b5cf6); color: #fff; }
+@media (max-width: 600px) { .grade-switch button { padding: 6px 10px; font-size: 14px; } }
+@media (max-width: 600px) {
+  .home-top { flex-wrap: wrap; }
+  .home-top .grade-switch { order: 9; flex-basis: 100%; justify-content: center; margin-top: 6px; }
+  .home-top .grade-switch button { flex: 1; }
+}

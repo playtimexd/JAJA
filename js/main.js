@@ -19,21 +19,33 @@ const SUBJECTS = [
   { id: 'anglais', icon: '🍁', color: 'green', mods: ['./content/anglais-catch.js', './content/anglais.js', './content/anglais2.js', './content/anglais3.js'], speech: 'en-CA', praise: 'en' },
   { id: 'chinois', icon: '🐼', color: 'red', mods: ['./content/chinois.js', './content/chinois2.js', './content/chinois3.js'], speech: 'zh-CN', praise: 'zh' },
 ];
+// 3e année: one module per subject in js/content/g3/<subject>.js exporting `units` (ids g3f…, g3m…, g3e…, g3c…) and `SECTIONS`.
+// The child switches 2e / 3e freely on the home screen (store.settings.grade); progress is kept per unit id, so nothing is lost.
+const G3 = { francais: './content/g3/francais.js', math: './content/g3/math.js', anglais: './content/g3/anglais.js', chinois: './content/g3/chinois.js' };
+const grade = () => (store.settings.grade === 3 ? 3 : 2);
 const perSession = () => store.settings.perSession || 8;
 const STICKERS = '🦊🐻🐼🐨🐯🦁🐸🐵🐧🐦🦉🦄🐝🦋🐢🐙🦀🐬🐳🦭🦫🦌🐿️🦔🐞🍁🌻🌈⭐🌙☀️❄️⛄🍓🍉🍩🧁🍭🎈🎨🚀🚲🛷🏒🎸🎁🏆👑💎🦕🦖🐲'.match(/\p{Extended_Pictographic}(️)?/gu);
 const DIFF_COL = ['', 'green', 'orange', 'red'];
 
-const units = {}; // subjectId -> units[]
+const units = {}; // subjectId -> units[] of the CURRENT grade
+const allUnits = {}; // subjectId -> { 2: units[], 3: units[] }
+const SECTIONS3 = {}; // subjectId -> sections of 3e année
 async function loadSubjects() {
   await Promise.all(SUBJECTS.map(async (s) => {
-    units[s.id] = [];
+    const g2 = [], g3 = [];
     for (const m of s.mods) {
-      try { units[s.id].push(...(await import(m)).units); } catch (e) { console.warn('missing content', m, e.message); }
+      try { g2.push(...(await import(m)).units); } catch (e) { console.warn('missing content', m, e.message); }
     }
-    for (const u of units[s.id]) u.subject = s;
+    try { const m3 = await import(G3[s.id]); g3.push(...m3.units); SECTIONS3[s.id] = m3.SECTIONS || []; } catch (e) { SECTIONS3[s.id] = []; }
+    for (const u of g2) { u.subject = s; u.grade ??= 2; }
+    for (const u of g3) { u.subject = s; u.grade = 3; }
+    allUnits[s.id] = { 2: g2, 3: g3 };
   }));
+  applyGrade();
 }
-const unitById = (id) => SUBJECTS.flatMap((s) => units[s.id]).find((u) => u.id === id);
+function applyGrade() { for (const s of SUBJECTS) units[s.id] = allUnits[s.id]?.[grade()] || []; }
+export function setGrade(g) { store.settings.grade = g; save(); applyGrade(); }
+const unitById = (id) => SUBJECTS.flatMap((s) => [...(allUnits[s.id]?.[2] || []), ...(allUnits[s.id]?.[3] || [])]).find((u) => u.id === id);
 const owl = (cls = '') => dressedOwl(cls);
 
 // ---------------- Sections (two-level navigation: subject → section → units) ----------------
@@ -78,7 +90,9 @@ const SECTIONS = {
 };
 function sectionsOf(s) {
   const list = units[s.id];
-  const secs = SECTIONS[s.id].map((x) => ({ ...x, subject: s, units: x.ids.map((id) => list.find((u) => u.id === id)).filter(Boolean) }));
+  const defs = grade() === 3 ? (SECTIONS3[s.id] || []) : SECTIONS[s.id];
+  if (!defs.length) return list.length ? [{ id: 'all', icon: s.icon, t: { fr: 'Tout', en: 'All' }, ids: list.map((u) => u.id), subject: s, units: list, boss: '🐲' }] : [];
+  const secs = defs.map((x) => ({ ...x, subject: s, units: x.ids.map((id) => list.find((u) => u.id === id)).filter(Boolean) }));
   const used = new Set(secs.flatMap((x) => x.ids));
   const rest = list.filter((u) => !used.has(u.id));
   if (rest.length) secs[secs.length - 1].units.push(...rest);   // never lose a unit
@@ -116,6 +130,7 @@ function home() {
     el('header', { class: 'home-top' },
       el('button', { class: 'owl-btn', onclick: () => { sfx('tap'); shop(); } }, owl('big bob')),
       el('div', { class: 'bubble' }, el('div', { class: 'greet' }, greet), el('div', {}, t('pickSubject'))),
+      el('div', { class: 'grade-switch', role: 'group' }, [2, 3].map((g) => el('button', { class: grade() === g ? 'on' : '', onclick: () => { if (grade() === g) return; sfx('tap'); setGrade(g); home(); } }, tr({ fr: `${g}e année`, en: `Grade ${g}` })))),
       el('div', { class: 'hud' }, wallet(), streakPill()),
     ),
     planCard(openPlanBlock, planUnitTitle),
