@@ -34,6 +34,14 @@ const SEQ = {
     probl: ['m7', 'm17', 'm18', 'm19'],
   },
 };
+// 3e année (when the child switches the home screen to 3e année): same 4 blocks, grade-3 units.
+const r3 = (p, a, b) => Array.from({ length: b - a + 1 }, (_, i) => `${p}${a + i}`);
+const SEQ3 = {
+  francais: { lire: r3('g3f', 1, 6), langue: r3('g3f', 20, 38), dictee: r3('g3f', 7, 12), ecrire: [...r3('g3f', 39, 42), 'BOOK'] },
+  anglais: { catch: r3('g3e', 6, 16), langue: r3('g3e', 17, 26), ecoute: [...r3('g3e', 1, 5), ...r3('g3e', 27, 29)], parler: ['TALK', ...r3('g3e', 30, 33)] },
+  math: { nombres: r3('g3m', 1, 8), calcul: r3('g3m', 9, 17), espace: r3('g3m', 18, 30), probl: ['g3m31', 'g3m32', 'g3m29', 'g3m30'] },
+};
+const LABEL3 = { francais: { langue: { fr: 'Grammaire, conjugaison, vocabulaire', en: 'Grammar, verbs, vocabulary' }, dictee: { fr: 'Les mots de la liste', en: 'Spelling list' } }, anglais: { catch: { fr: 'Vocabulaire', en: 'Vocabulary' } } };
 const BLOCKS = {
   francais: [['lire', '📗', { fr: 'Lecture', en: 'Reading' }, 9], ['langue', '📅', { fr: 'Mes mots de la semaine', en: 'This week’s words' }, 7], ['dictee', '🎧', { fr: 'Dictée de la semaine', en: 'This week’s dictation' }, 6], ['ecrire', '✍️', { fr: 'J’écris / un livre', en: 'Writing / a book' }, 8]],
   anglais: [['catch', '📗', { fr: 'Catch : vocabulaire de l’unité', en: 'Catch: unit vocabulary' }, 9], ['langue', '🔤', { fr: 'Sons, phrases et grammaire', en: 'Sounds, sentences, grammar' }, 7], ['ecoute', '👂', { fr: 'Écouter, lire, épeler', en: 'Listen, read, spell' }, 6], ['parler', '💬', { fr: 'Parler ou écrire', en: 'Speak or write' }, 8]],
@@ -47,11 +55,14 @@ export function planFor(d = today()) {
   const i = Math.max(0, dayIndex(d));
   const subject = ORDER[i % 3];
   const n = Math.floor(i / 3);                                   // how many times this language came before
-  const blocks = BLOCKS[subject].map(([key, icon, label, min], b) => {
-    const seq = SEQ[subject][key];
+  const blocks = BLOCKS[subject].map(([key, icon, label0, min], b) => {
+    let label = label0;
+    const g3 = store.settings.grade === 3;
+    const seq = (g3 ? SEQ3 : SEQ)[subject][key];
+    if (g3 && LABEL3[subject]?.[key]) label = LABEL3[subject][key];
     let target = seq[n % seq.length], level = null, cap = null;
     if (target === 'WEEK') { target = unitForWeek(frWeek(d)); if (key === 'dictee') level = 3; else cap = 2; }
-    return { key, icon, label, min, target, level, cap, id: `${d}|${subject}|${key}` };
+    return { key, icon, label, min, target, level, cap, id: `${d}|${subject}|${key}${store.settings.grade === 3 ? '|g3' : ''}` };
   });
   return { date: d, subject, ...SUBJ[subject], blocks, done: blocks.filter((b) => isDone(b)).length };
 }

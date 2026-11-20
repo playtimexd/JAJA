@@ -33,8 +33,9 @@ if (sub.detail) console.log('Balance not readable with this key (', sub.detail.s
 else { left = sub.character_limit - sub.character_count; console.log(`ElevenLabs plan: ${sub.tier} · used ${sub.character_count} / ${sub.character_limit} characters · left ${left}`); }
 
 const sets = arg('sets', 'books,why,prompts,arts').split(',');
+const grade = Number(arg('grade', 0)) || 0;   // --grade 2: only 2e année content (skips 3e année topics/units)
 const order = { books: 0, why: 1, prompts: 2, arts: 3 };
-const items = [...(await collect({ sets })).entries()].sort((a, b) => order[a[1].set] - order[b[1].set]).filter(([k]) => !fs.existsSync(path.join(out, `${k}.mp3`)));
+const items = [...(await collect({ sets, grade })).entries()].sort((a, b) => order[a[1].set] - order[b[1].set]).filter(([k]) => !fs.existsSync(path.join(out, `${k}.mp3`)));
 const chars = items.reduce((a, [, v]) => a + v.text.length, 0);
 console.log(`to record: ${items.length} clips, ${chars} characters (${sets.join(', ')})`);
 
@@ -53,6 +54,8 @@ if (chars > left) { console.log(`Not enough characters left (${left}). Use --set
 const limit = Number(arg('limit', items.length));
 const manifestFile = path.join(out, 'index.json');
 const manifest = fs.existsSync(manifestFile) ? JSON.parse(fs.readFileSync(manifestFile, 'utf8')) : {};
+// every clip on disk belongs in the manifest (a stopped run may have saved files after the last manifest write)
+for (const f of fs.readdirSync(out)) if (f.endsWith('.mp3')) manifest[f.slice(0, -4)] = 1;
 let done = 0, failed = 0;
 const queue = items.slice(0, limit);
 async function worker() {

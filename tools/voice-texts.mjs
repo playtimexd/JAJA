@@ -14,7 +14,7 @@ export function voiceKey(lang, text) {
 export const norm = (t) => String(t).replace(/☐/g, '').replace(/_{2,}/g, ' … ').trim();
 
 const root = new URL('../', import.meta.url);
-export async function collect({ sets = ['books', 'why', 'prompts', 'arts'] } = {}) {
+export async function collect({ sets = ['books', 'why', 'prompts', 'arts'], grade = 0 } = {}) {
   const out = new Map();   // key -> { lang, text, set }
   const add = (lang, text, set) => { if (!text) return; const t = norm(text); if (!t) return; const k = voiceKey(lang, t); if (!out.has(k)) out.set(k, { lang, text: t, set }); };
 
@@ -41,7 +41,7 @@ export async function collect({ sets = ['books', 'why', 'prompts', 'arts'] } = {
     const word = (lang, text) => add(lang, text, 'whywords');
     for (const c of CATS) {
       const { topics } = await import(new URL(`js/content/why/${c.id}.js`, root).href);
-      try { topics.push(...(await import(new URL(`js/content/why/g3-${c.id}.js`, root).href)).topics); } catch { /* no grade-3 file */ }
+      if (grade !== 2) try { topics.push(...(await import(new URL(`js/content/why/g3-${c.id}.js`, root).href)).topics); } catch { /* no grade-3 file */ }
       for (const t of topics) for (const l of W.LANGS) {
         const lang = W.SPEECH[l];
         for (let i = 0; i < t.slides.length; i++) for (const u of W.slideReading(t, i, l)) {
@@ -86,6 +86,7 @@ export async function collect({ sets = ['books', 'why', 'prompts', 'arts'] } = {
   if (sets.includes('prompts')) {
     // texts that come back again and again in the generated exercises (≥ 8 % of a unit's questions)
     const subj = { francais: 'fr-CA', francais2: 'fr-CA', francais3: 'fr-CA', francais4: 'fr-CA', francais5: 'fr-CA', francais6: 'fr-CA', math: null, anglais: 'en-CA', anglais2: 'en-CA', anglais3: 'en-CA', 'anglais-catch': 'en-CA', chinois: 'zh-CN', chinois2: 'zh-CN', chinois3: 'zh-CN' };
+    if (grade !== 2) Object.assign(subj, { 'g3/francais': 'fr-CA', 'g3/math': null, 'g3/anglais': 'en-CA', 'g3/chinois': 'zh-CN' });   // 3e année
     for (const [file, speech] of Object.entries(subj)) {
       if (!fs.existsSync(new URL(`js/content/${file}.js`, root))) continue;
       const { units } = await import(new URL(`js/content/${file}.js`, root).href);
