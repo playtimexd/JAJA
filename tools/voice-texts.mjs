@@ -33,17 +33,30 @@ export async function collect({ sets = ['books', 'why', 'prompts', 'arts'] } = {
       }
     }
   }
-  if (sets.includes('why')) {
-    for (const c of ['animaux', 'corps', 'ciel', 'science']) {
-      const { topics } = await import(new URL(`js/content/why/${c}.js`, root).href);
-      for (const t of topics) {
-        // first slide is read together with the question
-        add('zh-CN', `${t.q.zh} ${t.slides[0].zh}`, 'why'); add('fr-CA', `${t.q.fr} ${t.slides[0].fr}`, 'why');
-        for (const s of t.slides) { add('zh-CN', s.zh, 'why'); add('fr-CA', s.fr, 'why'); }
-        if (t.fact) { add('zh-CN', t.fact.zh, 'why'); add('fr-CA', t.fact.fr, 'why'); }
-        for (const q of t.quiz) { add('zh-CN', q.zh, 'why'); add('fr-CA', q.fr, 'why'); }
+  if (sets.includes('why') || sets.includes('whywords')) {
+    // exactly what js/why.js passes to speak(): js/why-text.js builds the reading of every slide (question, headings,
+    // sentences, vocabulary), the quiz questions, praise and the end message — in French, English and Chinese.
+    const W = await import(new URL('js/why-text.js', root).href);
+    const { CATS } = await import(new URL('js/content/why/groups.js', root).href);
+    const word = (lang, text) => add(lang, text, 'whywords');
+    for (const c of CATS) {
+      const { topics } = await import(new URL(`js/content/why/${c.id}.js`, root).href);
+      for (const t of topics) for (const l of W.LANGS) {
+        const lang = W.SPEECH[l];
+        for (let i = 0; i < t.slides.length; i++) for (const u of W.slideReading(t, i, l)) {
+          if (sets.includes('why')) add(lang, u.text, 'why');
+          if (!sets.includes('whywords') || u.part === 'q' || u.part === 'kind' || u.part === 'term') continue;
+          // tappable words (optional set « whywords »: short clips, otherwise the device voice says them)
+          if (l === 'zh') {
+            const s = t.slides[i], zh = u.part === 'def' ? s.words[u.k].zh.d : s.zh;
+            let at = 0; const chars = [...zh.hz];
+            for (const n of zh.w) { const tok = chars.slice(at, at + n).join(''); at += n; if (/[\p{Script=Han}0-9]/u.test(tok)) word(lang, tok); }
+          } else for (const p of u.text.split(/\s+/)) { const w = p.replace(/^[«»—“”"'(¡¿.,!?;:…]+|[«»—“”"'),.!?;:…]+$/g, ''); if (w) word(lang, w); }
+        }
+        if (sets.includes('why')) for (const q of t.quiz) add(lang, W.quizSay(q, l), 'why');
       }
     }
+    if (sets.includes('why')) for (const l of W.LANGS) { for (const p of W.PRAISE[l]) add(W.SPEECH[l], p, 'why'); add(W.SPEECH[l], W.DONE[l], 'why'); }
   }
   if (sets.includes('arts')) {
     // hand-made Arts plastiques projects (what js/arts.js reads aloud), in both UI languages
@@ -118,4 +131,6 @@ if (process.argv[1] && new URL(import.meta.url).pathname.endsWith(process.argv[1
   for (const v of all.values()) { const k = `${v.set} ${v.lang}`; by[k] ??= { n: 0, chars: 0 }; by[k].n++; by[k].chars += v.text.length; }
   console.table(by);
   console.log('total', all.size, 'clips,', [...all.values()].reduce((a, v) => a + v.text.length, 0), 'characters');
+  const ww = await collect({ sets: ['whywords'] });
+  console.log('optional set « whywords » (words tapped in « Pourquoi? »):', ww.size, 'clips,', [...ww.values()].reduce((a, v) => a + v.text.length, 0), 'characters');
 }

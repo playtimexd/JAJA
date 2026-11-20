@@ -1,30 +1,73 @@
-// Sub-themes for « Pourquoi? 十万个为什么 »: each category is shown as a few small shelves instead of one long grid.
-export const GROUPS = {
-  animaux: [
-    { icon: '🐾', zh: '身边的动物', fr: 'Les animaux d’ici', ids: ['chat-ronronne', 'chien-langue', 'ours-hiberne', 'castor-barrage', 'orignal-bois', 'grenouille-coasse', 'chauve-souris-echo'] },
-    { icon: '🦁', zh: '远方的动物', fr: 'Les animaux d’ailleurs', ids: ['girafe-cou', 'zebre-rayures', 'elephant-trompe', 'cameleon-couleur', 'serpent-mue', 'chameau-bosse', 'manchot-froid'] },
-    { icon: '🐟', zh: '水里和天上', fr: 'Dans l’eau et dans le ciel', ids: ['poisson-respire', 'baleine-souffle', 'oiseau-vole', 'oiseaux-migrateurs'] },
-    { icon: '🐝', zh: '小虫子', fr: 'Les petites bêtes', ids: ['abeille-miel', 'fourmis-file', 'luciole-lumiere', 'chenille-papillon'] },
-    { icon: '🌱', zh: '植物', fr: 'Les plantes', ids: ['plantes-soleil', 'graine-germe', 'feuille-verte', 'erable-rouge', 'tournesol-soleil', 'cactus-epines', 'fleur-pollinisation', 'arbre-cernes'] },
-  ],
-  corps: [
-    { icon: '😴', zh: '每天的小事', fr: 'Ce que mon corps fait tout seul', ids: ['baille', 'eternuer', 'hoquet', 'ventre-gargouille', 'larmes', 'transpirer', 'chair-poule', 'doigts-rides', 'buee-hiver', 'vertige'] },
-    { icon: '🫀', zh: '身体里面', fr: 'À l’intérieur du corps', ids: ['coeur', 'poumons', 'sang', 'os', 'cerveau', 'digestion'] },
-    { icon: '👀', zh: '五官', fr: 'Mes sens', ids: ['yeux-voir', 'oreille'] },
-    { icon: '📏', zh: '长大', fr: 'Je grandis', ids: ['grandir', 'dents-lait', 'cheveux', 'dormir', 'reves'] },
-    { icon: '🧼', zh: '健康', fr: 'Rester en santé', ids: ['brosser-dents', 'laver-mains', 'boire-eau', 'legumes', 'fievre', 'rhume', 'croute'] },
-  ],
-  ciel: [
-    { icon: '🌦️', zh: '天气', fr: 'La météo', ids: ['pluie', 'nuage', 'vent', 'tonnerre', 'brouillard', 'grele', 'arc-en-ciel', 'cycle-eau'] },
-    { icon: '❄️', zh: '冬天', fr: 'L’hiver', ids: ['neige', 'flocon', 'givre', 'hiver-court'] },
-    { icon: '☀️', zh: '太阳和天空', fr: 'Le soleil et le ciel', ids: ['soleil-chaud', 'bleu', 'coucher', 'jour-nuit', 'saisons', 'aurore'] },
-    { icon: '🌙', zh: '月亮和星星', fr: 'La lune et les étoiles', ids: ['lune-surface', 'phases-lune', 'lune-tombe', 'marees', 'eclipse', 'etoiles-scintillent', 'etoile-filante', 'astronaute'] },
-    { icon: '🌋', zh: '我们的地球', fr: 'Notre Terre', ids: ['terre-ronde', 'volcan', 'seisme', 'montagne-froide'] },
-  ],
-  science: [
-    { icon: '🧊', zh: '水和冰', fr: 'L’eau et la glace', ids: ['glace-flotte', 'eau-bout', 'sel-glace', 'patins', 'souffle-blanc', 'frigo'] },
-    { icon: '🍳', zh: '厨房里的科学', fr: 'La science dans la cuisine', ids: ['pain-gonfle', 'sirop-erable', 'bulles-soda', 'paille', 'rouille', 'savon-mains', 'bulle-savon'] },
-    { icon: '💡', zh: '光、声音和电', fr: 'Lumière, son et électricité', ids: ['ombre', 'miroir', 'loupe', 'echo', 'son', 'telephone', 'ampoule', 'solaire', 'electricite-statique', 'aimant', 'boussole'] },
-    { icon: '✈️', zh: '会动的东西', fr: 'Ce qui bouge', ids: ['bateau', 'montgolfiere', 'avion', 'fusee', 'velo', 'bascule'] },
-  ],
+// Domains and shelves of « Pourquoi? 十万个为什么 » (generated with the content; labels in fr / en / zh with pinyin).
+export const CATS = [
+  { id: "animaux", icon: "🦊", t: {"fr":"Animaux et plantes","en":"Animals and plants","zh":{"hz":"动物和植物","py":"dòng wù hé zhí wù","w":[2,1,2]}},
+    shelves: [
+      { id: "ici", icon: "🐾", t: {"fr":"Les animaux d’ici","en":"Animals of Québec","zh":{"hz":"我们身边的动物","py":"wǒ men shēn biān de dòng wù","w":[2,2,1,2]}} },
+      { id: "loin", icon: "🦁", t: {"fr":"Les animaux d’ailleurs","en":"Animals from far away","zh":{"hz":"远方的动物","py":"yuǎn fāng de dòng wù","w":[2,1,2]}} },
+      { id: "eau-air", icon: "🐟", t: {"fr":"Dans l’eau et dans le ciel","en":"In the water and in the sky","zh":{"hz":"水里和天上的动物","py":"shuǐ lǐ hé tiān shàng de dòng wù","w":[1,1,1,2,1,2]}} },
+      { id: "betes", icon: "🐝", t: {"fr":"Les petites bêtes","en":"Little critters","zh":{"hz":"小虫子","py":"xiǎo chóng zi","w":[3]}} },
+      { id: "plantes", icon: "🌱", t: {"fr":"Les plantes","en":"Plants","zh":{"hz":"植物","py":"zhí wù","w":[2]}} },
+    ] },
+  { id: "corps", icon: "🫀", t: {"fr":"Le corps humain","en":"The human body","zh":{"hz":"人的身体","py":"rén de shēn tǐ","w":[1,1,2]}},
+    shelves: [
+      { id: "auto", icon: "😴", t: {"fr":"Ce que mon corps fait tout seul","en":"What my body does by itself","zh":{"hz":"身体自己做的事","py":"shēn tǐ zì jǐ zuò de shì","w":[2,2,1,1,1]}} },
+      { id: "dedans", icon: "🫀", t: {"fr":"À l’intérieur du corps","en":"Inside the body","zh":{"hz":"身体里面","py":"shēn tǐ lǐ miàn","w":[2,2]}} },
+      { id: "sens", icon: "👀", t: {"fr":"Mes sens","en":"My senses","zh":{"hz":"我的感官","py":"wǒ de gǎn guān","w":[1,1,2]}} },
+      { id: "grandir", icon: "📏", t: {"fr":"Je grandis","en":"Growing up","zh":{"hz":"我在长大","py":"wǒ zài zhǎng dà","w":[1,1,2]}} },
+      { id: "sante", icon: "🧼", t: {"fr":"Rester en santé","en":"Staying healthy","zh":{"hz":"保持健康","py":"bǎo chí jiàn kāng","w":[2,2]}} },
+    ] },
+  { id: "ciel", icon: "🪐", t: {"fr":"Ciel et espace","en":"Sky and space","zh":{"hz":"天空和宇宙","py":"tiān kōng hé yǔ zhòu","w":[2,1,2]}},
+    shelves: [
+      { id: "soleil", icon: "☀️", t: {"fr":"Le Soleil et le ciel","en":"The Sun and the sky","zh":{"hz":"太阳和天空","py":"tài yáng hé tiān kōng","w":[2,1,2]}} },
+      { id: "lune", icon: "🌙", t: {"fr":"La Lune","en":"The Moon","zh":{"hz":"月亮","py":"yuè liang","w":[2]}} },
+      { id: "etoiles", icon: "🌟", t: {"fr":"Les étoiles","en":"The stars","zh":{"hz":"星星","py":"xīng xīng","w":[2]}} },
+      { id: "espace", icon: "🚀", t: {"fr":"Les planètes et l’espace","en":"Planets and space","zh":{"hz":"行星和太空","py":"xíng xīng hé tài kōng","w":[2,1,2]}} },
+    ] },
+  { id: "terre", icon: "🌋", t: {"fr":"La Terre et la météo","en":"Earth and weather","zh":{"hz":"地球和天气","py":"dì qiú hé tiān qì","w":[2,1,2]}},
+    shelves: [
+      { id: "meteo", icon: "🌦️", t: {"fr":"La météo","en":"Weather","zh":{"hz":"天气","py":"tiān qì","w":[2]}} },
+      { id: "tempetes", icon: "⚡", t: {"fr":"Orages et tempêtes","en":"Storms","zh":{"hz":"雷雨和风暴","py":"léi yǔ hé fēng bào","w":[2,1,2]}} },
+      { id: "hiver", icon: "❄️", t: {"fr":"L’hiver et les saisons","en":"Winter and seasons","zh":{"hz":"冬天和四季","py":"dōng tiān hé sì jì","w":[2,1,2]}} },
+      { id: "planete", icon: "⛰️", t: {"fr":"Volcans, séismes et montagnes","en":"Volcanoes, earthquakes and mountains","zh":{"hz":"火山、地震和高山","py":"huǒ shān dì zhèn hé gāo shān","w":[2,1,2,1,2]}} },
+      { id: "eau", icon: "🌊", t: {"fr":"Fleuves, glaces et océans","en":"Rivers, ice and oceans","zh":{"hz":"江河、冰川和海洋","py":"jiāng hé bīng chuān hé hǎi yáng","w":[2,1,2,1,2]}} },
+    ] },
+  { id: "science", icon: "🧲", t: {"fr":"Sciences de tous les jours","en":"Everyday science","zh":{"hz":"生活中的科学","py":"shēng huó zhōng de kē xué","w":[2,1,1,2]}},
+    shelves: [
+      { id: "eau-glace", icon: "🧊", t: {"fr":"L’eau et la glace","en":"Water and ice","zh":{"hz":"水和冰","py":"shuǐ hé bīng","w":[1,1,1]}} },
+      { id: "cuisine", icon: "🍳", t: {"fr":"La science dans la cuisine","en":"Kitchen science","zh":{"hz":"厨房里的科学","py":"chú fáng lǐ de kē xué","w":[2,1,1,2]}} },
+      { id: "lumiere-son", icon: "💡", t: {"fr":"Lumière et son","en":"Light and sound","zh":{"hz":"光和声音","py":"guāng hé shēng yīn","w":[1,1,2]}} },
+      { id: "forces", icon: "🧲", t: {"fr":"Forces et mouvement","en":"Forces and motion","zh":{"hz":"力和运动","py":"lì hé yùn dòng","w":[1,1,2]}} },
+    ] },
+  { id: "techno", icon: "🤖", t: {"fr":"Inventions et technologie","en":"Inventions and technology","zh":{"hz":"发明和科技","py":"fā míng hé kē jì","w":[2,1,2]}},
+    shelves: [
+      { id: "grandes", icon: "⚙️", t: {"fr":"Les grandes inventions","en":"Great inventions","zh":{"hz":"伟大的发明","py":"wěi dà de fā míng","w":[2,1,2]}} },
+      { id: "energie", icon: "⚡", t: {"fr":"Électricité et énergie","en":"Electricity and energy","zh":{"hz":"电和能源","py":"diàn hé néng yuán","w":[1,1,2]}} },
+      { id: "transport", icon: "🚆", t: {"fr":"Les transports","en":"Transportation","zh":{"hz":"交通工具","py":"jiāo tōng gōng jù","w":[4]}} },
+      { id: "numerique", icon: "💻", t: {"fr":"Ordinateurs et robots","en":"Computers and robots","zh":{"hz":"电脑和机器人","py":"diàn nǎo hé jī qì rén","w":[2,1,3]}} },
+      { id: "canada", icon: "🍁", t: {"fr":"Inventé au Canada","en":"Made in Canada","zh":{"hz":"加拿大的发明","py":"jiā ná dà de fā míng","w":[3,1,2]}} },
+    ] },
+];
+// Topics that moved to another domain (old id -> new id): progress is carried over.
+export const MOVED = {
+  "ciel-pluie": "terre-pluie",
+  "ciel-nuage": "terre-nuage",
+  "ciel-vent": "terre-vent",
+  "ciel-arc-en-ciel": "terre-arc-en-ciel",
+  "ciel-brouillard": "terre-brouillard",
+  "ciel-cycle-eau": "terre-cycle-eau",
+  "ciel-tonnerre": "terre-tonnerre",
+  "ciel-grele": "terre-grele",
+  "ciel-neige": "terre-neige",
+  "ciel-flocon": "terre-flocon",
+  "ciel-givre": "terre-givre",
+  "ciel-saisons": "terre-saisons",
+  "ciel-hiver-court": "terre-hiver-court",
+  "ciel-volcan": "terre-volcan",
+  "ciel-seisme": "terre-seisme",
+  "ciel-montagne-froide": "terre-montagne-froide",
+  "science-ampoule": "techno-ampoule",
+  "science-solaire": "techno-solaire",
+  "science-avion": "techno-avion",
+  "science-fusee": "techno-fusee",
+  "science-telephone": "techno-telephone"
 };

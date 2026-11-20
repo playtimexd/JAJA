@@ -1,8 +1,11 @@
 <!doctype html><meta charset="utf-8"><title>Why preview</title>
-<style>body{font-family:system-ui;margin:12px;background:#f4f1ea}h2{margin:16px 0 6px;font-size:17px}.row{display:flex;flex-wrap:wrap;gap:8px}.st{width:300px;background:#fff;border-radius:10px;padding:6px;font-size:13px}.st svg{width:288px;height:auto;display:block;border:1px solid #ddd}.q{color:#555}</style>
+<style>body{font-family:system-ui;margin:12px;background:#f4f1ea}h2{margin:16px 0 6px;font-size:17px}.row{display:flex;flex-wrap:wrap;gap:8px}.st{width:330px;background:#fff;border-radius:10px;padding:6px;font-size:13px}.st svg{width:318px;height:auto;display:block;border:1px solid #ddd}.e{font-size:40px}.k{color:#888}.q{color:#555}</style>
 <div id="o"></div>
 <script type="module">
+// ?cat=animaux&from=0&n=5 — every slide in fr / en / zh (+pinyin) with its picture, and the quiz.
 const q = new URLSearchParams(location.search), cat = q.get('cat') || 'animaux', from = +(q.get('from') || 0), n = +(q.get('n') || 999);
 const { topics } = await import(`../js/content/why/${cat}.js?${Date.now()}`);
-document.getElementById('o').innerHTML = topics.slice(from, from + n).map((t) => `<h2>${t.emoji} ${t.id} — ${t.q.zh} / ${t.q.fr} (niv ${t.level})</h2><div class="row">${t.slides.map((s, i) => `<div class="st">${s.svg || ''}<div><b>${i + 1}.</b> ${s.zh}<br>${s.fr}</div></div>`).join('')}<div class="st q">${t.quiz.map((x) => `<p><b>${x.zh}</b><br>${x.options.map((o, k) => (k === x.answer ? '✔ ' : '· ') + o.zh).join('<br>')}</p>`).join('')}</div></div>`).join('');
+const { PICS } = await import(`../js/content/why/${cat}-pics.js?${Date.now()}`);
+const tx = (x) => x.words ? x.words.map((w) => `<b>${w.fr.t}</b> ${w.fr.d}<br><b>${w.en.t}</b> ${w.en.d}<br><b>${w.zh.t.hz}</b> ${w.zh.d.hz}`).join('<hr>') : `${x.fr}<br>${x.en}<br>${x.zh.hz}<br><span class="k">${x.zh.py}</span>`;
+document.getElementById('o').innerHTML = topics.slice(from, from + n).map((t) => `<h2>${t.emoji} ${t.id} [${t.shelf}, niv ${t.level}] — ${t.q.fr} / ${t.q.en} / ${t.q.zh.hz}</h2><div class="row">${t.slides.map((s, i) => `<div class="st">${s.pic != null ? PICS[t.id][s.pic] : `<div class="e">${s.emoji}</div>`}<div><b>${i + 1}. ${s.kind}</b><br>${tx(s)}</div></div>`).join('')}<div class="st q">${t.quiz.map((x) => `<p><b>${x.fr}</b><br>${x.options.map((o, k) => (k === x.answer ? '✔ ' : '· ') + o.fr).join('<br>')}</p>`).join('')}</div></div>`).join('');
 </script>

@@ -166,7 +166,7 @@ async function openPlanBlock(b) {
   sfx('tap');
   if (b.target === 'BOOK') return (await import('./livres.js')).libraryHome(home);
   if (b.target === 'TALK') return (await import('./talk.js')).talkHome(home, 'en');
-  if (b.target === 'WHY') { store.settings.whyLang = 'zh'; save(); return (await import('./why.js')).whyHome(home, play); }
+  if (b.target === 'WHY') { store.settings.whyLang = 'zh'; store.settings.whyLangUi = store.settings.lang === 'en' ? 'en' : 'fr'; save(); return (await import('./why.js')).whyHome(home, play); }
   const u = unitById(b.target);
   if (u) play({ mode: 'practice', unit: u, level: b.level ?? Math.min(b.cap ?? 3, suggestedLevel(u)), back: home });
 }

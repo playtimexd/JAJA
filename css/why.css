@@ -1,0 +1,100 @@
+/* « Pourquoi? 十万个为什么 » — encyclopedia home (domains, shelves, search, progress) and reader (tappable words, sentence highlight). */
+.why-screen .bar { flex-wrap: wrap; }
+.why-lang { display: flex; gap: 6px; background: var(--card); padding: 5px; border-radius: 18px; box-shadow: var(--shadow); flex: none; }
+.why-lang button { min-width: 56px; height: 46px; border-radius: 13px; padding: 0 12px; font-weight: 900; font-size: 18px; background: transparent; border: 3px solid transparent; color: var(--ink2); }
+.why-lang button.on { background: var(--blue-l); border-color: var(--blue); color: var(--ink); }
+
+.why-top { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; gap: 14px; align-items: center; }
+.why-searchbox { display: flex; align-items: center; gap: 8px; background: var(--card); border-radius: 18px; padding: 0 14px; box-shadow: var(--shadow); height: 58px; font-size: 22px; }
+.why-search { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 20px; font-weight: 700; color: var(--ink); height: 100%; }
+.why-progress { display: flex; flex-direction: column; gap: 6px; }
+.why-progress small { font-weight: 800; color: var(--ink2); font-size: 15px; }
+.why-bar { height: 14px; border-radius: 8px; background: var(--card); box-shadow: inset 0 0 0 2px var(--line); overflow: hidden; }
+.why-bar i { display: block; height: 100%; background: linear-gradient(90deg, #3fb950, #8bd450); border-radius: 8px; }
+.why-quiz { white-space: nowrap; }
+
+.why-tabs { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; }
+.why-tabs.dim { opacity: .45; }
+.why-tab { flex: none; display: flex; align-items: center; gap: 8px; background: var(--card); border-radius: 18px; padding: 8px 14px; box-shadow: var(--shadow); border: 4px solid transparent; font-weight: 800; font-size: 18px; }
+.why-tab .ti { font-size: 28px; }
+.why-tab small { color: var(--ink2); font-size: 14px; }
+.why-tab.on { border-color: var(--blue); background: var(--blue-l); }
+.why-tab .hz rt, .why-q .hz rt, .why-group h2 .hz rt { font-size: .5em; }
+.why-results { display: flex; flex-direction: column; gap: 22px; max-width: 1400px; width: 100%; margin: 0 auto; }
+.why-none { font-size: 22px; font-weight: 800; color: var(--ink2); text-align: center; padding: 30px; }
+.why-card { border-left-width: 6px; }
+.why-card.read { background: #f2fbf4; }
+.why-card.done { background: #fffbe6; }
+.why-ok { font-size: 22px; }
+
+/* reader */
+.why-topic .bar { flex-wrap: wrap; row-gap: 8px; }
+.why-topic .why-title { flex: 1 1 360px; min-width: 0; line-height: 1.35; }
+.why-title .sen { border-radius: 10px; transition: background .2s; }
+.why-body { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 24px; align-items: start; align-content: start; max-width: 1500px; width: 100%; margin: 0 auto; }
+.why-pic { background: #fff; border-radius: 28px; box-shadow: var(--shadow); padding: 10px; position: sticky; top: 0; }
+.why-pic svg { display: block; width: 100%; height: auto; max-height: 66vh; border-radius: 18px; }
+.why-pic.emo { aspect-ratio: 4 / 3; display: grid; place-items: center; background: linear-gradient(160deg, #e8f5fd, #fdf6e3); }
+.why-pic.emo span { font-size: clamp(70px, 11vw, 150px); line-height: 1.1; text-align: center; letter-spacing: .05em; word-break: break-word; padding: 0 12px; }
+.why-pic.emo.kind-fact { background: linear-gradient(160deg, #fff3c4, #ffe1a8); }
+.why-pic.emo.kind-try { background: linear-gradient(160deg, #e2f7e1, #c9efd9); }
+.why-pic.emo.kind-words { background: linear-gradient(160deg, #efe6ff, #e1ecff); }
+.why-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.why-textbox { background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 18px 22px; }
+.why-read { font-size: clamp(21px, 2.15vw, 28px); line-height: 1.6; font-weight: 700; }
+.why-read[lang="zh"] { font-size: clamp(24px, 2.5vw, 32px); line-height: 1.25; }
+.why-read[lang="zh"] .why-para { line-height: 2.1; }
+.why-para { margin: 0; }
+.why-read .w { border-radius: 8px; padding: 0 1px; cursor: pointer; }
+.why-read .w.on { background: #ffe08a; }
+.why-read[lang="zh"] .w, .why-read[lang="zh"] .p { display: inline-flex; align-items: flex-end; vertical-align: bottom; padding: 0 2px; margin: 0 1px; }
+.why-read[lang="zh"] .p { padding: 0; margin: 0; line-height: 1.1; }
+.why-read[lang="zh"] .w .num { line-height: 1.1; }
+.why-read[lang="zh"] .w:hover { background: var(--blue-l); }
+.why-read .sen { border-radius: 10px; transition: background .25s, box-shadow .25s; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.sen.reading { background: #fff0a8; box-shadow: 0 0 0 4px #fff0a8; }
+.why-kind { display: inline-block; font-size: .85em; font-weight: 900; padding: 4px 14px; border-radius: 14px; margin-bottom: 10px; background: var(--blue-l); }
+.kind-fact .why-kind { background: #fff3c4; }
+.kind-try .why-kind { background: #dff5e1; }
+.kind-words .why-kind { background: #ece3ff; }
+.why-words { display: flex; flex-direction: column; gap: 12px; }
+.why-word { background: var(--bg); border-radius: 18px; padding: 10px 14px; }
+.why-word .term { font-weight: 900; color: var(--blue); display: inline-block; margin-bottom: 2px; }
+.why-word .def { font-size: .9em; }
+.why-side .hint { color: var(--ink2); font-weight: 700; }
+.why-modes { display: flex; gap: 10px; flex-wrap: wrap; }
+.why-mode { flex: 1 1 180px; background: var(--card); border-radius: 18px; padding: 10px 14px; font-weight: 800; font-size: 18px; box-shadow: var(--shadow); border: 3px solid transparent; }
+.why-mode.on { border-color: var(--blue); background: var(--blue-l); }
+.why-nav { display: flex; gap: 12px; align-items: center; }
+.why-nav .btn { flex: 1; font-size: 28px; }
+.why-nav .btn.ghost { flex: .5; background: var(--card); box-shadow: var(--shadow); }
+.why-nav .why-go { font-size: 24px; }
+.why-go.pulse { animation: why-pulse 1s ease-in-out infinite; }
+@keyframes why-pulse { 50% { transform: scale(1.06); } }
+.why-side .step-dots { justify-content: center; }
+.sd.fact { border-color: #f0b400; } .sd.try { border-color: #3fb950; } .sd.words { border-color: #8a63d2; }
+.why-qz .t-choice .f-text { font-size: clamp(18px, 2vw, 24px); }
+
+/* portrait iPad / phone: picture on top, smaller */
+@media (max-aspect-ratio: 1/1) {
+  .why-body { grid-template-columns: 1fr; }
+  .why-pic { position: static; max-width: 640px; width: 100%; margin: 0 auto; }
+  .why-pic svg { max-height: 34vh; }
+  .why-pic.emo { aspect-ratio: auto; height: min(30vh, 260px); }
+  .why-top { grid-template-columns: 1fr 1fr; }
+  .why-searchbox { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .why-lang button { min-width: 0; flex: 1; height: 42px; font-size: 16px; }
+  .why-screen .why-lang, .why-topic .why-lang { order: 3; width: 100%; }
+  .why-top { grid-template-columns: 1fr; }
+  .why-tab { font-size: 15px; padding: 6px 10px; }
+  .why-tab .ti { font-size: 22px; }
+  .why-read { font-size: 19px; }
+  .why-read[lang="zh"] { font-size: 22px; }
+  .why-textbox { padding: 14px 14px; border-radius: 20px; }
+  .why-pic.emo { height: 150px; }
+  .why-pic.emo span { font-size: 72px; }
+  .why-mode { font-size: 15px; flex-basis: 140px; padding: 8px 10px; }
+  .why-topic .why-title { font-size: 20px !important; flex-basis: 200px; }
+}
