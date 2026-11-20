@@ -19,13 +19,18 @@ export async function collect({ sets = ['books', 'why', 'prompts', 'arts'] } = {
   const add = (lang, text, set) => { if (!text) return; const t = norm(text); if (!t) return; const k = voiceKey(lang, t); if (!out.has(k)) out.set(k, { lang, text: t, set }); };
 
   if (sets.includes('books')) {
-    const dir = new URL('js/content/livres/', root);
-    for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.js'))) {
-      const { book: b } = await import(new URL(f, dir).href);
-      add('fr-CA', b.title, 'books');
-      for (const p of b.pages) add('fr-CA', p.text, 'books');
-      for (const w of b.words) add('fr-CA', `${w.word}. ${w.def}`, 'books');
-      for (const q of b.quiz) add('fr-CA', q.q, 'books');
+    // same texts as js/livres.js reads aloud (French, English and Chinese shelves)
+    for (const [shelf, lang] of [['livres', 'fr-CA'], ['livres-en', 'en-CA'], ['livres-zh', 'zh-CN']]) {
+      const dir = new URL(`js/content/${shelf}/`, root);
+      if (!fs.existsSync(dir)) continue;
+      const hz = (x) => (x && typeof x === 'object' ? x.hz : x);
+      for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.js') && x !== 'index.js')) {
+        const { book: b } = await import(new URL(f, dir).href);
+        add(lang, hz(b.titleZh || b.title), 'books');
+        for (const p of b.pages) add(lang, p.text, 'books');
+        for (const w of b.words) add(lang, `${w.word}${lang === 'zh-CN' ? '。' : '. '}${w.def}`, 'books');
+        for (const q of b.quiz) add(lang, hz(q.q), 'books');
+      }
     }
   }
   if (sets.includes('why')) {

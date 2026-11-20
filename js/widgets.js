@@ -416,7 +416,7 @@ export function runQuestion(q, root, R, hooks) {
     window.__q = q; // test hook
     root.innerHTML = '';
     const head = el('div', { class: 'q-head' });
-    const promptText = tr(q.prompt);
+    const promptText = q.prompt && q.prompt.hz ? hanzi(q.prompt.hz, q.prompt.py) : tr(q.prompt);
     head.append(el('div', { class: 'q-prompt' }, promptText));
     const say = q.say || (q.prompt ? { text: q.prompt } : null);
     if (say) head.prepend(el('button', { class: 'say-btn', 'aria-label': '🔊', onclick: () => speak(say) }, '🔊'));

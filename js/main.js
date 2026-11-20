@@ -66,12 +66,14 @@ const SECTIONS = {
     { id: 'gram', icon: '✍️', t: { fr: 'Phrases et grammaire', en: 'Sentences & grammar' }, ids: [...range('e', 21, 33)], boss: '🐙' },
     { id: 'write', icon: '✍️', t: { fr: 'Écrire en anglais', en: 'Writing' }, ids: ['e35', 'e36', 'e37', 'e38'], boss: '🦉' },
     { id: 'talk', icon: '💬', t: { fr: 'Parler', en: 'Speaking' }, ids: ['e1', 'e12'], boss: '🦈', talk: true },
+    { id: 'livres', icon: '📚', t: { fr: 'Livres en anglais', en: 'Storybooks' }, ids: [], books: true, lang: 'en' },
   ],
   chinois: [
     { id: 'py', icon: '🔤', t: { fr: 'Pinyin et tons', en: 'Pinyin & tones' }, ids: range('c', 1, 5), boss: '🐉' },
     { id: 'sz', icon: '🀄', t: { fr: 'Caractères', en: 'Characters' }, ids: range('c', 6, 14), boss: '🦁' },
     { id: 'xz', icon: '🖌️', t: { fr: 'Écrire', en: 'Writing' }, ids: [...range('c', 15, 18), 'c22', 'c23', 'c24'], boss: '🐯' },
     { id: 'yd', icon: '📜', t: { fr: 'Comptines et poèmes', en: 'Rhymes & poems' }, ids: range('c', 19, 21), boss: '🐲' },
+    { id: 'livres', icon: '📚', t: { fr: 'Histoires 故事书', en: 'Storybooks 故事书' }, ids: [], books: true, lang: 'zh' },
   ],
 };
 function sectionsOf(s) {
@@ -200,7 +202,7 @@ function subject(s) {
     el('header', { class: 'bar' }, backBtn(home), el('h1', {}, s.icon, ' ', t(s.id)), wallet()),
     el('div', { class: 'sec-grid' },
       secs.map((x) => {
-        if (x.books) return tile(x.icon, tr(x.t), `${Object.keys(store.books || {}).length} ✔ · 10 📖`, 'books', async () => (await import('./livres.js')).libraryHome(() => subject(s)));
+        if (x.books) { const pre = { en: 'en-', zh: 'zh-' }[x.lang]; const done = Object.keys(store.books || {}).filter((k) => (pre ? k.startsWith(pre) : !/^(en|zh)-/.test(k))).length; return tile(x.icon, tr(x.t), `${done} ✔ · 📖`, 'books', async () => (await import('./livres.js')).libraryHome(() => subject(s), x.lang || 'fr')); }
         const got = x.units.reduce((a, u) => a + unitStars(u), 0), max = x.units.length * 9;
         const troph = store.trophies[`${s.id}-${x.id}`];
         if (x.week) { const cur = x.units.find((u) => u.id === blockForWeek(frWeek()).id); return tile(x.icon, tr(x.t), `⭐ ${tr({ fr: 'Cette semaine', en: 'This week' })} : ${cur ? tr(cur.title) : ''}`, 'weekly', () => section(s, x.id)); }

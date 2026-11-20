@@ -1,6 +1,8 @@
 // `node tools/check-livres.mjs [id...]` — validates the storybooks (docs/LIVRES.md).
 import fs from 'node:fs';
-const dir = new URL('../js/content/livres/', import.meta.url);
+// SHELF=livres-en | livres-zh checks the English / Chinese shelves (Chinese pages: 20–160 characters, tokens with pinyin).
+const SHELF = process.env.SHELF || 'livres';
+const dir = new URL(`../js/content/${SHELF}/`, import.meta.url);
 const ids = process.argv.slice(2).length ? process.argv.slice(2) : fs.readdirSync(dir).filter((f) => f.endsWith('.js') && f !== 'index.js').map((f) => f.slice(0, -3));
 let errors = 0;
 const fail = (w, m) => { errors++; if (errors < 80) console.log(`✗ ${w}: ${m}`); };
@@ -21,8 +23,15 @@ for (const id of ids) {
   if (!Array.isArray(b.pages) || b.pages.length < 10 || b.pages.length > 16) fail(id, `pages ${b.pages?.length}`);
   (b.pages || []).forEach((p, i) => {
     svgOk(`${id}/p${i + 1}`, p.svg);
-    const n = (p.text || '').split(/\s+/).filter(Boolean).length;
-    if (n < 35 || n > 130) fail(`${id}/p${i + 1}`, `text words ${n} (want a 35–130 word paragraph)`);
+    if (SHELF === 'livres-zh') {
+      const n = [...(p.text || '')].filter((c) => /\p{Script=Han}/u.test(c)).length;
+      if (n < 20 || n > 160) fail(`${id}/p${i + 1}`, `characters ${n} (want 20–160)`);
+      if (!Array.isArray(p.tokens) || p.tokens.map((t) => t.hz).join('') !== p.text) fail(`${id}/p${i + 1}`, 'tokens must join to text');
+      for (const t of p.tokens || []) { const han = [...t.hz].filter((c) => /\p{Script=Han}/u.test(c)).length; if (han && (!t.py || t.py.trim().split(/\s+/).length !== han)) { fail(`${id}/p${i + 1}`, `pinyin count for ${t.hz}`); break; } }
+    } else {
+      const n = (p.text || '').split(/\s+/).filter(Boolean).length;
+      if (n < 35 || n > 130) fail(`${id}/p${i + 1}`, `text words ${n} (want a 35–130 word paragraph)`);
+    }
   });
   if (!Array.isArray(b.words) || b.words.length < 5) fail(id, 'words');
   (b.words || []).forEach((w) => { if (!w.word || !w.def) fail(id, 'word/def'); });
