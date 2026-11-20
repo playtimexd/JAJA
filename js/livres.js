@@ -169,7 +169,7 @@ async function quiz(b, back) {
   let score = 0;
   for (const [k, x] of b.quiz.entries()) {
     if (quit) return;
-    const q = { type: 'choice', key: `${b.id}#${k}`, prompt: x.q, say: sayB(b, x.q), options: x.options.map((o) => ({ text: o })), answer: x.answer, cols: 1 };
+    const q = { type: 'choice', key: `${b.id}#${k}`, prompt: x.q, say: sayB(b, x.q), options: x.options.map((o) => (o && typeof o === 'object' && o.hz ? { hz: o.hz, py: o.py } : { text: o })), answer: x.answer, cols: 1 };
     score += await runQuestion(q, qRoot, R, {
       praise: () => { const w = R.pick(conf(b).praise); bubble.textContent = w; bubble.className = 'owl-bubble show good'; speak(sayB(b, w)); },
       retry: () => { bubble.textContent = conf(b).retry; bubble.className = 'owl-bubble show bad'; },
