@@ -543,3 +543,4 @@
   .home-top .grade-switch { order: 9; flex-basis: 100%; justify-content: center; margin-top: 6px; }
   .home-top .grade-switch button { flex: 1; }
 }
+.book-text.zh { overflow: visible; padding-top: 4px; }
