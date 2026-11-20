@@ -41,6 +41,7 @@ export async function collect({ sets = ['books', 'why', 'prompts', 'arts'] } = {
     const word = (lang, text) => add(lang, text, 'whywords');
     for (const c of CATS) {
       const { topics } = await import(new URL(`js/content/why/${c.id}.js`, root).href);
+      try { topics.push(...(await import(new URL(`js/content/why/g3-${c.id}.js`, root).href)).topics); } catch { /* no grade-3 file */ }
       for (const t of topics) for (const l of W.LANGS) {
         const lang = W.SPEECH[l];
         for (let i = 0; i < t.slides.length; i++) for (const u of W.slideReading(t, i, l)) {

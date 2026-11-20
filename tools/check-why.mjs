@@ -33,6 +33,7 @@ for (const c of CATS) {
   const f = new URL(`../js/content/why/${cat}.js`, import.meta.url);
   if (!fs.existsSync(f)) { fail(cat, 'file missing'); continue; }
   const { topics } = await import(f.href);
+  try { topics.push(...(await import(new URL(`../js/content/why/g3-${cat}.js`, import.meta.url).href)).topics); } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e; }
   const { PICS } = await import(new URL(`../js/content/why/${cat}-pics.js`, import.meta.url).href);
   const shelves = new Set(c.shelves.map((s) => s.id));
   for (const s of c.shelves) { str(cat, s.t.fr, 'shelf'); str(cat, s.t.en, 'shelf'); zh(cat, s.t.zh, 'shelf'); }
@@ -46,6 +47,7 @@ for (const c of CATS) {
     if (t.cat !== cat) fail(w, 'cat');
     if (!shelves.has(t.shelf)) fail(w, `shelf « ${t.shelf} » not in groups.js`);
     if (!t.emoji) fail(w, 'emoji');
+    if (t.shelf === 'g3' && t.grade !== 3) fail(w, 'g3 shelf needs grade: 3');
     if (![1, 2, 3].includes(t.level)) fail(w, 'level'); else lv[t.level]++;
     tri(w, t.q, 'q');
     if (!Array.isArray(t.slides) || t.slides.length < 5 || t.slides.length > 8) fail(w, `slides 5–8 (has ${t.slides?.length})`);

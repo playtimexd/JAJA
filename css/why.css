@@ -98,3 +98,6 @@
   .why-mode { font-size: 15px; flex-basis: 140px; padding: 8px 10px; }
   .why-topic .why-title { font-size: 20px !important; flex-basis: 200px; }
 }
+/* 3e année badge on a topic card */
+.why-card { position: relative; }
+.why-g3 { position: absolute; top: 6px; left: 6px; background: #ffd23f; color: #3b2a00; font: 800 12px/1 system-ui, sans-serif; padding: 3px 6px; border-radius: 8px; }
