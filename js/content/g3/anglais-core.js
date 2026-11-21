@@ -22,8 +22,6 @@ export const P = {
   listenPic: { fr: 'Écoute. Touche la bonne image.', en: 'Listen. Tap the right picture.' },
   readPic: { fr: 'Lis le mot. Touche la bonne image.', en: 'Read the word. Tap the right picture.' },
   listenWord: { fr: 'Écoute. Quel mot as-tu entendu?', en: 'Listen. Which word did you hear?' },
-  fr2en: { fr: 'Comment dit-on ce mot en anglais?', en: 'How do you say this word in English?' },
-  en2fr: { fr: 'Que veut dire ce mot en français?', en: 'What does this word mean in French?' },
   odd: { fr: 'Quel mot n’est PAS comme les autres?', en: 'Which word does NOT belong?' },
   clue: { fr: 'Lis l’indice. Quel est le mot?', en: 'Read the clue. Which word is it?' },
   reply: { fr: 'Écoute. Quelle est la meilleure réponse?', en: 'Listen. What is the best reply?' },

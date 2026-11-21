@@ -1,6 +1,6 @@
 import { el, makeRng, wait } from './util.js';
 import { store, save, today, levelStats, recordSession, frWeek, setFrWeek } from './store.js';
-import { t, tr, lang, STRINGS } from './i18n.js';
+import { t, tr, lang, STRINGS, setZone } from './i18n.js';
 import { speak, stopSpeech, sfx, unlockAudio, setContentLang } from './audio.js';
 import { runQuestion, face } from './widgets.js';
 import { app, screen, backBtn, starsTxt, wallet, streakPill, refreshWallet, sheet } from './ui.js';
@@ -47,6 +47,9 @@ function applyGrade() { for (const s of SUBJECTS) units[s.id] = allUnits[s.id]?.
 export function setGrade(g) { store.settings.grade = g; save(); applyGrade(); }
 const unitById = (id) => SUBJECTS.flatMap((s) => [...(allUnits[s.id]?.[2] || []), ...(allUnits[s.id]?.[3] || [])]).find((u) => u.id === id);
 const owl = (cls = '') => dressedOwl(cls);
+// « English zone »: everything inside the anglais subject is shown and spoken in English (js/i18n.js setZone).
+const zoneOf = (s) => setZone(s?.id === 'anglais' ? 'en' : null);
+const zonePool = (list) => { const ids = new Set(list.map((u) => u?.subject?.id)); zoneOf(ids.size === 1 ? list[0].subject : null); };
 
 // ---------------- Sections (two-level navigation: subject → section → units) ----------------
 const range = (p, a, b) => Array.from({ length: b - a + 1 }, (_, i) => `${p}${a + i}`);
@@ -104,6 +107,7 @@ const record = (key) => store.records[key] || 0;
 
 // ---------------- Home ----------------
 function home() {
+  setZone(null);
   const name = store.settings.name;
   const dailyDone = store.daily.date === today() && store.daily.done;
   const greet = `${t('hello')}${name ? ', ' + name : ''}!`;
@@ -210,6 +214,7 @@ function resumeCard() {
 
 // ---------------- Subject: big section tiles ----------------
 function subject(s) {
+  zoneOf(s);
   const secs = sectionsOf(s);
   const tile = (icon, title, sub, cls, fn) => el('button', { class: `sec-tile ${cls}`, onclick: () => { sfx('tap'); fn(); } },
     el('span', { class: 'sec-icon' }, icon), el('span', { class: 'sec-name' }, title), sub ? el('span', { class: 'sec-sub' }, sub) : null);
@@ -231,6 +236,7 @@ function subject(s) {
 
 // ---------------- Section: adventure path ----------------
 function section(s, secId) {
+  zoneOf(s);
   const sec = sectionsOf(s).find((x) => x.id === secId);
   const lastId = [...store.log].reverse().find((x) => sec.units.some((u) => u.id === x.unit))?.unit;
   const curId = sec.week ? blockForWeek(frWeek()).id : null;
@@ -340,6 +346,7 @@ function modeCard(icon, title, sub, cls, fn) {
 }
 
 function openUnit(u, sec) {
+  zoneOf(u.subject);
   const box = el('div', { class: 'modes' });
   let sh;
   const fill = (l) => {
@@ -354,12 +361,13 @@ function openUnit(u, sec) {
   };
   const dp = diffPicker(u.id, fill, suggestedLevel(u));
   sh = sheet(
-    el('div', { class: 'sheet-head' }, el('span', { class: 'sheet-icon' }, u.icon), el('div', {}, el('h2', {}, tr(u.title)), el('small', {}, u.pfeq || ''))),
+    el('div', { class: 'sheet-head' }, el('span', { class: 'sheet-icon' }, u.icon), el('div', {}, el('h2', {}, tr(u.title)), el('small', {}, u.subject.id === 'anglais' ? '' : u.pfeq || ''))),
     dp.node, box);
   fill(dp.get());
 }
 
 function openBoss(s, sec) {
+  zoneOf(s);
   const key = `${s.id}-${sec.id}`;
   const dp = diffPicker(key);
   const sh = sheet(
@@ -371,6 +379,7 @@ function openBoss(s, sec) {
 }
 
 function quizHub(s) {
+  zoneOf(s);
   const key = `${s.id}-mix`;
   const box = el('div', { class: 'modes' });
   const back = () => quizHub(s);
@@ -391,6 +400,7 @@ function quizHub(s) {
 }
 
 function gamesHub(s) {
+  zoneOf(s);
   const key = `${s.id}-mix`;
   const box = el('div', { class: 'modes' });
   const back = () => gamesHub(s);
@@ -424,6 +434,9 @@ async function play(opts) {
   const pool = opts.pool || (opts.unit ? [opts.unit] : []);
   const recKey = opts.key ? `${opts.key}|${level}|${mode}` : opts.unit ? `${opts.unit.id}|${level}|${mode}` : null;
   const back = opts.back || home;
+  // mixed sessions (« Mes erreurs », défi du jour) switch language per question; the others stay in their subject's zone
+  const mixed = mode === 'review' || mode === 'daily';
+  if (mixed) setZone(null); else zonePool(pool);
 
   // question supply
   let fixed = null;
@@ -457,12 +470,13 @@ async function play(opts) {
   const owlNode = owl('mini');
   const hud = el('div', { class: 'game-hud' });
   let quit = false;
-  const title = mode === 'review' ? `📕 ${t('review')}` : mode === 'daily' ? `🌞 ${t('daily')}` : mode === 'boss' ? `${opts.sec.boss} ${t('guardian')}` : `${opts.unit ? opts.unit.icon : { eclair: '⚡', ballons: '🎈', marathon: '⏱️' }[mode]} ${t('diff' + level)}`;
+  const titleOf = () => mode === 'review' ? `📕 ${t('review')}` : mode === 'daily' ? `🌞 ${t('daily')}` : mode === 'boss' ? `${opts.sec.boss} ${t('guardian')}` : `${opts.unit ? opts.unit.icon : { eclair: '⚡', ballons: '🎈', marathon: '⏱️' }[mode]} ${t('diff' + level)}`;
+  const barTitle = el('span', { class: 'bar-title' }, titleOf());
   screen(`session ${accent} mode-${mode}`,
     el('header', { class: 'bar' },
       el('button', { class: 'round back', onclick: () => { quit = true; clearInterval(timer); stopSpeech(); back(); } }, '✕'),
       hud,
-      el('span', { class: 'bar-title' }, title)),
+      barTitle),
     qRoot,
     el('div', { class: 'owl-corner' }, bubble, owlNode),
     el('div', { class: 'next-wrap' }, nextBtn),
@@ -515,6 +529,7 @@ async function play(opts) {
     if (!item) break;
     const { q, unit: u } = item;
     setContentLang(u.subject.speech);
+    if (mixed) { zoneOf(u.subject); barTitle.textContent = titleOf(); nextBtn.firstChild.textContent = t('next'); }
     dots?.children[i]?.classList.add('now');
     bubble.className = 'owl-bubble';
     const praiseLang = u.subject.praise || lang();
@@ -589,6 +604,7 @@ async function play(opts) {
   }
   clearInterval(timer);
   if (quit) return;
+  if (mixed) setZone(null);
   finishGame({ ...opts, level, mode, recKey, score, correct, answered, total: fixed ? fixed.length : answered, bestCombo, ms: Date.now() - t0, won: mode === 'boss' ? hp <= 0 : null, R });
 }
 
@@ -707,6 +723,7 @@ async function results(g) {
 
 // ---------------- Memory (flip cards) ----------------
 function memory(s, level, back) {
+  zoneOf(s);
   unlockAudio();
   const R = makeRng();
   const n = [0, 6, 8, 10][level];

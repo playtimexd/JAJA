@@ -1,9 +1,9 @@
 // Grade 3 ESL — Vocabulary themes g3e6…g3e16 (11 units, ~32 words each).
-// Entries: 'word|emoji|français|group'. An empty emoji means "no safe picture": the word is then used only in text/French questions.
+// Entries: 'word|emoji|français|group'. An empty emoji means "no safe picture": the word is then used only in text questions.
+// « English zone »: nothing French reaches the child — the French gloss (3rd field) is kept for the parents' reference only.
 import { say, mc, mkUnit, sortQ, P, PF, COMP_INT, rest, split } from './anglais-core.js';
 
 const CTIP = { fr: 'Lis toute la phrase, puis choisis le mot qui a du sens.', en: 'Read the whole sentence, then pick the word that makes sense.' };
-const SHOW = (w, f) => `${w} = ${f}`;
 const ALPHA = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
 // An emoji used by two words of the same unit would make picture questions ambiguous: such emoji are dropped.
@@ -33,7 +33,9 @@ function vocab(id, icon, title, themeFr, bins, rows, cloze, clues) {
   const W = parse(rows), PIC = W.filter((x) => x.e), SINGLE = W.filter((x) => /^[a-z]+$/.test(x.w) && x.w.length <= 9);
   const grp = (g) => W.filter((x) => x.g === g);
   const GIDX = [...new Set(W.map((x) => x.g))];
-  const tip = (x) => SHOW(x.w, x.f);
+  // English-only hint: the picture, else the word's group (« “desk” goes in the box: in the classroom 🏫 »)
+  const tip = (x) => (x.e ? `${x.w} = ${x.e}` : `“${x.w}” goes in the box: ${bins[x.g].text} ${bins[x.g].emoji || ''}`.trim());
+  const inGroup = (g) => new Set(grp(g).map((y) => y.w));
   const same = (R, x, n) => R.sample(W.filter((y) => y.g === x.g && y.w !== x.w), n);
   const lowerClue = (s) => s;
   const cz = cloze.map((c) => { const [s, a, ...w] = split(c); return { s, a, w }; });
@@ -43,13 +45,16 @@ function vocab(id, icon, title, themeFr, bins, rows, cloze, clues) {
       (R) => { const x = R.pick(PIC); const o = R.sample(PIC.filter((y) => y.w !== x.w && y.e !== x.e), 2); return mc(`${id}:a1:${x.w}`, P.pic, x.w, o.map((y) => y.w), { stimulus: { emoji: x.e }, tip: tip(x) }); },
       (R) => { const x = R.pick(PIC); const o = R.sample(PIC.filter((y) => y.w !== x.w && y.e !== x.e), 2); return mc(`${id}:b1:${x.w}`, P.listenPic, x.e, o.map((y) => y.e), { say: say(x.w), emoji: true, tip: tip(x) }); },
       (R) => { const x = R.pick(PIC); const o = R.sample(PIC.filter((y) => y.w !== x.w && y.e !== x.e), 2); return mc(`${id}:c1:${x.w}`, P.readPic, x.e, o.map((y) => y.e), { stimulus: { text: x.w }, emoji: true, tip: tip(x) }); },
-      (R) => { const x = R.pick(W); const o = R.sample(W.filter((y) => y.w !== x.w && y.f !== x.f), 2); return mc(`${id}:d1:${x.w}`, P.fr2en, x.w, o.map((y) => y.w), { stimulus: { text: x.f }, tip: tip(x) }); },
+      (R) => { const x = R.pick(W), mine = inGroup(x.g); const o = R.sample(W.filter((y) => y.g !== x.g && !mine.has(y.w)), 2);
+        return mc(`${id}:d1:${x.w}`, P.listenWord, x.w, o.map((y) => y.w), { say: say(x.w), stimulus: { emoji: '🎧' }, tip: tip(x) }); },
     ],
     2: [
       (R) => { const x = R.pick(W); const o = [...same(R, x, 2), ...R.sample(W.filter((y) => y.g !== x.g), 1)]; return mc(`${id}:a2:${x.w}`, P.listenWord, x.w, o.map((y) => y.w), { say: say(x.w), cols: 2, tip: tip(x) }); },
       (R) => { const x = R.pick(SINGLE); const extra = R.sample(ALPHA.filter((c) => !x.w.includes(c)), 2);
-        return { type: 'order', key: `${id}:b2:${x.w}`, prompt: P.spell, say: say(x.w), stimulus: x.e ? { emoji: x.e } : { text: x.f }, tiles: x.w.split(''), extra, joiner: '', tip: tip(x) }; },
-      (R) => { const x = R.pick(W); const o = R.sample(W.filter((y) => y.f !== x.f), 3); return mc(`${id}:c2:${x.w}`, P.en2fr, x.f, o.map((y) => y.f), { stimulus: { text: x.w }, say: say(x.w), cols: 2, tip: tip(x) }); },
+        return { type: 'order', key: `${id}:b2:${x.w}`, prompt: P.spell, say: say(x.w), stimulus: { emoji: x.e || '🎧' }, tiles: x.w.split(''), extra, joiner: '', tip: tip(x) }; },
+      // listening discrimination: distractors look alike (same first letter when possible)
+      (R) => { const x = R.pick(W), near = W.filter((y) => y.w !== x.w && y.w[0] === x.w[0]); const o = [...R.sample(near, Math.min(3, near.length))]; o.push(...R.sample(W.filter((y) => y.w !== x.w && !o.includes(y)), 3 - o.length));
+        return mc(`${id}:c2:${x.w}`, P.listenWord, x.w, o.map((y) => y.w), { say: say(x.w), stimulus: { emoji: '🎧' }, cols: 2, tip: tip(x) }); },
       (R) => { const [a, b] = R.sample(GIDX, 2); const ga = R.sample(grp(a), 3).map((x) => x.w), gb = R.sample(grp(b), 3).map((x) => x.w);
         return sortQ(`${id}:d2:${[...ga, ...gb].sort().join(',')}`, P.sortW, [bins[a], bins[b]], [ga, gb], { speak: true }); },
       (R) => { const c = R.pick(cz); return mc(`${id}:e2:${c.s}`, P.fill, c.a, R.sample(c.w, Math.min(2, c.w.length)), { stimulus: { text: c.s }, cols: 3, tip: CTIP }); },
@@ -58,10 +63,10 @@ function vocab(id, icon, title, themeFr, bins, rows, cloze, clues) {
       (R) => { const x = R.pick(SINGLE); const extra = R.sample(ALPHA.filter((c) => !x.w.includes(c)), 3);
         return { type: 'order', key: `${id}:a3:${x.w}`, prompt: P.spell, say: say(x.w), tiles: x.w.split(''), extra, joiner: '', tip: tip(x) }; },
       (R) => { const [a, b] = R.sample(GIDX, 2); const three = R.sample(grp(a), 3), odd = R.pick(grp(b));
-        return mc(`${id}:b3:${[...three.map((x) => x.w), odd.w].sort().join(',')}`, P.odd, odd.w, three.map((x) => x.w), { cols: 2, tip: { fr: `« ${odd.w} » (${odd.f}) n’est pas du même groupe.`, en: `“${odd.w}” does not belong to the same group.` } }); },
+        return mc(`${id}:b3:${[...three.map((x) => x.w), odd.w].sort().join(',')}`, P.odd, odd.w, three.map((x) => x.w), { cols: 2, tip: { fr: `« ${odd.w} » n’est pas du même groupe.`, en: `“${odd.w}” does not belong to the same group.` } }); },
       (R) => { const c = R.pick(cl); return mc(`${id}:c3:${c.s}`, P.clue, c.a, c.w, { stimulus: { text: c.s }, say: say(c.s), cols: 2, tip: { fr: 'Pense à ce que fait ou à ce qu’est chaque chose de l’indice.', en: 'Think about what the clue says the thing does or is.' } }); },
       (R) => { const c = R.pick(cz); return mc(`${id}:d3:${c.s}`, P.fill, c.a, c.w, { stimulus: { text: c.s }, cols: 2, tip: CTIP }); },
-      (R) => { const x = R.pick(SINGLE); return mc(`${id}:e3:${x.w}:${R.int(0, 2)}`, { fr: 'Quelle est la bonne orthographe?', en: 'Which spelling is correct?' }, x.w, misspell(R, x.w), { stimulus: x.e ? { emoji: x.e } : { text: x.f }, say: say(x.w), cols: 2, tip: tip(x) }); },
+      (R) => { const x = R.pick(SINGLE); return mc(`${id}:e3:${x.w}:${R.int(0, 2)}`, { fr: 'Quelle est la bonne orthographe?', en: 'Which spelling is correct?' }, x.w, misspell(R, x.w), { stimulus: { emoji: x.e || '🎧' }, say: say(x.w), cols: 2, tip: tip(x) }); },
       (R) => { const idx = R.sample(GIDX, 3); const grps = idx.map((g) => R.sample(grp(g), 2).map((x) => x.w));
         return sortQ(`${id}:f3:${grps.flat().sort().join(',')}`, P.sortW, idx.map((g) => bins[g]), grps); },
     ],

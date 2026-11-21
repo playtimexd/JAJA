@@ -3,7 +3,7 @@
 import { el } from './util.js';
 import { VOICE_URL } from './config.js';
 import { store, save, today } from './store.js';
-import { tr, lang } from './i18n.js';
+import { tr, lang, setZone } from './i18n.js';
 import { sfx, stopSpeech, playSrc } from './audio.js';
 import { screen, backBtn, wallet, sheet } from './ui.js';
 import { COIN, addCoins, bump, progress, checkBadges, showBadges, confetti, touchStreak, dressedOwl } from './game.js';
@@ -12,7 +12,7 @@ export const TALK_LANGS = {
   en: { flag: '🍁', name: 'English', t: { fr: 'Anglais', en: 'English' }, code: 'en',
     who: 'practise speaking English. The child lives in Québec, goes to a French-speaking school, and is in grade 2 (English as a second language).',
     speak: 'Speak slowly and clearly in Canadian English.',
-    help: 'If the child answers in French or gets stuck, give the English words and invite them to repeat. You may say one short French word to help, but keep the conversation in English.',
+    help: 'If the child answers in French or gets stuck, give the English words and invite them to repeat. Never speak French: the whole conversation stays in English. To help, use very simple English words, examples, choices ("Is it big or small?") or describe things.',
     praise: 'Great!' },
   fr: { flag: '⚜️', name: 'Français', t: { fr: 'Français', en: 'French' }, code: 'fr',
     who: 'practise speaking French. The child lives in Québec and is in 2e année at a French-speaking school; help them speak in full, correct sentences and learn new words.',
@@ -102,6 +102,7 @@ export function talkHome(back, langArg) {
   let tl = langArg || store.pick.talkLang || 'en';
   if (!TALK_LANGS[tl]) tl = 'en';
   store.pick.talkLang = tl;
+  setZone(tl === 'en' ? 'en' : null);   // Talk in English = « English zone »: the whole screen reads in English
   const left = Math.max(0, dailyLimit() * 60 - usedToday());
   const ok = !!voiceUrl();
   let level = store.pick.talk || 1;
@@ -113,7 +114,7 @@ export function talkHome(back, langArg) {
   drawSeg();
   screen('talk-screen green',
     el('header', { class: 'bar' }, backBtn(back), el('h1', {}, '🎙️ ', tr(L.title)), wallet()),
-    el('div', { class: 'talk-langs' }, Object.entries(TALK_LANGS).map(([k, T]) => el('button', { class: `talk-lang ${k === tl ? 'on' : ''}`, onclick: () => { sfx('tap'); store.pick.talkLang = k; save(); talkHome(back, k); } }, el('span', {}, T.flag), T.name))),
+    el('div', { class: 'talk-langs' }, Object.entries(TALK_LANGS).map(([k, T]) => el('button', { class: `talk-lang ${k === tl ? 'on' : ''}`, onclick: () => { sfx('tap'); store.pick.talkLang = k; save(); talkHome(back, k); } }, el('span', {}, T.flag), tl === 'en' ? T.t.en : T.name))),
     el('p', { class: 'hub-intro' }, tr(L.pick), ' · ', `⏱️ ${Math.ceil(left / 60)} ${tr(L.left)}`),
     !ok ? el('div', { class: 'talk-warn' }, '⚙️ ', tr(L.noServer)) : null,
     ok && !store.settings.voiceCode ? el('div', { class: 'talk-warn' }, tr(L.needCode), codeBox(() => talkHome(back, tl))) : null,

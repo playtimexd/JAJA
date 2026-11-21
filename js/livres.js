@@ -2,7 +2,7 @@
 // Data: js/content/livres/<id>.js (schema in docs/LIVRES.md); BOOKS lists the files in shelf order.
 import { el, makeRng } from './util.js';
 import { store, save, today } from './store.js';
-import { tr } from './i18n.js';
+import { tr, setZone } from './i18n.js';
 import { speak, stopSpeech, sfx, unlockAudio, setContentLang } from './audio.js';
 import { runQuestion, hanzi } from './widgets.js';
 import { screen, backBtn, wallet, sheet } from './ui.js';
@@ -52,6 +52,8 @@ async function loadAll(lang) {
   return out;
 }
 const conf = (b) => SHELVES[b?.shelf || 'fr'];
+// English shelf = « English zone » (js/i18n.js): its whole chrome reads and speaks English.
+const zone = (shelf) => setZone(shelf === 'en' ? 'en' : null);
 const sayB = (b, text) => ({ text: text && typeof text === 'object' ? (text.hz ?? tr(text)) : text, lang: conf(b).speech });
 const label = (x) => (x && typeof x === 'object' && x.hz ? hanzi(x.hz, x.py) : x);
 // Each picture is an isolated <img>: books may use <style>/ids inside their SVG without leaking into each other.
@@ -70,6 +72,7 @@ const pic = (svg, cls) => {
 export async function openBook(id, back, i = 0) { const b = await loadBook(id); page(b, Math.min(i, b.pages.length - 1), back, false); }
 
 export async function libraryHome(back, lang = 'fr') {
+  zone(lang);
   const books = await loadAll(lang);
   const read = store.books || {};
   screen('livres-screen pink',
@@ -82,6 +85,7 @@ export async function libraryHome(back, lang = 'fr') {
 }
 
 function cover(b, back) {
+  zone(b.shelf);
   unlockAudio(); setContentLang(conf(b).speech);
   screen('book-cover-screen pink',
     el('header', { class: 'bar' }, backBtn(() => libraryHome(back, b.shelf))),
@@ -122,6 +126,7 @@ function tappable(text, b, p) {
 
 let auto = null;
 function page(b, i, back, listen) {
+  zone(b.shelf);
   clearTimeout(auto);
   store.bookPos = { ...(store.bookPos || {}), [b.id]: i };
   store.resume = { t: 'book', id: b.id, i, label: b.title, icon: b.emoji };
@@ -150,6 +155,7 @@ function page(b, i, back, listen) {
 }
 
 function endWords(b, back) {
+  zone(b.shelf);
   screen('book-words pink',
     el('header', { class: 'bar' }, backBtn(() => page(b, b.pages.length - 1, back, false)), el('h1', {}, '📝 ', tr(L.words))),
     el('div', { class: 'word-cards' }, b.words.map((w) => el('button', { class: 'word-card', onclick: () => { sfx('tap'); speak(sayB(b, `${w.word}${b.shelf === 'zh' ? '。' : '. '}${w.def}`)); } },
@@ -159,6 +165,7 @@ function endWords(b, back) {
 }
 
 async function quiz(b, back) {
+  zone(b.shelf);
   const R = makeRng();
   const qRoot = el('div', { class: 'q' });
   const bubble = el('div', { class: 'owl-bubble' });

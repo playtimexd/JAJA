@@ -110,7 +110,12 @@ const STR = {
   grade: { fr: '2e année · Programme du Québec', en: 'Grade 2 · Québec program' },
 };
 
-export const lang = () => store.settings.lang;
+// « English zone »: inside the anglais subject (2e/3e), the English book shelf and Talk in English, every piece of
+// UI text and voice is English whatever the app language is. setZone('en') on entering, setZone(null) on leaving.
+let zone = null;
+export const setZone = (l) => { zone = l || null; };
+export const getZone = () => zone;
+export const lang = () => zone || store.settings.lang;
 // Resolve a text field: string | {fr,en}
 export const tr = (x) => (x == null ? '' : typeof x === 'object' && !Array.isArray(x) && ('fr' in x || 'en' in x) ? x[lang()] ?? x.fr : x);
 export const t = (k) => tr(STR[k]);
