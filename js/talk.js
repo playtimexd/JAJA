@@ -5,7 +5,7 @@ import { VOICE_URL } from './config.js';
 import { store, save, today } from './store.js';
 import { tr, lang, setZone, getZone, zh } from './i18n.js';
 import { setText } from './widgets.js';
-import { sfx, stopSpeech, playSrc } from './audio.js';
+import { sfx, stopSpeech, playSrc, speak } from './audio.js';
 import { screen, backBtn, wallet, sheet } from './ui.js';
 import { COIN, addCoins, bump, progress, checkBadges, showBadges, confetti, touchStreak, dressedOwl } from './game.js';
 
@@ -210,7 +210,9 @@ async function localSession(base, instructions, code, kind) {
   const mic = live.mic;
   const type = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find((t) => window.MediaRecorder?.isTypeSupported?.(t)) || '';
   const btn = el('button', { class: 'btn talk-mic', disabled: true }, '🎤 ', tr(L.tapTalk));
-  const say = async (b64, mime) => { setState('speaking'); try { if (b64) await playSrc(audioUrl(b64, mime)); } catch {} if (live) setState('ready'); };
+  const voiceLang = { en: 'en-CA', fr: 'fr-CA', zh: 'zh-CN' }[code] || 'en-CA';
+  // no audio from the server (free Cloudflare path for French / Chinese) → the device voice reads the reply
+  const say = async (b64, mime, text) => { setState('speaking'); try { if (b64) await playSrc(audioUrl(b64, mime)); else if (text) await speak({ text, lang: voiceLang }); } catch {} if (live) setState('ready'); };
   const call = async (path, opts) => {
     const r = await fetch(`${base}${path}`, { ...opts, headers: { ...(opts.headers || {}), ...codeHdr() } });
     if (r.status === 401) throw Object.assign(new Error('code'), { code: 401 });
@@ -225,7 +227,7 @@ async function localSession(base, instructions, code, kind) {
     ui.log.after(btn);
     ui.log.before(el('div', { class: 'talk-via' }, kind === 'pc' ? '🖥️' : '☁️', getZone() === 'zh' ? '' : kind === 'pc' ? ' PC' : ' Cloudflare'));
     addLine('owl', first.reply); history.push({ role: 'assistant', content: first.reply });
-    await say(first.audio, first.mime);
+    await say(first.audio, first.mime, first.reply);
   } catch (e) {
     if (!live) return true;
     if (e.code === 401) { badCode(); return true; }
@@ -262,7 +264,7 @@ async function localSession(base, instructions, code, kind) {
       if (!live) return;
       if (res.heard) { addLine('me', res.heard); history.push({ role: 'user', content: res.heard }); live.turns++; sfx('tap'); }
       addLine('owl', res.reply); history.push({ role: 'assistant', content: res.reply });
-      await say(res.audio, res.mime);
+      await say(res.audio, res.mime, res.reply);
     } catch (e) { if (e.code === 401) badCode(); else if (live) setText(ui.status, tr(L.error)); }
     if (live) { btn.disabled = false; btn.replaceChildren('🎤 ', el('span', {}, tr(L.tapTalk))); }
   };

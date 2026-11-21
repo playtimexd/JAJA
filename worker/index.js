@@ -9,6 +9,28 @@
 
 const json = (obj, status, cors) => new Response(JSON.stringify(obj), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...cors } });
 
+
+// Workers AI text model. qwen3-30b-a3b-fp8 and melotts were deprecated on 2026-11-20; glm-4.7-flash is the
+// multilingual replacement. Reasoning is switched off when accepted (else retried without the option).
+const LLM = '@cf/zai-org/glm-4.7-flash';
+async function runLLM(env, messages, max_tokens, temperature) {
+  const model = env.AI_LLM || LLM;
+  let out;
+  try { out = await env.AI.run(model, { messages, max_tokens, temperature, chat_template_kwargs: { enable_thinking: false } }); }
+  catch { out = await env.AI.run(model, { messages, max_tokens, temperature }); }
+  const raw = out?.response ?? out?.choices?.[0]?.message?.content ?? '';
+  return String(typeof raw === 'string' ? raw : JSON.stringify(raw)).replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+}
+// English speech for the free path (Deepgram Aura); French / Chinese replies are spoken by the device.
+async function ttsEN(env, text) {
+  try {
+    const r = await env.AI.run('@cf/deepgram/aura-2-en', { text, speaker: 'luna', encoding: 'mp3' }, { returnRawResponse: true });
+    const buf = new Uint8Array(await new Response(r.body ?? r).arrayBuffer());
+    let bin = ''; for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+    return btoa(bin);
+  } catch { return ''; }
+}
+
 export default {
   async fetch(req, env) {
     const origin = req.headers.get('origin') || '';
@@ -69,15 +91,13 @@ export default {
         if (url.pathname === '/ai/talk' && !heard) {
           reply = { en: "Sorry, I didn't hear you. Can you say it again?", fr: 'Oups, je ne t’ai pas entendu. Peux-tu répéter?', zh: '我没听清楚，你能再说一遍吗？' }[lang];
         } else {
-          const msgs = [{ role: 'system', content: `${instructions}\n\nThis is a SPOKEN conversation: answer in 1–2 short sentences plus one question, no lists, no emoji, no markdown. /no_think` }];
+          const msgs = [{ role: 'system', content: `${instructions}\n\nThis is a SPOKEN conversation: answer in 1–2 short sentences plus one question, no lists, no emoji, no markdown.` }];
           for (const m of history) if ((m.role === 'user' || m.role === 'assistant') && m.content) msgs.push({ role: m.role, content: String(m.content).slice(0, 600) });
           if (msgs.length === 1) msgs.push({ role: 'user', content: { en: '(The child just arrived. Greet them and start.)', fr: '(L’enfant vient d’arriver. Salue-le et commence.)', zh: '（孩子刚来。跟孩子打招呼，开始活动。）' }[lang] });
-          const out = await env.AI.run(env.AI_LLM || '@cf/qwen/qwen3-30b-a3b-fp8', { messages: msgs, max_tokens: 200, temperature: 0.7 });
-          const raw = out?.response ?? out?.choices?.[0]?.message?.content ?? '';
-          reply = String(raw).replace(/<think>[\s\S]*?<\/think>/g, '').replace(/[*_#`]+/g, '').trim();
+          reply = (await runLLM(env, msgs, 400, 0.7)).replace(/[*_#`]+/g, '').trim();
         }
-        const tts = await env.AI.run('@cf/myshell-ai/melotts', { prompt: reply, lang });
-        return json({ heard, reply, audio: tts?.audio || '', mime: 'audio/mpeg' }, 200, cors);
+        const audio = lang === 'en' ? await ttsEN(env, reply) : '';
+        return json({ heard, reply, audio, mime: 'audio/mpeg', lang }, 200, cors);
       } catch (e) {
         return json({ error: 'ai', detail: String(e?.message || e).slice(0, 200) }, 429, cors);
       }
@@ -122,7 +142,7 @@ The child is a heritage speaker who understands spoken Mandarin well but reads f
         if (/(image|handwrit|transcri|text reads|appears)/i.test(text)) { const m = text.match(/["“«]([^"”»]{2,})["”»]/); if (m) text = m[1].trim(); }
         }
         if (text) {
-          const g = await env.AI.run(env.AI_LLM || '@cf/qwen/qwen3-30b-a3b-fp8', { messages: [{ role: 'system', content: `${grade} /no_think` }, { role: 'user', content: `Child's writing: «${text}»` }], max_tokens: 900, temperature: 0.2 });
+          const g = { response: await runLLM(env, [{ role: 'system', content: grade }, { role: 'user', content: `Child's writing: «${text}»` }], 900, 0.2) };
           const resp = g?.response ?? g?.choices?.[0]?.message?.content ?? '';
           if (resp && typeof resp === 'object') result = resp;
           else {
