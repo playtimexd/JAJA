@@ -2,9 +2,9 @@
 // Data: js/content/livres/<id>.js (schema in docs/LIVRES.md); BOOKS lists the files in shelf order.
 import { el, makeRng } from './util.js';
 import { store, save, today } from './store.js';
-import { tr, setZone } from './i18n.js';
+import { tr, setZone, zh } from './i18n.js';
 import { speak, stopSpeech, sfx, unlockAudio, setContentLang } from './audio.js';
-import { runQuestion, hanzi } from './widgets.js';
+import { runQuestion, hanzi, setText } from './widgets.js';
 import { screen, backBtn, wallet, sheet } from './ui.js';
 import { COIN, addCoins, bump, progress, checkBadges, showBadges, confetti, touchStreak, dressedOwl } from './game.js';
 
@@ -13,25 +13,28 @@ export const BOOKS = [
   'jour-de-tempete', 'jardin-de-grand-papa', 'dragon-de-la-ruelle', 'voyage-de-perle', 'robot-de-la-bibliotheque',
 ];
 const L = {
-  shelf: { fr: 'Mes livres', en: 'My books' },
-  cont: { fr: 'Continuer', en: 'Continue' },
-  read: { fr: 'Je lis', en: 'I read' },
-  listen: { fr: 'J’écoute', en: 'Listen' },
-  tapWord: { fr: 'Touche un mot pour l’entendre.', en: 'Tap a word to hear it.' },
-  words: { fr: 'Les mots du livre', en: 'Words from the book' },
-  quiz: { fr: 'As-tu bien compris?', en: 'Did you understand?' },
-  end: { fr: 'Fin', en: 'The end' },
-  bravo: { fr: 'Bravo, grand lecteur!', en: 'Well done, great reader!' },
-  again: { fr: 'Relire', en: 'Read again' },
-  other: { fr: 'Un autre livre', en: 'Another book' },
-  lvl: [null, { fr: 'Début 2e année', en: 'Early grade 2' }, { fr: 'Fin 2e année', en: 'Late grade 2' }, { fr: '3e année', en: 'Grade 3' }],
+  shelf: { fr: 'Mes livres', en: 'My books', zh: zh('我的书', 'wǒ de shū') },
+  cont: { fr: 'Continuer', en: 'Continue', zh: zh('继续读', 'jì xù dú') },
+  read: { fr: 'Je lis', en: 'I read', zh: zh('我自己读', 'wǒ zì jǐ dú') },
+  listen: { fr: 'J’écoute', en: 'Listen', zh: zh('听故事', 'tīng gù shì') },
+  tapWord: { fr: 'Touche un mot pour l’entendre.', en: 'Tap a word to hear it.', zh: zh('点一个词，听一听。', 'diǎn yí gè cí tīng yì tīng') },
+  words: { fr: 'Les mots du livre', en: 'Words from the book', zh: zh('书里的词语', 'shū lǐ de cí yǔ') },
+  quiz: { fr: 'As-tu bien compris?', en: 'Did you understand?', zh: zh('你读懂了吗？', 'nǐ dú dǒng le ma') },
+  end: { fr: 'Fin', en: 'The end', zh: zh('完', 'wán') },
+  bravo: { fr: 'Bravo, grand lecteur!', en: 'Well done, great reader!', zh: zh('真棒，你是小读者！', 'zhēn bàng nǐ shì xiǎo dú zhě') },
+  again: { fr: 'Relire', en: 'Read again', zh: zh('再读一遍', 'zài dú yí biàn') },
+  other: { fr: 'Un autre livre', en: 'Another book', zh: zh('换一本书', 'huàn yì běn shū') },
+  lvl: [null, { fr: 'Début 2e année', en: 'Early grade 2', zh: zh('二年级上', 'èr nián jí shàng') }, { fr: 'Fin 2e année', en: 'Late grade 2', zh: zh('二年级下', 'èr nián jí xià') }, { fr: '3e année', en: 'Grade 3', zh: zh('三年级', 'sān nián jí') }],
+  p: { fr: ' p.', en: ' p.', zh: zh('页', 'yè') },
+  pages: { fr: ' pages', en: ' pages', zh: zh('页', 'yè') },
+  min: { fr: ' min', en: ' min', zh: zh('分钟', 'fēn zhōng') },
 };
 // One shelf per language. English / Chinese shelves list their books in js/content/livres-en|livres-zh/index.js (BOOKS).
 // Book ids are unique across shelves (en-…, zh-…); a Chinese page carries `tokens: [{hz, py}]` for pinyin over each word.
 export const SHELVES = {
   fr: { dir: 'livres', speech: 'fr-CA', title: { fr: 'Mes livres', en: 'My books' }, praise: ['Bravo!', 'Super!', 'Exactement!'], retry: 'Essaie encore!', reveal: 'La bonne réponse :', bravo: 'Bravo, grand lecteur!' },
   en: { dir: 'livres-en', speech: 'en-CA', title: { fr: 'Livres en anglais', en: 'English books' }, praise: ['Great job!', 'Super!', 'Exactly!'], retry: 'Try again!', reveal: 'The right answer:', bravo: 'Well done, great reader!' },
-  zh: { dir: 'livres-zh', speech: 'zh-CN', title: { fr: 'Livres en chinois 中文故事', en: 'Chinese books 中文故事' }, praise: ['太棒了！', '真棒！', '对了！'], retry: '再试一次！', reveal: '正确答案：', bravo: '你真是个小读者！' },
+  zh: { dir: 'livres-zh', speech: 'zh-CN', title: { fr: 'Livres en chinois 中文故事', en: 'Chinese books 中文故事', zh: zh('中文故事书', 'zhōng wén gù shì shū') }, praise: [zh('太棒了！', 'tài bàng le'), zh('真棒！', 'zhēn bàng'), zh('对了！', 'duì le')], retry: zh('再试一次！', 'zài shì yí cì'), reveal: zh('正确答案：', 'zhèng què dá àn'), bravo: zh('你真是个小读者！', 'nǐ zhēn shì gè xiǎo dú zhě') },
 };
 const cache = {};
 const shelfOf = (id) => (id.startsWith('en-') ? 'en' : id.startsWith('zh-') ? 'zh' : 'fr');
@@ -52,8 +55,8 @@ async function loadAll(lang) {
   return out;
 }
 const conf = (b) => SHELVES[b?.shelf || 'fr'];
-// English shelf = « English zone » (js/i18n.js): its whole chrome reads and speaks English.
-const zone = (shelf) => setZone(shelf === 'en' ? 'en' : null);
+// English shelf = « English zone », Chinese shelf = « Chinese zone » (js/i18n.js): the whole chrome reads and speaks that language.
+const zone = (shelf) => setZone(shelf === 'en' || shelf === 'zh' ? shelf : null);
 const sayB = (b, text) => ({ text: text && typeof text === 'object' ? (text.hz ?? tr(text)) : text, lang: conf(b).speech });
 const label = (x) => (x && typeof x === 'object' && x.hz ? hanzi(x.hz, x.py) : x);
 // Each picture is an isolated <img>: books may use <style>/ids inside their SVG without leaking into each other.
@@ -79,7 +82,7 @@ export async function libraryHome(back, lang = 'fr') {
     el('header', { class: 'bar' }, backBtn(back), el('h1', {}, '📚 ', tr(SHELVES[lang].title)), wallet()),
     el('div', { class: 'shelf' }, books.map((b) => el('button', { class: `book lv${b.level} ${read[b.id] ? 'done' : ''}`, onclick: () => { sfx('tap'); cover(b, back); } },
       pic(b.cover, 'book-cover'),
-      el('div', { class: 'book-info' }, el('b', {}, b.emoji, ' ', label(b.titleZh || b.title)), el('small', {}, `${tr(L.lvl[b.level])} · ${b.pages.length} p. · ${b.minutes} min`)),
+      el('div', { class: 'book-info' }, el('b', {}, b.emoji, ' ', label(b.titleZh || b.title)), el('small', {}, tr(L.lvl[b.level]), ` · ${b.pages.length}`, tr(L.p), ` · ${b.minutes}`, tr(L.min))),
       read[b.id] ? el('span', { class: 'book-stars' }, '★'.repeat(read[b.id].stars || 0) + '☆'.repeat(3 - (read[b.id].stars || 0))) : null))),
   );
 }
@@ -93,8 +96,8 @@ function cover(b, back) {
       pic(b.cover, 'cover-pic'),
       el('div', { class: 'cover-side' },
         el('h1', { class: 'cover-title' }, label(b.titleZh || b.title)),
-        el('div', { class: 'art-meta' }, `${tr(L.lvl[b.level])} · ${b.pages.length} pages · ⏱️ ${b.minutes} min`),
-        (store.bookPos?.[b.id] > 0 && store.bookPos[b.id] < b.pages.length - 1) ? el('button', { class: 'btn primary big-go', onclick: () => { sfx('tap'); page(b, store.bookPos[b.id], back, false); } }, '▶ ', tr(L.cont), ` (p. ${store.bookPos[b.id] + 1})`) : null,
+        el('div', { class: 'art-meta' }, tr(L.lvl[b.level]), ` · ${b.pages.length}`, tr(L.pages), ` · ⏱️ ${b.minutes}`, tr(L.min)),
+        (store.bookPos?.[b.id] > 0 && store.bookPos[b.id] < b.pages.length - 1) ? el('button', { class: 'btn primary big-go', onclick: () => { sfx('tap'); page(b, store.bookPos[b.id], back, false); } }, '▶ ', tr(L.cont), b.shelf === 'zh' ? ` (${store.bookPos[b.id] + 1}` : ` (p. ${store.bookPos[b.id] + 1}`, b.shelf === 'zh' ? tr(L.p) : '', ')') : null,
         el('button', { class: 'btn primary big-go', onclick: () => { sfx('tap'); page(b, 0, back, false); } }, '📖 ', tr(L.read)),
         el('button', { class: 'btn big-go', onclick: () => { sfx('tap'); page(b, 0, back, true); } }, '🎧 ', tr(L.listen)))),
   );
@@ -144,7 +147,7 @@ function page(b, i, back, listen) {
         el('div', { class: 'step-nav' },
           el('button', { class: 'btn ghost', disabled: i === 0, onclick: () => go(i - 1) }, '◀'),
           el('button', { class: 'say-btn', onclick: () => speak(sayB(b, p.text)) }, '🔊'),
-          el('button', { class: 'btn primary', onclick: () => go(i + 1) }, last ? `${tr(L.end)} ➜` : '▶')))),
+          el('button', { class: 'btn primary', onclick: () => go(i + 1) }, last ? [tr(L.end), ' ➜'] : '▶')))),
   );
   // swipe to turn pages
   let x0 = null;
@@ -159,7 +162,7 @@ function endWords(b, back) {
   screen('book-words pink',
     el('header', { class: 'bar' }, backBtn(() => page(b, b.pages.length - 1, back, false)), el('h1', {}, '📝 ', tr(L.words))),
     el('div', { class: 'word-cards' }, b.words.map((w) => el('button', { class: 'word-card', onclick: () => { sfx('tap'); speak(sayB(b, `${w.word}${b.shelf === 'zh' ? '。' : '. '}${w.def}`)); } },
-      el('span', { class: 'wc-e' }, w.emoji || '📘'), el('b', {}, w.py ? hanzi(w.word, w.py) : w.word), el('small', {}, w.def)))),
+      el('span', { class: 'wc-e' }, w.emoji || '📘'), el('b', {}, w.py ? hanzi(w.word, w.py) : w.word), el('small', {}, w.defPy ? hanzi(w.def, w.defPy) : w.def)))),
     el('div', { class: 'res-btns' }, el('button', { class: 'btn primary big-go', onclick: () => { sfx('tap'); quiz(b, back); } }, '❓ ', tr(L.quiz), ' ➜')),
   );
 }
@@ -178,9 +181,9 @@ async function quiz(b, back) {
     if (quit) return;
     const q = { type: 'choice', key: `${b.id}#${k}`, prompt: x.q, say: sayB(b, x.q), options: x.options.map((o) => (o && typeof o === 'object' && o.hz ? { hz: o.hz, py: o.py } : { text: o })), answer: x.answer, cols: 1 };
     score += await runQuestion(q, qRoot, R, {
-      praise: () => { const w = R.pick(conf(b).praise); bubble.textContent = w; bubble.className = 'owl-bubble show good'; speak(sayB(b, w)); },
-      retry: () => { bubble.textContent = conf(b).retry; bubble.className = 'owl-bubble show bad'; },
-      reveal: () => { bubble.textContent = conf(b).reveal; bubble.className = 'owl-bubble show bad'; },
+      praise: () => { const w = R.pick(conf(b).praise); setText(bubble, w); bubble.className = 'owl-bubble show good'; speak(sayB(b, w)); },
+      retry: () => { setText(bubble, conf(b).retry); bubble.className = 'owl-bubble show bad'; },
+      reveal: () => { setText(bubble, conf(b).reveal); bubble.className = 'owl-bubble show bad'; },
       waitNext: (cb) => setTimeout(cb, 1600),
     });
   }

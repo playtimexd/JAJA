@@ -6,16 +6,16 @@ export const isHan = (c) => /\p{Script=Han}/u.test(c);
 export const hanLen = (s) => [...s].filter(isHan).length;
 
 export const THEMES = [
-  { id: 'home', icon: '🏠', fr: 'La maison et la famille', en: 'Home & family', zh: '家和家人', raw: RAW_A.home },
-  { id: 'school', icon: '🏫', fr: 'L’école', en: 'School', zh: '学校', raw: RAW_A.school },
-  { id: 'weather', icon: '🌦️', fr: 'Le temps et la nature', en: 'Weather & nature', zh: '天气和大自然', raw: RAW_A.weather },
-  { id: 'body', icon: '🧍', fr: 'Le corps et la santé', en: 'Body & health', zh: '身体和健康', raw: RAW_A.body },
-  { id: 'animals', icon: '🦁', fr: 'Les animaux', en: 'Animals', zh: '动物', raw: RAW_A.animals },
-  { id: 'food', icon: '🍜', fr: 'Les aliments', en: 'Food', zh: '食物', raw: RAW_B.food },
-  { id: 'time', icon: '⏰', fr: 'Couleurs, nombres et temps', en: 'Colours, numbers & time', zh: '颜色、数字和时间', raw: RAW_B.time },
-  { id: 'actions', icon: '🤸', fr: 'Les actions', en: 'Actions', zh: '动作', raw: RAW_B.actions },
-  { id: 'places', icon: '🏙️', fr: 'Lieux et déplacements', en: 'Places & directions', zh: '地方和方向', raw: RAW_B.places },
-  { id: 'mind', icon: '💭', fr: 'Caractère et sentiments', en: 'Character & feelings', zh: '性格和心情', raw: RAW_B.mind },
+  { id: 'home', icon: '🏠', fr: 'La maison et la famille', en: 'Home & family', zh: '家和家人', zhPy: 'jiā hé jiā rén', raw: RAW_A.home },
+  { id: 'school', icon: '🏫', fr: 'L’école', en: 'School', zh: '学校', zhPy: 'xué xiào', raw: RAW_A.school },
+  { id: 'weather', icon: '🌦️', fr: 'Le temps et la nature', en: 'Weather & nature', zh: '天气和大自然', zhPy: 'tiān qì hé dà zì rán', raw: RAW_A.weather },
+  { id: 'body', icon: '🧍', fr: 'Le corps et la santé', en: 'Body & health', zh: '身体和健康', zhPy: 'shēn tǐ hé jiàn kāng', raw: RAW_A.body },
+  { id: 'animals', icon: '🦁', fr: 'Les animaux', en: 'Animals', zh: '动物', zhPy: 'dòng wù', raw: RAW_A.animals },
+  { id: 'food', icon: '🍜', fr: 'Les aliments', en: 'Food', zh: '食物', zhPy: 'shí wù', raw: RAW_B.food },
+  { id: 'time', icon: '⏰', fr: 'Couleurs, nombres et temps', en: 'Colours, numbers & time', zh: '颜色、数字和时间', zhPy: 'yán sè shù zì hé shí jiān', raw: RAW_B.time },
+  { id: 'actions', icon: '🤸', fr: 'Les actions', en: 'Actions', zh: '动作', zhPy: 'dòng zuò', raw: RAW_B.actions },
+  { id: 'places', icon: '🏙️', fr: 'Lieux et déplacements', en: 'Places & directions', zh: '地方和方向', zhPy: 'dì fang hé fāng xiàng', raw: RAW_B.places },
+  { id: 'mind', icon: '💭', fr: 'Caractère et sentiments', en: 'Character & feelings', zh: '性格和心情', zhPy: 'xìng gé hé xīn qíng', raw: RAW_B.mind },
 ];
 
 const seen = new Set();

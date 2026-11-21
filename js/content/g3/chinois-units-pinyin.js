@@ -1,6 +1,6 @@
 // g3c14 tones 声调辨析, g3c15 blending / whole syllables 拼读, g3c16 neutral tone & erhua 轻声儿化.
 import { WORDS } from './chinois-vocab.js';
-import { say, T, mc, take, uniq, pyWrong, finish, split, mark, tone, hanLen } from './chinois-lib.js';
+import { say, T, H, HC, mc, take, uniq, pyWrong, finish, split, mark, tone, hanLen } from './chinois-lib.js';
 
 const cOpt = (hz, py, withPy = true) => (withPy ? { hz, py, say: say(hz) } : { hz, say: say(hz) });
 const ARROW = ['→', '↗', '↘↗', '↘'];
@@ -68,22 +68,22 @@ const SANDHI = `
 不|渴|bù kě|不渴
 不|饿|bú è|不饿
 `.trim().split('\n').map((l) => { const [a, b, py, hz] = l.split('|'); return { a, hz, py, t: py.split(' ')[0] }; });
-const SANDHI_TIP = T('不 et 一 changent de ton : devant un 4e ton, 不 → bú et 一 → yí. Devant les tons 1, 2, 3, 一 → yì (et 不 reste bù).', '不 and 一 change tone: before a 4th tone, 不 → bú and 一 → yí. Before tones 1, 2, 3, 一 → yì (and 不 stays bù).');
-const toneTip = (g) => T(`Même syllabe, quatre tons : ${g.map((x) => `${x.hz} ${x.py}`).join(' · ')}.`, `Same syllable, four tones: ${g.map((x) => `${x.hz} ${x.py}`).join(' · ')}.`);
+const SANDHI_TIP = H('变调：在第四声前面，一读 yí，不读 bú；在第一、二、三声前面，一读 yì，不还是读 bù。', 'biàn diào zài dì sì shēng qián miàn yī dú bù dú zài dì yī èr sān shēng qián miàn yī dú bù hái shì dú');
+const toneTip = (g) => HC(H('同一个音，四个声调：', 'tóng yí gè yīn sì gè shēng diào'), ...g.flatMap((x, i) => (i ? [' · ', x] : [x])), '。');
 const W2 = WORDS.filter((w) => hanLen(w.hz) === 2 && w.py.split(' ').every((s) => tone(s)));
 const W3 = WORDS.filter((w) => hanLen(w.hz) >= 3 && w.py.split(' ').every((s) => tone(s)));
 const g3c14 = finish({
-  id: 'g3c14', icon: '🎼', title: T('Écouter les tons 声调辨析', 'Telling tones apart 声调辨析'),
+  id: 'g3c14', icon: '🎼', title: { ...T('Écouter les tons 声调辨析', 'Telling tones apart 声调辨析'), zh: H('声调辨析', 'shēng diào biàn xī') },
   pfeq: 'Chinois — pinyin : distinguer les quatre tons et les changements de ton (2e–3e année)',
   generate(L, R) {
     const lvl = [1, 2, 3].includes(L) ? L : 2;
     const g = R.pick(SETS), x = R.pick(g);
-    const hearSet = () => mc(`ts-${x.hz}`, T('Écoute. Quel caractère entends-tu ?', 'Listen. Which character do you hear?'), cOpt(x.hz, x.py, lvl < 3), R.sample(g.filter((y) => y !== x), lvl === 1 ? 2 : 3).map((y) => cOpt(y.hz, y.py, lvl < 3)), { say: say(x.hz), cols: 2, tip: toneTip(g) });
-    const toneOf = () => mc(`to-${x.hz}`, T('Quel est le ton de ce caractère ?', 'Which tone is this character?'), contour(tone(x.py)), [1, 2, 3, 4].filter((t) => t !== tone(x.py)).slice(0, lvl === 1 ? 2 : 3).map(contour), { stimulus: { hz: x.hz, py: x.py }, say: say(x.hz), cols: 2, tip: toneTip(g) });
-    const pyPick = (pool, n) => { const w = R.pick(pool); return mc(`tw-${w.hz}`, T('Écoute. Quel est le bon pinyin ?', 'Listen. What is the right pinyin?'), { py: w.py }, pyWrong(R, w.py, 3).slice(0, n).map((p) => ({ py: p })), { stimulus: lvl === 3 ? { hz: w.hz } : { hz: w.hz }, say: say(w.hz), cols: 2, tip: T(`${w.hz} se lit ${w.py}.`, `${w.hz} is read ${w.py}.`) }); };
+    const hearSet = () => mc(`ts-${x.hz}`, H('听一听，你听到的是哪个字？', 'tīng yì tīng nǐ tīng dào de shì nǎ gè zì'), cOpt(x.hz, x.py, lvl < 3), R.sample(g.filter((y) => y !== x), lvl === 1 ? 2 : 3).map((y) => cOpt(y.hz, y.py, lvl < 3)), { say: say(x.hz), cols: 2, tip: toneTip(g) });
+    const toneOf = () => mc(`to-${x.hz}`, H('这个字读第几声？', 'zhè gè zì dú dì jǐ shēng'), contour(tone(x.py)), [1, 2, 3, 4].filter((t) => t !== tone(x.py)).slice(0, lvl === 1 ? 2 : 3).map(contour), { stimulus: { hz: x.hz, py: x.py }, say: say(x.hz), cols: 2, tip: toneTip(g) });
+    const pyPick = (pool, n) => { const w = R.pick(pool); return mc(`tw-${w.hz}`, H('听一听，哪个拼音是对的？', 'tīng yì tīng nǎ gè pīn yīn shì duì de'), { py: w.py }, pyWrong(R, w.py, 3).slice(0, n).map((p) => ({ py: p })), { stimulus: { hz: w.hz }, say: say(w.hz), cols: 2, tip: HC(w, H('读作', 'dú zuò'), ` ${w.py}。`) }); };
     const sandhi = () => {
       const s = R.pick(SANDHI), base = s.a === '一' ? ['yī', 'yí', 'yì'] : ['bù', 'bú', 'bǔ'];
-      return mc(`sd-${s.hz}`, T(`Comment lit-on « ${s.a} » dans ce mot ?`, `How is “${s.a}” read in this word?`), { py: s.t }, base.filter((p) => p !== s.t).map((p) => ({ py: p })).slice(0, s.a === '一' ? 2 : 2), { stimulus: { hz: s.hz }, say: say(s.hz), cols: 3, tip: SANDHI_TIP });
+      return mc(`sd-${s.hz}`, H('听一听，这个词的第一个字怎么读？', 'tīng yì tīng zhè gè cí de dì yī gè zì zěn me dú'), { py: s.t }, base.filter((p) => p !== s.t).map((p) => ({ py: p })).slice(0, s.a === '一' ? 2 : 2), { stimulus: { hz: s.hz }, say: say(s.hz), cols: 3, tip: SANDHI_TIP });
     };
     if (lvl === 1) return R.pick([hearSet, toneOf, hearSet])();
     if (lvl === 2) return R.pick([hearSet, toneOf, () => pyPick(W2, 2), () => pyPick(W2, 3)])();
@@ -102,7 +102,7 @@ const SPELL = `
 const INI = ['zh', 'ch', 'sh', 'b', 'p', 'm', 'f', 'd', 't', 'n', 'l', 'g', 'k', 'h', 'j', 'q', 'x', 'r', 'z', 'c', 's'];
 const parts = (py) => { const { base, tone: t } = split(py); const ini = INI.find((i) => base.startsWith(i) && base.length > i.length) || ''; return { ini, fin: base.slice(ini.length), t }; };
 const BLEND = SPELL.map((x) => ({ ...x, ...parts(x.py) })).map((x) => ({ ...x, finM: mark(x.fin.replace('v', 'ü'), x.t) }));
-const BLEND_TIP = (x) => T(`${x.ini} + ${x.finM} = ${x.py} (${x.hz}).`, `${x.ini} + ${x.finM} = ${x.py} (${x.hz}).`);
+const BLEND_TIP = (x) => HC(`${x.ini} + ${x.finM} = ${x.py}  `, { hz: x.hz, py: x.py }, '。');
 const NEAR_INI = { b: 'p', p: 'b', d: 't', t: 'd', g: 'k', k: 'g', j: 'q', q: 'j', zh: 'ch', ch: 'zh', sh: 's', s: 'sh', z: 'c', c: 'z', l: 'n', n: 'l', f: 'h', h: 'f', x: 'sh', m: 'n', r: 'l' };
 // ü after j q x is written u; y/w rules
 const UROWS = `
@@ -139,35 +139,36 @@ un|wen|文 wén
 ün|yun|云 yún
 `.trim().split('\n').map((l) => { const [f, w, c] = l.split('|'); const [h, p] = c.split(' '); return { fin: f, written: w, hz: h, py: p }; });
 const WT = WORDS.filter((w) => hanLen(w.hz) <= 3);
+const WHOLE_TIP = HC(H('整体认读音节不用拼，直接读：', 'zhěng tǐ rèn dú yīn jié bú yòng pīn zhí jiē dú'), ' zhi chi shi ri zi ci si yi wu yu ye yue yuan yin yun ying');
 const g3c15 = finish({
-  id: 'g3c15', icon: '🧩', title: T('Épeler et lire le pinyin 拼读', 'Spelling and reading pinyin 拼读'),
+  id: 'g3c15', icon: '🧩', title: { ...T('Épeler et lire le pinyin 拼读', 'Spelling and reading pinyin 拼读'), zh: H('拼读', 'pīn dú') },
   pfeq: 'Chinois — pinyin : syllabes à lecture globale, assemblage, règles d’écriture (2e–3e année)',
   generate(L, R) {
     const lvl = [1, 2, 3].includes(L) ? L : 2;
-    const hearWhole = () => { const x = R.pick(WHOLE); return mc(`wh-${x.hz}`, T('Écoute. Quelle syllabe entends-tu ? (Syllabe à lire en bloc)', 'Listen. Which syllable do you hear? (Read as a whole)'), { py: x.py }, take(R, WHOLE.filter((y) => y !== x), lvl === 1 ? 2 : 3).map((y) => ({ py: y.py })), { stimulus: { hz: x.hz }, say: say(x.hz), cols: 2, tip: T('zhi chi shi ri zi ci si yi wu yu ye yue yuan yin yun ying se lisent en bloc : on ne les épelle pas.', 'zhi chi shi ri zi ci si yi wu yu ye yue yuan yin yun ying are read as a whole, not spelled.') }); };
+    const hearWhole = () => { const x = R.pick(WHOLE); return mc(`wh-${x.hz}`, H('听一听，你听到的是哪个整体认读音节？', 'tīng yì tīng nǐ tīng dào de shì nǎ gè zhěng tǐ rèn dú yīn jié'), { py: x.py }, take(R, WHOLE.filter((y) => y !== x), lvl === 1 ? 2 : 3).map((y) => ({ py: y.py })), { stimulus: { hz: x.hz }, say: say(x.hz), cols: 2, tip: WHOLE_TIP }); };
     const blend = () => {
       const x = R.pick(BLEND);
       const wr = [...new Set([mark(x.fin.replace('v', 'ü'), x.t === 1 ? 2 : 1) && `${NEAR_INI[x.ini] || 'b'}${mark(x.fin.replace('v', 'ü'), x.t)}`, ...pyWrong(R, x.py, 3)])].filter((p) => p !== x.py);
-      return mc(`bl-${x.hz}`, T(`Assemble : ${x.ini} + ${x.finM} = ?`, `Blend: ${x.ini} + ${x.finM} = ?`), { py: x.py }, wr.slice(0, lvl === 1 ? 2 : 3).map((p) => ({ py: p })), { say: say(x.hz), cols: 2, tip: BLEND_TIP(x) });
+      return mc(`bl-${x.hz}`, HC(H('拼一拼：', 'pīn yì pīn'), ` ${x.ini} + ${x.finM} = ?`), { py: x.py }, wr.slice(0, lvl === 1 ? 2 : 3).map((p) => ({ py: p })), { say: say(x.hz), cols: 2, tip: BLEND_TIP(x) });
     };
     const wholeOrSpell = () => {
       const k = lvl === 2 ? 2 : 3;
       const items = R.shuffle([...take(R, WHOLE, k).map((x) => ({ hz: x.hz, py: x.py, bin: 0, say: say(x.hz) })), ...take(R, SPELL, k).map((x) => ({ hz: x.hz, py: x.py, bin: 1, say: say(x.hz) }))]);
-      return { type: 'sort', key: `ws-${items.map((i) => i.hz).sort().join('')}`, prompt: T('Quelles syllabes se lisent en bloc ? Trie-les.', 'Which syllables are read as a whole? Sort them.'), bins: [{ text: T('en bloc 整体认读', 'whole 整体认读') }, { text: T('à épeler', 'spelled out') }], items, tip: T('Les 16 syllabes en bloc : zhi chi shi ri zi ci si yi wu yu ye yue yuan yin yun ying.', 'The 16 whole syllables: zhi chi shi ri zi ci si yi wu yu ye yue yuan yin yun ying.') };
+      return { type: 'sort', key: `ws-${items.map((i) => i.hz).sort().join('')}`, prompt: H('分一分：哪些是整体认读音节，哪些要拼着读？', 'fēn yì fēn nǎ xiē shì zhěng tǐ rèn dú yīn jié nǎ xiē yào pīn zhe dú'), bins: [H('整体认读', 'zhěng tǐ rèn dú'), H('拼着读', 'pīn zhe dú')], items, tip: WHOLE_TIP };
     };
     const hearWord = () => {
       const w = R.pick(WT);
       const d = take(R, WT.filter((x) => x.hz !== w.hz && hanLen(x.hz) === hanLen(w.hz)), lvl === 1 ? 2 : 3);
-      return mc(`hwd-${w.hz}`, T('Écoute le mot. Quels caractères entends-tu ?', 'Listen to the word. Which characters do you hear?'), { hz: w.hz }, d.map((x) => ({ hz: x.hz })), { say: say(w.hz), cols: 2, tip: T(`${w.hz} se lit ${w.py}.`, `${w.hz} is read ${w.py}.`) });
+      return mc(`hwd-${w.hz}`, H('听一听，你听到的是哪个词？', 'tīng yì tīng nǐ tīng dào de shì nǎ gè cí'), { hz: w.hz }, d.map((x) => ({ hz: x.hz })), { say: say(w.hz), cols: 2, tip: HC(w, H('读作', 'dú zuò'), ` ${w.py}。`) });
     };
     const uRule = () => {
       const x = R.pick(UROWS);
-      return mc(`ur-${x.hz}`, T('Comment écrit-on ce son ? (j, q, x + ü)', 'How is this sound written? (j, q, x + ü)'), { py: x.py }, [{ py: x.wrong }, ...pyWrong(R, x.py, 2).map((p) => ({ py: p }))], { stimulus: { hz: x.hz }, say: say(x.hz), cols: 2, tip: T('Après j, q, x (et y), le ü s’écrit u sans les deux points : qù, jú, xū, yú. Après n et l, on garde ü : nǚ, lǜ.', 'After j, q, x (and y), ü is written u without dots: qù, jú, xū, yú. After n and l, keep ü: nǚ, lǜ.') });
+      return mc(`ur-${x.hz}`, HC(H('这个字的拼音怎么写？', 'zhè gè zì de pīn yīn zěn me xiě'), '（j q x + ü）'), { py: x.py }, [{ py: x.wrong }, ...pyWrong(R, x.py, 2).map((p) => ({ py: p }))], { stimulus: { hz: x.hz }, say: say(x.hz), cols: 2, tip: H('小ü见了j、q、x，去掉两点还读ü：qù、jú、xū；y后面也一样：yú。n、l后面要写两点：nǚ、lǜ。', 'xiǎo jiàn le qù diào liǎng diǎn hái dú hòu miàn yě yí yàng hòu miàn yào xiě liǎng diǎn') });
     };
     const ywRule = () => {
       const x = R.pick(YW);
       const wr = R.sample(YW.filter((y) => y.written !== x.written), 3).map((y) => y.written);
-      return mc(`yw-${x.fin}`, T(`Quand « ${x.fin} » est seul (sans consonne), comment l’écrit-on ?`, `When “${x.fin}” stands alone (no initial), how is it written?`), { py: x.written }, [...wr, x.fin === 'ü' ? 'u' : `y${x.fin}`].filter((p) => p !== x.written).slice(0, 3).map((p) => ({ py: p })), { stimulus: { hz: x.hz, py: x.py }, say: say(x.hz), cols: 2, tip: T(`${x.fin} sans consonne → ${x.written} (${x.hz} ${x.py}).`, `${x.fin} with no initial → ${x.written} (${x.hz} ${x.py}).`) });
+      return mc(`yw-${x.fin}`, HC(H('韵母', 'yùn mǔ'), ` ${x.fin} `, H('前面没有声母，要怎么写？', 'qián miàn méi yǒu shēng mǔ yào zěn me xiě')), { py: x.written }, [...wr, x.fin === 'ü' ? 'u' : `y${x.fin}`].filter((p) => p !== x.written).slice(0, 3).map((p) => ({ py: p })), { stimulus: { hz: x.hz, py: x.py }, say: say(x.hz), cols: 2, tip: HC(` ${x.fin} → ${x.written}  `, { hz: x.hz, py: x.py }, '。') });
     };
     if (lvl === 1) return R.pick([hearWhole, blend, hearWord, hearWord])();
     if (lvl === 2) return R.pick([hearWhole, blend, blend, wholeOrSpell, hearWord, hearWord])();
@@ -274,10 +275,13 @@ const ER = `
 门儿|ménr|la porte|door
 一会儿|yí huìr|un instant|a moment
 `.trim().split('\n').map((l) => { const [h, p, fr, en] = l.split('|'); return { hz: h, py: p, fr, en }; });
-const NEUT_TIP = T('Au ton neutre (轻声), la 2e syllabe est courte et légère, sans accent : mā ma, zhuō zi.', 'In the neutral tone (轻声) the 2nd syllable is short and light, with no mark: mā ma, zhuō zi.');
-const erTip = (e) => T(`${e.hz} se lit ${e.py} : 儿 s’ajoute au son précédent (une seule syllabe). ${e.fr}.`, `${e.hz} is read ${e.py}: 儿 merges into the previous sound (one syllable). ${e.en}.`);
+const NEUT_TIP = H('轻声：第二个字读得又短又轻，不标声调：mā ma、zhuō zi。', 'qīng shēng dì èr gè zì dú de yòu duǎn yòu qīng bù biāo shēng diào');
+// erhua word with pinyin over each character: 儿 shows « r » (花儿 huā r), written together as huār
+const erPy = (e) => e.py.replace(/r$/, ' r');
+const erW = (e) => ({ hz: e.hz, py: erPy(e) });
+const erTip = (e) => HC(erW(e), H('读作', 'dú zuò'), ` ${e.py}：`, H('儿和前面的音连在一起，只读一个音节。', 'ér hé qián miàn de yīn lián zài yì qǐ zhǐ dú yí gè yīn jié'));
 const g3c16 = finish({
-  id: 'g3c16', icon: '🪶', title: T('Ton léger et « r » final 轻声儿化', 'Light tone and the “r” sound 轻声儿化'),
+  id: 'g3c16', icon: '🪶', title: { ...T('Ton léger et « r » final 轻声儿化', 'Light tone and the “r” sound 轻声儿化'), zh: H('轻声和儿化', 'qīng shēng hé ér huà') },
   pfeq: 'Chinois — pinyin : le ton neutre (轻声) et la finale en -r (儿化) (2e–3e année)',
   generate(L, R) {
     const lvl = [1, 2, 3].includes(L) ? L : 2;
@@ -285,30 +289,31 @@ const g3c16 = finish({
       const w = R.pick(NEUT); const [a, b] = w.py.split(' ');
       const t = tone(a);
       const wr = [`${a} ${mark(split(b).base, 1)}`, `${a} ${mark(split(b).base, 4)}`, `${mark(split(a).base, t === 1 ? 2 : 1)} ${b}`, `${a} ${mark(split(b).base, 3)}`].filter((p) => p !== w.py);
-      return mc(`nt-${w.hz}`, T('Écoute. Quel est le bon pinyin ? (2e syllabe légère)', 'Listen. What is the right pinyin? (2nd syllable light)'), { py: w.py }, wr.slice(0, lvl === 1 ? 2 : 3).map((p) => ({ py: p })), { stimulus: { hz: w.hz }, say: say(w.hz), cols: 2, tip: NEUT_TIP });
+      return mc(`nt-${w.hz}`, H('听一听，哪个拼音是对的？第二个字读轻声。', 'tīng yì tīng nǎ gè pīn yīn shì duì de dì èr gè zì dú qīng shēng'), { py: w.py }, wr.slice(0, lvl === 1 ? 2 : 3).map((p) => ({ py: p })), { stimulus: { hz: w.hz }, say: say(w.hz), cols: 2, tip: NEUT_TIP });
     };
     const whichLight = () => {
       const w = R.pick(NEUT);
-      return mc(`wl-${w.hz}`, T('Quelle syllabe est légère (轻声) ?', 'Which syllable is light (轻声)?'), { text: T('la 2e', 'the 2nd') }, [{ text: T('la 1re', 'the 1st') }, { text: T('aucune', 'none') }], { stimulus: { hz: w.hz, py: w.py }, say: say(w.hz), cols: 3, tip: NEUT_TIP });
+      return mc(`wl-${w.hz}`, H('哪个字读轻声？', 'nǎ gè zì dú qīng shēng'), H('第二个字', 'dì èr gè zì'), [H('第一个字', 'dì yī gè zì'), H('都不读轻声', 'dōu bù dú qīng shēng')], { stimulus: { hz: w.hz, py: w.py }, say: say(w.hz), cols: 3, tip: NEUT_TIP });
     };
     const sortLight = () => {
       const k = lvl === 1 ? 2 : lvl === 2 ? 3 : 4;
       const items = R.shuffle([...take(R, NEUT, k).map((x) => ({ hz: x.hz, py: x.py, bin: 0, say: say(x.hz) })), ...take(R, FULL, k).map((x) => ({ hz: x.hz, py: x.py, bin: 1, say: say(x.hz) }))]);
-      return { type: 'sort', key: `sl-${items.map((i) => i.hz).sort().join('')}`, prompt: T('Trie les mots : 2e syllabe légère ou deux vrais tons ?', 'Sort the words: light 2nd syllable, or two full tones?'), bins: [{ text: T('ton léger 轻声', 'light tone 轻声') }, { text: T('deux tons pleins', 'two full tones') }], items, tip: NEUT_TIP };
+      return { type: 'sort', key: `sl-${items.map((i) => i.hz).sort().join('')}`, prompt: H('分一分：哪些词的第二个字读轻声？', 'fēn yì fēn nǎ xiē cí de dì èr gè zì dú qīng shēng'), bins: [H('读轻声', 'dú qīng shēng'), H('不读轻声', 'bù dú qīng shēng')], items, tip: NEUT_TIP };
     };
     const erPick = () => {
       const e = R.pick(ER);
       const base = e.py.replace(/r$/, '');
       const wr = [`${base} ér`, base, `${base}rr`.replace('rr', 'er'), pyWrong(R, base, 1)[0] ? `${pyWrong(R, base, 1)[0]}r` : ''].filter((p) => p && p !== e.py);
-      return mc(`er-${e.hz}`, T('Écoute. Comment écrit-on ce mot en pinyin ? (finale en -r)', 'Listen. How is this word written in pinyin? (final -r)'), { py: e.py }, [...new Set(wr)].slice(0, lvl === 1 ? 2 : 3).map((p) => ({ py: p })), { stimulus: { text: e.hz }, say: say(e.hz), cols: 2, tip: erTip(e) });
+      return mc(`er-${e.hz}`, H('听一听，这个儿化词的拼音怎么写？', 'tīng yì tīng zhè gè ér huà cí de pīn yīn zěn me xiě'), { py: e.py }, [...new Set(wr)].slice(0, lvl === 1 ? 2 : 3).map((p) => ({ py: p })), { stimulus: { hz: e.hz }, say: say(e.hz), cols: 2, tip: erTip(e) });
     };
     const erCount = () => {
       const e = R.pick(ER); const n = [...e.hz].length;
-      return mc(`ec-${e.hz}`, T('Combien de syllabes entend-on dans ce mot ? (儿 compte avec le son d’avant)', 'How many syllables do you hear in this word? (儿 merges with the sound before)'), { text: String(n - 1) }, [{ text: String(n) }, { text: String(n + 1) }], { stimulus: { text: e.hz }, say: say(e.hz), cols: 3, tip: erTip(e) });
+      return mc(`ec-${e.hz}`, H('这个词读几个音节？儿和前面的音一起读。', 'zhè gè cí dú jǐ gè yīn jié ér hé qián miàn de yīn yì qǐ dú'), { text: String(n - 1) }, [{ text: String(n) }, { text: String(n + 1) }], { stimulus: { hz: e.hz }, say: say(e.hz), cols: 3, tip: erTip(e) });
     };
+    // listen to an erhua word, pick it (no French/English meaning)
     const erMean = () => {
       const e = R.pick(ER);
-      return mc(`em-${e.hz}`, T('Écoute. Que veut dire ce mot ?', 'Listen. What does this word mean?'), { text: T(e.fr, e.en) }, take(R, ER.filter((x) => x.hz !== e.hz), lvl === 1 ? 2 : 3).map((x) => ({ text: T(x.fr, x.en) })), { say: say(e.hz), stimulus: { text: `${e.hz}  ${e.py}` }, tip: erTip(e) });
+      return mc(`em-${e.hz}`, H('听一听，你听到的是哪个儿化词？', 'tīng yì tīng nǐ tīng dào de shì nǎ gè ér huà cí'), lvl === 1 ? erW(e) : { hz: e.hz }, take(R, ER.filter((x) => x.hz !== e.hz), lvl === 1 ? 2 : 3).map((x) => (lvl === 1 ? erW(x) : { hz: x.hz })), { say: say(e.hz), cols: 2, tip: erTip(e) });
     };
     if (lvl === 1) return R.pick([hearNeut, whichLight, sortLight, erMean])();
     if (lvl === 2) return R.pick([hearNeut, sortLight, erPick, erMean, erCount])();

@@ -1,11 +1,11 @@
 // g3c1–g3c10 themed character units, g3c24 stroke-order writing (type `write`), g3c25 田字格 words (type `hand`).
 import { THEMES, CHARS, CHAR, WORDS } from './chinois-vocab.js';
-import { say, T, hand, mc, take, uniq, pyWrong, LOOKMAP, finish, hanLen, isHan, nOpt } from './chinois-lib.js';
+import { say, T, H, HC, hand, mc, take, uniq, pyWrong, LOOKMAP, finish, hanLen, isHan, nOpt } from './chinois-lib.js';
 
 const oc = (c, py = true) => (py ? { hz: c.hz, py: c.py, say: say(c.hz) } : { hz: c.hz, say: say(c.hz) });
 const ow = (w, py = true) => (py ? { hz: w.hz, py: w.py } : { hz: w.hz });
-const meaning = (c) => T(c.fr, c.en);
-const wordsTip = (c) => T(`${c.hz} (${c.py}) = ${c.fr}. Mots : ${c.words.map((w) => `${w.hz} ${w.py}`).join(' ; ')}.`, `${c.hz} (${c.py}) = ${c.en}. Words: ${c.words.map((w) => `${w.hz} ${w.py}`).join('; ')}.`);
+// tip: the character and the words it makes (组词), no French/English gloss
+const wordsTip = (c) => HC({ hz: c.hz, py: c.py }, H('，组词：', 'zǔ cí'), ...c.words.flatMap((w, i) => (i ? ['、', w] : [w])), '。');
 const blank = (w, ch) => {
   const hzs = [...w.hz]; const i = hzs.indexOf(ch);
   const pos = hzs.slice(0, i).filter(isHan).length;
@@ -28,41 +28,44 @@ const pickWord = (R, c, wi) => { const i = wi ?? R.int(0, c.words.length - 1); r
 const Q = {
   hearChar(R, c, pool, L) {
     const d = otherChars(R, c, pool, nOpt(L));
-    return mc(`hc-${c.hz}`, T('Écoute. Quel caractère entends-tu ?', 'Listen. Which character do you hear?'), oc(c, L === 1), d.map((x) => oc(x, L === 1)), { say: say(c.hz), cols: L === 1 ? 3 : 2, tip: wordsTip(c) });
+    return mc(`hc-${c.hz}`, H('听一听，你听到的是哪个字？', 'tīng yì tīng nǐ tīng dào de shì nǎ gè zì'), oc(c, L === 1), d.map((x) => oc(x, L === 1)), { say: say(c.hz), cols: L === 1 ? 3 : 2, tip: wordsTip(c) });
   },
+  // hear a word, find the new character inside it (meaning through the spoken word, no gloss)
   charMeaning(R, c, pool, L) {
-    const d = take(R, pool.filter((x) => x.hz !== c.hz && x.fr !== c.fr), nOpt(L));
-    return mc(`cm-${c.hz}`, T('Que veut dire ce caractère ?', 'What does this character mean?'), { text: meaning(c) }, d.map((x) => ({ text: meaning(x) })), { stimulus: { hz: c.hz, py: c.py }, say: say(c.hz), tip: wordsTip(c) });
+    const [w] = pickWord(R, c);
+    const d = otherChars(R, c, pool, nOpt(L)).filter((x) => !w.hz.includes(x.hz)).slice(0, nOpt(L));
+    return mc(`cm-${c.hz}-${w.hz}`, H('听一听这个词，词里有哪个字？', 'tīng yì tīng zhè gè cí cí lǐ yǒu nǎ gè zì'), oc(c, L === 1), d.map((x) => oc(x, L === 1)), { say: say(w.hz), stimulus: L === 1 ? { emoji: '🎧' } : undefined, cols: L === 1 ? 3 : 2, tip: wordsTip(c) });
   },
+  // read the pinyin, pick the character (no homophone among the options)
   meaningChar(R, c, pool, L) {
-    const d = otherChars(R, c, pool, nOpt(L));
-    return mc(`mc-${c.hz}`, T(`Quel caractère veut dire « ${c.fr} » ?`, `Which character means “${c.en}”?`), oc(c, L === 1), d.map((x) => oc(x, L === 1)), { say: say(c.hz), cols: L === 1 ? 3 : 2, tip: wordsTip(c) });
+    const d = otherChars(R, c, pool, nOpt(L) + 2).filter((x) => x.py !== c.py).slice(0, nOpt(L));
+    return mc(`mc-${c.hz}`, H('看拼音，选出对的字。', 'kàn pīn yīn xuǎn chū duì de zì'), oc(c, false), d.map((x) => oc(x, false)), { stimulus: { text: c.py }, say: say(c.hz), cols: L === 1 ? 3 : 2, tip: wordsTip(c) });
   },
   charPinyin(R, c, pool) {
     const wr = pyWrong(R, c.py, 3);
     const ex = take(R, pool.filter((x) => x.py !== c.py), 3).map((x) => x.py);
-    return mc(`cp-${c.hz}`, T('Quel est le pinyin de ce caractère ?', 'What is the pinyin of this character?'), { py: c.py }, [...wr, ...ex].slice(0, 3).map((p) => ({ py: p })), { stimulus: { hz: c.hz }, say: say(c.hz), cols: 2, tip: wordsTip(c) });
+    return mc(`cp-${c.hz}`, H('这个字的拼音是什么？', 'zhè gè zì de pīn yīn shì shén me'), { py: c.py }, [...wr, ...ex].slice(0, 3).map((p) => ({ py: p })), { stimulus: { hz: c.hz }, say: say(c.hz), cols: 2, tip: wordsTip(c) });
   },
   completeWord(R, c, pool, L, wi) {
     const [w, i] = pickWord(R, c, wi);
     const d = otherChars(R, c, pool, 3);
     const b = blank(w, c.hz);
-    return mc(`cw-${c.hz}-${i}`, T(`Quel caractère complète le mot ? (${c.fr})`, `Which character completes the word? (${c.en})`), oc(c, L === 1), d.map((x) => oc(x, L === 1)), { stimulus: L === 3 ? { hz: b.hz } : b, say: say(w.hz), cols: 2, tip: wordsTip(c) });
+    return mc(`cw-${c.hz}-${i}`, H('听一听，哪个字可以填进词语里？', 'tīng yì tīng nǎ gè zì kě yǐ tián jìn cí yǔ lǐ'), oc(c, L === 1), d.map((x) => oc(x, L === 1)), { stimulus: L === 3 ? { hz: b.hz } : b, say: say(w.hz), cols: 2, tip: wordsTip(c) });
   },
   wordWith(R, c, pool, L, wi) {
     const [w, i] = pickWord(R, c, wi);
     const d = otherWords(R, c, 3);
-    return mc(`ww-${c.hz}-${i}`, T('Quel mot contient ce caractère ?', 'Which word contains this character?'), ow(w, L < 3), d.map((x) => ow(x, L < 3)), { stimulus: { hz: c.hz, py: c.py }, say: say(c.hz), cols: 2, tip: wordsTip(c) });
+    return mc(`ww-${c.hz}-${i}`, H('哪个词里有这个字？', 'nǎ gè cí lǐ yǒu zhè gè zì'), ow(w, L < 3), d.map((x) => ow(x, L < 3)), { stimulus: { hz: c.hz, py: c.py }, say: say(c.hz), cols: 2, tip: wordsTip(c) });
   },
   hearWordPy(R, c, pool, L, wi) {
     const [w, i] = pickWord(R, c, wi);
-    return mc(`wp-${c.hz}-${i}`, T('Écoute. Quel est le pinyin de ce mot ?', 'Listen. What is the pinyin of this word?'), { py: w.py }, pyWrong(R, w.py, 3).map((p) => ({ py: p })), { stimulus: { hz: w.hz }, say: say(w.hz), cols: 2, tip: wordsTip(c) });
+    return mc(`wp-${c.hz}-${i}`, H('听一听，这个词的拼音是什么？', 'tīng yì tīng zhè gè cí de pīn yīn shì shén me'), { py: w.py }, pyWrong(R, w.py, 3).map((p) => ({ py: p })), { stimulus: { hz: w.hz }, say: say(w.hz), cols: 2, tip: wordsTip(c) });
   },
   hearWord(R, c, pool, L, wi) {
     const [w, i] = pickWord(R, c, wi);
     const sameFirst = WORDS.filter((x) => x.hz !== w.hz && (x.hz[0] === w.hz[0] || x.hz.endsWith(w.hz.slice(-1))));
     const d = uniq([...take(R, sameFirst, 2), ...take(R, WORDS.filter((x) => x.hz !== w.hz), 3)].map((x) => ow(x, false))).slice(0, 3);
-    return mc(`hw-${c.hz}-${i}`, T('Écoute. Quel mot entends-tu ?', 'Listen. Which word do you hear?'), ow(w, false), d, { say: say(w.hz), cols: 2, tip: wordsTip(c) });
+    return mc(`hw-${c.hz}-${i}`, H('听一听，你听到的是哪个词？', 'tīng yì tīng nǐ tīng dào de shì nǎ gè cí'), ow(w, false), d, { say: say(w.hz), cols: 2, tip: wordsTip(c) });
   },
 };
 const LEVELS = {
@@ -72,7 +75,7 @@ const LEVELS = {
 };
 
 const themeUnit = (n, th, pfeq) => finish({
-  id: `g3c${n}`, icon: th.icon, title: T(`${th.fr} · ${th.zh}`, `${th.en} · ${th.zh}`), pfeq,
+  id: `g3c${n}`, icon: th.icon, title: { ...T(`${th.fr} · ${th.zh}`, `${th.en} · ${th.zh}`), zh: { hz: th.zh, py: th.zhPy } }, pfeq,
   generate(L, R) {
     const lvl = [1, 2, 3].includes(L) ? L : 2;
     const c = R.pick(th.chars);
@@ -99,26 +102,26 @@ const WL = {
 }
 const writeQ = (c) => ({
   type: 'write', key: `g3c24-${c.hz}`,
-  prompt: T(`Écris le caractère « ${c.fr} » (${c.py}).`, `Write the character “${c.en}” (${c.py}).`),
+  prompt: HC(H('写一写：', 'xiě yì xiě'), c.words[0], H('的', 'de'), { hz: c.hz, py: c.py }, '。'),
   say: say(c.words[0].hz), char: c.hz, py: c.py, tip: wordsTip(c),
 });
 const g3c24 = finish({
-  id: 'g3c24', icon: '🖌️', title: T('Écrire les caractères 写字', 'Writing characters 写字'),
+  id: 'g3c24', icon: '🖌️', title: { ...T('Écrire les caractères 写字', 'Writing characters 写字'), zh: H('写字', 'xiě zì') },
   pfeq: `${PF}ordre des traits et écriture des nouveaux caractères`,
   generate(L, R) { return writeQ(CHAR[R.pick([...WL[[1, 2, 3].includes(L) ? L : 2]])]); },
   allSay() { return CHARS.map((c) => say(c.words[0].hz)); },
 });
 
 /* ================= g3c25 — 田字格 words ================= */
-const DP = T('Écoute et écris le mot dans les cases.', 'Listen and write the word in the boxes.');
+const DP = H('听一听，把词语写在格子里。', 'tīng yì tīng bǎ cí yǔ xiě zài gé zi lǐ');
 const w2 = WORDS.filter((w) => hanLen(w.hz) === 2);
 const w3 = WORDS.filter((w) => hanLen(w.hz) >= 3);
 const g3c25 = finish({
-  id: 'g3c25', icon: '✍️', title: T('Les mots dans la case 田字格', 'Words in the grid 田字格'),
+  id: 'g3c25', icon: '✍️', title: { ...T('Les mots dans la case 田字格', 'Words in the grid 田字格'), zh: H('田字格', 'tián zì gé') },
   pfeq: `${PF}écrire des mots (田字格)`,
   generate(L, R) {
-    if (L === 1) { const w = R.pick(w2); return hand({ mode: 'dictation', key: `g3c25-1-${w.hz}`, prompt: T('Copie le mot dans les cases.', 'Copy the word in the boxes.'), stimulus: { hz: w.hz, py: w.py }, say: say(w.hz), expected: w.hz, lines: 1 }); }
-    if (L === 2) { const w = R.pick(w2); return hand({ mode: 'dictation', key: `g3c25-2-${w.hz}`, prompt: T('Écoute le mot, lis le pinyin et écris les caractères.', 'Listen, read the pinyin and write the characters.'), stimulus: { text: w.py }, say: say(w.hz), expected: w.hz, lines: 1 }); }
+    if (L === 1) { const w = R.pick(w2); return hand({ mode: 'dictation', key: `g3c25-1-${w.hz}`, prompt: H('照着写，把词语写在格子里。', 'zhào zhe xiě bǎ cí yǔ xiě zài gé zi lǐ'), stimulus: { hz: w.hz, py: w.py }, say: say(w.hz), expected: w.hz, lines: 1 }); }
+    if (L === 2) { const w = R.pick(w2); return hand({ mode: 'dictation', key: `g3c25-2-${w.hz}`, prompt: H('听一听，看拼音，写出词语。', 'tīng yì tīng kàn pīn yīn xiě chū cí yǔ'), stimulus: { text: w.py }, say: say(w.hz), expected: w.hz, lines: 1 }); }
     const w = R.chance(0.35) ? R.pick(w3) : R.pick(w2);
     return hand({ mode: 'dictation', key: `g3c25-3-${w.hz}`, prompt: DP, say: say(w.hz), expected: w.hz, lines: 1 });
   },

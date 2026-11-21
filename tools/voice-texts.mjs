@@ -94,7 +94,8 @@ export async function collect({ sets = ['books', 'why', 'prompts', 'arts'], grad
       for (const u of units) for (const sy of (u.allSay?.() || [])) {
         for (const ui of ['fr', 'en']) {
           let text = sy.text, lang = sy.lang;
-          if (text && typeof text === 'object') { text = text[ui] ?? text.fr; lang = lang || (ui === 'fr' ? 'fr-CA' : 'en-CA'); }
+          if (text && typeof text === 'object' && typeof text.hz === 'string') { text = text.hz; lang = 'zh-CN'; }   // Chinese zone text {hz,py}
+          else if (text && typeof text === 'object') { text = text[ui] ?? text.fr; lang = lang || (ui === 'fr' ? 'fr-CA' : 'en-CA'); }
           if (typeof text === 'string') add(lang || speech || 'fr-CA', text, 'prompts');
         }
       }
@@ -106,7 +107,8 @@ export async function collect({ sets = ['books', 'why', 'prompts', 'arts'], grad
           if (!say) continue;
           for (const ui of ['fr', 'en']) {
             let text = say.text, lang = say.lang;
-            if (text && typeof text === 'object') { text = text[ui] ?? text.fr; lang = lang || (ui === 'fr' ? 'fr-CA' : 'en-CA'); }
+            if (text && typeof text === 'object' && typeof text.hz === 'string') { text = text.hz; lang = 'zh-CN'; }   // Chinese zone prompt {hz,py}
+            else if (text && typeof text === 'object') { text = text[ui] ?? text.fr; lang = lang || (ui === 'fr' ? 'fr-CA' : 'en-CA'); }
             if (!lang) lang = speech || (ui === 'fr' ? 'fr-CA' : 'en-CA');
             if (typeof text !== 'string') continue;
             const k = `${lang}|${norm(text)}`;
@@ -121,7 +123,7 @@ export async function collect({ sets = ['books', 'why', 'prompts', 'arts'], grad
       for (const w of STRINGS.great.fr) add('fr-CA', w, 'prompts');
       for (const w of STRINGS.great.en) add('en-CA', w, 'prompts');
       for (const w of STRINGS.great.zh || []) add('zh-CN', w, 'prompts');
-      for (const m of STRINGS.endMsg) { add('fr-CA', m.fr, 'prompts'); add('en-CA', m.en, 'prompts'); }
+      for (const m of STRINGS.endMsg) { add('fr-CA', m.fr, 'prompts'); add('en-CA', m.en, 'prompts'); if (m.zh) add('zh-CN', String(m.zh), 'prompts'); }
     }
   }
   return out;

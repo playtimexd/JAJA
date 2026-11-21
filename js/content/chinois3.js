@@ -4,7 +4,9 @@
 
 const ZH = 'zh-CN';
 const say = (text) => ({ text, lang: ZH });
-const T = (fr, en) => ({ fr, en });
+const T = (fr, en, zh) => ({ fr, en, zh });   // unit titles (parents page: fr/en; the child: zh)
+const H = (hz, py) => ({ hz, py });
+const HC = (...parts) => ({ hz: parts.map((p) => (typeof p === 'string' ? p : p.hz)).join(''), py: parts.filter((p) => typeof p !== 'string' && p.py).map((p) => p.py).join(' ') });
 const hand = (o) => ({ type: 'hand', lang: 'zh', ...o });
 const isHan = (c) => /\p{Script=Han}/u.test(c);
 const hanLen = (s) => [...s].filter(isHan).length;
@@ -256,8 +258,8 @@ const SHORT = parse(`
 上学了|shàng xué le
 `, 'SHORT');
 
-const DICT_P = T('Écoute et écris en caractères chinois.', 'Listen and write in Chinese characters.');
-const PY_P = T('Écris les caractères pour ce pinyin.', 'Write the characters for this pinyin.');
+const DICT_P = H('听一听，用汉字写下来。', 'tīng yì tīng yòng hàn zì xiě xià lái');
+const PY_P = H('看拼音，写汉字。', 'kàn pīn yīn xiě hàn zì');
 const lv = (level) => ([1, 2, 3].includes(level) ? level : 2);
 
 /* ================================================================== */
@@ -267,7 +269,7 @@ const DICT = { 1: CHARS, 2: WORDS, 3: SENT };
 const c22 = {
   id: 'c22',
   icon: '✍️',
-  title: T('La dictée 听写', 'Dictation 听写'),
+  title: T('La dictée 听写', 'Dictation 听写', H('听写', 'tīng xiě')),
   pfeq: 'Chinois — écriture (1re année) : dictée de caractères, de mots et de phrases',
   generate(level, R) {
     const l = lv(level), e = R.pick(DICT[l]);
@@ -283,7 +285,7 @@ const PYS = { 1: CHARS, 2: WORDS, 3: SHORT };
 const c23 = {
   id: 'c23',
   icon: '🔤',
-  title: T('Du pinyin aux caractères 看拼音写汉字', 'Pinyin to characters 看拼音写汉字'),
+  title: T('Du pinyin aux caractères 看拼音写汉字', 'Pinyin to characters 看拼音写汉字', H('看拼音写汉字', 'kàn pīn yīn xiě hàn zì')),
   pfeq: 'Chinois — écriture (1re année) : écrire les caractères à partir du pinyin',
   generate(level, R) {
     const l = lv(level), e = R.pick(PYS[l]);
@@ -332,6 +334,7 @@ ___在___。|🐸🍃|青蛙,叶子上
 ___在___。|☁️🔵|白云,天上
 ___在___。|🐶🌳|小狗,树下
 `;
+const PATPY = { '我喜欢___。': 'wǒ xǐ huan', '我想吃___。': 'wǒ xiǎng chī', '这是___。': 'zhè shì', '___在___。': 'zài' };
 const L2 = L2_TXT.trim().split('\n').map((l, i) => {
   const [pat, emoji, w] = l.split('|');
   return { i, pat, emoji, words: w.split(',') };
@@ -347,14 +350,14 @@ if (new Set(L3).size !== L3.length) throw new Error('duplicate L3 scenes');
 const c24 = {
   id: 'c24',
   icon: '📝',
-  title: T('J’écris une phrase 写一句话', 'I write a sentence 写一句话'),
+  title: T('J’écris une phrase 写一句话', 'I write a sentence 写一句话', H('写一句话', 'xiě yí jù huà')),
   pfeq: 'Chinois — écriture (1re année) : copier, compléter et écrire une phrase',
   generate(level, R) {
     const l = lv(level);
     if (l === 1) {
       const i = R.int(0, SENT.length - 1), e = SENT[i];
       return hand({
-        mode: 'dictation', key: `c24-l1-${i}`, prompt: T('Copie la phrase.', 'Copy the sentence.'),
+        mode: 'dictation', key: `c24-l1-${i}`, prompt: H('把这句话抄下来。', 'bǎ zhè jù huà chāo xià lái'),
         stimulus: { hz: e.hz, py: e.py }, say: say(e.hz), expected: e.hz, lines: 2,
       });
     }
@@ -362,14 +365,14 @@ const c24 = {
       const e = R.pick(L2);
       return hand({
         mode: 'sentence', key: `c24-l2-${e.i}`,
-        prompt: T(`Regarde l’image et écris la phrase en entier : ${e.pat}`, `Look at the picture and write the whole sentence: ${e.pat}`),
+        prompt: HC(H('看图，把句子写完整：', 'kàn tú bǎ jù zi xiě wán zhěng'), { hz: e.pat, py: PATPY[e.pat] }),
         stimulus: { emoji: e.emoji }, words: e.words, minWords: 4, lines: 2,
       });
     }
     const i = R.int(0, L3.length - 1);
     return hand({
       mode: 'sentence', key: `c24-l3-${i}`,
-      prompt: T('Regarde l’image et écris une phrase en chinois.', 'Look at the picture and write a sentence in Chinese.'),
+      prompt: H('看图，用中文写一句话。', 'kàn tú yòng zhōng wén xiě yí jù huà'),
       stimulus: { emoji: L3[i] }, minWords: 6, lines: 2,
     });
   },

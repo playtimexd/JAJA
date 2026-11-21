@@ -1,8 +1,8 @@
 import { el, makeRng, wait } from './util.js';
 import { store, save, today, levelStats, recordSession, frWeek, setFrWeek } from './store.js';
-import { t, tr, lang, STRINGS, setZone } from './i18n.js';
+import { t, tr, lang, STRINGS, setZone, getZone, zh } from './i18n.js';
 import { speak, stopSpeech, sfx, unlockAudio, setContentLang } from './audio.js';
-import { runQuestion, face } from './widgets.js';
+import { runQuestion, face, setText } from './widgets.js';
 import { app, screen, backBtn, starsTxt, wallet, streakPill, refreshWallet, sheet } from './ui.js';
 import {
   COIN, bump, maxStat, addCoins, touchStreak, missions, progress, claim, BADGES, checkBadges, showBadges,
@@ -47,8 +47,13 @@ function applyGrade() { for (const s of SUBJECTS) units[s.id] = allUnits[s.id]?.
 export function setGrade(g) { store.settings.grade = g; save(); applyGrade(); }
 const unitById = (id) => SUBJECTS.flatMap((s) => [...(allUnits[s.id]?.[2] || []), ...(allUnits[s.id]?.[3] || [])]).find((u) => u.id === id);
 const owl = (cls = '') => dressedOwl(cls);
-// « English zone »: everything inside the anglais subject is shown and spoken in English (js/i18n.js setZone).
-const zoneOf = (s) => setZone(s?.id === 'anglais' ? 'en' : null);
+// « English zone » / « Chinese zone »: everything inside the anglais subject is shown and spoken in English, everything
+// inside the chinois subject in Chinese with pinyin (js/i18n.js setZone).
+const ZONES = { anglais: 'en', chinois: 'zh' };
+const zoneOf = (s) => setZone(ZONES[s?.id] || null);
+// text in the app's own language even inside a zone (labels shown later on the home screen)
+const appLang = (fn) => { const z = getZone(); setZone(null); try { return fn(); } finally { setZone(z); } };
+const SEC = { fr: ' s', en: ' s', zh: zh('秒', 'miǎo') };   // seconds unit
 const zonePool = (list) => { const ids = new Set(list.map((u) => u?.subject?.id)); zoneOf(ids.size === 1 ? list[0].subject : null); };
 
 // ---------------- Sections (two-level navigation: subject → section → units) ----------------
@@ -84,17 +89,17 @@ const SECTIONS = {
     { id: 'livres', icon: '📚', t: { fr: 'Livres en anglais', en: 'Storybooks' }, ids: [], books: true, lang: 'en' },
   ],
   chinois: [
-    { id: 'py', icon: '🔤', t: { fr: 'Pinyin et tons', en: 'Pinyin & tones' }, ids: range('c', 1, 5), boss: '🐉' },
-    { id: 'sz', icon: '🀄', t: { fr: 'Caractères', en: 'Characters' }, ids: range('c', 6, 14), boss: '🦁' },
-    { id: 'xz', icon: '🖌️', t: { fr: 'Écrire', en: 'Writing' }, ids: [...range('c', 15, 18), 'c22', 'c23', 'c24'], boss: '🐯' },
-    { id: 'yd', icon: '📜', t: { fr: 'Comptines et poèmes', en: 'Rhymes & poems' }, ids: range('c', 19, 21), boss: '🐲' },
-    { id: 'livres', icon: '📚', t: { fr: 'Histoires 故事书', en: 'Storybooks 故事书' }, ids: [], books: true, lang: 'zh' },
+    { id: 'py', icon: '🔤', t: { fr: 'Pinyin et tons', en: 'Pinyin & tones', zh: zh('拼音和声调', 'pīn yīn hé shēng diào') }, ids: range('c', 1, 5), boss: '🐉' },
+    { id: 'sz', icon: '🀄', t: { fr: 'Caractères', en: 'Characters', zh: zh('识字', 'shí zì') }, ids: range('c', 6, 14), boss: '🦁' },
+    { id: 'xz', icon: '🖌️', t: { fr: 'Écrire', en: 'Writing', zh: zh('写字', 'xiě zì') }, ids: [...range('c', 15, 18), 'c22', 'c23', 'c24'], boss: '🐯' },
+    { id: 'yd', icon: '📜', t: { fr: 'Comptines et poèmes', en: 'Rhymes & poems', zh: zh('儿歌和古诗', 'ér gē hé gǔ shī') }, ids: range('c', 19, 21), boss: '🐲' },
+    { id: 'livres', icon: '📚', t: { fr: 'Histoires 故事书', en: 'Storybooks 故事书', zh: zh('故事书', 'gù shì shū') }, ids: [], books: true, lang: 'zh' },
   ],
 };
 function sectionsOf(s) {
   const list = units[s.id];
   const defs = grade() === 3 ? (SECTIONS3[s.id] || []) : SECTIONS[s.id];
-  if (!defs.length) return list.length ? [{ id: 'all', icon: s.icon, t: { fr: 'Tout', en: 'All' }, ids: list.map((u) => u.id), subject: s, units: list, boss: '🐲' }] : [];
+  if (!defs.length) return list.length ? [{ id: 'all', icon: s.icon, t: { fr: 'Tout', en: 'All', zh: zh('全部', 'quán bù') }, ids: list.map((u) => u.id), subject: s, units: list, boss: '🐲' }] : [];
   const secs = defs.map((x) => ({ ...x, subject: s, units: x.ids.map((id) => list.find((u) => u.id === id)).filter(Boolean) }));
   const used = new Set(secs.flatMap((x) => x.ids));
   const rest = list.filter((u) => !used.has(u.id));
@@ -226,7 +231,7 @@ function subject(s) {
         const got = x.units.reduce((a, u) => a + unitStars(u), 0), max = x.units.length * 9;
         const troph = store.trophies[`${s.id}-${x.id}`];
         if (x.week) { const cur = x.units.find((u) => u.id === blockForWeek(frWeek()).id); return tile(x.icon, tr(x.t), `⭐ ${tr({ fr: 'Cette semaine', en: 'This week' })} : ${cur ? tr(cur.title) : ''}`, 'weekly', () => section(s, x.id)); }
-        return tile(x.icon, tr(x.t), `${x.units.length} ${t('games')} · ★ ${got}/${max}${troph ? ' · 🏆' : ''}`, '', () => section(s, x.id));
+        return tile(x.icon, tr(x.t), [`${x.units.length} `, t('games'), ` · ★ ${got}/${max}${troph ? ' · 🏆' : ''}`], '', () => section(s, x.id));
       }),
       tile('⚡', t('quiz'), t('quizSub'), 'quiz', () => quizHub(s)),
       tile('🎮', t('gamesHub'), t('gamesSub'), 'games', () => gamesHub(s)),
@@ -334,7 +339,7 @@ function diffPicker(key, onChange, suggest = 0) {
   const seg = el('div', { class: 'diff-seg' });
   const draw = () => {
     seg.innerHTML = '';
-    for (const l of [1, 2, 3]) seg.append(el('button', { class: `${DIFF_COL[l]} ${cur === l ? 'on' : ''}`, onclick: () => { sfx('tap'); cur = l; store.pick[key] = l; save(); draw(); onChange?.(l); } }, t('diff' + l), suggest === l ? el('small', { class: 'sugg' }, `⭐ ${t('suggested')}`) : null));
+    for (const l of [1, 2, 3]) seg.append(el('button', { class: `${DIFF_COL[l]} ${cur === l ? 'on' : ''}`, onclick: () => { sfx('tap'); cur = l; store.pick[key] = l; save(); draw(); onChange?.(l); } }, t('diff' + l), suggest === l ? el('small', { class: 'sugg' }, '⭐ ', t('suggested')) : null));
   };
   draw();
   return { node: seg, get: () => cur };
@@ -354,14 +359,14 @@ function openUnit(u, sec) {
     const st = levelStats(u.id, l);
     const back = () => section(u.subject, sec.id);
     box.append(
-      modeCard('📝', t('practice'), `${perSession()} ${t('questions')} · ${starsTxt(st?.stars ?? 0)}`, 'practice', () => { sh.close(); play({ mode: 'practice', unit: u, level: l, back }); }),
-      modeCard('⚡', t('eclair'), `60 s · ${t('record')} ${record(`${u.id}|${l}|eclair`)}`, 'eclair', () => { sh.close(); play({ mode: 'eclair', unit: u, level: l, back }); }),
-      modeCard('🎈', t('ballons'), `❤️❤️❤️ · ${t('record')} ${record(`${u.id}|${l}|ballons`)}`, 'ballons', () => { sh.close(); play({ mode: 'ballons', unit: u, level: l, back }); }),
+      modeCard('📝', t('practice'), [`${perSession()} `, t('questions'), ` · ${starsTxt(st?.stars ?? 0)}`], 'practice', () => { sh.close(); play({ mode: 'practice', unit: u, level: l, back }); }),
+      modeCard('⚡', t('eclair'), ['60', tr(SEC), ' · ', t('record'), ` ${record(`${u.id}|${l}|eclair`)}`], 'eclair', () => { sh.close(); play({ mode: 'eclair', unit: u, level: l, back }); }),
+      modeCard('🎈', t('ballons'), ['❤️❤️❤️ · ', t('record'), ` ${record(`${u.id}|${l}|ballons`)}`], 'ballons', () => { sh.close(); play({ mode: 'ballons', unit: u, level: l, back }); }),
     );
   };
   const dp = diffPicker(u.id, fill, suggestedLevel(u));
   sh = sheet(
-    el('div', { class: 'sheet-head' }, el('span', { class: 'sheet-icon' }, u.icon), el('div', {}, el('h2', {}, tr(u.title)), el('small', {}, u.subject.id === 'anglais' ? '' : u.pfeq || ''))),
+    el('div', { class: 'sheet-head' }, el('span', { class: 'sheet-icon' }, u.icon), el('div', {}, el('h2', {}, tr(u.title)), el('small', {}, ZONES[u.subject.id] ? '' : u.pfeq || ''))),
     dp.node, box);
   fill(dp.get());
 }
@@ -373,7 +378,7 @@ function openBoss(s, sec) {
   const sh = sheet(
     el('div', { class: 'sheet-head' }, el('span', { class: 'sheet-icon boss-big' }, sec.boss), el('div', {}, el('h2', {}, t('guardian'), ' · ', tr(sec.t)), el('small', {}, t('bossRule')))),
     dp.node,
-    el('div', { class: 'modes one' }, modeCard('⚔️', t('fight'), store.trophies[key] ? `🏆 ${t('diff' + store.trophies[key])}` : t('bossSub'), 'boss',
+    el('div', { class: 'modes one' }, modeCard('⚔️', t('fight'), store.trophies[key] ? ['🏆 ', t('diff' + store.trophies[key])] : t('bossSub'), 'boss',
       () => { sh.close(); play({ mode: 'boss', pool: sec.units, level: dp.get(), sec, back: () => section(s, sec.id) }); })),
   );
 }
@@ -386,9 +391,9 @@ function quizHub(s) {
   const fill = (l) => {
     box.innerHTML = '';
     box.append(
-      modeCard('⚡', t('eclairMix'), `60 s · ${t('record')} ${record(`${key}|${l}|eclair`)}`, 'eclair', () => play({ mode: 'eclair', pool: units[s.id], level: l, key, back })),
-      modeCard('⏱️', t('marathon'), `${t('marathonSub')} · ${t('record')} ${record(`${key}|${l}|marathon`)}`, 'practice', () => play({ mode: 'marathon', pool: units[s.id], level: l, key, back })),
-      ...sectionsOf(s).filter((x) => x.units.length).map((x) => modeCard(x.icon, `⚡ ${tr(x.t)}`, `60 s · ${t('record')} ${record(`${s.id}-${x.id}|${l}|eclair`)}`, 'eclair',
+      modeCard('⚡', t('eclairMix'), ['60', tr(SEC), ' · ', t('record'), ` ${record(`${key}|${l}|eclair`)}`], 'eclair', () => play({ mode: 'eclair', pool: units[s.id], level: l, key, back })),
+      modeCard('⏱️', t('marathon'), [t('marathonSub'), ' · ', t('record'), ` ${record(`${key}|${l}|marathon`)}`], 'practice', () => play({ mode: 'marathon', pool: units[s.id], level: l, key, back })),
+      ...sectionsOf(s).filter((x) => x.units.length).map((x) => modeCard(x.icon, ['⚡ ', tr(x.t)], ['60', tr(SEC), ' · ', t('record'), ` ${record(`${s.id}-${x.id}|${l}|eclair`)}`], 'eclair',
         () => play({ mode: 'eclair', pool: x.units, level: l, key: `${s.id}-${x.id}`, back }))),
     );
   };
@@ -407,8 +412,8 @@ function gamesHub(s) {
   const fill = (l) => {
     box.innerHTML = '';
     box.append(
-      modeCard('🎈', t('ballons'), `❤️❤️❤️ · ${t('record')} ${record(`${key}|${l}|ballons`)}`, 'ballons', () => play({ mode: 'ballons', pool: units[s.id], level: l, key, back })),
-      modeCard('🃏', t('memory'), `${t('memorySub')} · ${t('record')} ${record(`${s.id}|${l}|memory`) ? record(`${s.id}|${l}|memory`) + ' s' : '–'}`, 'memory', () => memory(s, l, back)),
+      modeCard('🎈', t('ballons'), ['❤️❤️❤️ · ', t('record'), ` ${record(`${key}|${l}|ballons`)}`], 'ballons', () => play({ mode: 'ballons', pool: units[s.id], level: l, key, back })),
+      modeCard('🃏', t('memory'), [t('memorySub'), ' · ', t('record'), ' ', ...(record(`${s.id}|${l}|memory`) ? [String(record(`${s.id}|${l}|memory`)), tr(SEC)] : ['–'])], 'memory', () => memory(s, l, back)),
     );
   };
   const dp = diffPicker(key, fill);
@@ -428,7 +433,7 @@ async function talkInfo() {
 async function play(opts) {
   unlockAudio();
   const { mode } = opts;
-  if (opts.unit && mode !== 'daily') { store.resume = { t: 'play', mode, unit: opts.unit.id, level: opts.level || 1, label: `${tr(opts.unit.title)} · ${t('diff' + (opts.level || 1))}`, icon: opts.unit.icon }; save(); }
+  if (opts.unit && mode !== 'daily') { store.resume = { t: 'play', mode, unit: opts.unit.id, level: opts.level || 1, label: appLang(() => `${tr(opts.unit.title)} · ${t('diff' + (opts.level || 1))}`), icon: opts.unit.icon }; save(); }
   const R = makeRng();
   let level = opts.level || 1;
   const pool = opts.pool || (opts.unit ? [opts.unit] : []);
@@ -466,11 +471,11 @@ async function play(opts) {
   const accent = mode === 'daily' || mode === 'review' ? 'orange' : (opts.unit || pool[0])?.subject.color || 'blue';
   const qRoot = el('div', { class: 'q' });
   const bubble = el('div', { class: 'owl-bubble' });
-  const nextBtn = el('button', { class: 'btn next hidden' }, t('next'), ' ➜');
+  const nextBtn = el('button', { class: 'btn next hidden' }, el('span', {}, t('next')), ' ➜');
   const owlNode = owl('mini');
   const hud = el('div', { class: 'game-hud' });
   let quit = false;
-  const titleOf = () => mode === 'review' ? `📕 ${t('review')}` : mode === 'daily' ? `🌞 ${t('daily')}` : mode === 'boss' ? `${opts.sec.boss} ${t('guardian')}` : `${opts.unit ? opts.unit.icon : { eclair: '⚡', ballons: '🎈', marathon: '⏱️' }[mode]} ${t('diff' + level)}`;
+  const titleOf = () => mode === 'review' ? ['📕 ', t('review')] : mode === 'daily' ? ['🌞 ', t('daily')] : mode === 'boss' ? [`${opts.sec.boss} `, t('guardian')] : [`${opts.unit ? opts.unit.icon : { eclair: '⚡', ballons: '🎈', marathon: '⏱️' }[mode]} `, t('diff' + level)];
   const barTitle = el('span', { class: 'bar-title' }, titleOf());
   screen(`session ${accent} mode-${mode}`,
     el('header', { class: 'bar' },
@@ -482,7 +487,7 @@ async function play(opts) {
     el('div', { class: 'next-wrap' }, nextBtn),
   );
   const say = (txt, cls) => {
-    bubble.textContent = txt; bubble.className = `owl-bubble show ${cls}`;
+    setText(bubble, txt); bubble.className = `owl-bubble show ${cls}`;
     owlNode.classList.remove('hop', 'tilt'); void owlNode.offsetWidth;
     owlNode.classList.add(cls === 'good' ? 'hop' : 'tilt');
   };
@@ -529,7 +534,7 @@ async function play(opts) {
     if (!item) break;
     const { q, unit: u } = item;
     setContentLang(u.subject.speech);
-    if (mixed) { zoneOf(u.subject); barTitle.textContent = titleOf(); nextBtn.firstChild.textContent = t('next'); }
+    if (mixed) { zoneOf(u.subject); barTitle.replaceChildren(el('span', {}, titleOf())); nextBtn.firstChild.replaceChildren(el('span', {}, t('next'))); }
     dots?.children[i]?.classList.add('now');
     bubble.className = 'owl-bubble';
     const praiseLang = u.subject.praise || lang();
@@ -697,7 +702,7 @@ async function results(g) {
     owl('big hop-loop'),
     el('h1', {}, head),
     big,
-    newRecord ? el('div', { class: 'res-record' }, `🏆 ${t('record')} : ${recScore}`) : null,
+    newRecord ? el('div', { class: 'res-record' }, '🏆 ', t('record'), ` : ${recScore}`) : null,
     el('div', { class: 'res-row' }, coinEl, bestCombo >= 3 ? el('div', { class: 'res-combo' }, `🔥 ×${bestCombo}`) : null),
     sticker ? el('div', { class: 'sticker-reveal' }, el('div', { class: 'sticker-big' }, sticker), el('div', {}, t('newSticker'))) : null,
     tip ? el('div', { class: 'res-tip' }, tip) : null,
@@ -731,8 +736,9 @@ function memory(s, level, back) {
   const cards = R.shuffle(pairs.flatMap((p, i) => [{ i, f: p.a, say: p.say }, { i, f: p.b, say: p.say }]));
   let open = [], found = 0, flips = 0, lock = false;
   const t0 = Date.now();
-  const clock = el('span', { class: 'score' }, '0 s');
-  const timer = setInterval(() => { clock.textContent = `${Math.round((Date.now() - t0) / 1000)} s`; }, 500);
+  const sec = String(tr(SEC));
+  const clock = el('span', { class: 'score' }, `0${sec}`);
+  const timer = setInterval(() => { clock.textContent = `${Math.round((Date.now() - t0) / 1000)}${sec}`; }, 500);
   const grid = el('div', { class: `memory n${cards.length}` });
   for (const c of cards) {
     const b = el('button', { class: 'mcard' }, el('span', { class: 'm-back' }, '🦉'), el('span', { class: 'm-front' }, face(c.f)));
@@ -762,7 +768,7 @@ function memory(s, level, back) {
           addCoins(pairs.length);
           const fresh = checkBadges(); save();
           const sh = sheet(el('div', { class: 'memory-done' }, owl('big hop-loop'), el('h2', {}, newRecord && old ? t('newRecord') : t('bravoAll')),
-            el('div', { class: 'res-score' }, `⏱️ ${secs} s · ${flips} ${t('tries')}`), el('div', { class: 'res-coins' }, `+${pairs.length + (newRecord && old ? 10 : 0)} ${COIN}`),
+            el('div', { class: 'res-score' }, `⏱️ ${secs}`, tr(SEC), ` · ${flips} `, t('tries')), el('div', { class: 'res-coins' }, `+${pairs.length + (newRecord && old ? 10 : 0)} ${COIN}`),
             el('div', { class: 'res-btns' }, el('button', { class: 'btn ghost', onclick: () => { sh.close(); back(); } }, '‹ ', t('back')), el('button', { class: 'btn primary', onclick: () => { sh.close(); memory(s, level, back); } }, '↻ ', t('replay')))));
           confetti(50); sfx('win'); showBadges(fresh);
         }

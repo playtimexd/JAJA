@@ -334,6 +334,10 @@
 .hz rt { display: block; font-size: .4em; line-height: 1.2; padding: 0 .12em; white-space: nowrap; }
 .hz-g { display: inline-flex; align-items: flex-end; }
 .hz-p { line-height: 1.1; }
+/* Chinese zone: UI strings with pinyin (ZhStr rendered by el()) */
+.hz.ui { justify-content: flex-start; vertical-align: bottom; }
+.hz.ui rt { font-size: max(.45em, 10px); font-weight: 600; }
+.owl-bubble .hz.ui, .q-tip .hz.ui, .hub-intro .hz.ui, .talk-status .hz.ui { justify-content: center; }
 .talk-via { font-weight: 800; color: var(--ink2); font-size: 15px; }
 /* storybooks */
 .sec-tile.books { background: linear-gradient(135deg, #ffe4ed, #ffc6d9); border-color: #ff8fb3; box-shadow: 0 7px 0 #e86a93; }

@@ -1,6 +1,6 @@
 // g3c11 radicals 偏旁部首, g3c12 look-alikes 形近字, g3c13 polyphones 多音字 (light).
 import { CHAR, WORDS } from './chinois-vocab.js';
-import { say, T, mc, take, uniq, pyWrong, finish, parse, hanLen } from './chinois-lib.js';
+import { say, T, H, HC, mc, take, uniq, pyWrong, finish, parse, hanLen } from './chinois-lib.js';
 
 /* ======================= g3c11 — radicals ======================= */
 // radical|name|fr|en|chars (char py,…)
@@ -34,44 +34,54 @@ const ALLRC = RADS.flatMap((x) => x.chars);
   const s = new Set();
   for (const c of ALLRC) { if (s.has(c.hz)) throw new Error('dup radical char ' + c.hz); s.add(c.hz); }
 }
+// what each radical is about, and its name (三点水…), in Chinese with pinyin
+const RAD_ZH = {
+  '氵': [H('和水有关', 'hé shuǐ yǒu guān'), '三点水'], '木': [H('和树木有关', 'hé shù mù yǒu guān'), '木字旁'], '口': [H('和嘴巴有关', 'hé zuǐ ba yǒu guān'), '口字旁'], '扌': [H('和手的动作有关', 'hé shǒu de dòng zuò yǒu guān'), '提手旁'],
+  '亻': [H('和人有关', 'hé rén yǒu guān'), '单人旁'], '女': [H('和女孩子、女人有关', 'hé nǚ hái zi nǚ rén yǒu guān'), '女字旁'], '讠': [H('和说话有关', 'hé shuō huà yǒu guān'), '言字旁'], '艹': [H('和花草有关', 'hé huā cǎo yǒu guān'), '草字头'],
+  '日': [H('和太阳、时间有关', 'hé tài yáng shí jiān yǒu guān'), '日字旁'], '火': [H('和火、热有关', 'hé huǒ rè yǒu guān'), '火字旁'], '足': [H('和脚、走路有关', 'hé jiǎo zǒu lù yǒu guān'), '足字旁'], '饣': [H('和吃的东西有关', 'hé chī de dōng xi yǒu guān'), '食字旁'],
+  '钅': [H('和金属有关', 'hé jīn shǔ yǒu guān'), '金字旁'], '纟': [H('和丝线有关', 'hé sī xiàn yǒu guān'), '绞丝旁'], '忄': [H('和心情有关', 'hé xīn qíng yǒu guān'), '竖心旁'], '目': [H('和眼睛有关', 'hé yǎn jing yǒu guān'), '目字旁'],
+  '雨': [H('和下雨、天气有关', 'hé xià yǔ tiān qì yǒu guān'), '雨字头'], '虫': [H('和小虫子有关', 'hé xiǎo chóng zi yǒu guān'), '虫字旁'],
+};
+for (const x of RADS) { const z = RAD_ZH[x.r]; if (!z || hanLen(z[1]) !== x.name.split(' ').length) throw new Error('radical zh ' + x.r); x.zh = z[0]; x.nameZh = { hz: z[1], py: x.name }; }
 const RADMAP = Object.fromEntries(RADS.map((x) => [x.r, x]));
 const RAD_OTHER = ['冫', '禾', '刂', '宀', '辶', '竹'];
 const rOpt = (r) => ({ hz: r });
 const cOpt = (c, py = true) => (py ? { hz: c.hz, py: c.py, say: say(c.hz) } : { hz: c.hz, say: say(c.hz) });
-const radTip = (x) => T(`${x.r} (${x.name}) = ${x.fr}. Exemples : ${x.chars.slice(0, 5).map((c) => c.hz).join(' ')}.`, `${x.r} (${x.name}) = ${x.en}. Examples: ${x.chars.slice(0, 5).map((c) => c.hz).join(' ')}.`);
+const list = (a) => a.flatMap((c, i) => (i ? ['、', c] : [c]));
+const radTip = (x) => HC(x.nameZh, H('：'), x.zh, H('，比如', 'bǐ rú'), ...list(x.chars.slice(0, 5).map((c) => ({ hz: c.hz, py: c.py }))), '。');
 const RQ = {
   whichRad(R, c, L) {
     const right = RADMAP[c.rad];
     const pool = RADS.filter((x) => x !== right);
     const near = { '氵': ['冫'], '亻': ['讠'], '讠': ['亻'], '扌': ['木'], '木': ['扌', '禾'], '艹': ['竹'], '日': ['目'], '目': ['日'], '纟': ['钅'], '钅': ['纟'] }[c.rad] || [];
     const wr = [...near.slice(0, L === 3 ? 1 : 0).map((r) => rOpt(r)), ...take(R, pool, 4).map((x) => rOpt(x.r))];
-    return mc(`wr-${c.hz}`, T('Quel est le radical (偏旁) de ce caractère ?', 'Which radical (偏旁) does this character have?'), rOpt(right.r), wr.slice(0, nW(L)), { stimulus: { hz: c.hz, py: c.py }, say: say(c.hz), cols: 3, tip: radTip(right) });
+    return mc(`wr-${c.hz}`, H('这个字的偏旁是哪一个？', 'zhè gè zì de piān páng shì nǎ yí gè'), rOpt(right.r), wr.slice(0, nW(L)), { stimulus: { hz: c.hz, py: c.py }, say: say(c.hz), cols: 3, tip: radTip(right) });
   },
   radMeaning(R, x, L) {
     const wr = take(R, RADS.filter((y) => y !== x), nW(L));
-    return mc(`rm-${x.r}`, T('Que veut dire ce radical ? (Il aide à deviner le sens.)', 'What does this radical hint at?'), { text: T(x.fr, x.en) }, wr.map((y) => ({ text: T(y.fr, y.en) })), { stimulus: { hz: x.r }, tip: radTip(x) });
+    return mc(`rm-${x.r}`, H('这个偏旁和什么有关？', 'zhè gè piān páng hé shén me yǒu guān'), { ...x.zh }, wr.map((y) => ({ ...y.zh })), { stimulus: { hz: x.r }, tip: radTip(x) });
   },
   hasRad(R, x, L) {
     const c = R.pick(x.chars);
     const wr = take(R, ALLRC.filter((y) => y.rad !== x.r), nW(L));
-    return mc(`hr-${x.r}-${c.hz}`, T(`Quel caractère a le radical « ${x.r} » ?`, `Which character has the radical “${x.r}”?`), cOpt(c, L < 3), wr.map((y) => cOpt(y, L < 3)), { stimulus: { hz: x.r }, say: say(c.hz), cols: 2, tip: radTip(x) });
+    return mc(`hr-${x.r}-${c.hz}`, H('哪个字有这个偏旁？', 'nǎ gè zì yǒu zhè gè piān páng'), cOpt(c, L < 3), wr.map((y) => cOpt(y, L < 3)), { stimulus: { hz: x.r }, say: say(c.hz), cols: 2, tip: radTip(x) });
   },
   guess(R, x, L) {
     const c = R.pick(x.chars);
     const wr = take(R, ALLRC.filter((y) => y.rad !== x.r), nW(L));
-    return mc(`gs-${x.r}-${c.hz}`, T(`Devine : quel caractère parle de « ${x.fr} » ?`, `Guess: which character is about “${x.en}”?`), cOpt(c, L < 3), wr.map((y) => cOpt(y, L < 3)), { say: say(c.hz), cols: 2, tip: radTip(x) });
+    return mc(`gs-${x.r}-${c.hz}`, HC(H('猜一猜：哪个字', 'cāi yì cāi nǎ gè zì'), x.zh, '？'), cOpt(c, L < 3), wr.map((y) => cOpt(y, L < 3)), { say: say(c.hz), cols: 2, tip: radTip(x) });
   },
   sort(R, L) {
     const k = L === 3 ? 3 : 2;
     const rs = R.sample(RADS, k);
     const per = L === 1 ? 2 : 2;
     const items = R.shuffle(rs.flatMap((x, bin) => take(R, x.chars, per).map((c) => ({ hz: c.hz, py: c.py, bin }))));
-    return { type: 'sort', key: `so-${rs.map((x) => x.r).join('')}-${items.map((i) => i.hz).sort().join('')}`, prompt: T('Range chaque caractère dans la boîte de son radical.', 'Put each character in the box of its radical.'), bins: rs.map((x) => ({ hz: x.r })), items, tip: T(rs.map((x) => `${x.r} = ${x.fr}`).join(' ; '), rs.map((x) => `${x.r} = ${x.en}`).join('; ')) };
+    return { type: 'sort', key: `so-${rs.map((x) => x.r).join('')}-${items.map((i) => i.hz).sort().join('')}`, prompt: H('分一分：把每个字放进它的偏旁盒子里。', 'fēn yì fēn bǎ měi gè zì fàng jìn tā de piān páng hé zi lǐ'), bins: rs.map((x) => ({ hz: x.r })), items, tip: HC(...rs.flatMap((x, i) => [...(i ? ['；'] : []), x.nameZh, H('：'), x.zh]), '。') };
   },
 };
 const nW = (L) => (L === 1 ? 2 : 3);
 const g3c11 = finish({
-  id: 'g3c11', icon: '🧱', title: T('Les radicaux 偏旁部首', 'Radicals 偏旁部首'),
+  id: 'g3c11', icon: '🧱', title: { ...T('Les radicaux 偏旁部首', 'Radicals 偏旁部首'), zh: H('偏旁部首', 'piān páng bù shǒu') },
   pfeq: 'Chinois — caractères : les radicaux et leur sens (2e–3e année)',
   generate(L, R) {
     const lvl = [1, 2, 3].includes(L) ? L : 2;
@@ -178,9 +188,9 @@ const LA = LA_TXT.trim().split(/\n\s*\n/).map((g, gi) => g.trim().split('\n').ma
 }));
 const LAE = LA.flat();
 const laBlank = (e) => { const hzs = [...e.w]; hzs[hzs.indexOf(e.hz)] = '＿'; const sy = e.wp.split(' '); const pos = [...e.w].slice(0, [...e.w].indexOf(e.hz)).length; sy.splice(pos, 1); return { hz: hzs.join(''), py: sy.join(' ') }; };
-const laTip = (g) => T(`À ne pas confondre : ${g.map((x) => `${x.hz} (${x.py}) ${x.w}`).join(' ; ')}.`, `Do not mix up: ${g.map((x) => `${x.hz} (${x.py}) ${x.w}`).join('; ')}.`);
+const laTip = (g) => HC(H('别弄混：', 'bié nòng hùn'), ...g.flatMap((x, i) => [...(i ? ['；'] : []), { hz: x.hz, py: x.py }, '（', { hz: x.w, py: x.wp }, '）']), '。');
 const g3c12 = finish({
-  id: 'g3c12', icon: '🔍', title: T('Les caractères qui se ressemblent 形近字', 'Look-alike characters 形近字'),
+  id: 'g3c12', icon: '🔍', title: { ...T('Les caractères qui se ressemblent 形近字', 'Look-alike characters 形近字'), zh: H('形近字', 'xíng jìn zì') },
   pfeq: 'Chinois — caractères : distinguer les caractères de forme proche (2e–3e année)',
   generate(L, R) {
     const lvl = [1, 2, 3].includes(L) ? L : 2;
@@ -191,11 +201,11 @@ const g3c12 = finish({
     const wr = [...R.shuffle(sib), ...extra].slice(0, n);
     const opt = (x) => (lvl === 1 ? { hz: x.hz, py: x.py } : { hz: x.hz });
     if (lvl === 3 && R.chance(0.4)) {
-      // which word fits the meaning?
-      const ws = [...R.shuffle(sib).map((x) => x.w), ...take(R, LAE.filter((x) => x.g !== e.g), 3).map((x) => x.w)].slice(0, 3);
-      return mc(`la3w-${e.hz}-${e.w}`, T(`Quel mot veut dire « ${e.fr} » ?`, `Which word means “${e.en}”?`), { hz: e.w }, ws.map((w) => ({ hz: w })), { say: say(e.w), cols: 2, tip: laTip(grp) });
+      // listen: which word (look-alike words side by side)?
+      const ws = [...R.shuffle(sib).map((x) => x.w), ...take(R, LAE.filter((x) => x.g !== e.g), 3).map((x) => x.w)].filter((w) => w !== e.w).slice(0, 3);
+      return mc(`la3w-${e.hz}-${e.w}`, H('听一听，你听到的是哪个词？', 'tīng yì tīng nǐ tīng dào de shì nǎ gè cí'), { hz: e.w }, ws.map((w) => ({ hz: w })), { say: say(e.w), cols: 2, tip: laTip(grp) });
     }
-    return mc(`la${lvl}-${e.hz}-${e.w}`, T(`Quel caractère complète le mot « ${e.fr} » ?`, `Which character completes the word “${e.en}”?`), opt(e), wr.map(opt), { stimulus: lvl === 3 ? { hz: laBlank(e).hz } : laBlank(e), say: say(e.w), cols: 2, tip: laTip(grp) });
+    return mc(`la${lvl}-${e.hz}-${e.w}`, H('听一听，哪个字可以填进词语里？', 'tīng yì tīng nǎ gè zì kě yǐ tián jìn cí yǔ lǐ'), opt(e), wr.map(opt), { stimulus: lvl === 3 ? { hz: laBlank(e).hz } : laBlank(e), say: say(e.w), cols: 2, tip: laTip(grp) });
   },
   allSay() { return LAE.map((e) => say(e.w)); },
 });
@@ -234,10 +244,10 @@ const POLY = POLY_TXT.trim().split('\n').map((l) => {
   const rd = (x, fr, en) => { const [py, ws] = x.split(':'); return { py, fr, en, words: ws.split(';').map((w) => { const [wh, ...p] = w.trim().split(/\s+/); const wp = p.join(' '); if (hanLen(wh) !== wp.split(/\s+/).length) throw new Error('poly pinyin ' + wh + ' ' + wp); if (!wh.includes(h)) throw new Error('poly word ' + wh); return { hz: wh, py: wp }; }) }; };
   return { hz: h, rds: [rd(a, afr, aen), rd(b, bfr, ben)] };
 });
-const polyTip = (p) => T(`${p.hz} se lit ${p.rds[0].py} (${p.rds[0].fr}) : ${p.rds[0].words[0].hz} ; ou ${p.rds[1].py} (${p.rds[1].fr}) : ${p.rds[1].words[0].hz}.`, `${p.hz} is read ${p.rds[0].py} (${p.rds[0].en}): ${p.rds[0].words[0].hz}; or ${p.rds[1].py} (${p.rds[1].en}): ${p.rds[1].words[0].hz}.`);
+const polyTip = (p) => HC({ hz: p.hz, py: p.rds[0].py }, H('读', 'dú'), ` ${p.rds[0].py}：`, ...list(p.rds[0].words), H('；也读', 'yě dú'), ` ${p.rds[1].py}：`, ...list(p.rds[1].words), '。');
 const POLYE = POLY.flatMap((p) => p.rds.flatMap((rd, ri) => rd.words.map((w, wi) => ({ p, rd, ri, w, wi }))));
 const g3c13 = finish({
-  id: 'g3c13', icon: '🔀', title: T('Un caractère, deux sons 多音字', 'One character, two sounds 多音字'),
+  id: 'g3c13', icon: '🔀', title: { ...T('Un caractère, deux sons 多音字', 'One character, two sounds 多音字'), zh: H('多音字', 'duō yīn zì') },
   pfeq: 'Chinois — caractères : quelques caractères à deux lectures (2e–3e année)',
   generate(L, R) {
     const lvl = [1, 2, 3].includes(L) ? L : 2;
@@ -245,18 +255,18 @@ const g3c13 = finish({
     const key = `${e.p.hz}-${e.w.hz}`;
     if (lvl === 1 || (lvl === 2 && R.chance(0.5))) {
       const extra = take(R, [pyWrong(R, e.rd.py, 2)].flat(), lvl === 1 ? 0 : 1);
-      return mc(`g3c13a-${key}`, T(`Écoute le mot. Comment lit-on « ${e.p.hz} » ici ?`, `Listen to the word. How is “${e.p.hz}” read here?`), { py: e.rd.py }, [{ py: other.py }, ...extra.map((p) => ({ py: p }))].slice(0, lvl === 1 ? 1 : 2), { stimulus: { hz: e.w.hz }, say: say(e.w.hz), cols: 3, tip: polyTip(e.p) });
+      return mc(`g3c13a-${key}`, H('听一听，这个词里的多音字怎么读？', 'tīng yì tīng zhè gè cí lǐ de duō yīn zì zěn me dú'), { py: e.rd.py }, [{ py: other.py }, ...extra.map((p) => ({ py: p }))].slice(0, lvl === 1 ? 1 : 2), { stimulus: { hz: e.w.hz }, say: say(e.w.hz), cols: 3, tip: polyTip(e.p) });
     }
     if (lvl === 2) {
       const right = e.w, wr = [...take(R, other.words, 2), ...take(R, POLYE.filter((x) => x.p !== e.p), 1).map((x) => x.w)];
-      return mc(`g3c13b-${key}`, T(`Dans quel mot « ${e.p.hz} » se lit-il ${e.rd.py} (${e.rd.fr}) ?`, `In which word is “${e.p.hz}” read ${e.rd.py} (${e.rd.en})?`), { hz: right.hz }, wr.map((w) => ({ hz: w.hz })), { stimulus: { hz: e.p.hz }, say: say(right.hz), cols: 2, tip: polyTip(e.p) });
+      return mc(`g3c13b-${key}`, HC(H('在哪个词里，', 'zài nǎ gè cí lǐ'), { hz: e.p.hz, py: e.rd.py }, H('读', 'dú'), ` ${e.rd.py}？`), { hz: right.hz }, wr.map((w) => ({ hz: w.hz })), { stimulus: { hz: e.p.hz }, say: say(right.hz), cols: 2, tip: polyTip(e.p) });
     }
     // L3: pinyin of the whole word
     const swapped = e.w.py.split(' ');
     const idx = [...e.w.hz].filter((c) => /\p{Script=Han}/u.test(c)).indexOf(e.p.hz) >= 0 ? [...e.w.hz].indexOf(e.p.hz) : 0;
     swapped[idx] = other.py;
     const wr = [swapped.join(' '), ...pyWrong(R, e.w.py, 3)].filter((x) => x !== e.w.py);
-    return mc(`g3c13c-${key}`, T('Écoute. Quel est le bon pinyin de ce mot ?', 'Listen. What is the right pinyin of this word?'), { py: e.w.py }, [...new Set(wr)].slice(0, 3).map((p) => ({ py: p })), { stimulus: { hz: e.w.hz }, say: say(e.w.hz), cols: 2, tip: polyTip(e.p) });
+    return mc(`g3c13c-${key}`, H('听一听，这个词的拼音哪个是对的？', 'tīng yì tīng zhè gè cí de pīn yīn nǎ gè shì duì de'), { py: e.w.py }, [...new Set(wr)].slice(0, 3).map((p) => ({ py: p })), { stimulus: { hz: e.w.hz }, say: say(e.w.hz), cols: 2, tip: polyTip(e.p) });
   },
   allSay() { return POLYE.map((e) => say(e.w.hz)); },
 });

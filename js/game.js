@@ -1,7 +1,7 @@
 // Game layer: plumes 🪶 (coins), daily streak 🔥, daily missions, badges, owl shop, juice (confetti, floating text).
 import { el, makeRng } from './util.js';
 import { store, save, today } from './store.js';
-import { tr } from './i18n.js';
+import { tr, zh } from './i18n.js';
 import { sfx } from './audio.js';
 import { OWL } from './owl.js';
 
@@ -80,33 +80,33 @@ export function claim(id) {
 // ---------- badges ----------
 const S = (k) => store.stats[k] || 0;
 export const BADGES = [
-  { id: 'first', icon: '🐣', t: { fr: 'Premier pas', en: 'First step' }, d: { fr: 'Termine une partie', en: 'Finish a game' }, ok: () => S('games') >= 1 },
-  { id: 'c100', icon: '💯', t: { fr: 'Cent!', en: 'One hundred!' }, d: { fr: '100 bonnes réponses', en: '100 right answers' }, ok: () => S('correct') >= 100 },
-  { id: 'c500', icon: '🧠', t: { fr: 'Super cerveau', en: 'Super brain' }, d: { fr: '500 bonnes réponses', en: '500 right answers' }, ok: () => S('correct') >= 500 },
-  { id: 'c2000', icon: '🦉', t: { fr: 'Sage hibou', en: 'Wise owl' }, d: { fr: '2000 bonnes réponses', en: '2000 right answers' }, ok: () => S('correct') >= 2000 },
-  { id: 'combo10', icon: '🔥', t: { fr: 'En feu', en: 'On fire' }, d: { fr: '10 bonnes réponses de suite', en: '10 right in a row' }, ok: () => S('bestCombo') >= 10 },
-  { id: 'combo25', icon: '☄️', t: { fr: 'Comète', en: 'Comet' }, d: { fr: '25 bonnes réponses de suite', en: '25 right in a row' }, ok: () => S('bestCombo') >= 25 },
-  { id: 'perfect', icon: '🌟', t: { fr: 'Parfait', en: 'Perfect' }, d: { fr: '3 étoiles dans une partie', en: '3 stars in a game' }, ok: () => S('perfect') >= 1 },
-  { id: 'perfect10', icon: '✨', t: { fr: 'Étoile filante', en: 'Shooting star' }, d: { fr: '10 parties parfaites', en: '10 perfect games' }, ok: () => S('perfect') >= 10 },
-  { id: 'hard', icon: '🌶️', t: { fr: 'Courageux', en: 'Brave' }, d: { fr: 'Réussis une partie Difficile', en: 'Pass a Hard game' }, ok: () => S('hardWins') >= 1 },
-  { id: 'eclair', icon: '⚡', t: { fr: 'Éclair', en: 'Lightning' }, d: { fr: '100 points au Défi éclair', en: '100 points in a Lightning quiz' }, ok: () => S('bestEclair') >= 100 },
-  { id: 'eclair300', icon: '🌩️', t: { fr: 'Tonnerre', en: 'Thunder' }, d: { fr: '300 points au Défi éclair', en: '300 points in a Lightning quiz' }, ok: () => S('bestEclair') >= 300 },
-  { id: 'ballons', icon: '🎈', t: { fr: 'Pop pop!', en: 'Pop pop!' }, d: { fr: '15 ballons dans une partie', en: '15 balloons in one game' }, ok: () => S('bestBallons') >= 15 },
-  { id: 'records', icon: '🏆', t: { fr: 'Champion', en: 'Champion' }, d: { fr: 'Bats 10 records', en: 'Beat 10 records' }, ok: () => S('records') >= 10 },
-  { id: 'boss', icon: '🐉', t: { fr: 'Dompteur', en: 'Tamer' }, d: { fr: 'Gagne contre un gardien d’île', en: 'Beat an island guardian' }, ok: () => S('bossWins') >= 1 },
-  { id: 'boss5', icon: '👑', t: { fr: 'Roi des îles', en: 'Island king' }, d: { fr: 'Gagne contre 5 gardiens', en: 'Beat 5 guardians' }, ok: () => S('bossWins') >= 5 },
-  { id: 'streak3', icon: '📅', t: { fr: 'Trois jours', en: 'Three days' }, d: { fr: 'Joue 3 jours de suite', en: 'Play 3 days in a row' }, ok: () => store.streak.best >= 3 },
-  { id: 'streak7', icon: '🗓️', t: { fr: 'Une semaine', en: 'One week' }, d: { fr: 'Joue 7 jours de suite', en: 'Play 7 days in a row' }, ok: () => store.streak.best >= 7 },
-  { id: 'trilingue', icon: '🌍', t: { fr: 'Touche-à-tout', en: 'All-rounder' }, d: { fr: 'Joue aux 3 matières le même jour', en: 'Play all 3 subjects in one day' }, ok: () => S('allSubjectsDay') >= 1 },
-  { id: 'artiste', icon: '🎨', t: { fr: 'Artiste', en: 'Artist' }, d: { fr: 'Termine 3 projets d’arts', en: 'Finish 3 art projects' }, ok: () => Object.keys(store.arts.done).length >= 3 },
-  { id: 'artiste20', icon: '🖼️', t: { fr: 'Grand artiste', en: 'Great artist' }, d: { fr: 'Termine 20 projets d’arts', en: 'Finish 20 art projects' }, ok: () => Object.keys(store.arts.done).length >= 20 },
-  { id: 'curieux', icon: '🔭', t: { fr: 'Curieux', en: 'Curious' }, d: { fr: 'Découvre 10 « Pourquoi? »', en: 'Discover 10 “Why?”' }, ok: () => Object.keys(store.why || {}).length >= 10 },
-  { id: 'savant', icon: '🧪', t: { fr: 'Petit savant', en: 'Little scientist' }, d: { fr: 'Découvre 50 « Pourquoi? »', en: 'Discover 50 “Why?”' }, ok: () => Object.keys(store.why || {}).length >= 50 },
-  { id: 'panda', icon: '🐼', t: { fr: 'Petit panda', en: 'Little panda' }, d: { fr: 'Gagne 20 étoiles en chinois', en: 'Earn 20 stars in Chinese' }, ok: () => Object.entries(store.progress).filter(([k]) => /^c\d+$/.test(k)).reduce((a, [, v]) => a + Object.values(v).reduce((b, x) => b + (x.stars || 0), 0), 0) >= 20 },
-  { id: 'lecteur', icon: '📚', t: { fr: 'Lecteur', en: 'Reader' }, d: { fr: 'Lis 3 livres', en: 'Read 3 books' }, ok: () => Object.keys(store.books || {}).length >= 3 },
-  { id: 'bibliotheque', icon: '📖', t: { fr: 'Rat de bibliothèque', en: 'Bookworm' }, d: { fr: 'Lis les 10 livres', en: 'Read all 10 books' }, ok: () => Object.keys(store.books || {}).length >= 10 },
-  { id: 'shop', icon: '🛍️', t: { fr: 'Coquet', en: 'Stylish' }, d: { fr: 'Achète un accessoire', en: 'Buy an accessory' }, ok: () => store.owned.length >= 1 },
-  { id: 'missions', icon: '🎯', t: { fr: 'Mission accomplie', en: 'Mission done' }, d: { fr: 'Réussis 10 missions', en: 'Complete 10 missions' }, ok: () => S('missions') >= 10 },
+  { id: 'first', icon: '🐣', t: { fr: 'Premier pas', en: 'First step', zh: zh('第一步', 'dì yī bù') }, d: { fr: 'Termine une partie', en: 'Finish a game', zh: zh('玩完一局游戏', 'wán wán yì jú yóu xì') }, ok: () => S('games') >= 1 },
+  { id: 'c100', icon: '💯', t: { fr: 'Cent!', en: 'One hundred!', zh: zh('一百！', 'yì bǎi') }, d: { fr: '100 bonnes réponses', en: '100 right answers', zh: zh('答对100道题', 'dá duì dào tí') }, ok: () => S('correct') >= 100 },
+  { id: 'c500', icon: '🧠', t: { fr: 'Super cerveau', en: 'Super brain', zh: zh('超级大脑', 'chāo jí dà nǎo') }, d: { fr: '500 bonnes réponses', en: '500 right answers', zh: zh('答对500道题', 'dá duì dào tí') }, ok: () => S('correct') >= 500 },
+  { id: 'c2000', icon: '🦉', t: { fr: 'Sage hibou', en: 'Wise owl', zh: zh('聪明的猫头鹰', 'cōng míng de māo tóu yīng') }, d: { fr: '2000 bonnes réponses', en: '2000 right answers', zh: zh('答对2000道题', 'dá duì dào tí') }, ok: () => S('correct') >= 2000 },
+  { id: 'combo10', icon: '🔥', t: { fr: 'En feu', en: 'On fire', zh: zh('火力全开', 'huǒ lì quán kāi') }, d: { fr: '10 bonnes réponses de suite', en: '10 right in a row', zh: zh('连续答对10道题', 'lián xù dá duì dào tí') }, ok: () => S('bestCombo') >= 10 },
+  { id: 'combo25', icon: '☄️', t: { fr: 'Comète', en: 'Comet', zh: zh('彗星', 'huì xīng') }, d: { fr: '25 bonnes réponses de suite', en: '25 right in a row', zh: zh('连续答对25道题', 'lián xù dá duì dào tí') }, ok: () => S('bestCombo') >= 25 },
+  { id: 'perfect', icon: '🌟', t: { fr: 'Parfait', en: 'Perfect', zh: zh('满分', 'mǎn fēn') }, d: { fr: '3 étoiles dans une partie', en: '3 stars in a game', zh: zh('一局得到3颗星', 'yì jú dé dào kē xīng') }, ok: () => S('perfect') >= 1 },
+  { id: 'perfect10', icon: '✨', t: { fr: 'Étoile filante', en: 'Shooting star', zh: zh('流星', 'liú xīng') }, d: { fr: '10 parties parfaites', en: '10 perfect games', zh: zh('10局满分', 'jú mǎn fēn') }, ok: () => S('perfect') >= 10 },
+  { id: 'hard', icon: '🌶️', t: { fr: 'Courageux', en: 'Brave', zh: zh('勇敢', 'yǒng gǎn') }, d: { fr: 'Réussis une partie Difficile', en: 'Pass a Hard game', zh: zh('通过一局难的游戏', 'tōng guò yì jú nán de yóu xì') }, ok: () => S('hardWins') >= 1 },
+  { id: 'eclair', icon: '⚡', t: { fr: 'Éclair', en: 'Lightning', zh: zh('闪电', 'shǎn diàn') }, d: { fr: '100 points au Défi éclair', en: '100 points in a Lightning quiz', zh: zh('闪电挑战得到100分', 'shǎn diàn tiǎo zhàn dé dào fēn') }, ok: () => S('bestEclair') >= 100 },
+  { id: 'eclair300', icon: '🌩️', t: { fr: 'Tonnerre', en: 'Thunder', zh: zh('打雷', 'dǎ léi') }, d: { fr: '300 points au Défi éclair', en: '300 points in a Lightning quiz', zh: zh('闪电挑战得到300分', 'shǎn diàn tiǎo zhàn dé dào fēn') }, ok: () => S('bestEclair') >= 300 },
+  { id: 'ballons', icon: '🎈', t: { fr: 'Pop pop!', en: 'Pop pop!', zh: zh('啪啪啪！', 'pā pā pā') }, d: { fr: '15 ballons dans une partie', en: '15 balloons in one game', zh: zh('一局打破15个气球', 'yì jú dǎ pò gè qì qiú') }, ok: () => S('bestBallons') >= 15 },
+  { id: 'records', icon: '🏆', t: { fr: 'Champion', en: 'Champion', zh: zh('冠军', 'guàn jūn') }, d: { fr: 'Bats 10 records', en: 'Beat 10 records', zh: zh('打破10个纪录', 'dǎ pò gè jì lù') }, ok: () => S('records') >= 10 },
+  { id: 'boss', icon: '🐉', t: { fr: 'Dompteur', en: 'Tamer', zh: zh('驯兽师', 'xùn shòu shī') }, d: { fr: 'Gagne contre un gardien d’île', en: 'Beat an island guardian', zh: zh('打败一个小岛守护兽', 'dǎ bài yí gè xiǎo dǎo shǒu hù shòu') }, ok: () => S('bossWins') >= 1 },
+  { id: 'boss5', icon: '👑', t: { fr: 'Roi des îles', en: 'Island king', zh: zh('小岛之王', 'xiǎo dǎo zhī wáng') }, d: { fr: 'Gagne contre 5 gardiens', en: 'Beat 5 guardians', zh: zh('打败5个守护兽', 'dǎ bài gè shǒu hù shòu') }, ok: () => S('bossWins') >= 5 },
+  { id: 'streak3', icon: '📅', t: { fr: 'Trois jours', en: 'Three days', zh: zh('三天', 'sān tiān') }, d: { fr: 'Joue 3 jours de suite', en: 'Play 3 days in a row', zh: zh('连续玩3天', 'lián xù wán tiān') }, ok: () => store.streak.best >= 3 },
+  { id: 'streak7', icon: '🗓️', t: { fr: 'Une semaine', en: 'One week', zh: zh('一个星期', 'yí gè xīng qī') }, d: { fr: 'Joue 7 jours de suite', en: 'Play 7 days in a row', zh: zh('连续玩7天', 'lián xù wán tiān') }, ok: () => store.streak.best >= 7 },
+  { id: 'trilingue', icon: '🌍', t: { fr: 'Touche-à-tout', en: 'All-rounder', zh: zh('样样都会', 'yàng yàng dōu huì') }, d: { fr: 'Joue aux 3 matières le même jour', en: 'Play all 3 subjects in one day', zh: zh('同一天玩3门课', 'tóng yì tiān wán mén kè') }, ok: () => S('allSubjectsDay') >= 1 },
+  { id: 'artiste', icon: '🎨', t: { fr: 'Artiste', en: 'Artist', zh: zh('小画家', 'xiǎo huà jiā') }, d: { fr: 'Termine 3 projets d’arts', en: 'Finish 3 art projects', zh: zh('完成3个美术作品', 'wán chéng gè měi shù zuò pǐn') }, ok: () => Object.keys(store.arts.done).length >= 3 },
+  { id: 'artiste20', icon: '🖼️', t: { fr: 'Grand artiste', en: 'Great artist', zh: zh('大画家', 'dà huà jiā') }, d: { fr: 'Termine 20 projets d’arts', en: 'Finish 20 art projects', zh: zh('完成20个美术作品', 'wán chéng gè měi shù zuò pǐn') }, ok: () => Object.keys(store.arts.done).length >= 20 },
+  { id: 'curieux', icon: '🔭', t: { fr: 'Curieux', en: 'Curious', zh: zh('好奇宝宝', 'hào qí bǎo bao') }, d: { fr: 'Découvre 10 « Pourquoi? »', en: 'Discover 10 “Why?”', zh: zh('发现10个为什么', 'fā xiàn gè wèi shén me') }, ok: () => Object.keys(store.why || {}).length >= 10 },
+  { id: 'savant', icon: '🧪', t: { fr: 'Petit savant', en: 'Little scientist', zh: zh('小科学家', 'xiǎo kē xué jiā') }, d: { fr: 'Découvre 50 « Pourquoi? »', en: 'Discover 50 “Why?”', zh: zh('发现50个为什么', 'fā xiàn gè wèi shén me') }, ok: () => Object.keys(store.why || {}).length >= 50 },
+  { id: 'panda', icon: '🐼', t: { fr: 'Petit panda', en: 'Little panda', zh: zh('小熊猫', 'xiǎo xióng māo') }, d: { fr: 'Gagne 20 étoiles en chinois', en: 'Earn 20 stars in Chinese', zh: zh('中文得到20颗星', 'zhōng wén dé dào kē xīng') }, ok: () => Object.entries(store.progress).filter(([k]) => /^c\d+$/.test(k)).reduce((a, [, v]) => a + Object.values(v).reduce((b, x) => b + (x.stars || 0), 0), 0) >= 20 },
+  { id: 'lecteur', icon: '📚', t: { fr: 'Lecteur', en: 'Reader', zh: zh('小读者', 'xiǎo dú zhě') }, d: { fr: 'Lis 3 livres', en: 'Read 3 books', zh: zh('读完3本书', 'dú wán běn shū') }, ok: () => Object.keys(store.books || {}).length >= 3 },
+  { id: 'bibliotheque', icon: '📖', t: { fr: 'Rat de bibliothèque', en: 'Bookworm', zh: zh('书虫', 'shū chóng') }, d: { fr: 'Lis les 10 livres', en: 'Read all 10 books', zh: zh('读完10本书', 'dú wán běn shū') }, ok: () => Object.keys(store.books || {}).length >= 10 },
+  { id: 'shop', icon: '🛍️', t: { fr: 'Coquet', en: 'Stylish', zh: zh('爱打扮', 'ài dǎ bàn') }, d: { fr: 'Achète un accessoire', en: 'Buy an accessory', zh: zh('买一个装饰', 'mǎi yí gè zhuāng shì') }, ok: () => store.owned.length >= 1 },
+  { id: 'missions', icon: '🎯', t: { fr: 'Mission accomplie', en: 'Mission done', zh: zh('完成任务', 'wán chéng rèn wù') }, d: { fr: 'Réussis 10 missions', en: 'Complete 10 missions', zh: zh('完成10个任务', 'wán chéng gè rèn wù') }, ok: () => S('missions') >= 10 },
 ];
 // Returns newly earned badges (and records them).
 export function checkBadges() {
@@ -206,5 +206,5 @@ export function toast(icon, title, sub = '') {
   setTimeout(() => n.remove(), 3100);
 }
 export function showBadges(list) {
-  list.forEach((b, i) => setTimeout(() => toast(b.icon, { fr: `Badge : ${b.t.fr}`, en: `Badge: ${b.t.en}` }, b.d), 400 + i * 1200));
+  list.forEach((b, i) => setTimeout(() => toast(b.icon, { fr: `Badge : ${b.t.fr}`, en: `Badge: ${b.t.en}`, zh: zh(`徽章：${b.t.zh.hz}`, `huī zhāng ${b.t.zh.py}`) }, b.d), 400 + i * 1200));
 }

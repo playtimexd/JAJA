@@ -3,26 +3,27 @@
 import { el } from './util.js';
 import { VOICE_URL } from './config.js';
 import { store, save, today } from './store.js';
-import { tr, lang, setZone } from './i18n.js';
+import { tr, lang, setZone, getZone, zh } from './i18n.js';
+import { setText } from './widgets.js';
 import { sfx, stopSpeech, playSrc } from './audio.js';
 import { screen, backBtn, wallet, sheet } from './ui.js';
 import { COIN, addCoins, bump, progress, checkBadges, showBadges, confetti, touchStreak, dressedOwl } from './game.js';
 
 export const TALK_LANGS = {
-  en: { flag: '🍁', name: 'English', t: { fr: 'Anglais', en: 'English' }, code: 'en',
+  en: { flag: '🍁', name: 'English', t: { fr: 'Anglais', en: 'English', zh: zh('英语', 'yīng yǔ') }, code: 'en',
     who: 'practise speaking English. The child lives in Québec, goes to a French-speaking school, and is in grade 2 (English as a second language).',
     speak: 'Speak slowly and clearly in Canadian English.',
     help: 'If the child answers in French or gets stuck, give the English words and invite them to repeat. Never speak French: the whole conversation stays in English. To help, use very simple English words, examples, choices ("Is it big or small?") or describe things.',
     praise: 'Great!' },
-  fr: { flag: '⚜️', name: 'Français', t: { fr: 'Français', en: 'French' }, code: 'fr',
+  fr: { flag: '⚜️', name: 'Français', t: { fr: 'Français', en: 'French', zh: zh('法语', 'fǎ yǔ') }, code: 'fr',
     who: 'practise speaking French. The child lives in Québec and is in 2e année at a French-speaking school; help them speak in full, correct sentences and learn new words.',
     speak: 'Speak ONLY in French, slowly and clearly, with a warm Québec French accent and Québec vocabulary (ex. « déjeuner » for breakfast, « dîner » for lunch, « souper » for dinner, « auto », « chandail », « bas », « tuque », « mitaines », « fin de semaine », « dépanneur »); never use France-only words (« voiture », « pull », « chaussettes », « week-end », « petit-déjeuner »).',
     help: 'If the child answers in English or Chinese or gets stuck, give the French words and invite them to repeat. Gently model correct gender, verb forms and liaisons.',
     praise: 'Bravo!' },
-  zh: { flag: '🐼', name: '中文', t: { fr: 'Chinois', en: 'Chinese' }, code: 'zh',
+  zh: { flag: '🐼', name: '中文', t: { fr: 'Chinois', en: 'Chinese', zh: zh('中文', 'zhōng wén') }, code: 'zh',
     who: 'practise speaking Mandarin Chinese. The child is 7, lives in Québec (French school, learns English), and speaks some Chinese at home; help them speak more and learn new words.',
-    speak: 'Speak ONLY in Mandarin Chinese (Putonghua), slowly and clearly, standard pronunciation, simple everyday words a 7-year-old knows.',
-    help: 'If the child answers in French or English or gets stuck, say the Chinese words and invite them to repeat. Help gently with tones of difficult words. You may give one French or English word in parentheses if really needed.',
+    speak: 'Speak ONLY in Mandarin Chinese (Putonghua), slowly and clearly, standard pronunciation, simple everyday words a 7-year-old knows. Never say a single word of French or English, not even in parentheses: the whole conversation stays in Chinese. The activity below is written in English for you only: do it entirely in Chinese, with Chinese examples (e.g. “Once upon a time” → “从前”).',
+    help: 'If the child answers in French or English or gets stuck, say the Chinese words and invite them to repeat. Never translate into French or English. To help, use even simpler Chinese words, give examples, offer two choices (“是大的还是小的？”), describe the thing, or say the first word of the sentence for them. Help gently with tones of difficult words.',
     praise: '真棒!' },
 };
 const MAX_SESSION = 6 * 60;                  // seconds per conversation
@@ -30,28 +31,31 @@ export const dailyLimit = () => store.settings.talkLimit ?? 15;   // minutes per
 const usedToday = () => (store.talk?.date === today() ? store.talk.sec : 0);
 
 const L = {
-  title: { fr: 'Parle avec Hibou', en: 'Talk with Owl' },
-  pick: { fr: 'Choisis une langue et une conversation. Hibou parle avec toi!', en: 'Pick a language and a conversation. Owl talks with you!' },
-  start: { fr: 'Touche pour commencer', en: 'Tap to start' },
-  connecting: { fr: 'Hibou arrive…', en: 'Owl is coming…' },
-  listening: { fr: 'Hibou t’écoute… parle!', en: 'Owl is listening… talk!' },
-  speaking: { fr: 'Hibou parle…', en: 'Owl is talking…' },
-  stop: { fr: 'Terminer', en: 'Finish' },
-  noServer: { fr: 'La voix de Hibou n’est pas encore installée. Demande à un parent.', en: 'Owl’s voice is not set up yet. Ask a parent.' },
-  noMic: { fr: 'Le micro est bloqué. Autorise le micro pour ce site dans Réglages.', en: 'The microphone is blocked. Allow the microphone for this site in Settings.' },
-  needHttps: { fr: 'Le micro marche seulement sur la version en ligne (https).', en: 'The microphone only works on the online (https) version.' },
-  badCode: { fr: 'Le code familial n’est pas bon. Un parent peut l’entrer ici :', en: 'The family code is wrong. A parent can enter it here:' },
-  needCode: { fr: 'Avant la première conversation, un parent entre le code familial :', en: 'Before the first talk, a parent enters the family code:' },
-  codeLabel: { fr: 'Code familial', en: 'Family code' },
-  limit: { fr: 'C’est assez pour aujourd’hui! Reviens demain.', en: 'That’s enough for today! Come back tomorrow.' },
-  error: { fr: 'Oups, Hibou n’a pas pu venir. Réessaie plus tard.', en: 'Oops, Owl could not come. Try again later.' },
-  left: { fr: 'min restantes aujourd’hui', en: 'min left today' },
-  bravo: { fr: 'Super conversation!', en: 'Great conversation!' },
-  you: { fr: 'Toi', en: 'You' },
-  tapTalk: { fr: 'Touche et parle', en: 'Tap and talk' },
-  tapSend: { fr: 'Touche quand tu as fini', en: 'Tap when you are done' },
-  thinking: { fr: 'Hibou réfléchit…', en: 'Owl is thinking…' },
-  yourTurn: { fr: 'À toi! Touche le micro.', en: 'Your turn! Tap the mic.' },
+  title: { fr: 'Parle avec Hibou', en: 'Talk with Owl', zh: zh('和猫头鹰说话', 'hé māo tóu yīng shuō huà') },
+  pick: { fr: 'Choisis une langue et une conversation. Hibou parle avec toi!', en: 'Pick a language and a conversation. Owl talks with you!', zh: zh('选一种语言和一个话题。猫头鹰和你聊天！', 'xuǎn yì zhǒng yǔ yán hé yí gè huà tí māo tóu yīng hé nǐ liáo tiān') },
+  start: { fr: 'Touche pour commencer', en: 'Tap to start', zh: zh('点一下开始', 'diǎn yí xià kāi shǐ') },
+  connecting: { fr: 'Hibou arrive…', en: 'Owl is coming…', zh: zh('猫头鹰来了……', 'māo tóu yīng lái le') },
+  listening: { fr: 'Hibou t’écoute… parle!', en: 'Owl is listening… talk!', zh: zh('猫头鹰在听……说吧！', 'māo tóu yīng zài tīng shuō ba') },
+  speaking: { fr: 'Hibou parle…', en: 'Owl is talking…', zh: zh('猫头鹰在说话……', 'māo tóu yīng zài shuō huà') },
+  stop: { fr: 'Terminer', en: 'Finish', zh: zh('结束', 'jié shù') },
+  noServer: { fr: 'La voix de Hibou n’est pas encore installée. Demande à un parent.', en: 'Owl’s voice is not set up yet. Ask a parent.', zh: zh('猫头鹰的声音还没有装好。请问爸爸妈妈。', 'māo tóu yīng de shēng yīn hái méi yǒu zhuāng hǎo qǐng wèn bà ba mā ma') },
+  noMic: { fr: 'Le micro est bloqué. Autorise le micro pour ce site dans Réglages.', en: 'The microphone is blocked. Allow the microphone for this site in Settings.', zh: zh('麦克风被关了。请爸爸妈妈在设置里打开。', 'mài kè fēng bèi guān le qǐng bà ba mā ma zài shè zhì lǐ dǎ kāi') },
+  needHttps: { fr: 'Le micro marche seulement sur la version en ligne (https).', en: 'The microphone only works on the online (https) version.', zh: zh('麦克风只能在网上的版本用。', 'mài kè fēng zhǐ néng zài wǎng shàng de bǎn běn yòng') },
+  badCode: { fr: 'Le code familial n’est pas bon. Un parent peut l’entrer ici :', en: 'The family code is wrong. A parent can enter it here:', zh: zh('家庭密码不对。请爸爸妈妈在这里输入：', 'jiā tíng mì mǎ bú duì qǐng bà ba mā ma zài zhè lǐ shū rù') },
+  needCode: { fr: 'Avant la première conversation, un parent entre le code familial :', en: 'Before the first talk, a parent enters the family code:', zh: zh('第一次聊天以前，请爸爸妈妈输入家庭密码：', 'dì yī cì liáo tiān yǐ qián qǐng bà ba mā ma shū rù jiā tíng mì mǎ') },
+  codeLabel: { fr: 'Code familial', en: 'Family code', zh: zh('家庭密码', 'jiā tíng mì mǎ') },
+  ok: { fr: 'OK', en: 'OK', zh: zh('好', 'hǎo') },
+  limit: { fr: 'C’est assez pour aujourd’hui! Reviens demain.', en: 'That’s enough for today! Come back tomorrow.', zh: zh('今天说够了！明天再来吧。', 'jīn tiān shuō gòu le míng tiān zài lái ba') },
+  error: { fr: 'Oups, Hibou n’a pas pu venir. Réessaie plus tard.', en: 'Oops, Owl could not come. Try again later.', zh: zh('哎呀，猫头鹰来不了。等一下再试试。', 'āi yā māo tóu yīng lái bu liǎo děng yí xià zài shì shi') },
+  left: { fr: 'min restantes aujourd’hui', en: 'min left today', zh: zh('分钟：今天还可以说', 'fēn zhōng jīn tiān hái kě yǐ shuō') },
+  bravo: { fr: 'Super conversation!', en: 'Great conversation!', zh: zh('聊得真好！', 'liáo de zhēn hǎo') },
+  you: { fr: 'Toi', en: 'You', zh: zh('你', 'nǐ') },
+  owl: { fr: 'Hoo', en: 'Hoo', zh: zh('猫头鹰', 'māo tóu yīng') },
+  tapTalk: { fr: 'Touche et parle', en: 'Tap and talk', zh: zh('点一下，说话', 'diǎn yí xià shuō huà') },
+  tapSend: { fr: 'Touche quand tu as fini', en: 'Tap when you are done', zh: zh('说完了点一下', 'shuō wán le diǎn yí xià') },
+  thinking: { fr: 'Hibou réfléchit…', en: 'Owl is thinking…', zh: zh('猫头鹰在想……', 'māo tóu yīng zài xiǎng') },
+  yourTurn: { fr: 'À toi! Touche le micro.', en: 'Your turn! Tap the mic.', zh: zh('轮到你了！点一下麦克风。', 'lún dào nǐ le diǎn yí xià mài kè fēng') },
+  diff: [null, { fr: 'Facile', en: 'Easy', zh: zh('简单', 'jiǎn dān') }, { fr: 'Moyen', en: 'Medium', zh: zh('中等', 'zhōng děng') }, { fr: 'Difficile', en: 'Hard', zh: zh('难', 'nán') }],
 };
 
 const BASE = (level, T) => `You are "Hoo" (in Chinese: 小猫头鹰 Hoo, in French: Hibou), a warm, playful owl who helps a 7-year-old child ${T.who}
@@ -68,18 +72,18 @@ Rules:
 - Start right away by greeting the child and beginning the activity.`;
 
 export const SCENARIOS = [
-  { id: 'hello', icon: '👋', t: { fr: 'Faisons connaissance', en: 'Let’s meet' }, task: 'Introduce yourself (you are an owl living in a maple tree in Montréal). Ask the child’s first name only, age, favourite colour, favourite food, and what they like to play.' },
-  { id: 'repeat', icon: '🦜', t: { fr: 'Répète après moi', en: 'Repeat after me' }, task: 'Read-and-repeat (pronunciation) game. Say one short grade-2 sentence (themes: animals, food, family, school, weather, toys). Ask the child to repeat it. Listen to how they said it: praise what was good and help with at most ONE sound or word that was hard ("Let’s say “three” together: th-ree"). Then give the next sentence, slightly harder after 3 good ones. Count the stars out loud: one star per good repeat.' },
-  { id: 'icecream', icon: '🍦', t: { fr: 'Au comptoir de crème glacée', en: 'At the ice cream shop' }, task: 'Role-play: you work at an ice cream shop. Greet the customer, ask what flavour, cone or cup, how many scoops, toppings. Say the price in dollars and loonies; let the child pay and say thank you. Then swap roles once.' },
-  { id: 'animals', icon: '🦊', t: { fr: 'Devine l’animal', en: 'Guess the animal' }, task: 'Guessing game: describe an animal with 3 simple clues (colour, size, where it lives, sound) and let the child guess; then ask the child to describe one for you to guess. Use Canadian animals sometimes (moose, beaver, raccoon, loon).' },
-  { id: 'weather', icon: '⛄', t: { fr: 'Météo et vêtements', en: 'Weather and clothes' }, task: 'Talk about today’s weather and the season in Québec, and what to wear (toque, mittens, boots, snow pants, raincoat, shorts). Play “What do I wear when it’s…?”' },
-  { id: 'school', icon: '🎒', t: { fr: 'Ma journée à l’école', en: 'My school day' }, task: 'Ask about the child’s day: what they did at school, recess games, lunch, favourite subject, who they played with (first names only). React with interest and model full sentences.' },
-  { id: 'store', icon: '🧸', t: { fr: 'Au magasin de jouets', en: 'At the toy store' }, task: 'Role-play a toy store. The child is the customer: they ask for a toy, colour, size; you say the price; count money together with small numbers.' },
-  { id: 'story', icon: '📖', t: { fr: 'Inventons une histoire', en: 'Let’s make a story' }, task: 'Build a funny short story together, one sentence each. Start with “Once upon a time, there was a…”. Ask the child what happens next with choices if they are stuck. End the story after about 8 turns and retell it in 3 sentences.' },
-  { id: 'ispy', icon: '🔎', t: { fr: 'Je vois, je vois', en: 'I spy' }, task: 'Play “I spy with my little eye something that is…(colour)” using things found in a house or classroom; give more clues if needed; then let the child be the spy.' },
-  { id: 'hockey', icon: '🏒', t: { fr: 'Sports et jeux', en: 'Sports and games' }, task: 'Talk about sports and games: hockey, skating, soccer, swimming, tag. Ask what the child likes, can do, and teach action verbs (skate, kick, throw, jump) with “Can you…?” questions.' },
-  { id: 'feelings', icon: '😊', t: { fr: 'Mes émotions', en: 'My feelings' }, task: 'Talk about feelings (happy, sad, angry, tired, excited, scared) with simple situations: “How do you feel when it’s your birthday?” Teach “I feel … because …”.' },
-  { id: 'free', icon: '🌟', t: { fr: 'On jase!', en: 'Free chat' }, task: 'Free friendly chat about whatever the child wants (pets, games, cartoons, food, family). Keep it simple and fun.' },
+  { id: 'hello', icon: '👋', t: { fr: 'Faisons connaissance', en: 'Let’s meet', zh: zh('认识一下', 'rèn shí yí xià') }, task: 'Introduce yourself (you are an owl living in a maple tree in Montréal). Ask the child’s first name only, age, favourite colour, favourite food, and what they like to play.' },
+  { id: 'repeat', icon: '🦜', t: { fr: 'Répète après moi', en: 'Repeat after me', zh: zh('跟我说', 'gēn wǒ shuō') }, task: 'Read-and-repeat (pronunciation) game. Say one short grade-2 sentence (themes: animals, food, family, school, weather, toys). Ask the child to repeat it. Listen to how they said it: praise what was good and help with at most ONE sound or word that was hard ("Let’s say “three” together: th-ree"). Then give the next sentence, slightly harder after 3 good ones. Count the stars out loud: one star per good repeat.' },
+  { id: 'icecream', icon: '🍦', t: { fr: 'Au comptoir de crème glacée', en: 'At the ice cream shop', zh: zh('冰淇淋店', 'bīng qí lín diàn') }, task: 'Role-play: you work at an ice cream shop. Greet the customer, ask what flavour, cone or cup, how many scoops, toppings. Say the price in dollars and loonies; let the child pay and say thank you. Then swap roles once.' },
+  { id: 'animals', icon: '🦊', t: { fr: 'Devine l’animal', en: 'Guess the animal', zh: zh('猜猜是什么动物', 'cāi cai shì shén me dòng wù') }, task: 'Guessing game: describe an animal with 3 simple clues (colour, size, where it lives, sound) and let the child guess; then ask the child to describe one for you to guess. Use Canadian animals sometimes (moose, beaver, raccoon, loon).' },
+  { id: 'weather', icon: '⛄', t: { fr: 'Météo et vêtements', en: 'Weather and clothes', zh: zh('天气和衣服', 'tiān qì hé yī fu') }, task: 'Talk about today’s weather and the season in Québec, and what to wear (toque, mittens, boots, snow pants, raincoat, shorts). Play “What do I wear when it’s…?”' },
+  { id: 'school', icon: '🎒', t: { fr: 'Ma journée à l’école', en: 'My school day', zh: zh('我在学校的一天', 'wǒ zài xué xiào de yì tiān') }, task: 'Ask about the child’s day: what they did at school, recess games, lunch, favourite subject, who they played with (first names only). React with interest and model full sentences.' },
+  { id: 'store', icon: '🧸', t: { fr: 'Au magasin de jouets', en: 'At the toy store', zh: zh('玩具店', 'wán jù diàn') }, task: 'Role-play a toy store. The child is the customer: they ask for a toy, colour, size; you say the price; count money together with small numbers.' },
+  { id: 'story', icon: '📖', t: { fr: 'Inventons une histoire', en: 'Let’s make a story', zh: zh('一起编故事', 'yì qǐ biān gù shì') }, task: 'Build a funny short story together, one sentence each. Start with “Once upon a time, there was a…”. Ask the child what happens next with choices if they are stuck. End the story after about 8 turns and retell it in 3 sentences.' },
+  { id: 'ispy', icon: '🔎', t: { fr: 'Je vois, je vois', en: 'I spy', zh: zh('我看见了什么', 'wǒ kàn jiàn le shén me') }, task: 'Play “I spy with my little eye something that is…(colour)” using things found in a house or classroom; give more clues if needed; then let the child be the spy.' },
+  { id: 'hockey', icon: '🏒', t: { fr: 'Sports et jeux', en: 'Sports and games', zh: zh('运动和游戏', 'yùn dòng hé yóu xì') }, task: 'Talk about sports and games: hockey, skating, soccer, swimming, tag. Ask what the child likes, can do, and teach action verbs (skate, kick, throw, jump) with “Can you…?” questions.' },
+  { id: 'feelings', icon: '😊', t: { fr: 'Mes émotions', en: 'My feelings', zh: zh('我的心情', 'wǒ de xīn qíng') }, task: 'Talk about feelings (happy, sad, angry, tired, excited, scared) with simple situations: “How do you feel when it’s your birthday?” Teach “I feel … because …”.' },
+  { id: 'free', icon: '🌟', t: { fr: 'On jase!', en: 'Free chat', zh: zh('随便聊聊', 'suí biàn liáo liao') }, task: 'Free friendly chat about whatever the child wants (pets, games, cartoons, food, family). Keep it simple and fun.' },
 ];
 
 let live = null;   // current session
@@ -88,12 +92,12 @@ function codeBox(onSaved) {
   const i = el('input', { class: 'name-in code-in', type: 'password', inputmode: 'numeric', placeholder: '••••••', autocomplete: 'off', value: store.settings.voiceCode || '' });
   const ok = () => { store.settings.voiceCode = i.value.trim(); save(); sfx('tap'); onSaved?.(); };
   i.addEventListener('keydown', (e) => e.key === 'Enter' && ok());
-  return el('div', { class: 'code-box' }, el('span', {}, '🔑 ', tr(L.codeLabel)), i, el('button', { class: 'btn primary', onclick: ok }, 'OK'));
+  return el('div', { class: 'code-box' }, el('span', {}, '🔑 ', tr(L.codeLabel)), i, el('button', { class: 'btn primary', onclick: ok }, tr(L.ok)));
 }
 function badCode() {
   if (!live) return;
   const back = live.ui.back, tl = live.tl;
-  live.ui.status.textContent = tr(L.badCode);
+  setText(live.ui.status, tr(L.badCode));
   live.ui.status.after(codeBox(() => { end(true); talkHome(back, tl); }));
 }
 const voiceUrl = () => (store.settings.voiceUrl || VOICE_URL).replace(/\/$/, '');
@@ -102,20 +106,20 @@ export function talkHome(back, langArg) {
   let tl = langArg || store.pick.talkLang || 'en';
   if (!TALK_LANGS[tl]) tl = 'en';
   store.pick.talkLang = tl;
-  setZone(tl === 'en' ? 'en' : null);   // Talk in English = « English zone »: the whole screen reads in English
+  setZone(tl === 'en' || tl === 'zh' ? tl : null);   // Talk in English / Chinese = « English zone » / « Chinese zone »: the whole screen reads in that language
   const left = Math.max(0, dailyLimit() * 60 - usedToday());
   const ok = !!voiceUrl();
   let level = store.pick.talk || 1;
   const seg = el('div', { class: 'diff-seg' });
   const drawSeg = () => {
     seg.innerHTML = '';
-    for (const l of [1, 2, 3]) seg.append(el('button', { class: `${['', 'green', 'orange', 'red'][l]} ${l === level ? 'on' : ''}`, onclick: () => { sfx('tap'); level = l; store.pick.talk = l; save(); drawSeg(); } }, tr({ fr: ['', 'Facile', 'Moyen', 'Difficile'][l], en: ['', 'Easy', 'Medium', 'Hard'][l] })));
+    for (const l of [1, 2, 3]) seg.append(el('button', { class: `${['', 'green', 'orange', 'red'][l]} ${l === level ? 'on' : ''}`, onclick: () => { sfx('tap'); level = l; store.pick.talk = l; save(); drawSeg(); } }, tr(L.diff[l])));
   };
   drawSeg();
   screen('talk-screen green',
     el('header', { class: 'bar' }, backBtn(back), el('h1', {}, '🎙️ ', tr(L.title)), wallet()),
-    el('div', { class: 'talk-langs' }, Object.entries(TALK_LANGS).map(([k, T]) => el('button', { class: `talk-lang ${k === tl ? 'on' : ''}`, onclick: () => { sfx('tap'); store.pick.talkLang = k; save(); talkHome(back, k); } }, el('span', {}, T.flag), tl === 'en' ? T.t.en : T.name))),
-    el('p', { class: 'hub-intro' }, tr(L.pick), ' · ', `⏱️ ${Math.ceil(left / 60)} ${tr(L.left)}`),
+    el('div', { class: 'talk-langs' }, Object.entries(TALK_LANGS).map(([k, T]) => el('button', { class: `talk-lang ${k === tl ? 'on' : ''}`, onclick: () => { sfx('tap'); store.pick.talkLang = k; save(); talkHome(back, k); } }, el('span', {}, T.flag), getZone() ? tr(T.t) : T.name))),
+    el('p', { class: 'hub-intro' }, tr(L.pick), ' · ', `⏱️ ${Math.ceil(left / 60)} `, tr(L.left)),
     !ok ? el('div', { class: 'talk-warn' }, '⚙️ ', tr(L.noServer)) : null,
     ok && !store.settings.voiceCode ? el('div', { class: 'talk-warn' }, tr(L.needCode), codeBox(() => talkHome(back, tl))) : null,
     seg,
@@ -182,7 +186,7 @@ async function start(s, level, back, tl = 'en') {
   } catch (e) {
     console.warn('talk', e);
     const blocked = /NotAllowed|Permission/i.test(e?.name + e?.message);
-    ui.status.textContent = tr(blocked ? L.noMic : L.error);
+    setText(ui.status, tr(blocked ? L.noMic : L.error));
     cleanup();
   }
 }
@@ -214,12 +218,12 @@ async function localSession(base, instructions, code, kind) {
     return r.json();
   };
   try {
-    ui.status.textContent = tr(L.connecting);
+    setText(ui.status, tr(L.connecting));
     const first = await call('/start', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lang: code, instructions }) });
     if (!live) return;
     live.t0 = Date.now(); live.tick = setInterval(tick, 500);
     ui.log.after(btn);
-    ui.log.before(el('div', { class: 'talk-via' }, kind === 'pc' ? '🖥️ PC' : '☁️ Cloudflare'));
+    ui.log.before(el('div', { class: 'talk-via' }, kind === 'pc' ? '🖥️' : '☁️', getZone() === 'zh' ? '' : kind === 'pc' ? ' PC' : ' Cloudflare'));
     addLine('owl', first.reply); history.push({ role: 'assistant', content: first.reply });
     await say(first.audio, first.mime);
   } catch (e) {
@@ -240,7 +244,7 @@ async function localSession(base, instructions, code, kind) {
       rec = new MediaRecorder(mic, type ? { mimeType: type } : undefined);
       rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
       rec.start();
-      btn.textContent = `⏹ ${tr(L.tapSend)}`; btn.classList.add('rec'); setState('listening');
+      btn.replaceChildren('⏹ ', el('span', {}, tr(L.tapSend))); btn.classList.add('rec'); setState('listening');
       live.recTimer = setTimeout(() => rec && btn.onclick(), 20000);
       return;
     }
@@ -248,7 +252,7 @@ async function localSession(base, instructions, code, kind) {
     const r = rec; rec = null;
     await new Promise((res) => { r.onstop = res; r.stop(); });
     btn.disabled = true; btn.classList.remove('rec'); btn.textContent = '⏳ …';
-    ui.status.textContent = tr(L.thinking); ui.owlBox.className = 'talk-owl thinking';
+    setText(ui.status, tr(L.thinking)); ui.owlBox.className = 'talk-owl thinking';
     try {
       const blob = new Blob(chunks, { type: r.mimeType || 'audio/webm' });
       const fd = new FormData();
@@ -259,20 +263,20 @@ async function localSession(base, instructions, code, kind) {
       if (res.heard) { addLine('me', res.heard); history.push({ role: 'user', content: res.heard }); live.turns++; sfx('tap'); }
       addLine('owl', res.reply); history.push({ role: 'assistant', content: res.reply });
       await say(res.audio, res.mime);
-    } catch (e) { if (e.code === 401) badCode(); else if (live) ui.status.textContent = tr(L.error); }
-    if (live) { btn.disabled = false; btn.textContent = `🎤 ${tr(L.tapTalk)}`; }
+    } catch (e) { if (e.code === 401) badCode(); else if (live) setText(ui.status, tr(L.error)); }
+    if (live) { btn.disabled = false; btn.replaceChildren('🎤 ', el('span', {}, tr(L.tapTalk))); }
   };
   return true;
 }
 
 function setState(st) {
   if (!live) return;
-  live.ui.status.textContent = tr(st === 'listening' ? L.listening : st === 'ready' ? L.yourTurn : L.speaking);
+  setText(live.ui.status, tr(st === 'listening' ? L.listening : st === 'ready' ? L.yourTurn : L.speaking));
   live.ui.owlBox.className = `talk-owl ${st}`;
 }
 function addLine(who, text) {
   if (!live || !text?.trim()) return;
-  const n = el('div', { class: `tl ${who}` }, el('b', {}, who === 'me' ? `🧒 ${tr(L.you)}` : '🦉 Hoo'), ' ', text.trim());
+  const n = el('div', { class: `tl ${who}` }, el('b', {}, who === 'me' ? '🧒 ' : '🦉 ', tr(who === 'me' ? L.you : L.owl)), ' ', text.trim());
   live.ui.log.append(n);
   live.ui.log.scrollTop = live.ui.log.scrollHeight;
 }

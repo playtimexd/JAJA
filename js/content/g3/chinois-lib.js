@@ -6,6 +6,10 @@ export { isHan, hanLen };
 export const ZH = 'zh-CN';
 export const say = (text) => ({ text, lang: ZH });
 export const T = (fr, en) => ({ fr, en });
+// Chinese text with pinyin (everything the child sees in the « Chinese zone »). HC joins {hz,py} parts and plain strings
+// that hold no Han characters (pinyin, numbers, punctuation): HC(w, H('读作', 'dú zuò'), ` ${w.py}。`).
+export const H = (hz, py) => ({ hz, py });
+export const HC = (...parts) => ({ hz: parts.map((p) => (typeof p === 'string' ? p : p.hz)).join(''), py: parts.filter((p) => typeof p !== 'string' && p.py).map((p) => p.py).join(' ') });
 export const hand = (o) => ({ type: 'hand', lang: 'zh', ...o });
 export const hz = (h, p, extra = {}) => ({ hz: h, py: p, ...extra });
 export const label = (x) => (x.hz || '') + (x.emoji || '') + (x.svg || '') + (x.hz ? '' : JSON.stringify(x.text ?? x.py ?? ''));

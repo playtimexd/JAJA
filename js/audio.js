@@ -144,8 +144,11 @@ function voiceKey(l, text) {
 export async function speak(say, { interrupt = true } = {}) {
   if (!say || !store.settings.voice) return;
   let text = say.text, l = say.lang;
-  if (text && typeof text === 'object') { text = text[lang()] ?? text.fr; l = l || (lang() === 'fr' ? 'fr-CA' : 'en-CA'); }
-  if (!l) l = contentLang || (lang() === 'fr' ? 'fr-CA' : 'en-CA');
+  const uiVoice = () => ({ fr: 'fr-CA', zh: 'zh-CN' }[lang()] || 'en-CA');
+  if (text && typeof text === 'object' && !(text instanceof String) && typeof text.hz !== 'string') { text = text[lang()] ?? text.fr; l = l || uiVoice(); }
+  // Chinese text (ZhStr or {hz,py}): read the characters with the Chinese voice
+  if (text && typeof text === 'object' && typeof text.hz === 'string') { text = text.hz; l = 'zh-CN'; }
+  if (!l) l = contentLang || uiVoice();
   if (!text) return;
   text = String(text).replace(/☐/g, '').replace(/_{2,}/g, ' … ');
   if (interrupt) stopSpeech();

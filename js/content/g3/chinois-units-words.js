@@ -1,6 +1,7 @@
 // g3c17 measure words 量词, g3c18 antonyms & synonyms 反义词/近义词, g3c19 sentences & punctuation 连词成句/标点, g3c20 sentence-making 用词造句 (hand).
 import { WORDS } from './chinois-vocab.js';
-import { say, T, mc, hand, take, pyWrong, finish, split, hanLen, chk } from './chinois-lib.js';
+import { say, T, H, HC, mc, hand, take, pyWrong, finish, split, hanLen, chk } from './chinois-lib.js';
+const list = (a) => a.flatMap((c, i) => (i ? ['、', { hz: c.hz, py: c.py }] : [{ hz: c.hz, py: c.py }]));
 
 /* ======================= g3c17 — measure words ======================= */
 // mw|py|nouns (hz py… emoji, comma separated)
@@ -50,10 +51,11 @@ const KIN = [['只', '头', '条'], ['张', '幅'], ['朵', '片', '束'], ['本
 const compatible = (a, b) => KIN.some((g) => g.includes(a) && g.includes(b));
 const MWE = MWS.flatMap((m) => m.nouns.map((n) => ({ m, n })));
 const yiPy = (mwPy) => (split(mwPy).tone === 4 ? 'yí' : 'yì');
-const mwTip = (e) => T(`一${e.m.mw} (${yiPy(e.m.py)} ${e.m.py}) + ${e.n.hz} : ${e.n.hz} ${e.n.py} → 一${e.m.mw}${e.n.hz}.`, `一${e.m.mw} (${yiPy(e.m.py)} ${e.m.py}) + ${e.n.hz}: ${e.n.hz} ${e.n.py} → 一${e.m.mw}${e.n.hz}.`);
+const yiMw = (m) => ({ hz: `一${m.mw}`, py: `${yiPy(m.py)} ${m.py}` });
+const mwTip = (e) => HC(yiMw(e.m), ' + ', { hz: e.n.hz, py: e.n.py }, ' → ', { hz: `一${e.m.mw}${e.n.hz}`, py: `${yiPy(e.m.py)} ${e.m.py} ${e.n.py}` }, '。');
 const wrongMw = (R, e, n) => take(R, MWS.filter((m) => m.mw !== '个' && !(VALID[e.n.hz]?.has(m.mw)) && !compatible(m.mw, e.m.mw) && ![...VALID[e.n.hz] || []].some((v) => compatible(v, m.mw))), n);
 const g3c17 = finish({
-  id: 'g3c17', icon: '📏', title: T('Les mots de mesure 量词', 'Measure words 量词'),
+  id: 'g3c17', icon: '📏', title: { ...T('Les mots de mesure 量词', 'Measure words 量词'), zh: H('量词', 'liàng cí') },
   pfeq: 'Chinois — vocabulaire : les classificateurs (一只、一条、一本…) (2e–3e année)',
   generate(L, R) {
     const lvl = [1, 2, 3].includes(L) ? L : 2;
@@ -62,25 +64,25 @@ const g3c17 = finish({
     const nounToMw = () => {
       const wr = wrongMw(R, e, lvl === 1 ? 2 : 3);
       const stim = { hz: `一＿${e.n.hz}`, py: `${yiPy(e.m.py)} ${e.n.py}` };
-      return mc(`m1-${e.m.mw}-${e.n.hz}`, T(`Quel mot de mesure va avec ce mot ? ${e.n.em}`, `Which measure word goes with this word? ${e.n.em}`), mo(e.m, lvl < 3), wr.map((m) => mo(m, lvl < 3)), { stimulus: lvl === 3 ? { hz: `一＿${e.n.hz}` } : stim, say: say(`一${e.m.mw}${e.n.hz}`), cols: 2, tip: mwTip(e) });
+      return mc(`m1-${e.m.mw}-${e.n.hz}`, HC(H('选一个合适的量词。', 'xuǎn yí gè hé shì de liàng cí'), ` ${e.n.em}`), mo(e.m, lvl < 3), wr.map((m) => mo(m, lvl < 3)), { stimulus: lvl === 3 ? { hz: `一＿${e.n.hz}` } : stim, say: say(`一${e.m.mw}${e.n.hz}`), cols: 2, tip: mwTip(e) });
     };
     const mwToNoun = () => {
       const pool = MWE.filter((x) => x.n.hz !== e.n.hz && !(VALID[x.n.hz]?.has(e.m.mw)) && ![...VALID[x.n.hz]].some((v) => compatible(v, e.m.mw)));
       const wr = take(R, pool, lvl === 1 ? 2 : 3).map((x) => x.n);
       const o = (n, py) => (py ? { hz: n.hz, py: n.py, emoji: n.em } : { hz: n.hz });
-      return mc(`m2-${e.m.mw}-${e.n.hz}`, T('Quel mot va après ce mot de mesure ?', 'Which word goes after this measure word?'), o(e.n, lvl < 3), wr.map((n) => o(n, lvl < 3)), { stimulus: { hz: `一${e.m.mw}＿`, py: `${yiPy(e.m.py)} ${e.m.py}` }, say: say(`一${e.m.mw}${e.n.hz}`), cols: 2, tip: mwTip(e) });
+      return mc(`m2-${e.m.mw}-${e.n.hz}`, H('哪个词可以放在这个量词后面？', 'nǎ gè cí kě yǐ fàng zài zhè gè liàng cí hòu miàn'), o(e.n, lvl < 3), wr.map((n) => o(n, lvl < 3)), { stimulus: { hz: `一${e.m.mw}＿`, py: `${yiPy(e.m.py)} ${e.m.py}` }, say: say(`一${e.m.mw}${e.n.hz}`), cols: 2, tip: mwTip(e) });
     };
     const order = () => {
       const wr = wrongMw(R, e, 1)[0];
       const tiles = [{ hz: '一', py: yiPy(e.m.py) }, { hz: e.m.mw, py: e.m.py }, { hz: e.n.hz, py: e.n.py }];
-      return { type: 'order', key: `m3-${e.m.mw}-${e.n.hz}`, prompt: T(`Écoute. Remets dans l’ordre : un/une ${e.n.em}`, `Listen. Put in order: one ${e.n.em}`), say: say(`一${e.m.mw}${e.n.hz}`), tiles, extra: wr ? [{ hz: wr.mw, py: wr.py }] : undefined, joiner: '', tip: mwTip(e) };
+      return { type: 'order', key: `m3-${e.m.mw}-${e.n.hz}`, prompt: HC(H('听一听，排一排。', 'tīng yì tīng pái yì pái'), ` ${e.n.em}`), say: say(`一${e.m.mw}${e.n.hz}`), tiles, extra: wr ? [{ hz: wr.mw, py: wr.py }] : undefined, joiner: '', tip: mwTip(e) };
     };
     const sortMw = () => {
       const a = R.pick(MWS.filter((m) => m.mw !== '个')); const cands = MWS.filter((m) => m !== a && m.mw !== '个' && a.mw !== '个' && !compatible(m.mw, a.mw) && !m.nouns.some((n) => a.nouns.some((x) => x.hz === n.hz))); if (!cands.length) return nounToMw(); const b = R.pick(cands);
       const ia = take(R, a.nouns, 3).filter((n) => !VALID[n.hz].has(b.mw)), ib = take(R, b.nouns, 3).filter((n) => !VALID[n.hz].has(a.mw));
       if (ia.length < 2 || ib.length < 2) return nounToMw();
       const items = R.shuffle([...ia.map((n) => ({ hz: n.hz, py: n.py, emoji: n.em, bin: 0 })), ...ib.map((n) => ({ hz: n.hz, py: n.py, emoji: n.em, bin: 1 }))]);
-      return { type: 'sort', key: `m4-${a.mw}-${b.mw}-${items.map((i) => i.hz).sort().join('')}`, prompt: T('Range chaque mot avec son mot de mesure.', 'Put each word with its measure word.'), bins: [{ hz: `一${a.mw}`, py: `${yiPy(a.py)} ${a.py}` }, { hz: `一${b.mw}`, py: `${yiPy(b.py)} ${b.py}` }], items, tip: T(`一${a.mw} : ${a.nouns.map((n) => n.hz).join(' ')} ; 一${b.mw} : ${b.nouns.map((n) => n.hz).join(' ')}.`, `一${a.mw}: ${a.nouns.map((n) => n.hz).join(' ')}; 一${b.mw}: ${b.nouns.map((n) => n.hz).join(' ')}.`) };
+      return { type: 'sort', key: `m4-${a.mw}-${b.mw}-${items.map((i) => i.hz).sort().join('')}`, prompt: H('分一分：每个词和哪个量词搭配？', 'fēn yì fēn měi gè cí hé nǎ gè liàng cí dā pèi'), bins: [yiMw(a), yiMw(b)], items, tip: HC(yiMw(a), '：', ...list(a.nouns), '；', yiMw(b), '：', ...list(b.nouns), '。') };
     };
     if (lvl === 1) return R.pick([nounToMw, nounToMw, mwToNoun, order])();
     if (lvl === 2) return R.pick([nounToMw, mwToNoun, order, sortMw])();
@@ -169,17 +171,17 @@ const SO = SYN.flatMap((p) => [{ w: p.a, py: p.pa, o: p.b, opy: p.pb, p }, { w: 
 const ANTW = new Set(ANT.flatMap((p) => [p.a, p.b])), SYNW = new Set(SYN.flatMap((p) => [p.a, p.b]));
 const ow = (x, py) => (py ? { hz: x.hz, py: x.py } : { hz: x.hz });
 const g3c18 = finish({
-  id: 'g3c18', icon: '↔️', title: T('Contraires et mots proches 反义词和近义词', 'Opposites and similar words 反义词和近义词'),
+  id: 'g3c18', icon: '↔️', title: { ...T('Contraires et mots proches 反义词和近义词', 'Opposites and similar words 反义词和近义词'), zh: H('反义词和近义词', 'fǎn yì cí hé jìn yì cí') },
   pfeq: 'Chinois — vocabulaire : antonymes et synonymes (2e–3e année)',
   generate(L, R) {
     const lvl = [1, 2, 3].includes(L) ? L : 2;
     const useSyn = lvl >= 2 && R.chance(lvl === 2 ? 0.35 : 0.5);
     const list = useSyn ? SO : AO;
     const e = lvl === 1 ? R.pick(AO.filter((x) => [...x.w].length === 1)) : R.pick(list);
-    const kind = useSyn ? T('un mot qui a presque le même sens que', 'a word with almost the same meaning as') : T('le contraire de', 'the opposite of');
-    const tip = useSyn ? T(`${e.w} (${e.py}) et ${e.o} (${e.opy}) ont presque le même sens.`, `${e.w} (${e.py}) and ${e.o} (${e.opy}) mean almost the same.`) : T(`${e.w} (${e.py}) ↔ ${e.o} (${e.opy}) : ce sont des contraires.`, `${e.w} (${e.py}) ↔ ${e.o} (${e.opy}): they are opposites.`);
+    const W = { hz: e.w, py: e.py }, O = { hz: e.o, py: e.opy };
+    const tip = useSyn ? HC(W, H('和', 'hé'), O, H('意思差不多。', 'yì si chà bu duō')) : HC(W, ' ↔ ', O, H('：意思相反。', 'yì si xiāng fǎn'));
     function same2() { return list.filter((x) => x.p !== e.p && [...x.w].length === [...e.w].length).flatMap((x) => [{ hz: x.w, py: x.py }, { hz: x.o, py: x.opy }]); }
-    const pick = () => mc(`g3c18-${useSyn ? 's' : 'a'}-${e.w}-${e.o}`, T(`Quel est ${kind.fr} ?`, `What is ${kind.en}?`), ow({ hz: e.o, py: e.opy }, lvl < 3), take(R, same2().filter((x) => x.hz !== e.o && x.hz !== e.w), lvl === 1 ? 2 : 3).map((x) => ow(x, lvl < 3)), { stimulus: { hz: e.w, py: e.py }, say: say(e.w), cols: 2, tip });
+    const pick = () => mc(`g3c18-${useSyn ? 's' : 'a'}-${e.w}-${e.o}`, useSyn ? H('哪个词和它的意思差不多？', 'nǎ gè cí hé tā de yì si chà bu duō') : H('它的反义词是哪个？', 'tā de fǎn yì cí shì nǎ gè'), ow({ hz: e.o, py: e.opy }, lvl < 3), take(R, same2().filter((x) => x.hz !== e.o && x.hz !== e.w), lvl === 1 ? 2 : 3).map((x) => ow(x, lvl < 3)), { stimulus: { hz: e.w, py: e.py }, say: say(e.w), cols: 2, tip });
     const isPair = () => {
       // which pair really are opposites / similar?
       const q = R.pick(list.length ? (useSyn ? SYN : ANT) : ANT), q2 = R.pick((useSyn ? SYN : ANT).filter((x) => x !== q && [...x.a].length === [...q.a].length));
@@ -187,7 +189,7 @@ const g3c18 = finish({
       const mix = (a, b) => ({ hz: `${a.a} ${b.b}`, py: `${a.pa} ${b.pb}` });
       const others = take(R, (useSyn ? SYN : ANT).filter((x) => x !== q && x !== q2 && [...x.a].length === [...q.a].length), 2);
       const wrong = [mix(q, q2), ...others.map((o) => mix(o, q))];
-      return mc(`g3c18-p-${useSyn ? 's' : 'a'}-${q.a}`, useSyn ? T('Quelle paire a presque le même sens ?', 'Which pair means almost the same?') : T('Quelle paire est faite de contraires ?', 'Which pair are opposites?'), right, wrong.slice(0, 3), { cols: 2, tip: useSyn ? T(`${q.a} = ${q.b}.`, `${q.a} = ${q.b}.`) : T(`${q.a} ↔ ${q.b}.`, `${q.a} ↔ ${q.b}.`) });
+      return mc(`g3c18-p-${useSyn ? 's' : 'a'}-${q.a}`, useSyn ? H('哪一对词意思差不多？', 'nǎ yí duì cí yì si chà bu duō') : H('哪一对词意思相反？', 'nǎ yí duì cí yì si xiāng fǎn'), right, wrong.slice(0, 3), { cols: 2, tip: HC({ hz: q.a, py: q.pa }, useSyn ? ' = ' : ' ↔ ', { hz: q.b, py: q.pb }) });
     };
     if (lvl === 3 && R.chance(0.3)) return isPair();
     return pick();
@@ -291,33 +293,34 @@ const COMMAS = COMMA_TXT.trim().split('\n').map((l) => { const [hz, py] = l.spli
 const NAMES = [['。', '句号 jù hào', 'point (fin de phrase)', 'full stop'], ['，', '逗号 dòu hào', 'virgule', 'comma'], ['？', '问号 wèn hào', 'point d’interrogation', 'question mark'], ['！', '叹号 tàn hào', 'point d’exclamation', 'exclamation mark'], ['、', '顿号 dùn hào', 'virgule de liste', 'list comma']];
 const ENDS = ['。', '？', '！'];
 const exOk = (s) => s.end !== '！' || /真|好大|快乐|加油|谢谢|快看|小心/.test(s.hz);
-const PUNCT_TIP = T('？ à la fin d’une question (吗, 什么, 谁, 几, 哪…). ！ pour un cri ou une grande émotion. 。 pour une phrase simple. ， entre deux petites parties ; 、 entre les mots d’une liste.', '？ ends a question (吗, 什么, 谁, 几, 哪…). ！ shows a cry or strong feeling. 。 ends a plain sentence. ， separates two parts; 、 separates items in a list.');
+const PUNCT_TIP = H('问问题用问号？；大声喊或很激动用叹号！；一句话说完用句号。；句子中间停一停用逗号，；几个词语排在一起用顿号、。', 'wèn wèn tí yòng wèn hào dà shēng hǎn huò hěn jī dòng yòng tàn hào yí jù huà shuō wán yòng jù hào jù zi zhōng jiān tíng yì tíng yòng dòu hào jǐ gè cí yǔ pái zài yì qǐ yòng dùn hào');
 const g3c19 = finish({
-  id: 'g3c19', icon: '🧱', title: T('Phrases et ponctuation 连词成句和标点', 'Sentences and punctuation 连词成句和标点'),
+  id: 'g3c19', icon: '🧱', title: { ...T('Phrases et ponctuation 连词成句和标点', 'Sentences and punctuation 连词成句和标点'), zh: H('连词成句和标点', 'lián cí chéng jù hé biāo diǎn') },
   pfeq: 'Chinois — langue : former une phrase avec des mots, la ponctuation (，。？！、) (2e–3e année)',
   generate(L, R) {
     const lvl = [1, 2, 3].includes(L) ? L : 2;
     const orderQ = () => {
       const s = R.pick(SENTS.filter((x) => (lvl === 1 ? x.tiles.length <= 5 : lvl === 2 ? x.tiles.length >= 4 : x.tiles.length >= 5)));
       const ex = lvl === 3 ? [R.pick(SENTS.filter((x) => x !== s)).tiles[0]].filter((t) => !s.tiles.some((y) => y.hz === t.hz)) : undefined;
-      return { type: 'order', key: `g3c19-o-${s.hz}`, prompt: T(lvl === 3 ? 'Remets les mots dans l’ordre pour faire une phrase. (Un mot est de trop.)' : 'Remets les mots dans l’ordre pour faire une phrase.', lvl === 3 ? 'Put the words in order to make a sentence. (One word is extra.)' : 'Put the words in order to make a sentence.'), say: lvl < 3 ? say(s.hz) : undefined, tiles: s.tiles, extra: ex && ex.length ? ex : undefined, joiner: '', tip: T(`${s.hz} (${s.py})`, `${s.hz} (${s.py})`) };
+      return { type: 'order', key: `g3c19-o-${s.hz}`, prompt: lvl === 3 ? H('把词语排成一句话。有一个词是多余的。', 'bǎ cí yǔ pái chéng yí jù huà yǒu yí gè cí shì duō yú de') : H('把词语排成一句话。', 'bǎ cí yǔ pái chéng yí jù huà'), say: lvl < 3 ? say(s.hz) : undefined, tiles: s.tiles, extra: ex && ex.length ? ex : undefined, joiner: '', tip: { hz: s.hz, py: s.py } };
     };
     const endQ = () => {
       const s = R.pick(SENTS.filter(exOk));
       const opts = (lvl === 1 ? (s.end === '！' ? ['！', '。'] : s.end === '？' ? ['？', '。'] : ['。', '？']) : ENDS).map((m) => ({ text: m }));
       const right = opts.find((o) => o.text === s.end);
-      return mc(`g3c19-e-${s.hz}`, T('Quel signe faut-il à la fin de la phrase ?', 'Which mark ends the sentence?'), right, opts.filter((o) => o !== right), { stimulus: { hz: `${s.body}＿`, py: s.py }, say: say(s.hz), cols: 3, tip: PUNCT_TIP });
+      return mc(`g3c19-e-${s.hz}`, H('句子末尾用什么标点？', 'jù zi mò wěi yòng shén me biāo diǎn'), right, opts.filter((o) => o !== right), { stimulus: { hz: `${s.body}＿`, py: s.py }, say: say(s.hz), cols: 3, tip: PUNCT_TIP });
     };
     const commaQ = () => {
       const c = R.pick(COMMAS);
       const hz = `${c.hz.slice(0, c.idx)}＿${c.hz.slice(c.idx + 1)}`;
       const opts = lvl === 1 ? [c.mark, c.mark === '，' ? '。' : '，'] : ['，', '、', '。'];
-      return mc(`g3c19-c-${c.hz}`, T('Quel signe va dans le trou ?', 'Which mark goes in the gap?'), { text: c.mark }, opts.filter((m) => m !== c.mark).map((m) => ({ text: m })), { stimulus: { hz, py: c.py }, say: say(c.hz), cols: 3, tip: PUNCT_TIP });
+      return mc(`g3c19-c-${c.hz}`, H('空格里填什么标点？', 'kòng gé lǐ tián shén me biāo diǎn'), { text: c.mark }, opts.filter((m) => m !== c.mark).map((m) => ({ text: m })), { stimulus: { hz, py: c.py }, say: say(c.hz), cols: 3, tip: PUNCT_TIP });
     };
     const nameQ = () => {
-      const [m, , fr, en] = R.pick(NAMES);
+      const nm = (x) => { const [h, ...p] = x[1].split(' '); return { hz: h, py: p.join(' ') }; };
+      const right = R.pick(NAMES), m = right[0];
       const wr = take(R, NAMES.filter((x) => x[0] !== m), lvl === 1 ? 2 : 3);
-      return mc(`g3c19-n-${m}`, T('Comment s’appelle ce signe ?', 'What is this mark called?'), { text: T(`${NAMES.find((x) => x[0] === m)[1]} · ${fr}`, `${NAMES.find((x) => x[0] === m)[1]} · ${en}`) }, wr.map((x) => ({ text: T(`${x[1]} · ${x[2]}`, `${x[1]} · ${x[3]}`) })), { stimulus: { text: m }, tip: PUNCT_TIP });
+      return mc(`g3c19-n-${m}`, H('这个标点叫什么？', 'zhè gè biāo diǎn jiào shén me'), nm(right), wr.map(nm), { stimulus: { text: m }, tip: PUNCT_TIP });
     };
     if (lvl === 1) return R.pick([orderQ, orderQ, endQ, nameQ, commaQ])();
     if (lvl === 2) return R.pick([orderQ, orderQ, endQ, commaQ, nameQ])();
@@ -351,20 +354,20 @@ const PATS = `
 又…又…|yòu … yòu …|à la fois… et…|both… and…
 `.trim().split('\n').map((l) => { const [h, p, fr, en] = l.split('|'); return { hz: h, py: p, fr, en }; });
 const g3c20 = finish({
-  id: 'g3c20', icon: '💬', title: T('Faire des phrases 用词造句', 'Making sentences 用词造句'),
+  id: 'g3c20', icon: '💬', title: { ...T('Faire des phrases 用词造句', 'Making sentences 用词造句'), zh: H('用词造句', 'yòng cí zào jù') },
   pfeq: 'Chinois — écriture : écrire une phrase avec un mot ou un modèle donné (2e–3e année)',
   generate(L, R) {
     if (L === 1) {
       const n = R.pick(NOUNS);
-      return hand({ mode: 'sentence', key: `g3c20-1-${n.hz}`, prompt: T(`Écris une phrase avec le mot « ${n.hz} » (${n.py}).`, `Write a sentence with the word “${n.hz}” (${n.py}).`), stimulus: { emoji: n.em }, say: say(n.hz), words: [n.hz], minWords: 4, lines: 2 });
+      return hand({ mode: 'sentence', key: `g3c20-1-${n.hz}`, prompt: HC(H('用', 'yòng'), '“', { hz: n.hz, py: n.py }, '”', H('写一句话。', 'xiě yí jù huà')), stimulus: { emoji: n.em }, say: say(n.hz), words: [n.hz], minWords: 4, lines: 2 });
     }
     if (L === 2) {
       const n = R.pick(NOUNS), v = R.pick(VERBS);
-      return hand({ mode: 'sentence', key: `g3c20-2-${n.hz}-${v.hz}`, prompt: T(`Écris une phrase avec les deux mots : « ${n.hz} » (${n.py}) et « ${v.hz} » (${v.py}, ${v.fr}).`, `Write a sentence with both words: “${n.hz}” (${n.py}) and “${v.hz}” (${v.py}, ${v.en}).`), stimulus: { emoji: n.em }, say: say(`${n.hz}，${v.hz}`), words: [n.hz, v.hz], minWords: 5, lines: 2 });
+      return hand({ mode: 'sentence', key: `g3c20-2-${n.hz}-${v.hz}`, prompt: HC(H('用', 'yòng'), '“', { hz: n.hz, py: n.py }, '”', H('和', 'hé'), '“', { hz: v.hz, py: v.py }, '”', H('写一句话。', 'xiě yí jù huà')), stimulus: { emoji: n.em }, say: say(`${n.hz}，${v.hz}`), words: [n.hz, v.hz], minWords: 5, lines: 2 });
     }
     const p = R.pick(PATS), n = R.pick(NOUNS);
     const parts = p.hz.split('…').filter(Boolean);
-    return hand({ mode: 'sentence', key: `g3c20-3-${p.hz}-${n.hz}`, prompt: T(`Écris une phrase avec « ${p.hz} » (${p.py}, ${p.fr}) et le mot « ${n.hz} » (${n.py}).`, `Write a sentence with “${p.hz}” (${p.py}, ${p.en}) and the word “${n.hz}” (${n.py}).`), stimulus: { emoji: n.em }, say: say(p.hz.replace(/…/g, '，')), words: [...parts, n.hz], minWords: 8, lines: 3 });
+    return hand({ mode: 'sentence', key: `g3c20-3-${p.hz}-${n.hz}`, prompt: HC(H('用', 'yòng'), '“', { hz: p.hz, py: p.py.replace(/…/g, ' ').trim().split(/\s+/).join(' ') }, '”', H('和', 'hé'), '“', { hz: n.hz, py: n.py }, '”', H('写一句话。', 'xiě yí jù huà')), stimulus: { emoji: n.em }, say: say(p.hz.replace(/…/g, '，')), words: [...parts, n.hz], minWords: 8, lines: 3 });
   },
   allSay() { return [...NOUNS.map((n) => say(n.hz)), ...PATS.map((p) => say(p.hz.replace(/…/g, '，')))]; },
 });

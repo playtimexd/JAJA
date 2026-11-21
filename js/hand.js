@@ -1,22 +1,23 @@
 // Handwriting answers (type `hand`): a lined pad for Apple Pencil / finger, AI reading + gentle correction.
 // Server: worker /ai/write (free Cloudflare AI first, OpenAI as backup). Without a server: self-check against the model answer.
 import { el } from './util.js';
-import { tr } from './i18n.js';
+import { tr, zh } from './i18n.js';
 import { speak, sfx } from './audio.js';
 import { store } from './store.js';
 import { VOICE_URL } from './config.js';
 
 const L = {
-  check: { fr: 'Vérifier', en: 'Check' },
-  reading: { fr: 'Hibou lit ton écriture…', en: 'Owl is reading your writing…' },
-  read: { fr: 'Hibou a lu :', en: 'Owl read:' },
-  fix: { fr: 'À corriger :', en: 'To fix:' },
-  model: { fr: 'Réponse modèle :', en: 'Model answer:' },
-  empty: { fr: 'Écris d’abord ta réponse.', en: 'Write your answer first.' },
-  offline: { fr: 'Hibou ne peut pas lire en ce moment. Compare avec la réponse :', en: 'Owl cannot read right now. Compare with the answer:' },
-  yes: { fr: 'J’ai réussi', en: 'I got it' }, no: { fr: 'Pas encore', en: 'Not yet' },
-  pen: { fr: 'Crayon', en: 'Pen' }, eraser: { fr: 'Gomme', en: 'Eraser' }, keyboard: { fr: 'Clavier', en: 'Keyboard' },
-  words: { fr: 'Mots à utiliser :', en: 'Words to use:' },
+  check: { fr: 'Vérifier', en: 'Check', zh: zh('检查', 'jiǎn chá') },
+  reading: { fr: 'Hibou lit ton écriture…', en: 'Owl is reading your writing…', zh: zh('猫头鹰在看你写的字……', 'māo tóu yīng zài kàn nǐ xiě de zì') },
+  read: { fr: 'Hibou a lu :', en: 'Owl read:', zh: zh('猫头鹰看到：', 'māo tóu yīng kàn dào') },
+  fix: { fr: 'À corriger :', en: 'To fix:', zh: zh('要改正：', 'yào gǎi zhèng') },
+  model: { fr: 'Réponse modèle :', en: 'Model answer:', zh: zh('参考答案：', 'cān kǎo dá àn') },
+  empty: { fr: 'Écris d’abord ta réponse.', en: 'Write your answer first.', zh: zh('先写你的答案。', 'xiān xiě nǐ de dá àn') },
+  offline: { fr: 'Hibou ne peut pas lire en ce moment. Compare avec la réponse :', en: 'Owl cannot read right now. Compare with the answer:', zh: zh('猫头鹰现在看不了。和答案比一比：', 'māo tóu yīng xiàn zài kàn bù liǎo hé dá àn bǐ yì bǐ') },
+  yes: { fr: 'J’ai réussi', en: 'I got it', zh: zh('我写对了', 'wǒ xiě duì le') }, no: { fr: 'Pas encore', en: 'Not yet', zh: zh('还没有', 'hái méi yǒu') },
+  pen: { fr: 'Crayon', en: 'Pen', zh: zh('笔', 'bǐ') }, eraser: { fr: 'Gomme', en: 'Eraser', zh: zh('橡皮', 'xiàng pí') }, keyboard: { fr: 'Clavier', en: 'Keyboard', zh: zh('键盘', 'jiàn pán') },
+  undo: { fr: 'Annuler', en: 'Undo', zh: zh('撤销', 'chè xiāo') }, clear: { fr: 'Effacer', en: 'Clear', zh: zh('清除', 'qīng chú') },
+  words: { fr: 'Mots à utiliser :', en: 'Words to use:', zh: zh('要用的词：', 'yào yòng de cí') },
 };
 const voiceUrl = () => (store.settings.voiceUrl || VOICE_URL).replace(/\/$/, '');
 const norm = (s) => String(s).replace(/[，。！？、；：]/g, ' ').toLowerCase().replace(/[’']/g, "'").replace(/[.,!?;:«»"“”]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -98,8 +99,8 @@ export function hand(q, area, ctx) {
   const kbBtn = tool('⌨️', L.keyboard, () => { const k = ta.classList.toggle('hidden'); canvas.classList.toggle('hidden', !k); if (!k) ta.focus(); kbBtn.classList.toggle('on', !k); });
   const setTools = () => { penBtn.classList.toggle('on', mode === 'pen'); erBtn.classList.toggle('on', mode === 'eraser'); };
   const tools = el('div', { class: 'hand-tools' }, penBtn, erBtn,
-    tool('↶', { fr: 'Annuler', en: 'Undo' }, () => { strokes.pop(); redraw(); }),
-    tool('🗑️', { fr: 'Effacer', en: 'Clear' }, () => { strokes.length = 0; redraw(); }), kbBtn);
+    tool('↶', L.undo, () => { strokes.pop(); redraw(); }),
+    tool('🗑️', L.clear, () => { strokes.length = 0; redraw(); }), kbBtn);
 
   const out = el('div', { class: 'hand-out' });
   const checkBtn = el('button', { class: 'btn check' }, '✓ ', tr(L.check));
@@ -113,11 +114,16 @@ export function hand(q, area, ctx) {
     out.innerHTML = '';
     if (res.text) out.append(el('div', { class: 'hand-read' }, el('b', {}, tr(L.read), ' '), dictDiff(res.text)));
     if (res.corrections?.length) out.append(el('div', { class: 'hand-fix' }, el('b', {}, tr(L.fix), ' '), res.corrections.map((c) => el('span', { class: 'fx' }, el('s', {}, c.wrong), ' → ', el('b', {}, c.right)))));
-    if (res.feedback) { out.append(el('div', { class: 'hand-fb' }, '🦉 ', res.feedback)); speak({ text: res.feedback, lang: { fr: 'fr-CA', en: 'en-CA', zh: 'zh-CN' }[lang] }); }
+    if (res.feedback) { out.append(el('div', { class: 'hand-fb' }, '🦉 ', lang === 'zh' && res.feedbackPy ? zh(res.feedback, res.feedbackPy) : res.feedback)); speak({ text: res.feedback, lang: { fr: 'fr-CA', en: 'en-CA', zh: 'zh-CN' }[lang] }); }
   };
   // dictation: mark the words that differ from the dictated sentence
   const dictDiff = (text) => {
-    if (q.mode !== 'dictation' || !q.expected) return el('span', {}, `« ${text} »`);
+    const [qo, qc] = lang === 'zh' ? ['“', '”'] : ['« ', ' »'];
+    if (q.mode !== 'dictation' || !q.expected) return el('span', {}, `${qo}${text}${qc}`);
+    if (lang === 'zh') {                                // Chinese dictation: character by character
+      const want = [...q.expected.replace(/[，。！？、；：\s]/g, '')], got = [...String(text).replace(/[，。！？、；：\s]/g, '')];
+      return el('span', {}, qo, got.map((c, i) => el('span', { class: want[i] === c ? 'ok-w' : 'bad-w' }, c)), qc);
+    }
     const want = norm(q.expected).split(' '), got = norm(text).split(' ');
     return el('span', {}, '« ', got.map((w, i) => el('span', { class: want[i] === w ? 'ok-w' : 'bad-w' }, w, ' ')), '»');
   };
@@ -125,7 +131,7 @@ export function hand(q, area, ctx) {
   checkBtn.addEventListener('click', async () => {
     if (area.classList.contains('locked') || checkBtn.disabled) return;
     const typed = !ta.classList.contains('hidden') ? ta.value.trim() : '';
-    if (!typed && !strokes.some((s) => !s.erase)) { out.textContent = tr(L.empty); sfx('bad'); return; }
+    if (!typed && !strokes.some((s) => !s.erase)) { out.replaceChildren(el('span', {}, tr(L.empty))); sfx('bad'); return; }
     checkBtn.disabled = true; out.innerHTML = ''; out.append(el('div', { class: 'hand-wait' }, '⏳ ', tr(L.reading)));
     let res = null;
     try {
@@ -133,7 +139,8 @@ export function hand(q, area, ctx) {
       const r = await fetch(`${voiceUrl()}/ai/write`, {
         method: 'POST', headers: { 'content-type': 'application/json', ...(store.settings.voiceCode ? { 'x-family-code': store.settings.voiceCode } : {}) },
         body: JSON.stringify({ lang, mode: q.mode, image: typed ? undefined : canvas.toDataURL('image/png'), typed: typed || undefined,
-          expected: q.expected, answerKey: q.answerKey, text: q.stimulus?.text ? tr(q.stimulus.text) : undefined, question: tr(q.prompt), words: q.words, minWords: q.minWords }),
+          expected: q.expected, answerKey: q.answerKey, text: q.stimulus?.text ? String(tr(q.stimulus.text)) : q.stimulus?.hz || undefined,
+          question: String(q.prompt?.hz ?? tr(q.prompt)), words: q.words, minWords: q.minWords }),
         signal: AbortSignal.timeout(45000),
       });
       if (!r.ok) throw new Error('server ' + r.status);

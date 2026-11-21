@@ -20,7 +20,7 @@ export function toks(src) {
 }
 export const P = (svg, src) => { const tokens = toks(src); return { svg, text: tokens.map((t) => t.hz).join(''), tokens }; };
 export const Z = (src) => { const t = toks(src); return { hz: t.map((x) => x.hz).join(''), py: t.filter((x) => x.py).map((x) => x.py).join(' ') }; };
-export const W = (src, def, emoji) => { const z = Z(src); return { word: z.hz, py: z.py, def: def.replace(/\([^)]*\)/g, ''), emoji }; }; // def = very simple Chinese; its pinyin in parentheses is stripped (cards show plain text)
+export const W = (src, def, emoji) => { const z = Z(src), d = Z(def); return { word: z.hz, py: z.py, def: d.hz, defPy: d.py, emoji }; }; // def = very simple Chinese with its pinyin (shown over the characters)
 export const Q = (q, options, answer) => { const n = options.length, k = (q.length + n) % n, o = options.map(Z); return { q: Z(q), options: o.map((_, i) => o[(i + n - k) % n]), answer: (answer + k) % n }; }; // the right answer moves around deterministically
 
 // ---------------------------------------------------------------- picture primitives

@@ -3,8 +3,8 @@
 //   ctx.mistake()                                     (soft mistake, used by sort)
 //   ctx.finish()                                      (sort finished)
 //   ctx.revealed()                                    (widget finished showing the right answer)
-import { el, wait } from './util.js';
-import { tr, t } from './i18n.js';
+import { el, wait, RICH } from './util.js';
+import { tr, t, zh } from './i18n.js';
 import { speak, sfx } from './audio.js';
 import { store } from './store.js';
 
@@ -29,6 +29,10 @@ export function hanzi(hz, py, cls = '') {
   }
   return n;
 }
+
+RICH.zh = (s) => hanzi(s.hz, s.py, 'ui');
+// set a node's text from a UI string (keeps pinyin for Chinese)
+export const setText = (n, x) => { n.replaceChildren(); n.append(x && typeof x === 'object' && typeof x.hz === 'string' ? hanzi(x.hz, x.py, 'ui') : String(x ?? '')); };
 
 export function face(o, cls = '') {
   const f = el('span', { class: `face ${cls}` });
@@ -361,7 +365,7 @@ function write(q, area, ctx) {
   const grid = `<svg class="hw-grid" viewBox="0 0 100 100"><rect x="1" y="1" width="98" height="98" fill="none" stroke="#e5534b" stroke-width="1.5"/><path d="M0 0L100 100M100 0L0 100M50 0V100M0 50H100" stroke="#e5534b" stroke-width=".6" stroke-dasharray="3 3"/></svg>`;
   box.innerHTML = grid;
   const pin = el('div', { class: 'hw-py' }, hanzi(q.char, q.py, 'big'));
-  const watchBtn = el('button', { class: 'btn' }, '▶ ', tr({ fr: 'Regarder', en: 'Watch' }));
+  const watchBtn = el('button', { class: 'btn' }, '▶ ', tr({ fr: 'Regarder', en: 'Watch', zh: zh('看一看', 'kàn yí kàn') }));
   const msg = el('div', { class: 'hw-msg' });
   area.append(el('div', { class: 'hw-wrap' }, el('div', { class: 'hw-side' }, pin, watchBtn, msg), box));
   loadHW().then((HW) => {
@@ -372,7 +376,7 @@ function write(q, area, ctx) {
     watchBtn.onclick = () => { sfx('tap'); w.cancelQuiz?.(); w.animateCharacter({ onComplete: quiz }); };
     w.animateCharacter({ onComplete: quiz });
   }).catch(() => {
-    msg.textContent = tr({ fr: 'Il faut Internet pour cet exercice.', en: 'This exercise needs the Internet.' });
+    setText(msg, tr({ fr: 'Il faut Internet pour cet exercice.', en: 'This exercise needs the Internet.', zh: zh('这个练习要连上网络。', 'zhè gè liàn xí yào lián shàng wǎng luò') }));
     ctx.finish();
   });
 }

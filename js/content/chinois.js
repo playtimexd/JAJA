@@ -1,11 +1,15 @@
 // Chinese (中文) for Petit Hibou, part 1: Hanyu Pinyin and first characters (人教版一年级 level).
 // Simplified characters + pinyin with tone marks. Units c1..c14, 3 levels each.
-// Instructions are {fr, en}; Chinese audio uses say: { text, lang: 'zh-CN' }.
+// Instructions and tips are Chinese {hz, py} (« Chinese zone »: nothing in French or English reaches the child);
+// Chinese audio uses say: { text, lang: 'zh-CN' }. fr/en glosses stay in the data for parents only.
 // Careful rules: one pinyin syllable per Han character, neutral tone = no mark ('mā ma'),
 // no audio-only question has two possible answers (homophones filtered), no 3rd+3rd tone words in listening tasks.
 
 const Z = 'zh-CN';
 const sayZ = (t) => ({ text: t, lang: Z });
+const H = (hz, py) => ({ hz, py });
+// joins Chinese pieces ({hz,py}) and non-Han strings (pinyin, digits, punctuation) into one {hz,py}
+const HC = (...parts) => ({ hz: parts.map((p) => (typeof p === 'string' ? p : p.hz)).join(''), py: parts.filter((p) => typeof p !== 'string' && p.py).map((p) => p.py).join(' ') });
 const take = (R, a, n) => R.sample(a, Math.min(n, a.length));
 const nd = (L) => (L === 1 ? 2 : 3); // number of wrong options: 3 / 4 / 4 options
 const pyOf = (py) => ({ py });
@@ -75,17 +79,15 @@ function nearSyl(py) {
 
 // ---------- prompts ----------
 const P = {
-  hearPic: { fr: 'Écoute. Touche la bonne image.', en: 'Listen. Tap the right picture.' },
-  seePic: { fr: 'Quelle image va avec ce mot?', en: 'Which picture goes with this word?' },
-  picChar: { fr: 'Quel mot va avec l’image?', en: 'Which word goes with the picture?' },
-  hearChar: { fr: 'Écoute. Touche le bon caractère.', en: 'Listen. Tap the right character.' },
-  seePy: { fr: 'Lis le pinyin. Touche le bon caractère.', en: 'Read the pinyin. Tap the right character.' },
-  meaning: { fr: 'Que veut dire ce mot?', en: 'What does this word mean?' },
-  pyPick: { fr: 'Quel est le pinyin de ce mot?', en: 'What is the pinyin of this word?' },
-  hearPy: { fr: 'Écoute. Touche le bon pinyin.', en: 'Listen. Tap the right pinyin.' },
-  hearMean: { fr: 'Écoute. Que veut dire ce mot?', en: 'Listen. What does this word mean?' },
-  lookSame: { fr: 'Touche exactement le même caractère.', en: 'Tap exactly the same character.' },
-  meanBack: (w) => ({ fr: `Touche le mot qui veut dire « ${w.fr} ».`, en: `Tap the word that means “${w.en}”.` }),
+  hearPic: H('听一听，选出对的图。', 'tīng yì tīng xuǎn chū duì de tú'),
+  seePic: H('这个字是哪张图？', 'zhè gè zì shì nǎ zhāng tú'),
+  picChar: H('看图，选出对的字。', 'kàn tú xuǎn chū duì de zì'),
+  hearChar: H('听一听，选出对的字。', 'tīng yì tīng xuǎn chū duì de zì'),
+  seePy: H('读拼音，选出对的字。', 'dú pīn yīn xuǎn chū duì de zì'),
+  meaning: H('读一读，这个字是什么意思？选出对的图。', 'dú yì dú zhè gè zì shì shén me yì si xuǎn chū duì de tú'),
+  pyPick: H('这个字的拼音是什么？', 'zhè gè zì de pīn yīn shì shén me'),
+  hearPy: H('听一听，选出对的拼音。', 'tīng yì tīng xuǎn chū duì de pīn yīn'),
+  lookSame: H('找一个一模一样的字。', 'zhǎo yí gè yì mú yí yàng de zì'),
 };
 
 // ---------- vocabulary ----------
@@ -224,10 +226,11 @@ const VT = {
     const d = L === 3 ? lookOthers(R, w, pool, 3) : others(R, w, pool, nd(L), {});
     return mc('xp:' + w.hz, P.seePy, oHz(w, false), d.map((x) => oHz(x, false)), { say: sayZ(w.hz), stimulus: { text: w.py } });
   },
+  // read the word (pinyin only at level 1), show what it means by picking its picture
   meaning(R, w, pool, L) {
-    if (w.nm) return null;
-    const d = others(R, w, pool, nd(L), { mean: true });
-    return mc('mn:' + w.hz, P.meaning, { text: { fr: w.fr, en: w.en } }, d.map((x) => ({ text: { fr: x.fr, en: x.en } })), { say: sayZ(w.hz), stimulus: { hz: w.hz, py: w.py } });
+    if (w.nm || !w.e) return null;
+    const d = others(R, w, pool, nd(L), { pic: true });
+    return mc('mn:' + w.hz, P.meaning, { emoji: w.e }, d.map((x) => ({ emoji: x.e })), { say: sayZ(w.hz), stimulus: L === 1 ? { hz: w.hz, py: w.py } : { hz: w.hz } });
   },
   pyPick(R, w, pool, L) {
     let wrong;
@@ -246,15 +249,17 @@ const VT = {
     if (wrong.length < 3) return null;
     return mc('hy:' + w.hz, P.hearPy, pyOf(w.py), wrong.map(pyOf), { say: sayZ(w.hz) });
   },
+  // picture → the characters, without pinyin (silent: the child must read)
   meanBack(R, w, pool) {
-    if (w.nm) return null;
-    const d = others(R, w, pool, 3, { mean: true });
-    return mc('mb:' + w.hz, P.meanBack(w), oHz(w, false), d.map((x) => oHz(x, false)));
+    if (w.nm || !w.e) return null;
+    const d = others(R, w, pool, 3, {});
+    return mc('mb:' + w.hz, P.picChar, oHz(w, false), d.map((x) => oHz(x, false)), { stimulus: { emoji: w.e } });
   },
+  // hear the word, pick its picture among 4
   hearMean(R, w, pool) {
-    if (w.nm) return null;
-    const d = others(R, w, pool, 3, { mean: true });
-    return mc('hm:' + w.hz, P.hearMean, { text: { fr: w.fr, en: w.en } }, d.map((x) => ({ text: { fr: x.fr, en: x.en } })), { say: sayZ(w.hz) });
+    if (w.nm || !w.e) return null;
+    const d = others(R, w, pool, 3, { pic: true });
+    return mc('hm:' + w.hz, P.hearPic, { emoji: w.e }, d.map((x) => ({ emoji: x.e })), { say: sayZ(w.hz) });
   },
   lookSame(R, w, pool) {
     const d = lookOthers(R, w, pool, 3);
@@ -295,10 +300,10 @@ const EASY = ['ma', 'ba', 'yi', 'wu', 'shu', 'fu', 'mi', 'ji', 'qi', 'xi', 'shi'
 const ARROW = ['→', '↗', '↘↗', '↘'];
 const contourOpt = (t) => ({ text: `${t}  ${ARROW[t - 1]}` });
 const VOWELS = [['a', '啊'], ['o', '哦'], ['e', '鹅'], ['i', '衣'], ['u', '乌'], ['ü', '鱼']];
-const ORD = [{ fr: '1er', en: '1st' }, { fr: '2e', en: '2nd' }, { fr: '3e', en: '3rd' }, { fr: '4e', en: '4th' }];
+const TONE_Q = [H('选出第一声的拼音。', 'xuǎn chū dì yī shēng de pīn yīn'), H('选出第二声的拼音。', 'xuǎn chū dì èr shēng de pīn yīn'), H('选出第三声的拼音。', 'xuǎn chū dì sān shēng de pīn yīn'), H('选出第四声的拼音。', 'xuǎn chū dì sì shēng de pīn yīn')];
 
 const c1 = {
-  id: 'c1', icon: '🎵', title: { fr: 'Voyelles et 4 tons · 单韵母与四声', en: 'Vowels & 4 tones · 单韵母与四声' },
+  id: 'c1', icon: '🎵', title: { fr: 'Voyelles et 4 tons · 单韵母与四声', en: 'Vowels & 4 tones · 单韵母与四声', zh: H('单韵母与四声', 'dān yùn mǔ yǔ sì shēng') },
   pfeq: 'Chinois — pinyin : voyelles et tons (1re année, programme chinois)',
   generate(L, R) {
     const types = L === 1 ? ['tonePick', 'contour', 'vowelPick'] : L === 2 ? ['tonePick', 'contour', 'vowelPick', 'vowelTone', 'markPick'] : ['tonePick', 'contour', 'vowelPick', 'vowelTone', 'markPick', 'tonePick'];
@@ -308,24 +313,24 @@ const c1 = {
     const others = [1, 2, 3, 4].filter((x) => x !== t);
     if (type === 'tonePick') {
       const ws = L === 1 ? take(R, others, 2) : others;
-      return mc(`tp:${s}${t}`, { fr: 'Écoute. Quel est le bon ton?', en: 'Listen. Which tone is it?' }, pyOf(py), ws.map((x) => pyOf(mark(s, x))), { say: sayZ(hz) });
+      return mc(`tp:${s}${t}`, H('听一听，选出对的声调。', 'tīng yì tīng xuǎn chū duì de shēng diào'), pyOf(py), ws.map((x) => pyOf(mark(s, x))), { say: sayZ(hz) });
     }
     if (type === 'contour') {
       const ws = L === 1 ? take(R, others, 2) : others;
-      return mc(`ct:${s}${t}`, { fr: 'Regarde le pinyin. Quelle est la mélodie de ce ton?', en: 'Look at the pinyin. What is the melody of this tone?' }, contourOpt(t), ws.map(contourOpt), { say: sayZ(hz), stimulus: { text: py } });
+      return mc(`ct:${s}${t}`, H('看拼音，这是第几声？', 'kàn pīn yīn zhè shì dì jǐ shēng'), contourOpt(t), ws.map(contourOpt), { say: sayZ(hz), stimulus: { text: py } });
     }
     if (type === 'vowelPick') {
       const [v, vh] = R.pick(VOWELS);
       const ws = take(R, VOWELS.filter((x) => x[0] !== v), L === 1 ? 2 : L === 2 ? 3 : 5).map((x) => pyOf(x[0]));
-      return mc(`vp:${v}`, { fr: 'Écoute. Quelle voyelle entends-tu?', en: 'Listen. Which vowel do you hear?' }, pyOf(v), ws, { say: sayZ(vh), cols: 3 });
+      return mc(`vp:${v}`, H('听一听，这是哪个单韵母？', 'tīng yì tīng zhè shì nǎ gè dān yùn mǔ'), pyOf(v), ws, { say: sayZ(vh), cols: 3 });
     }
     if (type === 'vowelTone') {
       const [v] = R.pick(VOWELS), tt = R.int(1, 4);
       const key = v === 'ü' ? 'v' : v;
-      return mc(`vt:${v}${tt}`, { fr: 'Regarde la voyelle. Quelle est la mélodie de ce ton?', en: 'Look at the vowel. What is the melody of this tone?' }, contourOpt(tt), [1, 2, 3, 4].filter((x) => x !== tt).map(contourOpt), { stimulus: { text: mark(key, tt) } });
+      return mc(`vt:${v}${tt}`, H('看韵母上的声调，这是第几声？', 'kàn yùn mǔ shàng de shēng diào zhè shì dì jǐ shēng'), contourOpt(tt), [1, 2, 3, 4].filter((x) => x !== tt).map(contourOpt), { stimulus: { text: mark(key, tt) } });
     }
     // markPick: "touch the Nth tone"
-    return mc(`mk:${s}${t}`, { fr: `Touche la syllabe au ${ORD[t - 1].fr} ton (${ARROW[t - 1]}).`, en: `Tap the syllable with the ${ORD[t - 1].en} tone (${ARROW[t - 1]}).` }, pyOf(py), others.map((x) => pyOf(mark(s, x))));
+    return mc(`mk:${s}${t}`, HC(TONE_Q[t - 1], ` ${ARROW[t - 1]}`), pyOf(py), others.map((x) => pyOf(mark(s, x))));
   },
 };
 
@@ -360,27 +365,27 @@ const addSyl = (hz, py) => { const s = py.split(' ')[0]; if (!SYLS.some((x) => x
 IW.forEach((w) => addSyl(w.hz, w.py));
 
 const c2 = {
-  id: 'c2', icon: '🔤', title: { fr: 'Consonnes initiales · 声母', en: 'Initials · 声母' },
+  id: 'c2', icon: '🔤', title: { fr: 'Consonnes initiales · 声母', en: 'Initials · 声母', zh: H('声母', 'shēng mǔ') },
   pfeq: 'Chinois — pinyin : initiales (1re année, programme chinois)',
   generate(L, R) {
     const w = R.pick(IW);
     const types = L === 1 ? ['hearIni', 'picIni', 'seeIni', 'iniWord'] : L === 2 ? ['hearIni', 'picIni', 'iniWord', 'seeIni'] : ['hearIni', 'iniWord', 'iniPy', 'picIni', 'iniPy'];
     const t = R.pick(types);
-    const Pi = { fr: 'Par quelle lettre commence ce mot?', en: 'Which letter does this word start with?' };
-    if (t === 'hearIni') return mc(`hi:${w.ini}`, { fr: 'Écoute. Par quelle lettre commence ce mot?', en: 'Listen. Which letter does this word start with?' }, pyOf(w.ini), iniOpts(R, w.ini, L), { say: sayZ(w.hz), cols: 4 });
+    const Pi = H('这个字的声母是什么？', 'zhè gè zì de shēng mǔ shì shén me');
+    if (t === 'hearIni') return mc(`hi:${w.ini}`, H('听一听，这个字的声母是什么？', 'tīng yì tīng zhè gè zì de shēng mǔ shì shén me'), pyOf(w.ini), iniOpts(R, w.ini, L), { say: sayZ(w.hz), cols: 4 });
     if (t === 'picIni') return mc(`pi:${w.ini}`, Pi, pyOf(w.ini), iniOpts(R, w.ini, L), { say: sayZ(w.hz), stimulus: { emoji: w.e }, cols: 4 });
     if (t === 'seeIni') return mc(`si:${w.ini}`, Pi, pyOf(w.ini), iniOpts(R, w.ini, L), { say: sayZ(w.hz), stimulus: { hz: w.hz, py: w.py }, cols: 4 });
     if (t === 'iniWord') {
       const pool = IW.filter((x) => x.ini !== w.ini && (L === 3 ? iniClose(w.ini).includes(x.ini) : L === 1 ? !grp(w.ini).includes(x.ini) : true));
       const d = take(R, pool, L === 1 ? 2 : 3);
       const o = (x) => (L === 1 ? { hz: x.hz, py: x.py, emoji: x.e } : { hz: x.hz, py: x.py });
-      return mc(`iw:${w.ini}`, { fr: `Quel mot commence par « ${w.ini} »?`, en: `Which word starts with “${w.ini}”?` }, o(w), d.map(o), { stimulus: { text: w.ini } });
+      return mc(`iw:${w.ini}`, HC(H('哪个字的声母是', 'nǎ gè zì de shēng mǔ shì'), ` ${w.ini}？`), o(w), d.map(o), { stimulus: { text: w.ini } });
     }
     // iniPy: which syllable starts with the initial
     const right = R.pick(SYLS.filter((s) => s.ini === w.ini));
     const wrongPool = SYLS.filter((s) => s.ini !== w.ini && (L === 3 ? iniClose(w.ini).includes(s.ini) : true));
     const wrong = take(R, wrongPool, 3);
-    return mc(`ip:${w.ini}`, { fr: `Quelle syllabe commence par « ${w.ini} »?`, en: `Which syllable starts with “${w.ini}”?` }, pyOf(right.py), wrong.map((s) => pyOf(s.py)), { stimulus: { text: w.ini } });
+    return mc(`ip:${w.ini}`, HC(H('哪个音节的声母是', 'nǎ gè yīn jié de shēng mǔ shì'), ` ${w.ini}？`), pyOf(right.py), wrong.map((s) => pyOf(s.py)), { stimulus: { text: w.ini } });
   },
 };
 
@@ -411,7 +416,7 @@ const blendWrong = (R, w, L) => { // toneless wrong syllables near ini+fin
 };
 
 const c3 = {
-  id: 'c3', icon: '🧩', title: { fr: 'Assembler les sons · 拼读', en: 'Blending sounds · 拼读' },
+  id: 'c3', icon: '🧩', title: { fr: 'Assembler les sons · 拼读', en: 'Blending sounds · 拼读', zh: H('拼读', 'pīn dú') },
   pfeq: 'Chinois — pinyin : lecture de syllabes (1re année, programme chinois)',
   generate(L, R) {
     const types = L === 1 ? ['hearPy', 'seePyPic', 'blendO', 'blendC'] : L === 2 ? ['hearPy', 'seePyPic', 'blendO', 'blendC'] : ['hearPy', 'seePyHz', 'blendO', 'blendC', 'hearPy'];
@@ -430,7 +435,7 @@ const c3 = {
     }
     if (t === 'seePyPic') {
       const d = take(R, PIC1.filter((x) => x.py !== w.py && x.e !== w.e), nd(L));
-      return mc(`sy:${w.hz}`, { fr: 'Lis le pinyin. Touche la bonne image.', en: 'Read the pinyin. Tap the right picture.' }, { emoji: w.e }, d.map((x) => ({ emoji: x.e })), { say: sayZ(w.hz), stimulus: { text: w.py } });
+      return mc(`sy:${w.hz}`, H('读拼音，选出对的图。', 'dú pīn yīn xuǎn chū duì de tú'), { emoji: w.e }, d.map((x) => ({ emoji: x.e })), { say: sayZ(w.hz), stimulus: { text: w.py } });
     }
     if (t === 'seePyHz') {
       const lk = lookOthers(R, { hz: w.hz, py: w.py }, ALL, 3);
@@ -438,13 +443,13 @@ const c3 = {
     }
     if (t === 'blendC') {
       const wrong = take(R, blendWrong(R, w, L), nd(L)).map((s) => pyOf(s));
-      return mc(`bc:${w.hz}`, { fr: 'Mets les sons ensemble. Que lis-tu?', en: 'Blend the sounds. What do you read?' }, pyOf(w.ini + w.fin), wrong, { say: sayZ(w.hz), stimulus: { text: `${w.ini} + ${w.fin}` } });
+      return mc(`bc:${w.hz}`, H('拼一拼，读出来是什么？', 'pīn yì pīn dú chū lái shì shén me'), pyOf(w.ini + w.fin), wrong, { say: sayZ(w.hz), stimulus: { text: `${w.ini} + ${w.fin}` } });
     }
     // blendO: build the syllable from its pieces
     const oi = R.pick(PIC1.filter((x) => x.ini && x.ini !== w.ini));
     const extra = L === 1 ? [oi.ini] : L === 2 ? [oi.ini, oi.finM] : [NEAR_INI[w.ini] || oi.ini, mark(NEAR_FIN[w.fin] || oi.fin, w.tone)];
     const stim = L === 1 ? { emoji: w.e } : L === 2 ? { hz: w.hz } : undefined;
-    const q = { type: 'order', key: `bo:${w.hz}`, prompt: { fr: 'Écoute. Remets les sons dans l’ordre.', en: 'Listen. Put the sounds in order.' }, say: sayZ(w.hz), tiles: [w.ini, w.finM], extra: uniqStr(extra).filter((x) => x !== w.ini && x !== w.finM), joiner: '' };
+    const q = { type: 'order', key: `bo:${w.hz}`, prompt: H('听一听，把拼音排好。', 'tīng yì tīng bǎ pīn yīn pái hǎo'), say: sayZ(w.hz), tiles: [w.ini, w.finM], extra: uniqStr(extra).filter((x) => x !== w.ini && x !== w.finM), joiner: '' };
     if (stim) q.stimulus = stim;
     return q;
   },
@@ -491,33 +496,33 @@ const finOpts = (R, fin, L) => {
 };
 
 const c4 = {
-  id: 'c4', icon: '🔗', title: { fr: 'Voyelles composées et nasales · 复韵母和鼻韵母', en: 'Compound & nasal finals · 复韵母和鼻韵母' },
+  id: 'c4', icon: '🔗', title: { fr: 'Voyelles composées et nasales · 复韵母和鼻韵母', en: 'Compound & nasal finals · 复韵母和鼻韵母', zh: H('复韵母和鼻韵母', 'fù yùn mǔ hé bí yùn mǔ') },
   pfeq: 'Chinois — pinyin : finales composées et nasales (1re année, programme chinois)',
   generate(L, R) {
     const types = L === 1 ? ['hearFin', 'seeFin', 'finWord', 'hearFin'] : L === 2 ? ['hearFin', 'seeFin', 'finWord', 'finOrder'] : ['hearFin', 'finWord', 'finOrder', 'sortFin', 'hearFin'];
     const t = R.pick(types);
     const w = R.pick(F4);
-    if (t === 'hearFin') return mc(`hf:${w.hz}`, { fr: 'Écoute. Quelle finale entends-tu dans ce mot?', en: 'Listen. Which final do you hear in this word?' }, pyOf(w.fin), finOpts(R, w.fin, L), { say: sayZ(w.hz), cols: 4 });
-    if (t === 'seeFin') return mc(`sf:${w.hz}`, { fr: 'Quelle finale vois-tu dans ce mot?', en: 'Which final is in this word?' }, pyOf(w.fin), finOpts(R, w.fin, L), { say: sayZ(w.hz), stimulus: { hz: w.hz, py: w.py }, cols: 4 });
+    if (t === 'hearFin') return mc(`hf:${w.hz}`, H('听一听，这个字的韵母是什么？', 'tīng yì tīng zhè gè zì de yùn mǔ shì shén me'), pyOf(w.fin), finOpts(R, w.fin, L), { say: sayZ(w.hz), cols: 4 });
+    if (t === 'seeFin') return mc(`sf:${w.hz}`, H('这个字的韵母是什么？', 'zhè gè zì de yùn mǔ shì shén me'), pyOf(w.fin), finOpts(R, w.fin, L), { say: sayZ(w.hz), stimulus: { hz: w.hz, py: w.py }, cols: 4 });
     if (t === 'finWord') {
       const pool = F4.filter((x) => x.fin !== w.fin && x.py !== w.py && (L === 3 ? NEAR4[w.fin].includes(x.fin) : L === 1 ? !NEAR4[w.fin].includes(x.fin) : true) && (L > 1 || x.e));
       const seen = new Set();
       const d = R.shuffle(pool).filter((x) => { if (seen.has(x.fin + (L === 3 ? x.hz : ''))) return false; seen.add(x.fin + (L === 3 ? x.hz : '')); return true; }).slice(0, L === 1 ? 2 : 3);
       const o = (x) => (L === 1 ? { hz: x.hz, py: x.py, emoji: x.e } : { hz: x.hz, py: x.py });
-      if (L === 1 && !w.e) return mc(`fw:${w.hz}`, { fr: `Quel mot a la finale « ${w.fin} »?`, en: `Which word has the final “${w.fin}”?` }, { hz: w.hz, py: w.py }, d.map((x) => ({ hz: x.hz, py: x.py })), { stimulus: { text: w.fin } });
-      return mc(`fw:${w.hz}`, { fr: `Quel mot a la finale « ${w.fin} »?`, en: `Which word has the final “${w.fin}”?` }, o(w), d.map(o), { stimulus: { text: w.fin } });
+      if (L === 1 && !w.e) return mc(`fw:${w.hz}`, HC(H('哪个字的韵母是', 'nǎ gè zì de yùn mǔ shì'), ` ${w.fin}？`), { hz: w.hz, py: w.py }, d.map((x) => ({ hz: x.hz, py: x.py })), { stimulus: { text: w.fin } });
+      return mc(`fw:${w.hz}`, HC(H('哪个字的韵母是', 'nǎ gè zì de yùn mǔ shì'), ` ${w.fin}？`), o(w), d.map(o), { stimulus: { text: w.fin } });
     }
     if (t === 'finOrder') {
       const x = R.pick(F4.filter((y) => y.ini));
       const oi = R.pick(F4.filter((y) => y.ini && y.fin !== x.fin));
       const extra = L === 2 ? [oi.ini, oi.finM] : [oi.ini, mark(NEAR4[x.fin][0].replace('ü', 'v'), x.tone).replace('v', 'ü')];
-      return { type: 'order', key: `fo:${x.hz}`, prompt: { fr: 'Écoute. Remets les sons dans l’ordre.', en: 'Listen. Put the sounds in order.' }, say: sayZ(x.hz), stimulus: L === 2 ? { hz: x.hz } : undefined, tiles: [x.ini, x.finM], extra: uniqStr(extra).filter((z) => z !== x.ini && z !== x.finM), joiner: '' };
+      return { type: 'order', key: `fo:${x.hz}`, prompt: H('听一听，把拼音排好。', 'tīng yì tīng bǎ pīn yīn pái hǎo'), say: sayZ(x.hz), stimulus: L === 2 ? { hz: x.hz } : undefined, tiles: [x.ini, x.finM], extra: uniqStr(extra).filter((z) => z !== x.ini && z !== x.finM), joiner: '' };
     }
     // sortFin: two close finals
     const a = w.fin, b = R.pick(NEAR4[a].slice(0, 2));
     const ia = take(R, F4.filter((x) => x.fin === a), 3), ib = take(R, F4.filter((x) => x.fin === b), 3);
     const items = R.shuffle([...ia.map((x) => ({ hz: x.hz, py: x.py, bin: 0 })), ...ib.map((x) => ({ hz: x.hz, py: x.py, bin: 1 }))]);
-    return { type: 'sort', key: `sf:${a}:${b}:${items.map((x) => x.hz).sort().join('')}`, prompt: { fr: 'Place chaque mot dans la bonne boîte (selon sa finale).', en: 'Put each word in the right box (by its final).' }, bins: [{ text: a }, { text: b }], items };
+    return { type: 'sort', key: `sf:${a}:${b}:${items.map((x) => x.hz).sort().join('')}`, prompt: H('看韵母，把字放进对的盒子里。', 'kàn yùn mǔ bǎ zì fàng jìn duì de hé zi lǐ'), bins: [{ text: a }, { text: b }], items };
   },
 };
 
@@ -538,7 +543,7 @@ const W5 = [
 ].map(([hz, py, e]) => ({ hz, py, e, neutral: py.split(' ').some((s) => !split(s).tone), rep: hz[0] === hz[1] }));
 
 const c5 = {
-  id: 'c5', icon: '🎼', title: { fr: 'Le grand défi des tons · 声调大挑战', en: 'The big tone challenge · 声调大挑战' },
+  id: 'c5', icon: '🎼', title: { fr: 'Le grand défi des tons · 声调大挑战', en: 'The big tone challenge · 声调大挑战', zh: H('声调大挑战', 'shēng diào dà tiǎo zhàn') },
   pfeq: 'Chinois — pinyin : tons de mots de deux syllabes (1re année, programme chinois)',
   generate(L, R) {
     const types = L === 1 ? ['hearTone', 'hearPic', 'hearTone'] : L === 2 ? ['hearTone', 'hzPick', 'neutral', 'order', 'hearTone'] : ['hearTone', 'pyPick', 'hzPick', 'neutral', 'order'];
@@ -550,30 +555,30 @@ const c5 = {
       else if (L === 2) pool = uniqStr([...variants(w.py), ...variantsAll(w.py)]);
       else pool = variants(w.py);
       const wrong = take(R, pool, nd(L));
-      return mc(`ht:${w.hz}`, { fr: 'Écoute. Quel est le bon pinyin?', en: 'Listen. Which is the right pinyin?' }, pyOf(w.py), wrong.map(pyOf), { say: sayZ(w.hz), cols: L === 1 ? 3 : 2 });
+      return mc(`ht:${w.hz}`, H('听一听，选出对的拼音。', 'tīng yì tīng xuǎn chū duì de pīn yīn'), pyOf(w.py), wrong.map(pyOf), { say: sayZ(w.hz), cols: L === 1 ? 3 : 2 });
     }
     if (t === 'pyPick') {
       const wrong = take(R, variants(w.py), 3);
-      return mc(`pp:${w.hz}`, { fr: 'Quel est le pinyin de ce mot?', en: 'What is the pinyin of this word?' }, pyOf(w.py), wrong.map(pyOf), { say: sayZ(w.hz), stimulus: { hz: w.hz }, cols: 2 });
+      return mc(`pp:${w.hz}`, H('这个词的拼音是什么？', 'zhè gè cí de pīn yīn shì shén me'), pyOf(w.py), wrong.map(pyOf), { say: sayZ(w.hz), stimulus: { hz: w.hz }, cols: 2 });
     }
     if (t === 'hearPic') {
       const d = take(R, W5.filter((x) => x.e && x.e !== w.e), 2);
-      return mc(`hp:${w.hz}`, { fr: 'Écoute. Touche la bonne image.', en: 'Listen. Tap the right picture.' }, { emoji: w.e }, d.map((x) => ({ emoji: x.e })), { say: sayZ(w.hz) });
+      return mc(`hp:${w.hz}`, H('听一听，选出对的图。', 'tīng yì tīng xuǎn chū duì de tú'), { emoji: w.e }, d.map((x) => ({ emoji: x.e })), { say: sayZ(w.hz) });
     }
     if (t === 'hzPick') {
       const d = take(R, W5.filter((x) => x.py !== w.py && x.hz !== w.hz), 3);
-      return mc(`hz:${w.hz}`, { fr: 'Lis le pinyin. Touche le bon mot.', en: 'Read the pinyin. Tap the right word.' }, { hz: w.hz, py: L === 2 ? w.py : undefined }, d.map((x) => ({ hz: x.hz, py: L === 2 ? x.py : undefined })), { say: sayZ(w.hz), stimulus: { text: w.py } });
+      return mc(`hz:${w.hz}`, H('读拼音，选出对的词。', 'dú pīn yīn xuǎn chū duì de cí'), { hz: w.hz, py: L === 2 ? w.py : undefined }, d.map((x) => ({ hz: x.hz, py: L === 2 ? x.py : undefined })), { say: sayZ(w.hz), stimulus: { text: w.py } });
     }
     if (t === 'neutral') {
       const nw = R.pick(W5.filter((x) => x.neutral)), d = take(R, W5.filter((x) => !x.neutral), nd(L));
-      return mc(`nt:${nw.hz}`, { fr: 'Lequel a un ton neutre (une syllabe sans accent)?', en: 'Which one has a neutral tone (a syllable with no mark)?' }, { hz: nw.hz, py: nw.py }, d.map((x) => ({ hz: x.hz, py: x.py })));
+      return mc(`nt:${nw.hz}`, H('哪个词有轻声？', 'nǎ gè cí yǒu qīng shēng'), { hz: nw.hz, py: nw.py }, d.map((x) => ({ hz: x.hz, py: x.py })));
     }
     // order the two characters
     const ow = R.pick(W5.filter((x) => !x.rep));
     const [a, b] = [...ow.hz], [pa, pb] = ow.py.split(' ');
     const other = R.pick(W5.filter((x) => !x.rep && !ow.hz.includes([...x.hz][0]) && !ow.hz.includes([...x.hz][1])));
     const tile = (hz, py) => (L === 2 ? { hz, py } : { hz });
-    return { type: 'order', key: `od:${ow.hz}`, prompt: { fr: 'Écoute. Remets les caractères dans l’ordre.', en: 'Listen. Put the characters in order.' }, say: sayZ(ow.hz), tiles: [tile(a, pa), tile(b, pb)], extra: [tile([...other.hz][0], other.py.split(' ')[0])], joiner: '' };
+    return { type: 'order', key: `od:${ow.hz}`, prompt: H('听一听，把字排好。', 'tīng yì tīng bǎ zì pái hǎo'), say: sayZ(ow.hz), tiles: [tile(a, pa), tile(b, pb)], extra: [tile([...other.hz][0], other.py.split(' ')[0])], joiner: '' };
   },
 };
 
@@ -592,7 +597,7 @@ function numHz(n) {
 }
 const DOTS = ['🍎', '⭐', '🐟', '🌸', '🎈'];
 const c6 = {
-  id: 'c6', icon: '🔢', title: { fr: 'Les nombres · 数字', en: 'Numbers · 数字' },
+  id: 'c6', icon: '🔢', title: { fr: 'Les nombres · 数字', en: 'Numbers · 数字', zh: H('数字', 'shù zì') },
   pfeq: 'Chinois — nombres 一 à 十, 百, 千 (1re année, programme chinois)',
   generate(L, R) {
     const types = L === 1 ? ['hearNum', 'seeNum', 'digitHz', 'dotsHz', 'hearDots', 'keypad', 'order']
@@ -614,36 +619,36 @@ const c6 = {
       return take(R, [...set].filter((x) => x > 0 || (L === 2 && x === 0)), k);
     };
     const k = nd(L);
-    if (t === 'hearNum') return mc(`hn:${n}`, { fr: 'Écoute. Touche le bon nombre.', en: 'Listen. Tap the right number.' }, { text: String(n) }, near(k).map((x) => ({ text: String(x) })), { say: sayZ(h.hz), cols: 4 });
-    if (t === 'seeNum') return mc(`sn:${n}`, { fr: 'Quel est ce nombre?', en: 'What number is this?' }, { text: String(n) }, near(k).map((x) => ({ text: String(x) })), { say: sayZ(h.hz), stimulus: { hz: h.hz, py: h.py }, cols: 4 });
-    if (t === 'digitHz') return mc(`dh:${n}`, { fr: 'Touche le bon caractère pour ce nombre.', en: 'Tap the right characters for this number.' }, { hz: h.hz, ...(L < 3 ? { py: h.py } : {}) }, near(k).map((x) => ({ hz: numHz(x).hz, ...(L < 3 ? { py: numHz(x).py } : {}) })), { say: sayZ(h.hz), stimulus: { text: String(n) }, cols: 4 });
+    if (t === 'hearNum') return mc(`hn:${n}`, H('听一听，选出对的数。', 'tīng yì tīng xuǎn chū duì de shù'), { text: String(n) }, near(k).map((x) => ({ text: String(x) })), { say: sayZ(h.hz), cols: 4 });
+    if (t === 'seeNum') return mc(`sn:${n}`, H('这是多少？', 'zhè shì duō shǎo'), { text: String(n) }, near(k).map((x) => ({ text: String(x) })), { say: sayZ(h.hz), stimulus: { hz: h.hz, py: h.py }, cols: 4 });
+    if (t === 'digitHz') return mc(`dh:${n}`, H('这个数用汉字怎么写？', 'zhè gè shù yòng hàn zì zěn me xiě'), { hz: h.hz, ...(L < 3 ? { py: h.py } : {}) }, near(k).map((x) => ({ hz: numHz(x).hz, ...(L < 3 ? { py: numHz(x).py } : {}) })), { say: sayZ(h.hz), stimulus: { text: String(n) }, cols: 4 });
     if (t === 'dotsHz') {
       const e = R.pick(DOTS);
-      return mc(`dz:${n}`, { fr: 'Compte. Touche le bon nombre.', en: 'Count. Tap the right number.' }, { hz: h.hz, ...(L < 3 ? { py: h.py } : {}) }, near(k).map((x) => ({ hz: numHz(x).hz, ...(L < 3 ? { py: numHz(x).py } : {}) })), { say: sayZ(h.hz), stimulus: { emojis: e, count: n }, cols: 4 });
+      return mc(`dz:${n}`, H('数一数，一共有几个？', 'shù yí shù yí gòng yǒu jǐ gè'), { hz: h.hz, ...(L < 3 ? { py: h.py } : {}) }, near(k).map((x) => ({ hz: numHz(x).hz, ...(L < 3 ? { py: numHz(x).py } : {}) })), { say: sayZ(h.hz), stimulus: { emojis: e, count: n }, cols: 4 });
     }
     if (t === 'hearDots') {
       const e = R.pick(DOTS);
       const ws = take(R, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].filter((x) => x !== n), k);
-      return mc(`hd:${n}`, { fr: 'Écoute. Touche les bons objets.', en: 'Listen. Tap the right group.' }, { emoji: e.repeat(n) }, ws.map((x) => ({ emoji: e.repeat(x) })), { say: sayZ(h.hz), cols: 2 });
+      return mc(`hd:${n}`, H('听一听，选出对的一组。', 'tīng yì tīng xuǎn chū duì de yì zǔ'), { emoji: e.repeat(n) }, ws.map((x) => ({ emoji: e.repeat(x) })), { say: sayZ(h.hz), cols: 2 });
     }
-    if (t === 'keypad') return { type: 'keypad', key: `kp:${n}`, prompt: { fr: 'Écris ce nombre avec le clavier.', en: 'Type this number on the keypad.' }, say: sayZ(h.hz), stimulus: { hz: h.hz, py: h.py }, answer: n };
+    if (t === 'keypad') return { type: 'keypad', key: `kp:${n}`, prompt: H('用键盘写出这个数。', 'yòng jiàn pán xiě chū zhè gè shù'), say: sayZ(h.hz), stimulus: { hz: h.hz, py: h.py }, answer: n };
     // order
     const len = L === 1 ? 3 : 4, hi = L === 3 ? 18 : 10;
     const s = R.int(1, Math.max(1, hi - len + 1));
     const seq = Array.from({ length: len }, (_, i) => s + i);
-    return { type: 'order', key: `od:${s}:${len}`, prompt: { fr: 'Écoute. Mets les nombres dans l’ordre.', en: 'Listen. Put the numbers in order.' }, say: sayZ(seq.map((x) => numHz(x).hz).join('，')), tiles: seq.map((x) => ({ hz: numHz(x).hz, py: numHz(x).py })), joiner: ' ' };
+    return { type: 'order', key: `od:${s}:${len}`, prompt: H('听一听，把数排好。', 'tīng yì tīng bǎ shù pái hǎo'), say: sayZ(seq.map((x) => numHz(x).hz).join('，')), tiles: seq.map((x) => ({ hz: numHz(x).hz, py: numHz(x).py })), joiner: ' ' };
   },
 };
 
 // =====================================================================
 // c7-c12 vocabulary units (shared generator)
 // =====================================================================
-const c7 = vocabUnit('c7', '🌿', { fr: 'La nature · 大自然', en: 'Nature · 大自然' }, 'Chinois — caractères : la nature (1re année, programme chinois)', W7);
-const c8 = vocabUnit('c8', '🧍', { fr: 'Le corps · 身体', en: 'The body · 身体' }, 'Chinois — caractères : le corps (1re année, programme chinois)', W8);
-const c9 = vocabUnit('c9', '👨‍👩‍👧', { fr: 'La famille · 家人', en: 'Family · 家人' }, 'Chinois — caractères : la famille et les pronoms (1re année, programme chinois)', W9);
-const c10 = vocabUnit('c10', '🐾', { fr: 'Les animaux · 动物', en: 'Animals · 动物' }, 'Chinois — caractères : les animaux (1re année, programme chinois)', W10);
-const c11 = vocabUnit('c11', '🎨', { fr: 'Couleurs et directions · 颜色与方位', en: 'Colours & directions · 颜色与方位' }, 'Chinois — caractères : couleurs, directions, tailles (1re année, programme chinois)', W11);
-const c12 = vocabUnit('c12', '🏫', { fr: 'École et vie quotidienne · 学校和生活', en: 'School & daily life · 学校和生活' }, 'Chinois — caractères : l’école et la maison (1re année, programme chinois)', W12);
+const c7 = vocabUnit('c7', '🌿', { fr: 'La nature · 大自然', en: 'Nature · 大自然', zh: H('大自然', 'dà zì rán') }, 'Chinois — caractères : la nature (1re année, programme chinois)', W7);
+const c8 = vocabUnit('c8', '🧍', { fr: 'Le corps · 身体', en: 'The body · 身体', zh: H('身体', 'shēn tǐ') }, 'Chinois — caractères : le corps (1re année, programme chinois)', W8);
+const c9 = vocabUnit('c9', '👨‍👩‍👧', { fr: 'La famille · 家人', en: 'Family · 家人', zh: H('家人', 'jiā rén') }, 'Chinois — caractères : la famille et les pronoms (1re année, programme chinois)', W9);
+const c10 = vocabUnit('c10', '🐾', { fr: 'Les animaux · 动物', en: 'Animals · 动物', zh: H('动物', 'dòng wù') }, 'Chinois — caractères : les animaux (1re année, programme chinois)', W10);
+const c11 = vocabUnit('c11', '🎨', { fr: 'Couleurs et directions · 颜色与方位', en: 'Colours & directions · 颜色与方位', zh: H('颜色与方位', 'yán sè yǔ fāng wèi') }, 'Chinois — caractères : couleurs, directions, tailles (1re année, programme chinois)', W11);
+const c12 = vocabUnit('c12', '🏫', { fr: 'École et vie quotidienne · 学校和生活', en: 'School & daily life · 学校和生活', zh: H('学校和生活', 'xué xiào hé shēng huó') }, 'Chinois — caractères : l’école et la maison (1re année, programme chinois)', W12);
 
 // =====================================================================
 // c13 组词
@@ -675,22 +680,22 @@ const w13others = (R, w, n, o = {}) => {
 };
 const ow = (w, L) => (L === 1 ? { hz: w.hz, py: w.py, emoji: w.e } : L === 2 ? { hz: w.hz, py: w.py } : { hz: w.hz });
 const c13 = {
-  id: 'c13', icon: '🧱', title: { fr: 'Former des mots · 组词', en: 'Building words · 组词' },
+  id: 'c13', icon: '🧱', title: { fr: 'Former des mots · 组词', en: 'Building words · 组词', zh: H('组词', 'zǔ cí') },
   pfeq: 'Chinois —组词 : assembler des caractères en mots (1re année, programme chinois)',
   generate(L, R) {
     const types = L === 1 ? ['charWord', 'wordPic', 'hearWord', 'missing'] : L === 2 ? ['charWord', 'missing', 'hearWord', 'wordMean', 'wordPic'] : ['charWord', 'missing', 'hearWord', 'wordMean', 'meanWord'];
     const t = R.pick(types);
-    const w = R.pick(t === 'wordPic' || L === 1 ? W13E : W13);
+    const w = R.pick(t === 'wordPic' || t === 'wordMean' || t === 'meanWord' || L === 1 ? W13E : W13);
     const chars = [...w.hz], py = W13PY(w);
     if (t === 'charWord') {
       const i = R.int(0, 1), ch = chars[i];
       const pool = R.shuffle(W13.filter((x) => !x.hz.includes(ch) && x.hz !== w.hz && (L > 1 || x.e)));
       const d = pool.slice(0, nd(L));
-      return mc(`cw:${w.hz}:${ch}`, { fr: 'Quel mot contient ce caractère?', en: 'Which word contains this character?' }, ow(w, L), d.map((x) => ow(x, L)), { say: sayZ(ch), stimulus: { hz: ch, ...(PYM[ch] && L < 3 ? { py: PYM[ch] } : {}) } });
+      return mc(`cw:${w.hz}:${ch}`, H('哪个词里有这个字？', 'nǎ gè cí lǐ yǒu zhè gè zì'), ow(w, L), d.map((x) => ow(x, L)), { say: sayZ(ch), stimulus: { hz: ch, ...(PYM[ch] && L < 3 ? { py: PYM[ch] } : {}) } });
     }
     if (t === 'wordPic') {
       const d = w13others(R, w, nd(L), { e: true });
-      return mc(`wp:${w.hz}`, { fr: 'Quelle image va avec ce mot?', en: 'Which picture goes with this word?' }, { emoji: w.e }, d.map((x) => ({ emoji: x.e })), { say: sayZ(w.hz), stimulus: { hz: w.hz, py: w.py } });
+      return mc(`wp:${w.hz}`, H('这个词是哪张图？', 'zhè gè cí shì nǎ zhāng tú'), { emoji: w.e }, d.map((x) => ({ emoji: x.e })), { say: sayZ(w.hz), stimulus: { hz: w.hz, py: w.py } });
     }
     if (t === 'hearWord') {
       let d;
@@ -700,15 +705,17 @@ const c13 = {
         const real = w13others(R, w, 3).map((x) => x.hz);
         d = uniqStr([...take(R, cands, 2), ...real]).slice(0, 3).map((hz) => ({ hz }));
       } else d = w13others(R, w, nd(L), { e: L === 1 }).map((x) => ow(x, L));
-      return mc(`hw:${w.hz}`, { fr: 'Écoute. Touche le bon mot.', en: 'Listen. Tap the right word.' }, ow(w, L), d.map((x) => (x.hz ? (x.py || x.emoji || L < 3 ? x : { hz: x.hz }) : x)), { say: sayZ(w.hz) });
+      return mc(`hw:${w.hz}`, H('听一听，选出对的词。', 'tīng yì tīng xuǎn chū duì de cí'), ow(w, L), d.map((x) => (x.hz ? (x.py || x.emoji || L < 3 ? x : { hz: x.hz }) : x)), { say: sayZ(w.hz) });
     }
     if (t === 'wordMean') {
-      const d = w13others(R, w, 3);
-      return mc(`wm:${w.hz}`, { fr: 'Que veut dire ce mot?', en: 'What does this word mean?' }, { text: { fr: w.fr, en: w.en } }, d.map((x) => ({ text: { fr: x.fr, en: x.en } })), { say: sayZ(w.hz), stimulus: { hz: w.hz, py: w.py } });
+      // read the word without pinyin, pick its picture
+      const d = w13others(R, w, 3, { e: true });
+      return mc(`wm:${w.hz}`, H('读一读，这个词是什么意思？选出对的图。', 'dú yì dú zhè gè cí shì shén me yì si xuǎn chū duì de tú'), { emoji: w.e }, d.map((x) => ({ emoji: x.e })), { say: sayZ(w.hz), stimulus: { hz: w.hz } });
     }
     if (t === 'meanWord') {
+      // picture → the word, without pinyin and without sound
       const d = w13others(R, w, 3);
-      return mc(`mw:${w.hz}`, { fr: `Touche le mot qui veut dire « ${w.fr} ».`, en: `Tap the word that means “${w.en}”.` }, { hz: w.hz }, d.map((x) => ({ hz: x.hz })));
+      return mc(`mw:${w.hz}`, H('看图，选出对的词。', 'kàn tú xuǎn chū duì de cí'), { hz: w.hz }, d.map((x) => ({ hz: x.hz })), { stimulus: { emoji: w.e } });
     }
     // missing character
     const pos = R.int(0, 1), miss = chars[pos], keep = chars[1 - pos];
@@ -724,7 +731,7 @@ const c13 = {
     pool = uniqStr([...R.shuffle(pool), ...R.shuffle(allChars)]).filter((c) => !WSET.has(pos === 0 ? c + keep : keep + c) && c !== miss);
     const d = pool.slice(0, nd(L));
     const o = (c, p) => (L < 3 ? { hz: c, py: p } : { hz: c });
-    return mc(`ms:${w.hz}:${pos}`, { fr: `Écoute. Il manque un caractère : « ${w.fr} ».`, en: `Listen. One character is missing: “${w.en}”.` }, o(miss, missPy), d.map((c) => o(c, PYM[c])), { say: sayZ(w.hz), stimulus: { hz: stimHz, py: keepPy } });
+    return mc(`ms:${w.hz}:${pos}`, H('听一听，少了哪个字？', 'tīng yì tīng shǎo le nǎ gè zì'), o(miss, missPy), d.map((c) => o(c, PYM[c])), { say: sayZ(w.hz), stimulus: { hz: stimHz, py: keepPy } });
   },
 };
 
@@ -763,7 +770,7 @@ const oppWrong = (R, hz, L, k) => {
   return uniqStr([...take(R, picked, 2).map((p) => p.hz), ...rest.map((c) => c.hz)]).slice(0, k).map((h) => ({ hz: h, py: PYM[h] }));
 };
 const c14 = {
-  id: 'c14', icon: '⚖️', title: { fr: 'Contraires et mots de mesure · 反义词和量词', en: 'Opposites & measure words · 反义词和量词' },
+  id: 'c14', icon: '⚖️', title: { fr: 'Contraires et mots de mesure · 反义词和量词', en: 'Opposites & measure words · 反义词和量词', zh: H('反义词和量词', 'fǎn yì cí hé liàng cí') },
   pfeq: 'Chinois — contraires et classificateurs (1re année, programme chinois)',
   generate(L, R) {
     const types = L === 1 ? ['oppPick', 'hearOpp', 'mwFill', 'mwPic'] : L === 2 ? ['oppPick', 'hearOpp', 'mwFill', 'mwPic', 'oppPair'] : ['oppPick', 'hearOpp', 'mwFill', 'oppPair', 'mwOrder'];
@@ -773,8 +780,8 @@ const c14 = {
       const wrong = oppWrong(R, c.hz, L, nd(L));
       const o = (h) => ({ hz: h.hz, ...(L < 3 ? { py: h.py } : {}) });
       const right = { hz: OPP[c.hz], py: PYM[OPP[c.hz]] };
-      if (t === 'oppPick') return mc(`op:${c.hz}`, { fr: 'Quel est le contraire de ce mot?', en: 'What is the opposite of this word?' }, o(right), wrong.map(o), { say: sayZ(c.hz), stimulus: { hz: c.hz, py: c.py } });
-      return mc(`ho:${c.hz}`, { fr: 'Écoute. Quel est le contraire?', en: 'Listen. What is the opposite?' }, o(right), wrong.map(o), { say: sayZ(c.hz) });
+      if (t === 'oppPick') return mc(`op:${c.hz}`, H('这个字的反义词是什么？', 'zhè gè zì de fǎn yì cí shì shén me'), o(right), wrong.map(o), { say: sayZ(c.hz), stimulus: { hz: c.hz, py: c.py } });
+      return mc(`ho:${c.hz}`, H('听一听，它的反义词是什么？', 'tīng yì tīng tā de fǎn yì cí shì shén me'), o(right), wrong.map(o), { say: sayZ(c.hz) });
     }
     if (t === 'oppPair') {
       const [a, pa, b, pb] = R.pick(ANT);
@@ -787,22 +794,22 @@ const c14 = {
         seen.add(x.hz + y.hz); wrong.push({ hz: x.hz + y.hz, py: x.py + ' ' + y.py });
       }
       const o = (z) => (L === 3 ? { hz: z.hz, py: z.py } : { hz: z.hz, py: z.py });
-      return mc(`pr:${a}${b}`, { fr: 'Quelle paire est faite de deux contraires?', en: 'Which pair is made of two opposites?' }, o(right), wrong.map(o), { say: sayZ(right.hz) });
+      return mc(`pr:${a}${b}`, H('哪两个字是一对反义词？', 'nǎ liǎng gè zì shì yí duì fǎn yì cí'), o(right), wrong.map(o), { say: sayZ(right.hz) });
     }
     const x = R.pick(MW);
     if (t === 'mwFill') {
       const wrong = mwWrong(R, x, nd(L));
       const o = (z) => (L < 3 ? { hz: z.m, py: z.mp } : { hz: z.m });
-      return mc(`mf:${x.n}`, { fr: 'Complète : quel mot de mesure va ici?', en: 'Fill in: which measure word goes here?' }, o({ m: x.m, mp: x.mp }), wrong.map(o), { say: sayZ(L === 1 ? '一' + x.m + x.n : x.n), stimulus: { hz: '一＿' + x.n, py: 'yī ' + x.np }, ...(L === 1 ? {} : {}) });
+      return mc(`mf:${x.n}`, H('填一填，用哪个量词？', 'tián yì tián yòng nǎ gè liàng cí'), o({ m: x.m, mp: x.mp }), wrong.map(o), { say: sayZ(L === 1 ? '一' + x.m + x.n : x.n), stimulus: { hz: '一＿' + x.n, py: 'yī ' + x.np }, ...(L === 1 ? {} : {}) });
     }
     if (t === 'mwPic') {
       const y = R.pick(MW.filter((z) => z.m !== '个'));
       const d = take(R, MW.filter((z) => z.m !== y.m && z.e !== y.e), nd(L));
-      return mc(`mp:${y.n}`, { fr: 'Quelle image va avec ce mot de mesure?', en: 'Which picture goes with this measure word?' }, { emoji: y.e }, d.map((z) => ({ emoji: z.e })), { say: sayZ('一' + y.m), stimulus: { hz: '一' + y.m, py: 'yī ' + y.mp } });
+      return mc(`mp:${y.n}`, H('哪张图可以用这个量词？', 'nǎ zhāng tú kě yǐ yòng zhè gè liàng cí'), { emoji: y.e }, d.map((z) => ({ emoji: z.e })), { say: sayZ('一' + y.m), stimulus: { hz: '一' + y.m, py: 'yī ' + y.mp } });
     }
     // mwOrder
     const other = R.pick(MWS.filter((s) => s.m !== x.m && s.m !== '个'));
-    return { type: 'order', key: `mo:${x.n}`, prompt: { fr: 'Écoute. Remets les mots dans l’ordre.', en: 'Listen. Put the words in order.' }, say: sayZ('一' + x.m + x.n), tiles: [{ hz: '一', py: 'yī' }, { hz: x.m, py: x.mp }, { hz: x.n, py: x.np }], extra: [{ hz: other.m, py: other.mp }], joiner: '' };
+    return { type: 'order', key: `mo:${x.n}`, prompt: H('听一听，把字排好。', 'tīng yì tīng bǎ zì pái hǎo'), say: sayZ('一' + x.m + x.n), tiles: [{ hz: '一', py: 'yī' }, { hz: x.m, py: x.mp }, { hz: x.n, py: x.np }], extra: [{ hz: other.m, py: other.mp }], joiner: '' };
   },
 };
 

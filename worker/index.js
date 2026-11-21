@@ -97,11 +97,12 @@ export default {
         : mode === 'sentence' ? `Instruction: ${clip(body.question, 300)}. Words that must be used: ${(body.words || []).join(', ')}. Minimum words: ${Number(body.minWords) || 3}.`
         : `Writing prompt: ${clip(body.question, 400)}. Minimum words: ${Number(body.minWords) || 20}.`;
       const okRule = mode === 'answer' ? 'the meaning answers the question correctly (spelling mistakes do not make it wrong)'
-        : mode === 'dictation' ? 'the text matches the dictation exactly (accents and plural endings count)'
+        : mode === 'dictation' ? (lang === 'zh' ? 'the characters match the dictation exactly' : 'the text matches the dictation exactly (accents and plural endings count)')
           : 'the instruction is followed (required words used, enough words, real sentences)';
       const grade = `You are a kind ${L} teacher for a 7-8 year old (grade 2-3). ${task}
-Return ONLY compact JSON: {"ok":true|false,"score":0..1,"feedback":"2 short encouraging sentences in ${L} for the child: one thing done well, one thing to fix","corrections":[{"wrong":"...","right":"..."}]}.
-ok = ${okRule}. corrections = at most 6 spelling/grammar fixes, child's word -> correct word. Be gentle; never mock.`;
+Return ONLY compact JSON: {"ok":true|false,"score":0..1,"feedback":"2 short encouraging sentences in ${L} for the child: one thing done well, one thing to fix",${lang === 'zh' ? '"feedbackPy":"Hanyu Pinyin of feedback with tone marks, exactly one syllable per Chinese character, separated by spaces, no punctuation",' : ''}"corrections":[{"wrong":"...","right":"..."}]}.
+ok = ${okRule}. corrections = at most 6 spelling/grammar fixes, child's word -> correct word. Be gentle; never mock.${lang === 'zh' ? `
+The child is a heritage speaker who understands spoken Mandarin well but reads few characters. Write feedback ONLY in simplified Chinese characters (no French, no English, no Latin letters), with very simple everyday words a 7-year-old knows, at most 30 characters; it will be read aloud. Count "words" as Chinese characters. corrections use Chinese characters.` : ''}`;
       const readPrompt = `Transcribe exactly the handwritten ${L} text of a young child in this image. Keep their spelling mistakes; do not correct anything. Output only the text.`;
       let text = '', result = null, via = '';
       // 1) free: Workers AI vision + Qwen (skipped for Chinese handwriting when OpenAI is available: much better at hanzi)
@@ -148,7 +149,7 @@ ok = ${okRule}. corrections = at most 6 spelling/grammar fixes, child's word -> 
         } catch (e) { return json({ error: 'write', detail: String(e?.message || e).slice(0, 160) }, 502, cors); }
       }
       if (!result) return json({ error: 'write' }, 502, cors);
-      return json({ text, via, cfErr: via === 'openai' ? (body._cfErr || 'no text') : undefined, ok: !!result.ok, score: Math.max(0, Math.min(1, Number(result.score) || 0)), feedback: String(result.feedback || ''), corrections: Array.isArray(result.corrections) ? result.corrections.slice(0, 6) : [] }, 200, cors);
+      return json({ text, via, cfErr: via === 'openai' ? (body._cfErr || 'no text') : undefined, ok: !!result.ok, score: Math.max(0, Math.min(1, Number(result.score) || 0)), feedback: String(result.feedback || ''), feedbackPy: lang === 'zh' ? String(result.feedbackPy || '') : undefined, corrections: Array.isArray(result.corrections) ? result.corrections.slice(0, 6) : [] }, 200, cors);
     }
 
     if (url.pathname === '/realtime') {

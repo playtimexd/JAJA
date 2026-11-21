@@ -1,12 +1,12 @@
 // Chinese (中文) units c15–c21 for Petit Hibou: strokes, writing, stroke order, nursery rhymes, poems, short stories.
 // Simplified characters + Hanyu Pinyin (tone marks, neutral tone unmarked), 人教版一年级 level.
-// Instructions are {fr, en}; Chinese audio is `say: { text, lang: 'zh-CN' }`.
+// Instructions are Chinese {hz, py} (« Chinese zone »); Chinese audio is `say: { text, lang: 'zh-CN' }`.
 
 const ZH = 'zh-CN';
 const say = (text) => ({ text, lang: ZH });
 const isHan = (c) => /\p{Script=Han}/u.test(c);
 const hanLen = (s) => [...s].filter(isHan).length;
-const T = (fr, en) => ({ fr, en });
+const H = (hz, py) => ({ hz, py });
 const o = (hz, py, extra = {}) => ({ hz, py, say: say(hz), ...extra });
 const label = (x) => (x.hz || '') + (x.emoji || '') + (x.svg || '') + (x.hz ? '' : JSON.stringify(x.text ?? ''));
 const uniq = (arr) => { const seen = new Set(); return arr.filter((x) => { const k = label(x); if (seen.has(k)) return false; seen.add(k); return true; }); };
@@ -16,7 +16,7 @@ function mc(key, prompt, right, wrong, extra = {}) {
 function chk(hz, py, where) {
   if (hanLen(hz) !== py.trim().split(/\s+/).length) throw new Error(`pinyin mismatch at ${where}: ${hz} / ${py}`);
 }
-const ord = (i) => ({ fr: ['1er', '2e', '3e', '4e', '5e', '6e', '7e', '8e'][i], en: ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th'][i] });
+const NTH = [H('这个字的第一笔是什么？', 'zhè gè zì de dì yī bǐ shì shén me'), H('这个字的第二笔是什么？', 'zhè gè zì de dì èr bǐ shì shén me'), H('这个字的第三笔是什么？', 'zhè gè zì de dì sān bǐ shì shén me'), H('这个字的第四笔是什么？', 'zhè gè zì de dì sì bǐ shì shén me'), H('这个字的第五笔是什么？', 'zhè gè zì de dì wǔ bǐ shì shén me'), H('这个字的第六笔是什么？', 'zhè gè zì de dì liù bǐ shì shén me'), H('这个字的第七笔是什么？', 'zhè gè zì de dì qī bǐ shì shén me'), H('这个字的第八笔是什么？', 'zhè gè zì de dì bā bǐ shì shén me'), H('这个字的第九笔是什么？', 'zhè gè zì de dì jiǔ bǐ shì shén me'), H('这个字的第十笔是什么？', 'zhè gè zì de dì shí bǐ shì shén me')];
 
 /* ================================================================== */
 /*  Pool of common words (for distractors and pictures)                */
@@ -398,7 +398,7 @@ function c15Name(R, level) {
   const list = LV_STROKES[level];
   const s = R.pick(list);
   const w = R.sample(list.filter((x) => x !== s), level === 1 ? 2 : 3);
-  return mc(`c15-a-${s.n}-${level}`, T('Quel est le nom de ce trait?', 'What is the name of this stroke?'), strokeName(s), w.map(strokeName), {
+  return mc(`c15-a-${s.n}-${level}`, H('这个笔画叫什么？', 'zhè gè bǐ huà jiào shén me'), strokeName(s), w.map(strokeName), {
     stimulus: { svg: strokeSvg(s) },
     say: say(s.n),
     cols: level === 1 ? 3 : 2,
@@ -409,7 +409,7 @@ function c15Pic(R, level) {
   const s = R.pick(list);
   const w = R.sample(list.filter((x) => x !== s), level === 1 ? 2 : 3);
   const so = (x) => ({ svg: strokeSvg(x) });
-  return mc(`c15-b-${s.n}-${level}`, T('Quel dessin est ce trait?', 'Which drawing is this stroke?'), so(s), w.map(so), {
+  return mc(`c15-b-${s.n}-${level}`, H('哪一个是这个笔画？', 'nǎ yí gè shì zhè gè bǐ huà'), so(s), w.map(so), {
     stimulus: { hz: s.n, py: s.py },
     say: say(s.n),
     cols: 2,
@@ -418,7 +418,7 @@ function c15Pic(R, level) {
 function c15Count(R, level) {
   const c = R.pick(c15Chars[level]);
   const base = { stimulus: { hz: c.hz, py: c.py }, say: chSay(c) };
-  const prompt = T('Combien de traits a ce caractère?', 'How many strokes does this character have?');
+  const prompt = H('这个字有几画？', 'zhè gè zì yǒu jǐ huà');
   if (level === 1) {
     const w = R.sample([c.n - 2, c.n - 1, c.n + 1, c.n + 2].filter((x) => x >= 1), 2);
     return { type: 'choice', key: `c15-c-${c.hz}`, prompt, ...base, options: [c.n, ...w].map((x) => ({ text: String(x) })), answer: 0, cols: 3 };
@@ -433,12 +433,12 @@ function c15More(R, level) {
   const big = a.n > b.n ? a : b;
   const small = big === a ? b : a;
   const key = `c15-m-${[a.hz, b.hz].sort().join('')}`;
-  return mc(key, T('Quel caractère a le plus de traits?', 'Which character has more strokes?'), o(big.hz, big.py), [o(small.hz, small.py)], { cols: 2 });
+  return mc(key, H('哪个字的笔画多？', 'nǎ gè zì de bǐ huà duō'), o(big.hz, big.py), [o(small.hz, small.py)], { cols: 2 });
 }
 const c15 = {
   id: 'c15',
   icon: '✏️',
-  title: { fr: 'Les traits 笔画', en: 'Strokes 笔画' },
+  title: { fr: 'Les traits 笔画', en: 'Strokes 笔画', zh: H('笔画', 'bǐ huà') },
   pfeq: 'Chinois — écriture : les traits de base (1re année)',
   generate(level, R) {
     return R.pick([c15Name, c15Pic, c15Count, c15Count, c15More])(R, level);
@@ -452,7 +452,7 @@ function writeQ(prefix) {
   return (c) => ({
     type: 'write',
     key: `${prefix}-${c.hz}`,
-    prompt: T(`Écris le caractère « ${c.fr} » (${c.py}).`, `Write the character “${c.en}” (${c.py}).`),
+    prompt: H('先看笔顺，再跟着写这个字。', 'xiān kàn bǐ shùn zài gēn zhe xiě zhè gè zì'),
     say: chSay(c),
     char: c.hz,
     py: c.py,
@@ -463,14 +463,14 @@ const c17Sets = { 1: CH.c17a, 2: CH.c17b, 3: CH.c17c };
 const c16 = {
   id: 'c16',
   icon: '🖌️',
-  title: { fr: 'Écrire 1 写字', en: 'Writing 1 写字' },
+  title: { fr: 'Écrire 1 写字', en: 'Writing 1 写字', zh: H('写字（一）', 'xiě zì yī') },
   pfeq: 'Chinois — écriture (1re année) : caractères simples',
   generate(level, R) { return writeQ('c16')(R.pick(c16Sets[level])); },
 };
 const c17 = {
   id: 'c17',
   icon: '✍️',
-  title: { fr: 'Écrire 2 写字', en: 'Writing 2 写字' },
+  title: { fr: 'Écrire 2 写字', en: 'Writing 2 写字', zh: H('写字（二）', 'xiě zì èr') },
   pfeq: 'Chinois — écriture (1re année) : caractères des listes 识字表/写字表',
   generate(level, R) { return writeQ('c17')(R.pick(c17Sets[level])); },
 };
@@ -553,10 +553,10 @@ function c18Nth(R, level) {
   const wrong = R.sample(ALL_STROKE_NAMES.filter((n) => n !== c.seq[i]).map(strokeInfo), level === 1 ? 2 : 3);
   const last = i === c.seq.length - 1 && c.seq.length > 1;
   const prompt = last
-    ? T('Quel est le dernier trait de ce caractère?', 'What is the last stroke of this character?')
+    ? H('这个字的最后一笔是什么？', 'zhè gè zì de zuì hòu yì bǐ shì shén me')
     : i === 0
-      ? T('Quel est le premier trait de ce caractère?', 'What is the first stroke of this character?')
-      : { fr: `Quel est le ${ord(i).fr} trait de ce caractère?`, en: `What is the ${ord(i).en} stroke of this character?` };
+      ? NTH[0]
+      : NTH[i];
   return mc(`c18-n-${c.hz}-${i}`, prompt, strokeName(ans), wrong.map(strokeName), {
     stimulus: { hz: c.hz, py: c.py },
     say: say(SAYWORD[c.hz] || c.hz),
@@ -568,7 +568,7 @@ function c18Order(R, level) {
   return {
     type: 'order',
     key: `c18-o-${c.hz}`,
-    prompt: T('Remets les traits dans le bon ordre.', 'Put the strokes in the right order.'),
+    prompt: H('把笔画按顺序排好。', 'bǎ bǐ huà àn shùn xù pái hǎo'),
     stimulus: { hz: c.hz, py: c.py },
     say: say(c.hz),
     tiles: c.seq.map((n) => ({ hz: n, py: strokeInfo(n).py })),
@@ -580,7 +580,7 @@ function c18Rule(R) {
   const right = RULES[it.ri];
   const wrong = R.sample(RULES.filter((r) => r !== right), 3);
   const ro = (r) => o(r.hz, r.py);
-  return mc(`c18-r-${it.hz}`, T("Quelle règle d'ordre des traits s'applique?", 'Which stroke-order rule applies?'), ro(right), wrong.map(ro), {
+  return mc(`c18-r-${it.hz}`, H('写这个字，用哪一条笔顺规则？', 'xiě zhè gè zì yòng nǎ yì tiáo bǐ shùn guī zé'), ro(right), wrong.map(ro), {
     stimulus: { hz: it.hz, py: it.py },
     say: say(it.hz),
     cols: 2,
@@ -589,7 +589,7 @@ function c18Rule(R) {
 const c18 = {
   id: 'c18',
   icon: '📝',
-  title: { fr: 'Ordre des traits 笔顺', en: 'Stroke order 笔顺' },
+  title: { fr: 'Ordre des traits 笔顺', en: 'Stroke order 笔顺', zh: H('笔顺', 'bǐ shùn') },
   pfeq: 'Chinois — écriture (1re année) : ordre des traits',
   generate(level, R) {
     if (level === 1) return c18Nth(R, 1);
@@ -638,7 +638,7 @@ function nextLineQ(R, prefix, text, i, nOpts, level, mixOther) {
     wrong = [...w1, ...R.sample(others, nOpts - 1 - w1.length)];
   } else wrong = R.sample(others, nOpts - 1);
   const lo = (l) => o(l.hz, l.py);
-  return mc(`${prefix}-n-${text.id}-${i}`, T('Quelle est la ligne suivante?', 'Which line comes next?'), lo(nxt), wrong.map(lo), {
+  return mc(`${prefix}-n-${text.id}-${i}`, H('下一句是什么？', 'xià yí jù shì shén me'), lo(nxt), wrong.map(lo), {
     stimulus: { hz: cur.hz, py: cur.py },
     say: say(cur.hz),
     cols: 1,
@@ -650,7 +650,7 @@ function blankQ(R, prefix, text, i, nOpts) {
   const avoid = text.lines.map((x) => x.hz).join('');
   const wrong = wrongWords(R, m.kind, m.word, avoid, nOpts - 1, false);
   const shown = text.lines.map((x, j) => (j === i ? { hz: m.hz, py: m.py } : x));
-  return mc(`${prefix}-b-${text.id}-${i}`, T('Quel mot manque?', 'Which word is missing?'), o(m.word, m.wordPy), wrong.map((p) => o(p.hz, p.py)), {
+  return mc(`${prefix}-b-${text.id}-${i}`, H('少了哪个词？', 'shǎo le nǎ gè cí'), o(m.word, m.wordPy), wrong.map((p) => o(p.hz, p.py)), {
     stimulus: { hz: joinHz(shown), py: joinPy(shown) },
     say: sayAll(text.lines),
     cols: nOpts === 4 ? 2 : 3,
@@ -660,7 +660,7 @@ function orderQ(prefix, text) {
   return {
     type: 'order',
     key: `${prefix}-o-${text.id}`,
-    prompt: T('Remets les lignes dans le bon ordre.', 'Put the lines in the right order.'),
+    prompt: H('把句子按顺序排好。', 'bǎ jù zi àn shùn xù pái hǎo'),
     say: sayAll(text.lines),
     tiles: text.lines.map((l) => ({ hz: l.hz, py: l.py })),
     joiner: ' ',
@@ -678,7 +678,7 @@ function picQ(R, prefix, text, i, all, prompt) {
 function heardQ(R, prefix, text, i) {
   const l = text.lines[i];
   const w = R.sample(text.lines.filter((x) => x !== l), 2);
-  return mc(`${prefix}-h-${text.id}-${i}`, T('Écoute. Quelle ligne as-tu entendue?', 'Listen. Which line did you hear?'), o(l.hz, l.py), w.map((x) => o(x.hz, x.py)), {
+  return mc(`${prefix}-h-${text.id}-${i}`, H('听一听，你听到的是哪一句？', 'tīng yì tīng nǐ tīng dào de shì nǎ yí jù'), o(l.hz, l.py), w.map((x) => o(x.hz, x.py)), {
     say: say(l.hz),
     cols: 1,
   });
@@ -707,11 +707,11 @@ const RH = [
   { id: 'r17', e: '🎂', L: ['今天我生日 | jīn tiān wǒ shēng rì | 今天:t', '大家来唱歌 | dà jiā lái chàng gē | 唱歌:v', '我吹蜡烛真高兴 | wǒ chuī là zhú zhēn gāo xìng | 蜡烛:o', '吃块大蛋糕 | chī kuài dà dàn gāo | 蛋糕:o'] },
 ].map((r) => ({ id: r.id, e: r.e, lines: parseLines(r.L, r.id) }));
 const blankIdx = (t) => t.lines.map((l, i) => (l.b ? i : -1)).filter((i) => i >= 0);
-const RH_PIC = T('Quelle image va avec cette comptine?', 'Which picture goes with this rhyme?');
+const RH_PIC = H('哪张图和这首儿歌有关？', 'nǎ zhāng tú hé zhè shǒu ér gē yǒu guān');
 const c19 = {
   id: 'c19',
   icon: '🎵',
-  title: { fr: 'Comptines 儿歌', en: 'Nursery rhymes 儿歌' },
+  title: { fr: 'Comptines 儿歌', en: 'Nursery rhymes 儿歌', zh: H('儿歌', 'ér gē') },
   pfeq: 'Chinois — lecture : comptines (儿歌) et compréhension (1re année)',
   generate(level, R) {
     const t = R.pick(RH);
@@ -743,32 +743,32 @@ const AU = {
 for (const [k, v] of Object.entries(AU)) chk(k, v, 'author ' + k);
 const POEMS_RAW = [
   { id: 'p1', t: '咏鹅', tp: 'yǒng é', a: '骆宾王', e: '🪿', L: ['鹅鹅鹅 | é é é', '曲项向天歌 | qū xiàng xiàng tiān gē', '白毛浮绿水 | bái máo fú lǜ shuǐ | 绿水:n', '红掌拨清波 | hóng zhǎng bō qīng bō | 红掌:o'],
-    m: [2, T("Les plumes blanches flottent sur l'eau verte.", 'White feathers float on green water.'), [T("L'oie vole haut dans le ciel.", 'The goose flies high in the sky.'), T("L'oie mange du riz.", 'The goose eats rice.')]] },
+    m: [2, H('白色的羽毛浮在绿绿的水上。', 'bái sè de yǔ máo fú zài lǜ lǜ de shuǐ shàng'), [H('大白鹅在天上飞。', 'dà bái é zài tiān shàng fēi'), H('大白鹅在吃米饭。', 'dà bái é zài chī mǐ fàn')]] },
   { id: 'p2', t: '静夜思', tp: 'jìng yè sī', a: '李白', e: '🌕', L: ['床前明月光 | chuáng qián míng yuè guāng | 明月:n', '疑是地上霜 | yí shì dì shàng shuāng | 地上:p', '举头望明月 | jǔ tóu wàng míng yuè | 明月:n', '低头思故乡 | dī tóu sī gù xiāng | 故乡:p'],
-    m: [2, T('Je lève la tête et je regarde la lune brillante.', 'I raise my head and look at the bright moon.'), [T('Je ferme les yeux et je dors.', 'I close my eyes and sleep.'), T('Je regarde la neige tomber.', 'I watch the snow fall.')]] },
+    m: [2, H('我抬起头，看着明亮的月亮。', 'wǒ tái qǐ tóu kàn zhe míng liàng de yuè liang'), [H('我闭上眼睛睡觉。', 'wǒ bì shàng yǎn jing shuì jiào'), H('我看着雪花落下来。', 'wǒ kàn zhe xuě huā luò xià lái')]] },
   { id: 'p3', t: '春晓', tp: 'chūn xiǎo', a: '孟浩然', e: '🐦', L: ['春眠不觉晓 | chūn mián bù jué xiǎo', '处处闻啼鸟 | chù chù wén tí niǎo | 啼鸟:who', '夜来风雨声 | yè lái fēng yǔ shēng | 风雨:n', '花落知多少 | huā luò zhī duō shao | 花:n'],
-    m: [1, T('Partout, on entend chanter les oiseaux.', 'Everywhere, you hear birds singing.'), [T('Partout, les gens dansent.', 'Everywhere, people are dancing.'), T('Partout, les oiseaux dorment.', 'Everywhere, the birds are sleeping.')]] },
+    m: [1, H('到处都能听到小鸟在叫。', 'dào chù dōu néng tīng dào xiǎo niǎo zài jiào'), [H('到处都有人在跳舞。', 'dào chù dōu yǒu rén zài tiào wǔ'), H('到处的小鸟都在睡觉。', 'dào chù de xiǎo niǎo dōu zài shuì jiào')]] },
   { id: 'p4', t: '悯农', tp: 'mǐn nóng', a: '李绅', e: '🌾', L: ['锄禾日当午 | chú hé rì dāng wǔ', '汗滴禾下土 | hàn dī hé xià tǔ | 汗:o', '谁知盘中餐 | shéi zhī pán zhōng cān', '粒粒皆辛苦 | lì lì jiē xīn kǔ | 辛苦:f'],
-    m: [3, T('Chaque grain de riz vient d\'un travail très dur.', 'Every grain of rice comes from hard work.'), [T('Chaque grain de riz est très sucré.', 'Every grain of rice is very sweet.'), T('Chaque grain de riz est tombé du ciel.', 'Every grain of rice fell from the sky.')]] },
+    m: [3, H('每一粒米都来得很辛苦。', 'měi yí lì mǐ dōu lái de hěn xīn kǔ'), [H('每一粒米都很甜。', 'měi yí lì mǐ dōu hěn tián'), H('每一粒米都是从天上掉下来的。', 'měi yí lì mǐ dōu shì cóng tiān shàng diào xià lái de')]] },
   { id: 'p5', t: '画', tp: 'huà', a: '', e: '⛰️', L: ['远看山有色 | yuǎn kàn shān yǒu sè | 山:n', '近听水无声 | jìn tīng shuǐ wú shēng | 水:n', '春去花还在 | chūn qù huā hái zài | 花:n', '人来鸟不惊 | rén lái niǎo bù jīng | 鸟:who'],
-    m: [0, T('De loin, on voit les montagnes en couleurs.', 'From far away, the mountains show their colours.'), [T('De loin, on entend la mer.', 'From far away, you hear the sea.'), T('De près, on ne voit rien.', 'Up close, you see nothing.')]] },
+    m: [0, H('远远地看，山有好看的颜色。', 'yuǎn yuǎn de kàn shān yǒu hǎo kàn de yán sè'), [H('远远地听到大海的声音。', 'yuǎn yuǎn de tīng dào dà hǎi de shēng yīn'), H('走近了，什么也看不见。', 'zǒu jìn le shén me yě kàn bú jiàn')]] },
   { id: 'p6', t: '江南', tp: 'jiāng nán', a: '', e: '🐟', L: ['江南可采莲 | jiāng nán kě cǎi lián', '莲叶何田田 | lián yè hé tián tián | 莲叶:n', '鱼戏莲叶间 | yú xì lián yè jiān | 鱼:who', '鱼戏莲叶东 | yú xì lián yè dōng | 东:d', '鱼戏莲叶西 | yú xì lián yè xī | 西:d', '鱼戏莲叶南 | yú xì lián yè nán | 南:d', '鱼戏莲叶北 | yú xì lián yè běi | 北:d'],
-    m: [2, T('Les poissons jouent entre les feuilles de lotus.', 'Fish play among the lotus leaves.'), [T('Les poissons dorment sur la rive.', 'Fish sleep on the bank.'), T('Les oiseaux jouent dans les feuilles.', 'Birds play in the leaves.')]] },
+    m: [2, H('小鱼在莲叶中间游来游去。', 'xiǎo yú zài lián yè zhōng jiān yóu lái yóu qù'), [H('小鱼在岸上睡觉。', 'xiǎo yú zài àn shàng shuì jiào'), H('小鸟在叶子里玩。', 'xiǎo niǎo zài yè zi lǐ wán')]] },
   { id: 'p7', t: '登鹳雀楼', tp: 'dēng guàn què lóu', a: '王之涣', e: '🏯', L: ['白日依山尽 | bái rì yī shān jìn | 白日:n', '黄河入海流 | huáng hé rù hǎi liú | 黄河:n', '欲穷千里目 | yù qióng qiān lǐ mù', '更上一层楼 | gèng shàng yì céng lóu | 楼:p'],
-    m: [3, T('Monte encore un étage.', 'Climb one more floor.'), [T("Descends l'escalier.", 'Go down the stairs.'), T('Reste dans la maison.', 'Stay in the house.')]] },
+    m: [3, H('再往上走一层楼。', 'zài wǎng shàng zǒu yì céng lóu'), [H('走下楼梯。', 'zǒu xià lóu tī'), H('一直在家里。', 'yì zhí zài jiā lǐ')]] },
   { id: 'p8', t: '池上', tp: 'chí shàng', a: '白居易', e: '🛶', L: ['小娃撑小艇 | xiǎo wá chēng xiǎo tǐng | 小艇:o', '偷采白莲回 | tōu cǎi bái lián huí | 白莲:n', '不解藏踪迹 | bù jiě cáng zōng jì', '浮萍一道开 | fú píng yí dào kāi | 浮萍:n'],
-    m: [0, T('Un petit enfant fait avancer une petite barque.', 'A little child pushes a small boat along.'), [T('Un petit enfant dort sur un bateau.', 'A little child sleeps on a boat.'), T('Un petit enfant nage dans la mer.', 'A little child swims in the sea.')]] },
+    m: [0, H('一个小孩撑着一条小船。', 'yí gè xiǎo hái chēng zhe yì tiáo xiǎo chuán'), [H('一个小孩在船上睡觉。', 'yí gè xiǎo hái zài chuán shàng shuì jiào'), H('一个小孩在大海里游泳。', 'yí gè xiǎo hái zài dà hǎi lǐ yóu yǒng')]] },
   { id: 'p9', t: '小池', tp: 'xiǎo chí', a: '杨万里', e: '🪷', L: ['泉眼无声惜细流 | quán yǎn wú shēng xī xì liú | 泉眼:n', '树阴照水爱晴柔 | shù yīn zhào shuǐ ài qíng róu | 树阴:n', '小荷才露尖尖角 | xiǎo hé cái lù jiān jiān jiǎo | 小荷:n', '早有蜻蜓立上头 | zǎo yǒu qīng tíng lì shàng tóu | 蜻蜓:who'],
-    m: [3, T('Une libellule est déjà posée tout en haut.', 'A dragonfly has already landed on top.'), [T("Une grenouille saute dans l'eau.", 'A frog jumps into the water.'), T("Un poisson saute hors de l'eau.", 'A fish jumps out of the water.')]] },
+    m: [3, H('一只蜻蜓早就站在上面了。', 'yì zhī qīng tíng zǎo jiù zhàn zài shàng miàn le'), [H('一只青蛙跳进水里。', 'yì zhī qīng wā tiào jìn shuǐ lǐ'), H('一条鱼跳出水面。', 'yì tiáo yú tiào chū shuǐ miàn')]] },
   { id: 'p10', t: '所见', tp: 'suǒ jiàn', a: '袁枚', e: '🐄', L: ['牧童骑黄牛 | mù tóng qí huáng niú | 黄牛:who', '歌声振林樾 | gē shēng zhèn lín yuè | 歌声:o', '意欲捕鸣蝉 | yì yù bǔ míng chán | 鸣蝉:who', '忽然闭口立 | hū rán bì kǒu lì | 闭口:v'],
-    m: [0, T('Un petit berger monte sur un buffle jaune.', 'A shepherd boy rides a yellow ox.'), [T('Un petit berger monte sur un cheval blanc.', 'A shepherd boy rides a white horse.'), T('Un petit berger porte un panier.', 'A shepherd boy carries a basket.')]] },
+    m: [0, H('放牛的小孩骑在黄牛上。', 'fàng niú de xiǎo hái qí zài huáng niú shàng'), [H('放牛的小孩骑着白马。', 'fàng niú de xiǎo hái qí zhe bái mǎ'), H('放牛的小孩背着篮子。', 'fàng niú de xiǎo hái bēi zhe lán zi')]] },
   { id: 'p11', t: '咏柳', tp: 'yǒng liǔ', a: '贺知章', e: '🍃', L: ['碧玉妆成一树高 | bì yù zhuāng chéng yí shù gāo | 碧玉:o', '万条垂下绿丝绦 | wàn tiáo chuí xià lǜ sī tāo | 垂下:v', '不知细叶谁裁出 | bù zhī xì yè shéi cái chū | 细叶:n', '二月春风似剪刀 | èr yuè chūn fēng sì jiǎn dāo | 剪刀:o'],
-    m: [3, T('Le vent du printemps est comme des ciseaux.', 'The spring wind is like scissors.'), [T('Le vent du printemps est comme un tambour.', 'The spring wind is like a drum.'), T('Le vent du printemps est comme de la neige.', 'The spring wind is like snow.')]] },
+    m: [3, H('春天的风像一把剪刀。', 'chūn tiān de fēng xiàng yì bǎ jiǎn dāo'), [H('春天的风像一面鼓。', 'chūn tiān de fēng xiàng yí miàn gǔ'), H('春天的风像雪花。', 'chūn tiān de fēng xiàng xuě huā')]] },
   { id: 'p12', t: '梅花', tp: 'méi huā', a: '王安石', e: '🌸', L: ['墙角数枝梅 | qiáng jiǎo shù zhī méi | 墙角:p', '凌寒独自开 | líng hán dú zì kāi', '遥知不是雪 | yáo zhī bú shì xuě | 雪:n', '为有暗香来 | wèi yǒu àn xiāng lái | 暗香:n'],
-    m: [2, T("De loin, on sait que ce n'est pas de la neige.", 'From far away, you know it is not snow.'), [T("De loin, on sait que c'est de la pluie.", 'From far away, you know it is rain.'), T("De loin, on sait que c'est un oiseau.", 'From far away, you know it is a bird.')]] },
+    m: [2, H('远远地就知道那不是雪。', 'yuǎn yuǎn de jiù zhī dào nà bú shì xuě'), [H('远远地就知道那是雨。', 'yuǎn yuǎn de jiù zhī dào nà shì yǔ'), H('远远地就知道那是一只鸟。', 'yuǎn yuǎn de jiù zhī dào nà shì yì zhī niǎo')]] },
 ];
 const PO = POEMS_RAW.map((p) => { chk(p.t, p.tp, 'poem title ' + p.id); return { id: p.id, e: p.e, t: p.t, tp: p.tp, a: p.a, m: p.m, lines: parseLines(p.L, p.id) }; });
-const PO_PIC = T('Quel dessin va avec ce poème?', 'Which drawing goes with this poem?');
+const PO_PIC = H('哪张图和这首诗有关？', 'nǎ zhāng tú hé zhè shǒu shī yǒu guān');
 function poemTitleQ(R, p) {
   const w = R.sample(PO.filter((x) => x !== p), 2);
   return mc(`c20-t-${p.id}`, PO_PIC, { emoji: p.e }, w.map((x) => ({ emoji: x.e })), { stimulus: { hz: p.t, py: p.tp }, say: say(p.t), cols: 3 });
@@ -776,12 +776,12 @@ function poemTitleQ(R, p) {
 function authorQ(R, p) {
   const names = Object.keys(AU);
   const w = R.sample(names.filter((n) => n !== p.a), 3);
-  return mc(`c20-a-${p.id}`, T('Qui a écrit ce poème?', 'Who wrote this poem?'), o(p.a, AU[p.a]), w.map((n) => o(n, AU[n])), { stimulus: { hz: p.t, py: p.tp }, say: say(p.t), cols: 2 });
+  return mc(`c20-a-${p.id}`, H('这首诗是谁写的？', 'zhè shǒu shī shì shuí xiě de'), o(p.a, AU[p.a]), w.map((n) => o(n, AU[n])), { stimulus: { hz: p.t, py: p.tp }, say: say(p.t), cols: 2 });
 }
 function meaningQ(p) {
   const [i, ok, wr] = p.m;
   const l = p.lines[i];
-  return mc(`c20-m-${p.id}`, T('Que veut dire cette ligne?', 'What does this line mean?'), { text: ok }, wr.map((x) => ({ text: x })), {
+  return mc(`c20-m-${p.id}`, H('这一句是什么意思？', 'zhè yí jù shì shén me yì si'), { ...ok }, wr.map((x) => ({ ...x })), {
     stimulus: { hz: l.hz, py: l.py },
     say: say(l.hz),
     cols: 1,
@@ -790,7 +790,7 @@ function meaningQ(p) {
 const c20 = {
   id: 'c20',
   icon: '📜',
-  title: { fr: 'Poèmes anciens 古诗', en: 'Classic poems 古诗' },
+  title: { fr: 'Poèmes anciens 古诗', en: 'Classic poems 古诗', zh: H('古诗', 'gǔ shī') },
   pfeq: 'Chinois — lecture : poèmes classiques (古诗), mémorisation et compréhension (1re année)',
   generate(level, R) {
     const p = R.pick(PO);
@@ -818,77 +818,77 @@ const c20 = {
 /* ================================================================== */
 /*  c21 — 小故事 (original short stories)                              */
 /* ================================================================== */
-// [id, level, sentences ('hz | py'), facts [kind, answer hz, fr, en]]
+// [id, level, sentences ('hz | py'), facts [kind, answer hz, question {hz, py}]]
 const ST_RAW = [
   // ---- level 1 (3 short sentences, picture options) ----
   ['s1', 1, ['今天下雪了。 | jīn tiān xià xuě le', '小明在雪地里堆雪人。 | xiǎo míng zài xuě dì lǐ duī xuě rén', '小明很高兴。 | xiǎo míng hěn gāo xìng'],
-    [['who', '小明', 'Qui joue dans la neige?', 'Who plays in the snow?'], ['p', '雪地', 'Où joue Xiaoming?', 'Where does Xiaoming play?'], ['v', '堆雪人', 'Que fait Xiaoming?', 'What does Xiaoming do?'], ['f', '高兴', 'Comment se sent Xiaoming?', 'How does Xiaoming feel?']]],
+    [['who', '小明', H('谁在雪地里堆雪人？', 'shuí zài xuě dì lǐ duī xuě rén')], ['p', '雪地', H('小明在哪里玩？', 'xiǎo míng zài nǎ lǐ wán')], ['v', '堆雪人', H('小明在做什么？', 'xiǎo míng zài zuò shén me')], ['f', '高兴', H('小明觉得怎么样？', 'xiǎo míng jué de zěn me yàng')]]],
   ['s2', 1, ['妈妈在厨房。 | mā ma zài chú fáng', '她在包饺子。 | tā zài bāo jiǎo zi', '小美想吃饺子。 | xiǎo měi xiǎng chī jiǎo zi'],
-    [['who', '妈妈', 'Qui est dans la cuisine?', 'Who is in the kitchen?'], ['p', '厨房', 'Où est maman?', 'Where is Mum?'], ['v', '包饺子', 'Que fait maman?', 'What is Mum doing?'], ['o', '饺子', 'Que veut manger Xiaomei?', 'What does Xiaomei want to eat?']]],
+    [['who', '妈妈', H('谁在厨房？', 'shuí zài chú fáng')], ['p', '厨房', H('妈妈在哪里？', 'mā ma zài nǎ lǐ')], ['v', '包饺子', H('妈妈在做什么？', 'mā ma zài zuò shén me')], ['o', '饺子', H('小美想吃什么？', 'xiǎo měi xiǎng chī shén me')]]],
   ['s3', 1, ['小狗在公园里。 | xiǎo gǒu zài gōng yuán lǐ', '它爱跑步。 | tā ài pǎo bù', '它跑累了。 | tā pǎo lèi le'],
-    [['who', '小狗', 'Qui est dans le parc?', 'Who is in the park?'], ['p', '公园', 'Où est le chien?', 'Where is the dog?'], ['v', '跑步', 'Qu\'est-ce que le chien aime faire?', 'What does the dog like to do?'], ['f', '累', 'Comment se sent le chien à la fin?', 'How does the dog feel at the end?']]],
+    [['who', '小狗', H('谁在公园里？', 'shuí zài gōng yuán lǐ')], ['p', '公园', H('小狗在哪里？', 'xiǎo gǒu zài nǎ lǐ')], ['v', '跑步', H('小狗爱做什么？', 'xiǎo gǒu ài zuò shén me')], ['f', '累', H('最后小狗怎么了？', 'zuì hòu xiǎo gǒu zěn me le')]]],
   ['s4', 1, ['爸爸有一个蛋糕。 | bà ba yǒu yí gè dàn gāo', '今天是小美的生日。 | jīn tiān shì xiǎo měi de shēng rì', '小美很高兴。 | xiǎo měi hěn gāo xìng'],
-    [['who', '爸爸', 'Qui a un gâteau?', 'Who has a cake?'], ['o', '蛋糕', 'Qu\'a papa?', 'What does Dad have?'], ['t', '今天', "Quand est l'anniversaire de Xiaomei?", "When is Xiaomei's birthday?"], ['f', '高兴', 'Comment se sent Xiaomei?', 'How does Xiaomei feel?']]],
+    [['who', '爸爸', H('谁有一个蛋糕？', 'shuí yǒu yí gè dàn gāo')], ['o', '蛋糕', H('爸爸有什么？', 'bà ba yǒu shén me')], ['t', '今天', H('小美的生日是哪天？', 'xiǎo měi de shēng rì shì nǎ tiān')], ['f', '高兴', H('小美觉得怎么样？', 'xiǎo měi jué de zěn me yàng')]]],
   ['s5', 1, ['小鸟在树上。 | xiǎo niǎo zài shù shàng', '它唱着歌。 | tā chàng zhe gē', '小猫看着它。 | xiǎo māo kàn zhe tā'],
-    [['who', '小鸟', "Qui est dans l'arbre?", 'Who is in the tree?'], ['p', '树上', "Où est l'oiseau?", 'Where is the bird?'], ['v', '唱歌', "Que fait l'oiseau?", 'What does the bird do?'], ['who', '小猫', "Qui regarde l'oiseau?", 'Who looks at the bird?']]],
+    [['who', '小鸟', H('谁在树上？', 'shuí zài shù shàng')], ['p', '树上', H('小鸟在哪里？', 'xiǎo niǎo zài nǎ lǐ')], ['v', '唱歌', H('小鸟在做什么？', 'xiǎo niǎo zài zuò shén me')], ['who', '小猫', H('谁在看小鸟？', 'shuí zài kàn xiǎo niǎo')]]],
   ['s6', 1, ['奶奶给我一个红包。 | nǎi nai gěi wǒ yí gè hóng bāo', '今天是春节。 | jīn tiān shì chūn jié', '我说新年快乐。 | wǒ shuō xīn nián kuài lè'],
-    [['who', '奶奶', 'Qui donne une enveloppe rouge?', 'Who gives a red envelope?'], ['o', '红包', 'Que donne grand-maman?', 'What does Grandma give?'], ['t', '春节', 'Quelle fête est-ce?', 'Which holiday is it?']]],
+    [['who', '奶奶', H('谁给我红包？', 'shuí gěi wǒ hóng bāo')], ['o', '红包', H('奶奶给我什么？', 'nǎi nai gěi wǒ shén me')], ['t', '春节', H('今天是什么节日？', 'jīn tiān shì shén me jié rì')]]],
   ['s7', 1, ['小熊在冬天睡觉。 | xiǎo xióng zài dōng tiān shuì jiào', '外面在下雪。 | wài miàn zài xià xuě', '小熊在家里。 | xiǎo xióng zài jiā lǐ'],
-    [['who', '小熊', 'Qui dort?', 'Who is sleeping?'], ['t', '冬天', 'Quand dort-il?', 'When does it sleep?'], ['v', '睡觉', 'Que fait le petit ours?', 'What does the little bear do?'], ['p', '家里', 'Où est le petit ours?', 'Where is the little bear?']]],
+    [['who', '小熊', H('谁在睡觉？', 'shuí zài shuì jiào')], ['t', '冬天', H('小熊什么时候睡觉？', 'xiǎo xióng shén me shí hou shuì jiào')], ['v', '睡觉', H('小熊在做什么？', 'xiǎo xióng zài zuò shén me')], ['p', '家里', H('小熊在哪里？', 'xiǎo xióng zài nǎ lǐ')]]],
   ['s8', 1, ['小美有一把雨伞。 | xiǎo měi yǒu yì bǎ yǔ sǎn', '外面下大雨。 | wài miàn xià dà yǔ', '她去学校。 | tā qù xué xiào'],
-    [['who', '小美', 'Qui a un parapluie?', 'Who has an umbrella?'], ['o', '雨伞', 'Qu\'a Xiaomei?', 'What does Xiaomei have?'], ['p', '学校', 'Où va Xiaomei?', 'Where does Xiaomei go?']]],
+    [['who', '小美', H('谁有雨伞？', 'shuí yǒu yǔ sǎn')], ['o', '雨伞', H('小美有什么？', 'xiǎo měi yǒu shén me')], ['p', '学校', H('小美去哪里？', 'xiǎo měi qù nǎ lǐ')]]],
   ['s9', 1, ['爷爷在家里看书。 | yé ye zài jiā lǐ kàn shū', '小猫在床上睡觉。 | xiǎo māo zài chuáng shàng shuì jiào', '我在写字。 | wǒ zài xiě zì'],
-    [['who', '爷爷', 'Qui lit?', 'Who is reading?'], ['v', '看书', 'Que fait grand-papa?', 'What does Grandpa do?'], ['who', '小猫', 'Qui dort?', 'Who is sleeping?'], ['p', '床上', 'Où dort le chat?', 'Where is the cat sleeping?']]],
+    [['who', '爷爷', H('谁在看书？', 'shuí zài kàn shū')], ['v', '看书', H('爷爷在做什么？', 'yé ye zài zuò shén me')], ['who', '小猫', H('谁在睡觉？', 'shuí zài shuì jiào')], ['p', '床上', H('小猫在哪里睡觉？', 'xiǎo māo zài nǎ lǐ shuì jiào')]]],
   ['s10', 1, ['小鱼在河里游。 | xiǎo yú zài hé lǐ yóu', '小鸭也在河里。 | xiǎo yā yě zài hé lǐ', '它们很高兴。 | tā men hěn gāo xìng'],
-    [['who', '小鱼', 'Qui nage?', 'Who is swimming?'], ['who', '小鸭', 'Qui est aussi dans la rivière?', 'Who is also in the river?'], ['p', '河里', 'Où sont-ils?', 'Where are they?'], ['f', '高兴', 'Comment se sentent-ils?', 'How do they feel?']]],
+    [['who', '小鱼', H('谁在河里游？', 'shuí zài hé lǐ yóu')], ['who', '小鸭', H('谁也在河里？', 'shuí yě zài hé lǐ')], ['p', '河里', H('它们在哪里？', 'tā men zài nǎ lǐ')], ['f', '高兴', H('它们觉得怎么样？', 'tā men jué de zěn me yàng')]]],
   ['s11', 1, ['早上，弟弟喝牛奶。 | zǎo shang dì di hē niú nǎi', '他还吃面包。 | tā hái chī miàn bāo', '他吃饱了。 | tā chī bǎo le'],
-    [['who', '弟弟', 'Qui boit du lait?', 'Who drinks milk?'], ['t', '早上', 'Quand?', 'When?'], ['o', '牛奶', 'Que boit-il?', 'What does he drink?'], ['o', '面包', 'Que mange-t-il?', 'What does he eat?']]],
+    [['who', '弟弟', H('谁在喝牛奶？', 'shuí zài hē niú nǎi')], ['t', '早上', H('这是什么时候？', 'zhè shì shén me shí hou')], ['o', '牛奶', H('弟弟喝什么？', 'dì di hē shén me')], ['o', '面包', H('弟弟吃什么？', 'dì di chī shén me')]]],
   ['s12', 1, ['小兔在花园里。 | xiǎo tù zài huā yuán lǐ', '它吃苹果。 | tā chī píng guǒ', '太阳很大，它很热。 | tài yáng hěn dà tā hěn rè'],
-    [['who', '小兔', 'Qui est dans le jardin?', 'Who is in the garden?'], ['p', '花园', 'Où est le lapin?', 'Where is the rabbit?'], ['o', '苹果', 'Que mange le lapin?', 'What does the rabbit eat?'], ['f', '热', 'Comment se sent le lapin?', 'How does the rabbit feel?']]],
+    [['who', '小兔', H('谁在花园里？', 'shuí zài huā yuán lǐ')], ['p', '花园', H('小兔在哪里？', 'xiǎo tù zài nǎ lǐ')], ['o', '苹果', H('小兔吃什么？', 'xiǎo tù chī shén me')], ['f', '热', H('小兔觉得怎么样？', 'xiǎo tù jué de zěn me yàng')]]],
   // ---- level 2 (4 sentences) ----
   ['s13', 2, ['周末，爸爸带我去冰场。 | zhōu mò bà ba dài wǒ qù bīng chǎng', '我穿上冰鞋。 | wǒ chuān shàng bīng xié', '爸爸和我打冰球。 | bà ba hé wǒ dǎ bīng qiú', '我们玩得很开心。 | wǒ men wán de hěn kāi xīn'],
-    [['who', '爸爸', 'Qui m\'emmène à la patinoire?', 'Who takes me to the rink?'], ['p', '冰场', 'Où allons-nous?', 'Where do we go?'], ['o', '冰鞋', 'Que je mets?', 'What do I put on?'], ['o', '冰球', 'À quoi jouons-nous?', 'What do we play?']]],
+    [['who', '爸爸', H('谁带我去冰场？', 'shuí dài wǒ qù bīng chǎng')], ['p', '冰场', H('我们去哪里？', 'wǒ men qù nǎ lǐ')], ['o', '冰鞋', H('我穿上了什么？', 'wǒ chuān shàng le shén me')], ['o', '冰球', H('我们玩什么？', 'wǒ men wán shén me')]]],
   ['s14', 2, ['秋天到了。 | qiū tiān dào le', '公园里的枫叶红了。 | gōng yuán lǐ de fēng yè hóng le', '小美捡了很多枫叶。 | xiǎo měi jiǎn le hěn duō fēng yè', '她把枫叶送给妈妈。 | tā bǎ fēng yè sòng gěi mā ma'],
-    [['t', '秋天', 'Quelle saison est-ce?', 'Which season is it?'], ['p', '公园', 'Où sont les feuilles d\'érable?', 'Where are the maple leaves?'], ['o', '枫叶', 'Que ramasse Xiaomei?', 'What does Xiaomei pick up?'], ['who', '妈妈', 'À qui donne-t-elle les feuilles?', 'Who does she give the leaves to?']]],
+    [['t', '秋天', H('现在是什么季节？', 'xiàn zài shì shén me jì jié')], ['p', '公园', H('哪里的枫叶红了？', 'nǎ lǐ de fēng yè hóng le')], ['o', '枫叶', H('小美捡了什么？', 'xiǎo měi jiǎn le shén me')], ['who', '妈妈', H('小美把枫叶送给谁？', 'xiǎo měi bǎ fēng yè sòng gěi shuí')]]],
   ['s15', 2, ['春节快到了。 | chūn jié kuài dào le', '奶奶和妈妈在包饺子。 | nǎi nai hé mā ma zài bāo jiǎo zi', '我也来帮忙。 | wǒ yě lái bāng máng', '饺子真好吃。 | jiǎo zi zhēn hǎo chī'],
-    [['t', '春节', 'Quelle fête arrive?', 'Which holiday is coming?'], ['v', '包饺子', 'Que font grand-maman et maman?', 'What are Grandma and Mum doing?'], ['who', '奶奶', 'Qui fait des raviolis avec maman?', 'Who makes dumplings with Mum?']]],
+    [['t', '春节', H('什么节日快到了？', 'shén me jié rì kuài dào le')], ['v', '包饺子', H('奶奶和妈妈在做什么？', 'nǎi nai hé mā ma zài zuò shén me')], ['who', '奶奶', H('谁和妈妈一起包饺子？', 'shuí hé mā ma yì qǐ bāo jiǎo zi')]]],
   ['s16', 2, ['下雪了，雪很大。 | xià xuě le xuě hěn dà', '爷爷拿来雪橇。 | yé ye ná lái xuě qiāo', '小明和弟弟坐在雪橇上。 | xiǎo míng hé dì di zuò zài xuě qiāo shàng', '他们从山上滑下来。 | tā men cóng shān shàng huá xià lái'],
-    [['o', '雪橇', 'Qu\'apporte grand-papa?', 'What does Grandpa bring?'], ['who', '爷爷', 'Qui apporte la luge?', 'Who brings the sled?'], ['who', '弟弟', 'Avec qui Xiaoming est-il sur la luge?', 'Who is on the sled with Xiaoming?'], ['p', '山上', "D'où glissent-ils?", 'Where do they slide from?']]],
+    [['o', '雪橇', H('爷爷拿来了什么？', 'yé ye ná lái le shén me')], ['who', '爷爷', H('谁拿来了雪橇？', 'shuí ná lái le xuě qiāo')], ['who', '弟弟', H('谁和小明坐在雪橇上？', 'shuí hé xiǎo míng zuò zài xuě qiāo shàng')], ['p', '山上', H('他们从哪里滑下来？', 'tā men cóng nǎ lǐ huá xià lái')]]],
   ['s17', 2, ['今天是小美的生日。 | jīn tiān shì xiǎo měi de shēng rì', '妈妈做了一个大蛋糕。 | mā ma zuò le yí gè dà dàn gāo', '朋友们来到她家。 | péng you men lái dào tā jiā', '大家一起唱生日歌。 | dà jiā yì qǐ chàng shēng rì gē'],
-    [['t', '今天', "Quand est l'anniversaire de Xiaomei?", "When is Xiaomei's birthday?"], ['who', '妈妈', 'Qui fait le gâteau?', 'Who makes the cake?'], ['o', '蛋糕', 'Que fait maman?', 'What does Mum make?'], ['v', '唱歌', 'Que font-ils tous ensemble?', 'What do they all do together?']]],
+    [['t', '今天', H('小美的生日是哪天？', 'xiǎo měi de shēng rì shì nǎ tiān')], ['who', '妈妈', H('谁做了蛋糕？', 'shuí zuò le dàn gāo')], ['o', '蛋糕', H('妈妈做了什么？', 'mā ma zuò le shén me')], ['v', '唱歌', H('大家一起做什么？', 'dà jiā yì qǐ zuò shén me')]]],
   ['s18', 2, ['小猫饿了。 | xiǎo māo è le', '它去河边找小鱼。 | tā qù hé biān zhǎo xiǎo yú', '小鱼在水里游。 | xiǎo yú zài shuǐ lǐ yóu', '小猫吃不到，很难过。 | xiǎo māo chī bú dào hěn nán guò'],
-    [['f', '饿', 'Comment se sent le chat au début?', 'How does the cat feel at the start?'], ['p', '河边', 'Où va le chat?', 'Where does the cat go?'], ['who', '小鱼', 'Qui nage dans l\'eau?', 'Who swims in the water?'], ['f', '难过', 'Comment se sent le chat à la fin?', 'How does the cat feel at the end?']]],
+    [['f', '饿', H('一开始小猫怎么了？', 'yì kāi shǐ xiǎo māo zěn me le')], ['p', '河边', H('小猫去哪里？', 'xiǎo māo qù nǎ lǐ')], ['who', '小鱼', H('谁在水里游？', 'shuí zài shuǐ lǐ yóu')], ['f', '难过', H('最后小猫觉得怎么样？', 'zuì hòu xiǎo māo jué de zěn me yàng')]]],
   ['s19', 2, ['小海狸住在河边。 | xiǎo hǎi lí zhù zài hé biān', '它每天搬木头。 | tā měi tiān bān mù tou', '它用木头盖房子。 | tā yòng mù tou gài fáng zi', '房子盖好了，它很高兴。 | fáng zi gài hǎo le tā hěn gāo xìng'],
-    [['who', '海狸', 'Qui construit?', 'Who builds?'], ['p', '河边', 'Où habite le castor?', 'Where does the beaver live?'], ['o', '房子', 'Que construit le castor?', 'What does the beaver build?'], ['f', '高兴', 'Comment se sent le castor à la fin?', 'How does the beaver feel at the end?']]],
+    [['who', '海狸', H('谁在盖房子？', 'shuí zài gài fáng zi')], ['p', '河边', H('小海狸住在哪里？', 'xiǎo hǎi lí zhù zài nǎ lǐ')], ['o', '房子', H('小海狸盖了什么？', 'xiǎo hǎi lí gài le shén me')], ['f', '高兴', H('最后小海狸觉得怎么样？', 'zuì hòu xiǎo hǎi lí jué de zěn me yàng')]]],
   ['s20', 2, ['早上，我去学校。 | zǎo shang wǒ qù xué xiào', '老师在黑板上写字。 | lǎo shī zài hēi bǎn shàng xiě zì', '我们一起读书。 | wǒ men yì qǐ dú shū', '我喜欢上学。 | wǒ xǐ huan shàng xué'],
-    [['t', '早上', 'Quand vais-je à l\'école?', 'When do I go to school?'], ['p', '学校', 'Où vais-je?', 'Where do I go?'], ['who', '老师', 'Qui écrit au tableau?', 'Who writes on the board?']]],
+    [['t', '早上', H('我什么时候去学校？', 'wǒ shén me shí hou qù xué xiào')], ['p', '学校', H('我去哪里？', 'wǒ qù nǎ lǐ')], ['who', '老师', H('谁在黑板上写字？', 'shuí zài hēi bǎn shàng xiě zì')]]],
   ['s21', 2, ['星期六，我和姐姐去公园。 | xīng qī liù wǒ hé jiě jie qù gōng yuán', '姐姐放风筝。 | jiě jie fàng fēng zheng', '风很大，风筝飞得很高。 | fēng hěn dà fēng zheng fēi de hěn gāo', '我看着风筝笑。 | wǒ kàn zhe fēng zheng xiào'],
-    [['who', '姐姐', 'Qui fait voler un cerf-volant?', 'Who flies a kite?'], ['v', '放风筝', 'Que fait grande sœur?', 'What does my older sister do?'], ['p', '公园', 'Où allons-nous?', 'Where do we go?'], ['o', '风筝', 'Qu\'est-ce qui vole très haut?', 'What flies very high?']]],
+    [['who', '姐姐', H('谁在放风筝？', 'shuí zài fàng fēng zheng')], ['v', '放风筝', H('姐姐在做什么？', 'jiě jie zài zuò shén me')], ['p', '公园', H('我们去哪里？', 'wǒ men qù nǎ lǐ')], ['o', '风筝', H('什么飞得很高？', 'shén me fēi de hěn gāo')]]],
   ['s22', 2, ['晚上，妈妈给我讲故事。 | wǎn shang mā ma gěi wǒ jiǎng gù shi', '故事里有一只小兔。 | gù shi lǐ yǒu yì zhī xiǎo tù', '小兔不睡觉，小兔玩球。 | xiǎo tù bú shuì jiào xiǎo tù wán qiú', '我很快睡着了。 | wǒ hěn kuài shuì zháo le'],
-    [['t', '晚上', 'Quand maman raconte-t-elle l\'histoire?', 'When does Mum tell the story?'], ['who', '妈妈', 'Qui raconte l\'histoire?', 'Who tells the story?'], ['who', '小兔', 'Qui est dans l\'histoire?', 'Who is in the story?'], ['o', '球', 'Avec quoi joue le lapin?', 'What does the rabbit play with?']]],
+    [['t', '晚上', H('妈妈什么时候讲故事？', 'mā ma shén me shí hou jiǎng gù shi')], ['who', '妈妈', H('谁给我讲故事？', 'shuí gěi wǒ jiǎng gù shi')], ['who', '小兔', H('故事里有谁？', 'gù shi lǐ yǒu shuí')], ['o', '球', H('小兔玩什么？', 'xiǎo tù wán shén me')]]],
   ['s23', 2, ['爸爸去商店。 | bà ba qù shāng diàn', '他买了牛奶和面包。 | tā mǎi le niú nǎi hé miàn bāo', '小明想吃糖。 | xiǎo míng xiǎng chī táng', '爸爸笑了，也买了糖。 | bà ba xiào le yě mǎi le táng'],
-    [['p', '商店', 'Où va papa?', 'Where does Dad go?'], ['o', '牛奶', 'Papa a acheté du…', 'Dad bought some…'], ['who', '小明', 'Qui veut des bonbons?', 'Who wants candy?'], ['o', '糖', 'Que veut Xiaoming?', 'What does Xiaoming want?']]],
+    [['p', '商店', H('爸爸去哪里？', 'bà ba qù nǎ lǐ')], ['o', '牛奶', H('爸爸买了什么？', 'bà ba mǎi le shén me')], ['who', '小明', H('谁想吃糖？', 'shuí xiǎng chī táng')], ['o', '糖', H('小明想吃什么？', 'xiǎo míng xiǎng chī shén me')]]],
   // ---- level 3 (5–6 sentences) ----
   ['s24', 3, ['星期天早上，小明起床了。 | xīng qī tiān zǎo shang xiǎo míng qǐ chuáng le', '他先刷牙，再洗脸。 | tā xiān shuā yá zài xǐ liǎn', '妈妈做了面包和牛奶。 | mā ma zuò le miàn bāo hé niú nǎi', '吃完早饭，他去公园。 | chī wán zǎo fàn tā qù gōng yuán', '在公园里，他遇到了小美。 | zài gōng yuán lǐ tā yù dào le xiǎo měi', '他们一起打球，玩得真开心。 | tā men yì qǐ dǎ qiú wán de zhēn kāi xīn'],
-    [['t', '早上', 'Quand Xiaoming se lève-t-il?', 'When does Xiaoming get up?'], ['v', '刷牙', "Que fait-il d'abord?", 'What does he do first?'], ['p', '公园', 'Où va-t-il après le repas?', 'Where does he go after eating?'], ['who', '小美', 'Qui rencontre-t-il?', 'Who does he meet?']]],
+    [['t', '早上', H('小明什么时候起床？', 'xiǎo míng shén me shí hou qǐ chuáng')], ['v', '刷牙', H('小明先做什么？', 'xiǎo míng xiān zuò shén me')], ['p', '公园', H('吃完早饭，小明去哪里？', 'chī wán zǎo fàn xiǎo míng qù nǎ lǐ')], ['who', '小美', H('小明在公园里遇到了谁？', 'xiǎo míng zài gōng yuán lǐ yù dào le shuí')]]],
   ['s25', 3, ['冬天，河里结冰了。 | dōng tiān hé lǐ jié bīng le', '爸爸说我们去滑冰吧。 | bà ba shuō wǒ men qù huá bīng ba', '我穿上厚厚的手套和帽子。 | wǒ chuān shàng hòu hòu de shǒu tào hé mào zi', '冰上有很多人。 | bīng shàng yǒu hěn duō rén', '我不会滑，摔倒了。 | wǒ bú huì huá shuāi dǎo le', '爸爸笑着拉我起来。 | bà ba xiào zhe lā wǒ qǐ lái'],
-    [['t', '冬天', 'Quelle saison est-ce?', 'Which season is it?'], ['v', '滑冰', 'Que font-ils?', 'What do they do?'], ['o', '手套', 'Que je mets aux mains?', 'What do I put on my hands?'], ['who', '爸爸', 'Qui m\'aide à me relever?', 'Who helps me get up?']]],
+    [['t', '冬天', H('现在是什么季节？', 'xiàn zài shì shén me jì jié')], ['v', '滑冰', H('我们去做什么？', 'wǒ men qù zuò shén me')], ['o', '手套', H('我手上戴着什么？', 'wǒ shǒu shàng dài zhe shén me')], ['who', '爸爸', H('谁拉我起来？', 'shuí lā wǒ qǐ lái')]]],
   ['s26', 3, ['秋天，松鼠很忙。 | qiū tiān sōng shǔ hěn máng', '它在树林里跑来跑去。 | tā zài shù lín lǐ pǎo lái pǎo qù', '它找到了很多吃的。 | tā zhǎo dào le hěn duō chī de', '它把吃的搬回家。 | tā bǎ chī de bān huí jiā', '冬天来了，它不怕冷。 | dōng tiān lái le tā bú pà lěng'],
-    [['t', '秋天', "Quand l'écureuil est-il très occupé?", 'When is the squirrel very busy?'], ['who', '松鼠', 'Qui est très occupé?', 'Who is very busy?'], ['p', '树林', 'Où court-il?', 'Where does it run around?'], ['f', '冷', "De quoi n'a-t-il pas peur?", 'What is it not afraid of?']]],
+    [['t', '秋天', H('松鼠什么时候很忙？', 'sōng shǔ shén me shí hou hěn máng')], ['who', '松鼠', H('谁很忙？', 'shuí hěn máng')], ['p', '树林', H('松鼠在哪里跑来跑去？', 'sōng shǔ zài nǎ lǐ pǎo lái pǎo qù')], ['f', '冷', H('冬天来了，松鼠不怕什么？', 'dōng tiān lái le sōng shǔ bú pà shén me')]]],
   ['s27', 3, ['春节那天，我们去奶奶家。 | chūn jié nà tiān wǒ men qù nǎi nai jiā', '家里挂着红红的灯笼。 | jiā lǐ guà zhe hóng hóng de dēng long', '爷爷奶奶给我红包。 | yé ye nǎi nai gěi wǒ hóng bāo', '大家一起吃饺子。 | dà jiā yì qǐ chī jiǎo zi', '饭后，我和弟弟唱歌跳舞。 | fàn hòu wǒ hé dì di chàng gē tiào wǔ'],
-    [['t', '春节', 'Quel jour allons-nous chez grand-maman?', 'On which day do we go to Grandma\'s?'], ['o', '灯笼', 'Qu\'est-ce qui est accroché à la maison?', 'What hangs in the house?'], ['o', '饺子', 'Que mange-t-on ensemble?', 'What do we eat together?'], ['who', '弟弟', 'Qui chante et danse avec moi?', 'Who sings and dances with me?']]],
+    [['t', '春节', H('我们哪天去奶奶家？', 'wǒ men nǎ tiān qù nǎi nai jiā')], ['o', '灯笼', H('家里挂着什么？', 'jiā lǐ guà zhe shén me')], ['o', '饺子', H('大家一起吃什么？', 'dà jiā yì qǐ chī shén me')], ['who', '弟弟', H('谁和我一起唱歌跳舞？', 'shuí hé wǒ yì qǐ chàng gē tiào wǔ')]]],
   ['s28', 3, ['今天下雨了。 | jīn tiān xià yǔ le', '小美没有带雨伞。 | xiǎo měi méi yǒu dài yǔ sǎn', '她很难过。 | tā hěn nán guò', '这时，小明走过来。 | zhè shí xiǎo míng zǒu guò lái', '他说我们一起走吧。 | tā shuō wǒ men yì qǐ zǒu ba', '他和小美用一把雨伞回家。 | tā hé xiǎo měi yòng yì bǎ yǔ sǎn huí jiā'],
-    [['who', '小美', "Qui n'a pas de parapluie?", 'Who has no umbrella?'], ['f', '难过', 'Comment se sent Xiaomei?', 'How does Xiaomei feel?'], ['who', '小明', 'Qui vient aider?', 'Who comes to help?'], ['o', '雨伞', 'Que partagent-ils?', 'What do they share?']]],
+    [['who', '小美', H('谁没有带雨伞？', 'shuí méi yǒu dài yǔ sǎn')], ['f', '难过', H('小美觉得怎么样？', 'xiǎo měi jué de zěn me yàng')], ['who', '小明', H('谁走过来了？', 'shuí zǒu guò lái le')], ['o', '雨伞', H('他们一起用什么？', 'tā men yì qǐ yòng shén me')]]],
   ['s29', 3, ['星期六，爸爸带我去动物园。 | xīng qī liù bà ba dài wǒ qù dòng wù yuán', '我看见了大象。 | wǒ kàn jiàn le dà xiàng', '大象的鼻子很长。 | dà xiàng de bí zi hěn cháng', '我还看见了老虎和猴子。 | wǒ hái kàn jiàn le lǎo hǔ hé hóu zi', '小猴子很可爱。 | xiǎo hóu zi hěn kě ài', '我有点怕老虎。 | wǒ yǒu diǎn pà lǎo hǔ'],
-    [['p', '动物园', 'Où va-t-on le samedi?', 'Where do we go on Saturday?'], ['who', '大象', 'Qui a un très long nez?', 'Who has a very long nose?'], ['who', '猴子', 'Qui est très mignon?', 'Who is very cute?'], ['who', '老虎', "De qui ai-je un peu peur?", 'Who am I a little afraid of?']]],
+    [['p', '动物园', H('星期六我们去哪里？', 'xīng qī liù wǒ men qù nǎ lǐ')], ['who', '大象', H('谁的鼻子很长？', 'shuí de bí zi hěn cháng')], ['who', '猴子', H('谁很可爱？', 'shuí hěn kě ài')], ['who', '老虎', H('我有点怕谁？', 'wǒ yǒu diǎn pà shuí')]]],
   ['s30', 3, ['小鸭不会游泳。 | xiǎo yā bú huì yóu yǒng', '鸭妈妈说别怕。 | yā mā ma shuō bié pà', '小鸭跳进河里。 | xiǎo yā tiào jìn hé lǐ', '它游起来了。 | tā yóu qǐ lái le', '小鸭真高兴。 | xiǎo yā zhēn gāo xìng'],
-    [['v', '游泳', 'Que ne sait pas faire le caneton?', "What can't the duckling do?"], ['p', '河里', 'Où saute-t-il?', 'Where does it jump?'], ['f', '高兴', 'Comment se sent-il à la fin?', 'How does it feel at the end?']]],
+    [['v', '游泳', H('小鸭不会做什么？', 'xiǎo yā bú huì zuò shén me')], ['p', '河里', H('小鸭跳进了哪里？', 'xiǎo yā tiào jìn le nǎ lǐ')], ['f', '高兴', H('最后小鸭觉得怎么样？', 'zuì hòu xiǎo yā jué de zěn me yàng')]]],
   ['s31', 3, ['周末，爸爸在厨房做饭。 | zhōu mò bà ba zài chú fáng zuò fàn', '我帮爸爸洗苹果。 | wǒ bāng bà ba xǐ píng guǒ', '妈妈在看书。 | mā ma zài kàn shū', '奶奶在睡觉。 | nǎi nai zài shuì jiào', '饭做好了，大家一起吃饭。 | fàn zuò hǎo le dà jiā yì qǐ chī fàn'],
-    [['p', '厨房', 'Où cuisine papa?', 'Where does Dad cook?'], ['o', '苹果', 'Que lave-je?', 'What do I wash?'], ['v', '看书', 'Que fait maman?', 'What does Mum do?'], ['who', '奶奶', 'Qui dort?', 'Who is sleeping?']]],
+    [['p', '厨房', H('爸爸在哪里做饭？', 'bà ba zài nǎ lǐ zuò fàn')], ['o', '苹果', H('我帮爸爸洗什么？', 'wǒ bāng bà ba xǐ shén me')], ['v', '看书', H('妈妈在做什么？', 'mā ma zài zuò shén me')], ['who', '奶奶', H('谁在睡觉？', 'shuí zài shuì jiào')]]],
   ['s32', 3, ['夏天，我们去海边。 | xià tiān wǒ men qù hǎi biān', '太阳很大，天很热。 | tài yáng hěn dà tiān hěn rè', '弟弟在海边玩球。 | dì di zài hǎi biān wán qiú', '我和姐姐游泳。 | wǒ hé jiě jie yóu yǒng', '妈妈给我们西瓜吃。 | mā ma gěi wǒ men xī guā chī', '吃了西瓜，不热了。 | chī le xī guā bú rè le'],
-    [['t', '夏天', 'Quelle saison est-ce?', 'Which season is it?'], ['p', '海边', 'Où allons-nous?', 'Where do we go?'], ['v', '游泳', 'Que font ma sœur et moi?', 'What do my sister and I do?'], ['o', '西瓜', 'Que nous donne maman?', 'What does Mum give us?']]],
+    [['t', '夏天', H('现在是什么季节？', 'xiàn zài shì shén me jì jié')], ['p', '海边', H('我们去哪里？', 'wǒ men qù nǎ lǐ')], ['v', '游泳', H('我和姐姐做什么？', 'wǒ hé jiě jie zuò shén me')], ['o', '西瓜', H('妈妈给我们吃什么？', 'mā ma gěi wǒ men chī shén me')]]],
   ['s33', 3, ['春天，风很大。 | chūn tiān fēng hěn dà', '小明和爷爷去公园放风筝。 | xiǎo míng hé yé ye qù gōng yuán fàng fēng zheng', '风筝飞得很高，像一只小鸟。 | fēng zheng fēi de hěn gāo xiàng yì zhī xiǎo niǎo', '忽然，线断了。 | hū rán xiàn duàn le', '风筝飞走了，小明很难过。 | fēng zheng fēi zǒu le xiǎo míng hěn nán guò', '爷爷笑着说明年再做一个。 | yé ye xiào zhe shuō míng nián zài zuò yí gè'],
-    [['t', '春天', 'Quelle saison est-ce?', 'Which season is it?'], ['who', '爷爷', 'Avec qui Xiaoming fait-il voler le cerf-volant?', 'Who flies the kite with Xiaoming?'], ['o', '风筝', "Qu'est-ce qui s'envole?", 'What flies away?'], ['f', '难过', 'Comment se sent Xiaoming à la fin?', 'How does Xiaoming feel at the end?']]],
+    [['t', '春天', H('现在是什么季节？', 'xiàn zài shì shén me jì jié')], ['who', '爷爷', H('谁和小明一起放风筝？', 'shuí hé xiǎo míng yì qǐ fàng fēng zheng')], ['o', '风筝', H('什么飞走了？', 'shén me fēi zǒu le')], ['f', '难过', H('最后小明觉得怎么样？', 'zuì hòu xiǎo míng jué de zěn me yàng')]]],
 ];
 const STORIES = ST_RAW.map(([id, lv, ss, facts]) => {
   const sents = ss.map((s, i) => { const [hz, py] = s.split(' | '); chk(hz, py, `${id}#${i}`); return { hz, py }; });
@@ -897,22 +897,22 @@ const STORIES = ST_RAW.map(([id, lv, ss, facts]) => {
   return { id, lv, hz: text, py: sents.map((s) => s.py).join(' '), facts };
 });
 // the 'o' question in s23 is clearer with a plain prompt: fix text
-STORIES.find((s) => s.id === 's23').facts[1] = ['o', '牛奶', 'Que boit-on? Papa a acheté…', 'Dad bought some…'];
+STORIES.find((s) => s.id === 's23').facts[1] = ['o', '牛奶', H('爸爸买了什么喝的？', 'bà ba mǎi le shén me hē de')];
 const ST_LV = { 1: STORIES.filter((s) => s.lv === 1), 2: STORIES.filter((s) => s.lv <= 2), 3: STORIES.filter((s) => s.lv >= 2) };
 const c21 = {
   id: 'c21',
   icon: '📚',
-  title: { fr: 'Petites histoires 小故事', en: 'Little stories 小故事' },
+  title: { fr: 'Petites histoires 小故事', en: 'Little stories 小故事', zh: H('小故事', 'xiǎo gù shi') },
   pfeq: 'Chinois — lecture : courts textes, compréhension (qui, quoi, où, quand) (1re année)',
   generate(level, R) {
     const s = R.pick(ST_LV[level]);
     const fi = R.int(0, s.facts.length - 1);
-    const [kind, ans, fr, en] = s.facts[fi];
+    const [kind, ans, question] = s.facts[fi];
     const a = POOLBY[ans];
     const n = level === 1 ? 3 : level === 2 ? 3 : 4;
     const wr = wrongWords(R, kind, ans, s.hz, n - 1, true);
     const pic = level === 1;
-    return mc(`c21-${s.id}-${fi}`, T(fr, en), poolOpt(a, pic), wr.map((p) => poolOpt(p, pic)), {
+    return mc(`c21-${s.id}-${fi}`, question, poolOpt(a, pic), wr.map((p) => poolOpt(p, pic)), {
       stimulus: { hz: s.hz, py: s.py },
       say: say(s.hz),
       cols: n === 4 ? 2 : 3,

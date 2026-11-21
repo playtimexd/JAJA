@@ -27,6 +27,9 @@ export function makeRng(seed = (Math.random() * 2 ** 32) >>> 0) {
   return R;
 }
 
+// Rich text hook: js/widgets.js registers hanzi() so a Chinese UI string (ZhStr / {hz,py}) passed to el() shows pinyin.
+export const RICH = { zh: null };
+const isZh = (k) => typeof k === 'object' && typeof k.hz === 'string' && (k instanceof String || !k.nodeType) && 'py' in k;
 export const el = (tag, attrs = {}, ...kids) => {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -37,7 +40,7 @@ export const el = (tag, attrs = {}, ...kids) => {
     else if (k === 'style' && typeof v === 'object') Object.assign(e.style, v);
     else e.setAttribute(k, v === true ? '' : v);
   }
-  for (const kid of kids.flat()) if (kid != null && kid !== false) e.append(kid.nodeType ? kid : String(kid));
+  for (const kid of kids.flat()) if (kid != null && kid !== false) e.append(kid.nodeType ? kid : isZh(kid) && RICH.zh ? RICH.zh(kid) : String(kid));
   return e;
 };
 
