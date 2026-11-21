@@ -240,7 +240,7 @@ const VT = {
       wrong = uniqStr([...wrong, ...o]).slice(0, 3);
     } else wrong = others(R, w, pool, nd(L), { len: true }).map((x) => x.py);
     if (wrong.length < 2) return null;
-    return mc('pp:' + w.hz, P.pyPick, pyOf(w.py), wrong.map(pyOf), { say: sayZ(w.hz), stimulus: L === 1 ? { hz: w.hz, py: w.py } : { hz: w.hz } });
+    return mc('pp:' + w.hz, P.pyPick, pyOf(w.py), wrong.map(pyOf), { say: L === 1 ? sayZ(w.hz) : sayZ('这个字的拼音是什么？'), stimulus: { hz: w.hz } });
   },
   hearPy(R, w, pool, L) {
     let wrong = take(R, variants(w.py), 2);
@@ -374,7 +374,7 @@ const c2 = {
     const Pi = H('这个字的声母是什么？', 'zhè gè zì de shēng mǔ shì shén me');
     if (t === 'hearIni') return mc(`hi:${w.ini}`, H('听一听，这个字的声母是什么？', 'tīng yì tīng zhè gè zì de shēng mǔ shì shén me'), pyOf(w.ini), iniOpts(R, w.ini, L), { say: sayZ(w.hz), cols: 4 });
     if (t === 'picIni') return mc(`pi:${w.ini}`, Pi, pyOf(w.ini), iniOpts(R, w.ini, L), { say: sayZ(w.hz), stimulus: { emoji: w.e }, cols: 4 });
-    if (t === 'seeIni') return mc(`si:${w.ini}`, Pi, pyOf(w.ini), iniOpts(R, w.ini, L), { say: sayZ(w.hz), stimulus: { hz: w.hz, py: w.py }, cols: 4 });
+    if (t === 'seeIni') return mc(`si:${w.ini}`, Pi, pyOf(w.ini), iniOpts(R, w.ini, L), { say: sayZ(w.hz), stimulus: { hz: w.hz }, cols: 4 });
     if (t === 'iniWord') {
       const pool = IW.filter((x) => x.ini !== w.ini && (L === 3 ? iniClose(w.ini).includes(x.ini) : L === 1 ? !grp(w.ini).includes(x.ini) : true));
       const d = take(R, pool, L === 1 ? 2 : 3);
@@ -503,7 +503,7 @@ const c4 = {
     const t = R.pick(types);
     const w = R.pick(F4);
     if (t === 'hearFin') return mc(`hf:${w.hz}`, H('听一听，这个字的韵母是什么？', 'tīng yì tīng zhè gè zì de yùn mǔ shì shén me'), pyOf(w.fin), finOpts(R, w.fin, L), { say: sayZ(w.hz), cols: 4 });
-    if (t === 'seeFin') return mc(`sf:${w.hz}`, H('这个字的韵母是什么？', 'zhè gè zì de yùn mǔ shì shén me'), pyOf(w.fin), finOpts(R, w.fin, L), { say: sayZ(w.hz), stimulus: { hz: w.hz, py: w.py }, cols: 4 });
+    if (t === 'seeFin') return mc(`sf:${w.hz}`, H('这个字的韵母是什么？', 'zhè gè zì de yùn mǔ shì shén me'), pyOf(w.fin), finOpts(R, w.fin, L), { say: sayZ(w.hz), stimulus: { hz: w.hz }, cols: 4 });
     if (t === 'finWord') {
       const pool = F4.filter((x) => x.fin !== w.fin && x.py !== w.py && (L === 3 ? NEAR4[w.fin].includes(x.fin) : L === 1 ? !NEAR4[w.fin].includes(x.fin) : true) && (L > 1 || x.e));
       const seen = new Set();
